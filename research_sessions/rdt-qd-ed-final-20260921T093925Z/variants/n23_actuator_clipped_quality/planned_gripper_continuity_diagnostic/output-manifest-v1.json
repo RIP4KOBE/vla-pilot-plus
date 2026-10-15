@@ -1,0 +1,45 @@
+{
+  "schema": "n23-planned-gripper-continuity-output-manifest-v1",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/planned_gripper_continuity_diagnostic/conclusion-v1.md",
+      "sha256": "411520526421410871d4d293971ba51b5467e39f211299e0aa2fc452585e4a52",
+      "bytes": 9168
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/planned_gripper_continuity_diagnostic/extract-v1.log",
+      "sha256": "4d26ae908e75d6d0b94f0ef470223da3c5aaa36f38056412e2e8b4b658e600bd",
+      "bytes": 2448
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/planned_gripper_continuity_diagnostic/extract_cpu_v1.py",
+      "sha256": "9e085cec3ae3aca2d11e9f031a42c8b68f169680a545f14b903b047a33b3b0d9",
+      "bytes": 16067
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/planned_gripper_continuity_diagnostic/freeze-v1.log",
+      "sha256": "0793801b189d420e41781e06b9b899ead68a9100157e0b42903622ddb5266b8a",
+      "bytes": 720
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/planned_gripper_continuity_diagnostic/freeze_read_scope_v1.py",
+      "sha256": "9617b70d705fd859cacf078e30f850a9ec70e89b0ed8fd5ac5deca1294278904",
+      "bytes": 5475
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/planned_gripper_continuity_diagnostic/pairs-v1.csv",
+      "sha256": "2b69067d2fa4e650c26548051f9c7bb1ae663fcadd58c4944f9b5d1d6f1e9093",
+      "bytes": 34242
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/planned_gripper_continuity_diagnostic/read-scope-v1.json",
+      "sha256": "65e0381d8ad3e1e9321be09b63e5cbf5a11ece46f1950adf76a2aceed640d452",
+      "bytes": 93775744
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/planned_gripper_continuity_diagnostic/result-v1.json",
+      "sha256": "2e12365b15cff7e656a4468a4ad22cb238e34d0c5155ad0294a5fd13c332cacd",
+      "bytes": 1741099
+    }
+  ]
+}

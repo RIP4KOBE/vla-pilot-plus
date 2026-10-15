@@ -1,0 +1,26 @@
+{
+  "schema": "n30-r1-root-plan-adoption-v1",
+  "at": "2026-10-03T21:34:31.159748+00:00",
+  "plan": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/plan.frozen.v1.gpu7.json",
+    "sha256": "a70fa5d90433962f665e9a5b5a8758d6901408e914212b1ed12baeb1f9d8f5a9"
+  },
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/adoption-v1/authority.json",
+    "sha256": "544f4249a8c26a88f6f14d1c8b04d4796ec8410bffb6847c7c3e38c2babf5c54"
+  },
+  "command_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/real-command-composition-review-v1.json",
+    "sha256": "3d4cda7b5d726ee1679da7b882acfea82333f64c21bbe5bd9803c4b8ad8a197c"
+  },
+  "source_bridge": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/source-history-bridge-v1.json",
+    "sha256": "c48ecbd62835eee848bbea5c2c85da35ab5bb39f62a0e92367ed39ef47b023bb"
+  },
+  "new_dispatches": 10,
+  "inherited_valid_cells": 2,
+  "original_costs_retained": true,
+  "execution_release_created": false,
+  "gpu_dispatch": false,
+  "budget_changed": false
+}

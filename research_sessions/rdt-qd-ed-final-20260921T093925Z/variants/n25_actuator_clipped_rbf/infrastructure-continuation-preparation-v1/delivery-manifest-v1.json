@@ -1,0 +1,31 @@
+{
+  "actual_payload_reads": 0,
+  "executable": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/read-scope-v1.json",
+      "sha256": "ba96ac8c62835b8b3fcda23c3ecfdc035a7e4bd4ee2f7839d5d31b41a2e9b6c0"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/input-manifest-v1.json",
+      "sha256": "d38c36aa1f10681bffa56d230d049be83b4e0b87bfe1d41f08b76c9a8c31c1e5"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/source-index-v1.json",
+      "sha256": "717bc90ac2cc837887e39f35181c408bfe4189fdfb8145ddbca63de40b044e27"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/design-review-v1.md",
+      "sha256": "8daceadf71cbf081ed137919aeced134cf06ab8ea127d3624600267ad591a610"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/record-schemas-v1.md",
+      "sha256": "80b02258cdb23df18935a6a58e6ca63357fd0cd105c27d769cc8822c8ca426e1"
+    }
+  ],
+  "runtime_imports": 0,
+  "schema": "n25-infrastructure-continuation-design-delivery-v1",
+  "source_files_read": 8,
+  "status": "DESIGN_ONLY_NO_IMPLEMENTATION",
+  "tests_executed": 0
+}

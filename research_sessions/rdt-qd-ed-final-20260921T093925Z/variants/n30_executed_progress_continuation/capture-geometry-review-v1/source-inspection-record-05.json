@@ -1,0 +1,94 @@
+{
+  "read_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/__init__.py",
+      "sha256": "b99601b6b44de6d0078baa66054113881492826bbfbe8cd41e2d39d5bf6f0875",
+      "bytes": 267,
+      "windows": [
+        [
+          1,
+          100
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/robots/__init__.py",
+      "sha256": "92d2667dcd9fce0d0ba744bcc317bfc07104136e90f066df04d09cbad5bd489e",
+      "bytes": 307,
+      "windows": [
+        [
+          1,
+          120
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/bddl_base_domain.py",
+      "sha256": "055836670ac5fcac7e033fc86404718fd53854996e5776b1ff68b646f7bbcc9d",
+      "bytes": 32639,
+      "line_filter": "robot/gripper model selection only"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/robots/manipulators/manipulator_model.py",
+      "sha256": "ac21ce0b004a1ee93cb8b728c00b9c18c38ecabb2dedca370de80602ad26f059",
+      "bytes": 6579,
+      "windows": [
+        [
+          43,
+          81
+        ],
+        [
+          100,
+          118
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/grippers/gripper_model.py",
+      "sha256": "0543b5a9e1d8b41e21880d8445c5d8fbf8535a4ac6fd55c5e70a3b1f323c3735",
+      "bytes": 5476,
+      "windows": [
+        [
+          17,
+          38
+        ],
+        [
+          100,
+          126
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/transform_utils.py",
+      "sha256": "1c2317895733449883b56af0decefb3529649b3a7779dc2ef3ed00816bb25bb0",
+      "bytes": 27506,
+      "windows": [
+        [
+          50,
+          77
+        ],
+        [
+          461,
+          502
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/assets/robots/panda/robot.xml",
+      "sha256": "51e3a4a6d54bcaf77e9d36a27372b871728590eedf53d4fd0e195525950eb988",
+      "bytes": 21425,
+      "line_filter": "hand/eef attachment"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_grasp_timing.py",
+      "sha256": "f38c980b22df080991e4cb86d07c1dbc933652e584e8b897dbb16e1312fd6142",
+      "bytes": 3847,
+      "line_filter": "eligible|projected|gripper|threshold|distance|target"
+    }
+  ],
+  "cpu_seconds": 0.0007518580000000011,
+  "affinity": [
+    0,
+    1
+  ]
+}

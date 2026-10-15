@@ -1,0 +1,34 @@
+{
+  "schema": "n30-r1-static-source-check-v1",
+  "commit": "b2775fa2008a8a88e374c43a5753f8862485af1f",
+  "base_commit": "7c0d80d734fa8300173e56d9a8de03415bc55fe2",
+  "files_verified": 457,
+  "base_files": 441,
+  "unchanged_base_files": 439,
+  "modified_base_files": [
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n23_worker.py"
+  ],
+  "added_files": [
+    "docs/experiments/n30/r1/base-source-v1.json",
+    "docs/experiments/n30/r1/controller-contract-v1.md",
+    "docs/experiments/n30/r1/cpu-integration-scope-v1.md",
+    "docs/experiments/n30/r1/original-source-v1.json",
+    "docs/experiments/n30/r1/reverse-source-v1.json",
+    "docs/experiments/n30/r1/root-cpu-integration-release-v1.json",
+    "scripts/qd_ed_n30_r1_bridge.py",
+    "scripts/qd_ed_n30_r1_contract.py",
+    "scripts/qd_ed_n30_r1_prepare.py",
+    "scripts/qd_ed_n30_r1_report.py",
+    "scripts/qd_ed_n30_r1_supervise.py",
+    "tests/n30_r1_synthetic.py",
+    "tests/test_n30_r1_admission.py",
+    "tests/test_n30_r1_bridge.py",
+    "tests/test_n30_r1_controller.py",
+    "tests/test_n30_r1_worker.py"
+  ],
+  "whole_file_reverse_verified": true,
+  "git_blob_equality_verified": true,
+  "runtime_or_history_outputs_read": false,
+  "cuda_imported": false
+}

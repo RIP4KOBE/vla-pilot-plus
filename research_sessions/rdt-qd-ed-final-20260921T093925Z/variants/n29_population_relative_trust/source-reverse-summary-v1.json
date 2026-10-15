@@ -1,0 +1,67 @@
+{
+  "schema": "n29-cpu-source-reversal-review-v1",
+  "base_commit": "52b9eb0a8a365ee2ea12daffdb7a98c76bec0a72",
+  "new_commit": "d855cfd690482e018bb40ce98edec80fad9700e0",
+  "old_source_files": 383,
+  "new_source_files": 411,
+  "unchanged_old_files": 380,
+  "changed_existing": [
+    "core/rdt_policy_steer.py",
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n23_worker.py"
+  ],
+  "added": [
+    "configs/qd_ed_final/candidate_n29.json",
+    "core/qd_population_relative_rbf.py",
+    "core/qd_population_relative_trust.py",
+    "docs/experiments/n29-population-relative-trust-native-arithmetic-v1.md",
+    "experiments/qd_ed_n29/accepted-history-refs-v1.json",
+    "experiments/qd_ed_n29/base-source-v1.json",
+    "experiments/qd_ed_n29/controller-contract-v1.md",
+    "experiments/qd_ed_n29/execution-integration-cpu-scope-v1.md",
+    "experiments/qd_ed_n29/existing-adaptive-controller-overlap-v1.md",
+    "experiments/qd_ed_n29/independent-arithmetic-protocol-v1.md",
+    "experiments/qd_ed_n29/matched-dev-design-draft-v1.md",
+    "experiments/qd_ed_n29/native-input-domain-clarification-v1.md",
+    "experiments/qd_ed_n29/reverse-source-v1.json",
+    "scripts/qd_ed_n29_backend.py",
+    "scripts/qd_ed_n29_bridge.py",
+    "scripts/qd_ed_n29_contract.py",
+    "scripts/qd_ed_n29_native.py",
+    "scripts/qd_ed_n29_preflight.py",
+    "scripts/qd_ed_n29_prepare.py",
+    "scripts/qd_ed_n29_reference.py",
+    "scripts/qd_ed_n29_report.py",
+    "scripts/qd_ed_n29_supervise.py",
+    "tests/test_n29_admission.py",
+    "tests/test_n29_controller.py",
+    "tests/test_n29_integration.py",
+    "tests/test_n29_native.py",
+    "tests/test_n29_source_bridge.py",
+    "tests/test_qd_population_relative_trust.py"
+  ],
+  "exact_reverse_verified": true,
+  "phase_a_unchanged": [
+    "core/qd_population_relative_trust.py",
+    "tests/test_qd_population_relative_trust.py",
+    "docs/experiments/n29-population-relative-trust-native-arithmetic-v1.md"
+  ],
+  "rdt_method_count": 123,
+  "rdt_methods_unchanged": 116,
+  "rdt_changed_methods": [
+    "__init__",
+    "reset",
+    "_eds_rbf_witness",
+    "_eds_initial_denoise_rbf_diverse",
+    "_eds_renoise_reference",
+    "_eds_guided_denoise_loop",
+    "_resolve_eds_config_with_reference_defaults"
+  ],
+  "source_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/source-manifest-execution-v1.json",
+    "sha256": "9a31cdab710e5b14771be8f4c41d230db3ba537bf552e8903be85851d72b46cf"
+  },
+  "historical_raw_proof_replayed": false,
+  "actual_runtime_loaded": false,
+  "gpu_authorized": false
+}

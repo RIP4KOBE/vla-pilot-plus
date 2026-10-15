@@ -1,0 +1,631 @@
+diff --git a/configs/config.yaml b/configs/config.yaml
+index 8b5a08d..577954f 100644
+--- a/configs/config.yaml
++++ b/configs/config.yaml
+@@ -81,6 +81,7 @@ main:
+     save_ed_cache: false
+     diversity_input_source: noisy_sample
+     diversity_update_mode: legacy_additive
++    rollout_diversity_placement: model_output
+     initial_sampling_mode: iid
+     initial_diversity_descriptor_mode: absolute_eef
+     initial_diversity_scale: 1.0
+diff --git a/configs/qd_ed_final/candidate_n28.json b/configs/qd_ed_final/candidate_n28.json
+new file mode 100644
+index 0000000..1d7013a
+--- /dev/null
++++ b/configs/qd_ed_final/candidate_n28.json
+@@ -0,0 +1,107 @@
++{
++  "action_chunk_horizon": 8,
++  "algorithm_contract": "n28_parent_before_renoise_v1",
++  "baseline_provenance": {
++    "path": "configs/qd_ed_final/baseline_profiles.json",
++    "profile": "Q0.restored_profile",
++    "sha256": "75ba829fc29db71ae31669cd803c24fbe8ea96fe347160539a273f9d73551690"
++  },
++  "baseline_reference": "N27",
++  "label": "N28",
++  "only_algorithm_change": {
++    "rollout_diversity_placement": {
++      "after": "parent_before_renoise_v1",
++      "before": "model_output"
++    }
++  },
++  "parent_candidate": {
++    "path": "configs/qd_ed_final/candidate_n27.json",
++    "sha256": "c066eac51a60390cab4eb2ba7f719701c2b8997a461ccf470105091f16333318"
++  },
++  "profile": {
++    "adaptive_early_stop_patience": 2,
++    "adaptive_min_cem_iters": 4,
++    "adaptive_reward_improvement_eps": 0.001,
++    "cem_iters": 10,
++    "chunk_memory_fraction": 0.0,
++    "chunk_memory_renoise_steps": 2,
++    "chunk_memory_reward_guard_quantile": 0.25,
++    "chunk_population_mode": "fresh",
++    "diversity_input_source": "model_output_sample_v1",
++    "diversity_update_mode": "feasible_ray_v1",
++    "elite_carryover_count": 0,
++    "execution_contact_distance": 0.04,
++    "execution_horizon_contact": 2,
++    "execution_horizon_far": 8,
++    "execution_horizon_mode": "fixed",
++    "execution_horizon_near": 4,
++    "execution_near_distance": 0.08,
++    "gemini_grounding_enabled": false,
++    "initial_diversity_descriptor_mode": "actuator_clipped_eef_v1",
++    "initial_diversity_scale": 20.0,
++    "initial_diversity_start_ratio": 0.8,
++    "initial_sampling_mode": "rbf_diverse_denoise",
++    "label": "eds_quality_diversity_sparse_primary",
++    "max_episode_steps": 720,
++    "method": "eds_quality_diversity_sparse_primary",
++    "num_elites": 16,
++    "p2_joblib_multiprocessing": false,
++    "p2_render_gpu_index": 7,
++    "parent_anchor_count": 0,
++    "parent_anchor_reward_quantile": 0.5,
++    "parent_coverage_mode": "none",
++    "parent_weighting_mode": "legacy_temperature",
++    "population_size": 16,
++    "qd_archive_mode": "grid_archive",
++    "qd_bounds_expand_fraction": 0.1,
++    "qd_bounds_quantiles": [
++      0.05,
++      0.95
++    ],
++    "qd_bounds_update_policy": "fixed_initial",
++    "qd_cell_capacity": 1,
++    "qd_degenerate_fallback_policy": "none",
++    "qd_descriptor": "target_xy_quadrant_signed_height_v1",
++    "qd_final_selection_mode": "terminal_grasp_proximity_v1",
++    "qd_global_quality_anchor_count": 0,
++    "qd_grid_shape": [
++      4,
++      4
++    ],
++    "qd_metrics_observer": true,
++    "qd_min_axis_span_m": 0.08,
++    "qd_overflow_policy": "clamp_edge",
++    "qd_parent_sampling": "sparse_priority",
++    "qd_quality_mode": "actuator_clipped_provider_v1",
++    "qd_secondary_lane_mode": "none",
++    "qd_sparse_exponent": 1.0,
++    "qd_tie_break": "stable_fingerprint",
++    "renoise_t_max": 3,
++    "renoise_t_min": 1,
++    "reward_mode": "normal",
++    "role": "sampling_attribution",
++    "rollout_diversity_band_ratio": 0.2,
++    "rollout_diversity_control_mode": "fixed",
++    "rollout_diversity_decay_floor": 0.25,
++    "rollout_diversity_descriptor_mode": "actuator_clipped_eef_v1",
++    "rollout_diversity_iters": "all",
++    "rollout_diversity_placement": "parent_before_renoise_v1",
++    "rollout_diversity_scale": 20.0,
++    "rollout_diversity_scale_max": 20.0,
++    "rollout_diversity_scale_min": 0.0,
++    "rollout_diversity_skip_final_steps": 0,
++    "rollout_diversity_start_ratio": 0.6,
++    "rollout_diversity_target_ratio": 1.0,
++    "save_mechanism_trace_to_qualitative": true,
++    "search_schedule_mode": "legacy_linear",
++    "seed": 0,
++    "selection_beta_max": 100.0,
++    "selection_bisection_steps": 24,
++    "selection_ess_target_ratio": 0.6,
++    "stage_recognition_enabled": true,
++    "temperature": 0.1,
++    "truncated_rollout_mode": "rbf_diverse",
++    "use_cem": false
++  },
++  "schema_version": "qd-ed-final-candidate-profile-v1"
++}
+diff --git a/core/qd_parent_before_renoise.py b/core/qd_parent_before_renoise.py
+new file mode 100644
+index 0000000..aadac56
+--- /dev/null
++++ b/core/qd_parent_before_renoise.py
+@@ -0,0 +1,120 @@
++"""N28 one current-chunk parent mutation, before unchanged renoise/denoise."""
++import json
++import time
++import torch
++from core.qd_actuator_clipped_rbf import applied_evidence
++from core.qd_clean_output_rbf import require_sample_scheduler
++from core.qd_feasible_ray_rbf import (FeasibleRayWitness, validate_update_option,
++    MODE as UPDATE_MODE, observe)
++from core.qd_feasible_ray_update import feasible_ray_update
++
++DEFAULT = "model_output"
++MODE = "parent_before_renoise_v1"
++SOURCE = "core.qd_parent_before_renoise:parent_before_renoise_v1"
++INPUT = "current_chunk_selected_parent_offspring"
++
++
++def validate_placement(cfg):
++    mode = getattr(cfg, "rollout_diversity_placement", DEFAULT)
++    if mode not in {DEFAULT, MODE}:
++        raise ValueError("unsupported rollout_diversity_placement")
++    if mode == DEFAULT:
++        return
++    validate_update_option(cfg)
++    if cfg.diversity_update_mode != UPDATE_MODE:
++        raise ValueError("N28 requires N27 feasible-ray update")
++
++
++def mutate(offspring, *, cfg, scheduler, compute_gradient, mask_gradient,
++           witness, iteration, parent_allocation_sequence):
++    """Mutate only the actual selected copy; no RNG/model/score calls."""
++    validate_placement(cfg)
++    if cfg.rollout_diversity_placement != MODE:
++        raise ValueError("N28 requires explicit parent placement")
++    require_sample_scheduler(cfg, scheduler)
++    if tuple(offspring.shape) != (16, 64, 128):
++        raise ValueError("N28 requires 16 selected parent offspring")
++    if type(iteration) is not int or not 0 <= iteration < 10:
++        raise ValueError("N28 parent iteration outside fixed ten rounds")
++    capture = witness.prepare("parent", iteration)
++    gradient, evidence = compute_gradient(
++        offspring, descriptor_mode=cfg.rollout_diversity_descriptor_mode,
++        descriptor_cfg=cfg.__dict__,
++        **({"capture_out": capture} if capture is not None else {}))
++    if gradient is None or not bool(torch.isfinite(gradient).all()):
++        raise ValueError("N28 missing/nonfinite parent gradient")
++    masked = mask_gradient(gradient).to(device=offspring.device, dtype=offspring.dtype)
++    operand = -1.0 * float(cfg.rollout_diversity_scale) * masked[:, :8, (39, 40, 41)]
++    before = offspring[:, :8, (39, 40, 41)].detach().clone()
++    started = time.perf_counter()
++    feasible = feasible_ray_update(before, operand)
++    offspring[:, :8, (39, 40, 41)] = feasible.prefix
++    after = offspring[:, :8, (39, 40, 41)]
++    applied_evidence(evidence, masked=masked, update=operand, phase="parent",
++                     iteration=iteration, step=None, timestep=None)
++    observe(evidence, before, after, operand, feasible.alpha, started)
++    evidence.update(schema="n28-parent-rbf-call-summary-v1", source=SOURCE,
++        input_source=INPUT, input_binding="selected_offspring_before_original_renoise",
++        rollout_diversity_placement=MODE, parent_allocation_sequence=parent_allocation_sequence,
++        prediction_type="sample", model_jacobian_used=False,
++        update_operand_semantics="unconstrained_native_parent_proposal_before_feasible_ray",
++        after_semantics="assigned_parent_offspring; not model output or final action",
++        original_renoise_and_denoise_follow=True)
++    if capture is not None:
++        capture.update(update_operand=operand.detach().clone(),
++                       parent_offspring_before=before,
++                       parent_offspring_after=after.detach().clone())
++        witness.emit(capture, evidence)
++    return evidence
++
++
++class ParentWitness(FeasibleRayWitness):
++    """First guided decision: original initial slot plus ten parent slots."""
++    SOURCE = SOURCE
++    SCHEMA = "n28-bounded-rbf-witness-v1"
++    EVENT = "n28_rbf_witness"
++    COVERAGE_EVENT = "n28_rbf_witness_coverage"
++    SLOTS = (("initial", -1),) + tuple(("parent", i) for i in range(10))
++
++    def emit(self, capture, evidence):
++        if capture is None:
++            return
++        if evidence.get("phase") == "initial":
++            # Original N27 initial math and same-forward binding remain truthful.
++            return super().emit(capture, evidence)
++        if (evidence.get("schema") != "n28-parent-rbf-call-summary-v1"
++            or evidence.get("source") != SOURCE or evidence.get("input_source") != INPUT
++            or evidence.get("input_binding") != "selected_offspring_before_original_renoise"
++            or evidence.get("phase") != "parent" or evidence.get("denoising_step") is not None
++            or evidence.get("timestep") is not None or evidence.get("model_jacobian_used") is not False):
++            raise ValueError("N28 parent witness semantic downgrade")
++        if not self.active or self.recorder is None:
++            raise ValueError("N28 witness outside first guided decision")
++        key = ("parent", evidence["iteration"])
++        if key not in self.seen or key in self.recorded or len(self.recorded) >= 11:
++            raise ValueError("N28 duplicate/unselected witness")
++        expected = {"input_xyz", "source_origins", "cast_origins", "projected_xyz",
++                    "gradient_before", "gradient_after", "update_operand",
++                    "parent_offspring_before", "parent_offspring_after"}
++        if set(capture) != expected:
++            raise ValueError("N28 witness tensor fields differ")
++        for name, value in capture.items():
++            shape = (16, 3) if name in {"source_origins", "cast_origins"} else (16, 8, 3)
++            if not torch.is_tensor(value) or tuple(value.shape) != shape or not bool(torch.isfinite(value).all()):
++                raise ValueError("N28 witness tensor shape/nonfinite")
++        a, b = capture["input_xyz"], capture["parent_offspring_before"]
++        if a.dtype != b.dtype or a.device != b.device or not torch.equal(a.contiguous().view(torch.uint8), b.contiguous().view(torch.uint8)):
++            raise ValueError("N28 input is not selected parent before assignment")
++        count = sum(v.numel() * v.element_size() for v in capture.values())
++        if count > self.NUMERIC_CALL_CAP or self.numeric_bytes + count > self.NUMERIC_EPISODE_CAP:
++            raise ValueError("N28 numeric witness cap")
++        metadata = {"schema": self.SCHEMA, "source": self.SOURCE, "call": dict(evidence),
++            "numeric_bytes": count, "tensors": {n: {"dtype": str(v.dtype), "shape": list(v.shape),
++            "capture_stride_before_serialization": list(v.stride())} for n, v in capture.items()},
++            "identity_binding": "enclosing decision plus actual parent_allocation sequence; current chunk selected offspring",
++            "exact_cuda_replay_claim": False}
++        if len(json.dumps(metadata, allow_nan=False).encode()) > self.METADATA_CALL_CAP:
++            raise ValueError("N28 metadata witness cap")
++        self.recorder.record(self.EVENT, metadata=metadata, tensors=capture)
++        self.numeric_bytes += count
++        self.recorded.append(key)
+diff --git a/core/rdt_policy_steer.py b/core/rdt_policy_steer.py
+index 9733bac..082c83d 100644
+--- a/core/rdt_policy_steer.py
++++ b/core/rdt_policy_steer.py
+@@ -50,6 +50,10 @@ from core.qd_feasible_ray_rbf import (
+     LEGACY as LEGACY_RBF_UPDATE, MODE as FEASIBLE_RBF_UPDATE, FeasibleRayWitness,
+     validate_update_option, step as feasible_rbf_step, observe as observe_feasible_rbf,
+ )
++from core.qd_parent_before_renoise import (
++    DEFAULT as DEFAULT_RBF_PLACEMENT, MODE as PARENT_RBF_PLACEMENT, ParentWitness,
++    validate_placement, mutate as mutate_parent_offspring,
++)
+ from core.qd_lift_quality import (
+     HOLD_MODE as HOLD_LIFT_MODE, LIFT_MODES,
+     LiftAfterCloseContract, close_then_lift_bonus, close_hold_then_lift_bonus,
+@@ -131,6 +135,7 @@ class _EDSConfig:
+     mechanism_pretest: Optional[dict] = None
+     diversity_input_source: str = NOISY_SOURCE
+     diversity_update_mode: str = LEGACY_RBF_UPDATE
++    rollout_diversity_placement: str = DEFAULT_RBF_PLACEMENT
+     initial_sampling_mode: str = "iid"
+     initial_diversity_scale: float = 1.0
+     initial_diversity_start_ratio: Optional[float] = None
+@@ -1015,6 +1020,7 @@ class RDTSteer:
+         self._n25_rbf_witness = BoundedWitness()
+         self._n26_rbf_witness = CleanOutputWitness()
+         self._n27_rbf_witness = FeasibleRayWitness()
++        self._n28_rbf_witness = ParentWitness()
+         self._last_eds_metrics: Optional[dict] = None
+         self._last_eds_artifacts: Optional[dict] = None
+         self._last_eds_initial_sampler_info: Optional[dict] = None
+@@ -1402,6 +1408,7 @@ class RDTSteer:
+         self._n25_rbf_witness = BoundedWitness()
+         self._n26_rbf_witness = CleanOutputWitness()
+         self._n27_rbf_witness = FeasibleRayWitness()
++        self._n28_rbf_witness = ParentWitness()
+         self.reset_episode_compute_counters()
+         if hasattr(self, "_executed_feedback"):
+             self._executed_feedback.clear("episode_reset", reset=True)
+@@ -2962,6 +2969,8 @@ class RDTSteer:
+         return population, info
+ 
+     def _eds_rbf_witness(self, cfg):
++        if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:
++            return self._n28_rbf_witness
+         if cfg.diversity_update_mode == FEASIBLE_RBF_UPDATE:
+             return self._n27_rbf_witness
+         return self._n26_rbf_witness if cfg.diversity_input_source == CLEAN_SOURCE else self._n25_rbf_witness
+@@ -3728,6 +3737,8 @@ class RDTSteer:
+         rollout_timesteps: Tensor,
+         local_step: int,
+     ) -> bool:
++        if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:
++            return False
+         if rollout_timesteps.numel() == 0:
+             return False
+         step_count = int(math.ceil(float(rollout_timesteps.numel()) * float(cfg.rollout_diversity_start_ratio)))
+@@ -5914,9 +5925,10 @@ class RDTSteer:
+                 qd_parent_cell_ids = qd_parent_cell_ids.index_select(
+                     0, full_parent_indices.to(device=qd_parent_cell_ids.device)
+                 )
++            parent_allocation_sequence = None
+             evidence = getattr(self, "_decision_evidence", None)
+             if evidence is not None:
+-                evidence.record("parent_allocation", iter_idx=i, source_population=population,
++                parent_allocation_sequence = evidence.record("parent_allocation", iter_idx=i, source_population=population,
+                                 source_quality=parent_source_rewards, source_costs=parent_source_scores,
+                                 parent_indices=full_parent_indices, elite_count=elite_count,
+                                 parent_cell_ids=qd_parent_cell_ids,
+@@ -6101,6 +6113,15 @@ class RDTSteer:
+                     )
+                 )
+ 
++            parent_mutation_evidence = None
++            if cfg.rollout_diversity_placement == PARENT_RBF_PLACEMENT:
++                parent_mutation_evidence = mutate_parent_offspring(
++                    offspring, cfg=cfg, scheduler=self._noise_scheduler,
++                    compute_gradient=self._compute_eds_diversity_gradient,
++                    mask_gradient=self._mask_guidance_gradient,
++                    witness=self._eds_rbf_witness(cfg), iteration=i,
++                    parent_allocation_sequence=parent_allocation_sequence,
++                )
+             offspring_before_renoise = offspring
+             offspring = self._eds_renoise_reference(offspring, n_trunc_steps)
+             if tuple(offspring.shape) != (offspring_count, 64, 128):
+@@ -6189,6 +6210,8 @@ class RDTSteer:
+                 rollout_scores,
+                 offspring_count,
+             )
++            if parent_mutation_evidence is not None:
++                rollout_info.setdefault("direction_rbf_evidence_by_step", []).append(parent_mutation_evidence)
+             metrics.score_call_count += 1
+             metrics.search_evaluation_count += offspring_count
+             if controller_decision is not None:
+@@ -7981,6 +8004,7 @@ class RDTSteer:
+             mechanism_pretest=cfg.get("mechanism_pretest", None),
+             diversity_input_source=str(cfg.get("diversity_input_source", NOISY_SOURCE)),
+             diversity_update_mode=str(cfg.get("diversity_update_mode", LEGACY_RBF_UPDATE)),
++            rollout_diversity_placement=str(cfg.get("rollout_diversity_placement", DEFAULT_RBF_PLACEMENT)),
+             initial_sampling_mode=str(cfg.get("initial_sampling_mode", "iid")),
+             initial_diversity_scale=float(cfg.get("initial_diversity_scale", 1.0)),
+             initial_diversity_start_ratio=(
+@@ -8538,6 +8562,7 @@ class RDTSteer:
+ 
+         validate_source_option(resolved)
+         validate_update_option(resolved)
++        validate_placement(resolved)
+         clipped_rbf = CLIPPED_RBF_MODE in {
+             resolved.initial_diversity_descriptor_mode, resolved.rollout_diversity_descriptor_mode}
+         if clipped_rbf:
+diff --git a/docs/01_specs/n28-parent-before-renoise-cpu-v1.md b/docs/01_specs/n28-parent-before-renoise-cpu-v1.md
+new file mode 100644
+index 0000000..caf87c8
+--- /dev/null
++++ b/docs/01_specs/n28-parent-before-renoise-cpu-v1.md
+@@ -0,0 +1,37 @@
++# N28：父代变异后再加噪、去噪（事前假设）
++
++状态：登记一个候选，仅授权 CPU 实现准备；GPU 计划与预算尚未放行。来源 e21d48ab33dbd3aca017349b6004c2ba7d981493。所有产物留在本目录。
++
++## 依据和目标失败行为
++
++N26 与 N27 的匹配 Dev 未改善任务。N27 完整四任务筛选中 C0/Q0/N26/N27 均0/4，更新处的受限赋值确实活跃，但不能证明最终动作有用。task0 首个引导决策的固定 schedule 显示，10轮 rollout 中9轮在末次模型 forward 后仍直接修改 model_output。
++
++旧 skip_final=1 已有负结果，且大部分单步 rollout 完全失去变异；本候选不会重试该参数。新的有限 CPU 父代检查完整覆盖同一个已暴露决策的10轮：每16槽只有6–8个独特父代，但160/160槽均有非零参考赋值变化，3736/3840分量在严格内部。它排除这个有限 CPU 域上的“新算子完全不活跃”反驳；CUDA行为、去噪后的传递及任务收益仍 Unknown。
++
++依据：../n27_feasible_ray_update/hydra-continuation-v1/root-terminal-review-v1.json；../n27_feasible_ray_update/conditional-operator-placement-review-v1/review-v1.md；../n27_feasible_ray_update/parent-domain-cpu-audit-v1/root-review-v1.json。
++
++## 唯一主要改动
++
++在每一轮 QD parent allocation 已产生原有 offspring 后、原有 renoise 之前，对这一实际父代副本执行一次 clipped-EEF 几何的负梯度、原全局归一化/scale20、逐粒子 feasible-ray 赋值。随后执行完全相同的原噪声抽样和所有 RDT denoising/scheduler 步；这一候选的 rollout model_output 不再附加 RBF 变异。
++
++初始 population 路径保留 N27 的原4次变异；QD descriptor、quality、archive、parent allocation、final selection、Stage、reward、动作语义、执行长度、模型和数据全部保持 N27。无跨 chunk memory、无新噪声/抖动、无新 scale、无额外模型或评分调用。重复组不能靠隐式噪声被拆开；原 renoise 噪声仍按原位置和次数抽样。
++
++新输入语义必须叫 current-chunk selected parent offspring；不得伪标为 same_forward_unmodified_model_output。父代可能来自本 chunk 较早 archive，不保证已在[-1,1]或在真实可行流形。可行射线只保持本次变异的严格内部支持和未改坐标，并不保证去噪后/执行时的边界或安全。
++
++这是一次 proposal operator 的替换，输入对象、位置与 RBF 调用数共同变化，不能称纯时序单因素或同总算力：rollout RBF 15→10，initial4不变，总19→14；原模型 denoise schedule、噪声次数和完整 guided chunk 176候选/11评分批次不变，实际成本另报。
++
++## 可证伪预测、比较和终止
++
++机制预测：真实父代变异应有可核对的输入→赋值→原 renoise→原 denoise 链，并保持默认关闭路径、RNG、尾部/非xyz动作和计算契约。合法零梯度如实计入，不成为工程 invalid，也不靠挑案例或加抖动补救。单路径 parent→final 差异不能证明变异传递；不额外调用模型作反事实，不运行额外仿真分支。传递归因仍 Unknown，匹配任务结果决定晋级。
++
++计划比较 C0、Q0、N27（移除本轮改动）、N28，沿原冻结 Dev 的 task0..3、原 task-seed-init 映射及 task-major 顺序，共16格，禁止按历史成功挑任务。完整筛选后 N28>=2/4、>=C0/Q0、严格>N27，且QD/ED实质活跃，才可另行冻结完整Dev；否则 REJECT_SCREEN。错误停止，保留全部消耗；未授权自动 retry。此处不允许运行GPU矩阵，不修改已有协议门槛。
++
++模型调用、reward/VLM调用、RBF/投影次数、latency和episode GPU-hours必须完整报告。若机制活跃但任务无收益，拒绝候选；不再仅以 spread、可行性或非零变异为理由继续同轴扫参。验证/正式集保持关闭，所有已有结果不变。
++
++## 当前 CPU 实现范围
++
++独立 worktree：本目录 implementation；分支 codex/n28-parent-before-renoise-20261001，基于 e21d48a。只实现最小算子、默认关闭的配置及主循环接线、真实语义的有限 trace/witness、相关必要 CPU 单测和实际 Hydra 配置组合检查。无需新 GPU controller、预算 gate、native GPU proof 或线上注册；这些待 root 实现审查后分别处理。
++
++测试重点：原路径关闭时不改变行为/调用数/RNG；父代变异恰好在原 renoise 前每轮一次；原 denoiser 调用/顺序保持、rollout 后无重复变异；合法重复父代/零梯度、边界、BF16/FP32、零operand字节和非xyz/尾部不变；真实候选 override 能被 Hydra 接受。只用有意义的合成输入与 stub 调用链，不启动模型/环境/API，不读取新实验或保护集 payload。
++
++CPU 测试累计≤180 CPU秒，2 CPU affinity/2线程，CUDA隐藏；记录 Torch 内部设备发现探测与实际 CUDA 工作的区别。只允许根据具体失败做必要修复重测，不重复已经通过的未变检查。输出代码提交、diff、测试结果、资源记录和未解决问题供 root 审查。不得直接合入 study_worktree、修改其状态/账本/预算或启动GPU。
+diff --git a/tests/test_n28_parent_before_renoise.py b/tests/test_n28_parent_before_renoise.py
+new file mode 100644
+index 0000000..2601159
+--- /dev/null
++++ b/tests/test_n28_parent_before_renoise.py
+@@ -0,0 +1,221 @@
++"""Bounded synthetic N28 operator/caller/config coverage; no real model or env."""
++import ast, copy, hashlib, json, os
++from pathlib import Path
++from types import MethodType, SimpleNamespace
++import pytest, torch
++from test_rdt_steer import _patch_core_imports, stub_steer, stub_adapter, _rollout_cond, _n2_fixture_provider
++from test_n25_clipped_rbf import native_adapter, input_tensor, config
++from test_n26_clean_output_rbf import layout, bytes_equal
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def setup(steer, adapter, monkeypatch):
++    origins = native_adapter(adapter, monkeypatch)
++    steer.post_init(adapter=adapter, postprocessor=lambda x:x, sample_batch_size=16,
++                    policy_config={'action_chunk_horizon':8})
++    steer._noise_scheduler.config={'prediction_type':'sample'}
++    return origins
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++@pytest.mark.parametrize('case',['interior','mixed','coincident','zero'])
++def test_parent_operator_support_bytes_rng_and_no_extra_calls(stub_steer,stub_adapter,monkeypatch,dtype,case):
++    from core.qd_parent_before_renoise import mutate, ParentWitness, INPUT
++    origins=setup(stub_steer,stub_adapter,monkeypatch);cfg=config(stub_steer,'N28')
++    values=input_tensor(dtype,16)
++    if case=='mixed':
++        values[0,:8,39:42]=2;values[1,:8,39:42]=-1
++        values[2,0,39]=-0.0
++    elif case in {'coincident','zero'}:values[:,:8,39:42]=0.25 if case=='coincident' else -0.0
++    values=layout(values,'model_slice');saved=values.clone();stride=values.stride();rng=torch.random.get_rng_state().clone()
++    w=ParentWitness();w.begin(None)
++    e=mutate(values,cfg=cfg,scheduler=stub_steer._noise_scheduler,compute_gradient=stub_steer._compute_eds_diversity_gradient,
++             mask_gradient=stub_steer._mask_guidance_gradient,witness=w,iteration=0,parent_allocation_sequence=None)
++    assert values.stride()==stride and bytes_equal(values[:,8:],saved[:,8:])
++    other=[k for k in range(128) if k not in (39,40,41)]
++    assert bytes_equal(values[:,:,other],saved[:,:,other])
++    unsupported=(saved[:,:8,39:42]<=-1)|(saved[:,:8,39:42]>=1)
++    assert bytes_equal(values[:,:8,39:42][unsupported],saved[:,:8,39:42][unsupported])
++    assert torch.equal(rng,torch.random.get_rng_state()) and len(origins)==16
++    if case in {'coincident','zero'}:assert bytes_equal(values,saved) and e['zero_gradient']
++    else:assert not bytes_equal(values,saved)
++    assert e['input_source']==INPUT and e['denoising_step'] is None and e['timestep'] is None
++    assert e['update_operand_is_measured_output_delta'] is False and e['phase']=='parent'
++    counters=stub_steer.get_episode_compute_counters()
++    assert counters['rbf_gradient_calls']==1 and counters['model_forward_calls']==counters['reward_calls']==0
++
++
++def test_config_closed_and_scheduler_gate(stub_steer,stub_adapter,monkeypatch):
++    from core.qd_parent_before_renoise import mutate,ParentWitness
++    setup(stub_steer,stub_adapter,monkeypatch)
++    raw=json.loads((ROOT/'configs/qd_ed_final/candidate_n28.json').read_text())
++    old=json.loads((ROOT/'configs/qd_ed_final/candidate_n27.json').read_text())
++    assert raw['parent_candidate']['sha256']==hashlib.sha256((ROOT/'configs/qd_ed_final/candidate_n27.json').read_bytes()).hexdigest()
++    assert raw['profile']==old['profile']|{'rollout_diversity_placement':'parent_before_renoise_v1'}
++    for change in [{'rollout_diversity_placement':'none'}, {'diversity_update_mode':'legacy_additive'},
++                   {'rollout_diversity_scale':21}, {'qd_gripper_rescue_mode':'canonical_full_close_v1'},
++                   {'num_elites':15}, {'renoise_t_max':4}, {'diversity_input_source':'noisy_sample'}]:
++        with pytest.raises(ValueError):stub_steer._resolve_eds_config_with_reference_defaults(raw['profile']|change)
++    for prediction in ['epsilon',None]:
++        stub_steer._noise_scheduler.config={'prediction_type':prediction}
++        with pytest.raises(ValueError):mutate(input_tensor(torch.float32,16),cfg=config(stub_steer,'N28'),
++            scheduler=stub_steer._noise_scheduler,compute_gradient=lambda *a,**k:pytest.fail('gradient before gate'),
++            mask_gradient=None,witness=ParentWitness(),iteration=0,parent_allocation_sequence=None)
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++def test_rollout_uses_original_timesteps_forward_scheduler_score(stub_steer,stub_adapter,monkeypatch,dtype):
++    setup(stub_steer,stub_adapter,monkeypatch);cfg=config(stub_steer,'N28');cond=_rollout_cond(stub_steer)
++    scheduler=stub_steer._noise_scheduler;trace=[];current={};step=scheduler.step
++    def forward(x,t,cond):
++        assert not torch.is_grad_enabled() and tuple(x.shape)==(16,64,128)
++        out=layout(input_tensor(dtype,16),'model_slice');current.update(out=out,before=out.clone())
++        trace.append(('F',int(t)));return out
++    def scheduler_step(out,t,x):
++        assert out is current['out'] and bytes_equal(out,current['before'])
++        trace.append(('S',int(t)));return step(out,t,x)
++    def score(values,**kwargs):trace.append(('Q',len(values)));return torch.zeros(16,dtype=dtype),{}
++    monkeypatch.setattr(stub_steer._rdt_model.dit,'forward',forward)
++    monkeypatch.setattr(scheduler,'step',scheduler_step)
++    monkeypatch.setattr(stub_steer,'_eds_score_population_as_cost',score)
++    monkeypatch.setattr(stub_steer,'_compute_eds_diversity_gradient',lambda *a,**k:pytest.fail('post-forward RBF'))
++    for n in (3,2,1):
++        trace.clear()
++        _,_,info=stub_steer._eds_rollout_rbf_diverse_reference(cond=cond,action_mask=cond['action_mask'],
++            noisy_action=input_tensor(dtype,16),keypoints=torch.zeros(1,3,dtype=dtype),guidance_fns=[],
++            n_trunc_steps=n,reward_mode='normal',shuffle_seed=0,cfg=cfg,iter_idx=0)
++        assert trace==[(kind,t) for t in range(n-1,-1,-1) for kind in ('F','S')]+[('Q',16)]
++        assert info['rollout_rbf_step_flags']==[False]*n and info['rollout_diversity_steps_applied']==0
++    assert stub_steer.get_episode_compute_counters()['model_forward_calls']==6
++
++
++def base_methods(steer):
++    """Actual e21 source functions, compiled only for a synthetic old-path comparison."""
++    source=Path(os.environ['N28_BASE_POLICY']).read_text();tree=ast.parse(source)
++    cls=next(x for x in tree.body if isinstance(x,ast.ClassDef) and x.name=='RDTSteer')
++    names={'_eds_guided_denoise_loop','_eds_rollout_diversity_step_mask','_eds_rbf_witness'}
++    import core.rdt_policy_steer as module
++    scope=dict(vars(module));nodes=[x for x in cls.body if isinstance(x,ast.FunctionDef) and x.name in names]
++    exec(compile(ast.Module(body=nodes,type_ignores=[]),'e21_synthetic_original_methods','exec'),scope)
++    return {name:MethodType(scope[name],steer) for name in names}
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++def test_full_loop_original_parity_n28_allocation_order_witness(stub_steer,stub_adapter,monkeypatch,tmp_path,dtype):
++    from core.decision_evidence import DecisionEvidence
++    from test_qd_actuator_clipped_quality import static_adapter_fixture
++    import core.rdt_policy_steer as policy
++    for k,v in vars(static_adapter_fixture()).items():monkeypatch.setattr(stub_adapter,k,v,raising=False)
++    origins=setup(stub_steer,stub_adapter,monkeypatch)
++    monkeypatch.setattr(stub_steer._rdt_model.dit,'forward',lambda *a:layout(input_tensor(dtype,16),'model_slice'))
++    points=torch.tensor([[.1124,-.071,.3154],[.13,-.21,.39]],dtype=dtype);provider=_n2_fixture_provider(index=0)
++    old_methods=base_methods(stub_steer);new_methods={n:getattr(stub_steer,n) for n in old_methods}
++    original_mutate=policy.mutate_parent_offspring;original_renoise=stub_steer._eds_renoise_reference
++    original_rollout=stub_steer._eds_rollout_rbf_diverse_reference;original_step=stub_steer._noise_scheduler.step
++    runs={};order=[];pending={};denoise=[]
++    def mutate(x,**kw):
++        order.append(('P',kw['iteration']));before=x.clone();rng=torch.random.get_rng_state().clone()
++        evidence=original_mutate(x,**kw);pending.update(before=before,after=x.clone(),sequence=kw['parent_allocation_sequence'])
++        assert torch.equal(rng,torch.random.get_rng_state());return evidence
++    def renoise(x,n):
++        order.append(('N',n))
++        if pending:assert bytes_equal(x,pending['after'])
++        return original_renoise(x,n)
++    def rollout(**kw):
++        order.append(('D',kw['n_trunc_steps']));return original_rollout(**kw)
++    def step(out,t,x):denoise.append((int(t),tuple(out.shape)));return original_step(out,t,x)
++    monkeypatch.setattr(policy,'mutate_parent_offspring',mutate)
++    monkeypatch.setattr(stub_steer,'_eds_renoise_reference',renoise)
++    monkeypatch.setattr(stub_steer,'_eds_rollout_rbf_diverse_reference',rollout)
++    monkeypatch.setattr(stub_steer._noise_scheduler,'step',step)
++    for mode,recording,baseline in [('N27',False,True),('N27',False,False),('N28',False,False),('N28',True,False)]:
++        for n,m in (old_methods if baseline else new_methods).items():monkeypatch.setattr(stub_steer,n,m)
++        stub_steer.reset();torch.manual_seed(2828);origins.clear();order.clear();pending.clear();denoise.clear();saved=[]
++        rec=DecisionEvidence(tmp_path/'synthetic',episode=0) if recording else None
++        if rec:
++            record=rec.record
++            def capture(event,**values):
++                if event.startswith('n28_rbf') or event=='parent_allocation':saved.append((event,copy.deepcopy(values)))
++                return record(event,**values)
++            monkeypatch.setattr(rec,'record',capture)
++            rec.begin_decision(global_step=24,stage=1,use_guidance=True,keypoints=points,providers=[provider])
++        stub_steer._decision_evidence=rec
++        selected=stub_steer._eds_guided_denoise_loop(x_t=input_tensor(dtype,16),cond=_rollout_cond(stub_steer),keypoints=points,
++            guidance_fns=[provider],eds_config=config(stub_steer,mode),verbose=False,global_step=24,current_stage=1)
++        m=stub_steer.get_last_eds_metrics();json.dumps(m,allow_nan=False);c=stub_steer.get_episode_compute_counters()
++        assert m['search_evaluation_count']==176 and m['score_call_count']==11
++        assert m['resample_count']==m['renoise_count']==m['rollout_count']==10
++        assert c['model_forward_calls']==21 and c['rbf_gradient_calls']==(19 if mode=='N27' else 14)
++        nsteps=[3,2,2,2,2,1,1,1,1,1]
++        assert [n for k,n in order if k=='N']==nsteps and [n for k,n in order if k=='D']==nsteps
++        expected=[(t,(16,64,128)) for t in range(4,-1,-1)]+[(t,(16,64,128)) for n in nsteps for t in range(n-1,-1,-1)]
++        assert denoise==expected
++        if mode=='N28':
++            assert order==[event for i,n in enumerate(nsteps) for event in [('P',i),('N',n),('D',n)]]
++            assert len(m['initial_direction_rbf_evidence_by_step'])==4
++            calls=m['rollout_direction_rbf_evidence_by_iter'];assert len(calls)==10 and all(len(x)==1 for x in calls)
++            assert [x[0]['iteration'] for x in calls]==list(range(10))
++            assert all(x[0]['phase']=='parent' and x[0]['denoising_step'] is None for x in calls)
++            assert all(x['input_binding']=='same_forward_unmodified_model_output' for x in m['initial_direction_rbf_evidence_by_step'])
++            if rec:
++                witness=[v for k,v in saved if k=='n28_rbf_witness'];coverage=[v for k,v in saved if k=='n28_rbf_witness_coverage']
++                assert len(witness)==11 and len(coverage)==1 and coverage[0]['missing_slots']==[]
++                assert coverage[0]['numeric_bytes']<=220*1024
++                parents=[v for k,v in saved if k=='parent_allocation'];assert len(parents)==10
++                for i,v in enumerate(witness[1:]):
++                    md=v['metadata'];ts=v['tensors'];a=parents[i]
++                    assert md['call']['phase']=='parent' and type(md['call']['parent_allocation_sequence']) is int
++                    assert bytes_equal(ts['input_xyz'],ts['parent_offspring_before'])
++                    assert bytes_equal(ts['input_xyz'],a['source_population'].index_select(0,a['parent_indices'])[:,:8,[39,40,41]])
++                    assert 'model_output_before' not in ts and len(json.dumps(md).encode())<=16*1024
++                assert 'model_output_before' in witness[0]['tensors']
++                assert stub_steer._n28_rbf_witness.prepare('parent',0) is None
++        key=(mode,recording,baseline);runs[key]=(selected.clone(),c,torch.random.get_rng_state().clone(),len(origins))
++    for a,b in [(('N27',False,True),('N27',False,False)),(('N28',False,False),('N28',True,False))]:
++        x,y=runs[a],runs[b];assert bytes_equal(x[0],y[0]) and x[1]==y[1] and torch.equal(x[2],y[2]) and x[3]==y[3]
++    assert torch.equal(runs[('N27',False,False)][2],runs[('N28',False,False)][2])
++
++
++def test_actual_hydra_four_profiles(stub_steer):
++    from scripts import qd_ed_final_runner as r
++    from hydra import compose,initialize_config_dir
++    from omegaconf import OmegaConf
++    baseline=json.loads((ROOT/'configs/qd_ed_final/n4_observed_baseline_profiles.json').read_text())['profiles']
++    raw=json.loads((ROOT/'configs/qd_ed_final/candidate_n27.json').read_text())
++    old=r.expand_candidate('N27',raw,baseline['Q0'])
++    overrides={k:list(baseline[k]['hydra_overrides']) for k in ('C0','Q0')}
++    overrides['N27']=old['hydra_overrides'];overrides['N28']=old['hydra_overrides']+['main.eds_config.rollout_diversity_placement=parent_before_renoise_v1']
++    with initialize_config_dir(config_dir=str(ROOT/'configs'),version_base=None):
++        resolved={k:OmegaConf.to_container(compose(config_name='config',overrides=v),resolve=False) for k,v in overrides.items()}
++    for k in ('C0','Q0','N27'):assert resolved[k]['main']['eds_config']['rollout_diversity_placement']=='model_output'
++    assert resolved['N28']['main']['eds_config']['rollout_diversity_placement']=='parent_before_renoise_v1'
++    a=copy.deepcopy(resolved['N28']);a['main']['eds_config']['rollout_diversity_placement']='model_output'
++    assert a==resolved['N27']
++    cfg=stub_steer._resolve_eds_config_with_reference_defaults(resolved['N28']['main']['eds_config'])
++    assert cfg.rollout_diversity_placement=='parent_before_renoise_v1' and cfg.qd_gripper_rescue_mode=='none'
++
++
++def test_parent_witness_fail_closed_and_no_later_backfill(stub_steer,stub_adapter,monkeypatch):
++    from core.qd_parent_before_renoise import ParentWitness,mutate
++    setup(stub_steer,stub_adapter,monkeypatch)
++    saved=[]
++    class Recorder:
++        def record(self,event,**kw):saved.append((event,copy.deepcopy(kw)))
++    w=ParentWitness();w.begin(Recorder())
++    mutate(input_tensor(torch.float32,16),cfg=config(stub_steer,'N28'),scheduler=stub_steer._noise_scheduler,
++           compute_gradient=stub_steer._compute_eds_diversity_gradient,mask_gradient=stub_steer._mask_guidance_gradient,
++           witness=w,iteration=0,parent_allocation_sequence=123)
++    _,v=saved[0];original=v['metadata']['call'];capture=v['tensors']
++    for field,value in [('schema','n27-rbf-call-summary-v1'),('input_source','model_output_sample_v1'),
++                        ('input_binding','same_forward_unmodified_model_output'),('denoising_step',0)]:
++        other=ParentWitness();other.begin(Recorder());other.prepare('parent',0)
++        with pytest.raises(ValueError):other.emit(copy.deepcopy(capture),original|{field:value})
++    other=ParentWitness();other.begin(Recorder());other.prepare('parent',0)
++    bad=copy.deepcopy(capture);bad['input_xyz'][0,0,0]+=.125
++    with pytest.raises(ValueError):other.emit(bad,original)
++    other.finish()
++    with pytest.raises(ValueError):other.emit(capture,original)
++    w.finish();w.begin(Recorder());assert w.prepare('parent',1) is None
++    # Recorder absence consumes first-guided opportunity, without outcome-based backfill.
++    w=ParentWitness();w.begin(None);assert w.prepare('parent',0) is None
++    w.finish();w.begin(Recorder());assert w.prepare('parent',0) is None

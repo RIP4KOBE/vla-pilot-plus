@@ -1,0 +1,1 @@
+Source manifest first generation failed before any manifest write: FileNotFoundError on guessed scripts/qd_ed_metered_worker.py. Removed this nonexistent entry; no source/test/data mutation or runtime execution. Tool failure retained; this is packaging only.

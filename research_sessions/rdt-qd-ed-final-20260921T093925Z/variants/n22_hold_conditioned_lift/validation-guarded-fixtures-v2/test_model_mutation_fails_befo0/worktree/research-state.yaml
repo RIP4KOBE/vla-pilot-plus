@@ -1,0 +1,19 @@
+artifacts: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n22_hold_conditioned_lift/validation-guarded-fixtures-v2/test_model_mutation_fails_befo0/artifacts
+budget:
+  aborted: 0
+  dispatched: 0
+  gpu_hours_consumed: 0.0
+  max_episode_attempts: 240
+  max_gpu_hours: 48.0
+  reserved:
+    baseline: 20
+    development: 100
+    formal: 40
+    recovery: 20
+    validation: 60
+  running: 0
+  valid: 0
+gpu_pool:
+- 7
+max_concurrent_gpu_workers: 1
+run_name: fixture

@@ -1,0 +1,103 @@
+{
+  "schema": "n31-phase-a-static-inputs-v1",
+  "base_commit": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "sources": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962,
+      "windows": [
+        [
+          1879,
+          1932
+        ],
+        [
+          3671,
+          3758
+        ],
+        [
+          3891,
+          4158
+        ],
+        [
+          5317,
+          5336
+        ],
+        [
+          6290,
+          6316
+        ],
+        [
+          6445,
+          6485
+        ]
+      ],
+      "read_only": true
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_ed.py",
+      "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89",
+      "bytes": 46573,
+      "windows": [
+        [
+          603,
+          614
+        ],
+        [
+          648,
+          655
+        ]
+      ],
+      "read_only": true
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/main.py",
+      "sha256": "5209b0ac07362e1df85bf2fd842e57d4786e24c0a625ee5b9e49bee48f528f93",
+      "bytes": 108959,
+      "windows": [
+        [
+          1645,
+          1651
+        ],
+        [
+          1713,
+          1717
+        ],
+        [
+          1831,
+          1850
+        ]
+      ],
+      "read_only": true
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160,
+      "windows": [
+        [
+          1141,
+          1149
+        ],
+        [
+          1787,
+          1791
+        ]
+      ],
+      "read_only": true
+    }
+  ],
+  "protocol": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/hypothesis-and-cpu-phase-a-v1.md",
+    "sha256": "921bd41d16141a5cd69314b8e28a354a126402daa9f410937c09aebe143609e5",
+    "bytes": 10719
+  },
+  "executor_override": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/executor-prompt-v1.md",
+    "sha256": "76d893056dac6aa81c5e4e9fe659baed7286e7f16b40e93a1d03aae487f89b21",
+    "bytes": 4148
+  },
+  "source_inspection_performed_without_import": true,
+  "historical_payload_reads": 0,
+  "robot_control_semantics": "Root supplied source findings; installed robosuite/Panda files not independently reread in this phase."
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "n30-handoff-review-resources-v1",
+  "cpu_limit_seconds": 300,
+  "metadata_cpu_seconds": 0.276442859,
+  "static_cpu_seconds": 0.013604122,
+  "initial_scope_cpu_seconds": 0.00035997,
+  "finalization_cpu_seconds_to_record": 0.011492383000000002,
+  "measured_work_cpu_seconds_to_record": 0.30189933399999996,
+  "small_display_and_interpreter_startup_cpu": "not separately measured; do not call the measured subtotal an exact all-process CPU total",
+  "conservative_cpu_budget_debit_for_unmetered_displays_startup_and_packaging_seconds": 60,
+  "accounted_budget_seconds_upper_charge": 60.301899334,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads_environment": 2,
+  "original_metadata_reads_including_scope_bytes": 17024378,
+  "external_static_plus_repeat_scope_bytes": 713286,
+  "external_read_bytes_including_repeats": 17737664,
+  "metadata_cap_bytes": 67108864,
+  "owned_output_reviews": "Own generated JSON/source ledgers were read for review and packaging; no original metadata/index reread. Output-manifest own file byte total is separately bounded below.",
+  "original_payload_stats": {
+    "files": 68,
+    "bytes": 24429984
+  },
+  "payload_opens": 0,
+  "payload_hash_measurements": 0,
+  "payload_decodes": 0,
+  "torch_numpy_production_imports": 0,
+  "tests": 0,
+  "network_gpu_api_model_sim_calls": 0,
+  "video_image_files_read_or_statted": 0,
+  "inventory_guard_denied": [],
+  "failed_executions": 0,
+  "writes_only": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1"
+}

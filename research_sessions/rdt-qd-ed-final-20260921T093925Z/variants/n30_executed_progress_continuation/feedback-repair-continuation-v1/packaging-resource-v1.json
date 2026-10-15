@@ -1,0 +1,14 @@
+{
+  "schema": "n30-r2-source-packaging-resource-v1",
+  "process_cpu_seconds": 0.359295001,
+  "wall_seconds": 2.8946986419614404,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "production_imports": 0,
+  "historical_tensor_reads": 0,
+  "source_files": 480,
+  "git_source_blobs": 943,
+  "peak_rss_kib": 284420
+}

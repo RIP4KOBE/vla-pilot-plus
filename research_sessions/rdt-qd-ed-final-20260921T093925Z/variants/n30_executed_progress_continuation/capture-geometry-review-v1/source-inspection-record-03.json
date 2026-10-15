@@ -1,0 +1,69 @@
+{
+  "read_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160,
+      "line_filter": "LIBERO.*PATH|OffScreen|env_args|robots|gripper|make_env|LiberoEnv|load_controller"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/robots/single_arm.py",
+      "sha256": "d233b1b785e8f88ffb5df1357666b02a397ae930ce98181b079e0496ab35fc57",
+      "bytes": 19104,
+      "line_filter": "eef_pos|eef_quat|gripper_qpos|_eef|grip_site|convert_quat|body_xquat|site_xpos"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/robots/manipulators/panda_robot.py",
+      "sha256": "cedaeef03d4c01b6a76a56838f9cf8f68b34f85bac823cb2c76543492553c736",
+      "bytes": 1504,
+      "line_filter": "default_gripper|eef_name|gripper|bottom_offset"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/grippers/panda_gripper.py",
+      "sha256": "a3760a8fc4599fa6f79914304b82466f3c1bda1a945943ca693bb57f00dc59eb",
+      "bytes": 1817,
+      "line_filter": "."
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/assets/grippers/panda_gripper.xml",
+      "sha256": "d9d68123909d6910488310d0fae4e358ed4ac831c6d0957f3e30893a5412baac",
+      "bytes": 4600,
+      "line_filter": "."
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n12_grasp_affordance/outer-loop-screen-v1.md",
+      "sha256": "17de1f3b84c1be4572abfb8e7e7a9451836fc3e430206458ad4ad08ce29977cc",
+      "bytes": 3622,
+      "full_text": true
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n15_stalled_contact/screen-conclusion.md",
+      "sha256": "0a2db951c311360d94e61274e92e3ba984d74d6f974bd94f7bb06a506945eb5d",
+      "bytes": 1089,
+      "full_text": true
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n16_gripper_quality/screen-conclusion.md",
+      "sha256": "42b055e3a9d520386b29e49abd76af007e637ac09565ae7b3f004c198bdf0205",
+      "bytes": 1305,
+      "full_text": true
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n22_hold_conditioned_lift/idea-declaration-v1.md",
+      "sha256": "cc22391a16bb2f0bdd9f4ad3dd71322894601e353cda9e5daf88bccbd736404d",
+      "bytes": 1582,
+      "full_text": true
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n22_hold_conditioned_lift/offline-screen-conclusion-v1.md",
+      "sha256": "0dd03be93436d25b4ab9ec80214d8f6ae9cd102c0b428cce96b0db6c9476f367",
+      "bytes": 1471,
+      "full_text": true
+    }
+  ],
+  "cpu_seconds": 0.0027526190000000013,
+  "affinity": [
+    0,
+    1
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "schema": "n27-hydra-continuation-cpu-delivery-v1",
+  "commit": "e21d48ab33dbd3aca017349b6004c2ba7d981493",
+  "source_files": 359,
+  "old_files_unchanged": 342,
+  "original_files": 345,
+  "test_cases": 87,
+  "gpu_authorized": false,
+  "actual_metadata_reads": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/authority.disabled-v1.json",
+      "sha256": "447ab1c38735a6c1fbf86dfa1f928daf3cefa4b9e9abcef0d3800894bf726fa5",
+      "bytes": 1032
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/binding-v1.guard.json",
+      "sha256": "359bfa7654ff0b14bb1e8d903942ebf5099e44d36b38522c57e06412c6af20ac",
+      "bytes": 577
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/binding-v1.log",
+      "sha256": "5c38e38a66ec90e0380b642dcb67ef91eafdfd4336c10f1545a210a4ab1be92c",
+      "bytes": 610
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/bounds-final-v1.guard.json",
+      "sha256": "a4facd22df16bc275df4003a11662b1b6b3e6743fcfc1dc9386e52a76bf79b27",
+      "bytes": 515
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/bounds-final-v1.log",
+      "sha256": "2c556de134dd0f4df6b901e8e3b80aa1f382a8ba64564e63a50b373ebaa3dac8",
+      "bytes": 551
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/cpu-implementation-report-v1.md",
+      "sha256": "fe4f53de7cc8da3f4d5f43f4dc82c4cc831402302974c3dc23d71da0667d6783",
+      "bytes": 6707
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/cpu-results-v1.json",
+      "sha256": "273c81cc6c6345f7c9a712150c05d39e9ec9de40078d7c918f2b31a52a96bbf5",
+      "bytes": 15020
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/execution-clean-v2.guard.json",
+      "sha256": "620cc4569025da304dd6768423310795381951ed04e8b0add8c0b780512f9e67",
+      "bytes": 398
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/execution-clean-v2.log",
+      "sha256": "04eeee2d24f13830a6be08ac323e877db8bf099924ef5e9a539ff8264e7f4356",
+      "bytes": 449
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/execution-v1.guard.json",
+      "sha256": "a96af5b7959f4ae83be1f5d174d5ca0a7f9e3aba5148eceffbdc7fb75460110c",
+      "bytes": 10235
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/execution-v1.log",
+      "sha256": "916779478399c83267196760c80432ad9fbb6fe1570bdc5fdb795f2bc5d964e8",
+      "bytes": 28237
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/final-source-review.disabled-v1.json",
+      "sha256": "70ca2ef06422607f95f4fcddf762552e6e6ffc91f22a4501441d92687120c078",
+      "bytes": 419
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/focused-v1.guard.json",
+      "sha256": "59208f082347f12a12318f6e64692208dc60a2c3cc342464dca8cf00fab22462",
+      "bytes": 330
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/focused-v1.log",
+      "sha256": "91a4f9af625b16659524162656c2e35f547337b91b3d0210c9cf8f0d8db26b71",
+      "bytes": 375
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/guard_cpu_v1.py",
+      "sha256": "3eb30fd1b668ce45719faa03cc99a767c24f1aa2c8795a1f3c78fbbd0bfeed55",
+      "bytes": 4098
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/history-seal.disabled-v1.json",
+      "sha256": "520ed3e5410722d480e8fea9f27d099c89c302f7e9068042ecde882a3ab51afd",
+      "bytes": 945
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/plan.disabled-v1.json",
+      "sha256": "610e8313d3bcc2bc85d061a6d05e2bd2b56625cbf21f1c6003157204570c3129",
+      "bytes": 969
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/release.disabled-v1.json",
+      "sha256": "b8a757cbcdc7390887a9084cd85abe2e8aa14fad17a7d36a1ba505b8ed3460c1",
+      "bytes": 692
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/root-seal-review.disabled-v1.json",
+      "sha256": "1c93083ad5427d7dae8a2dc21b0d5b633b37c38f413f1d4ea39187a402a4b654",
+      "bytes": 514
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/runtime-ref.disabled-v1.json",
+      "sha256": "536c717dedded37d0dad1976920d62c118de7a65fd68a6c58134371fa9a1db5e",
+      "bytes": 269
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/source-bridge.disabled-v1.json",
+      "sha256": "df10e9c515526c8f043f08675f95e6eb86c0d9ddc78c193256c79bfa0bf557ff",
+      "bytes": 495
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/source-byte-bridge-v1.json",
+      "sha256": "fe8c9c011a2ff7091dbc16b9233f1e25e20b97759b330fad98f32596b50a1173",
+      "bytes": 115493
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/source-diff-v1.patch",
+      "sha256": "dce0bba0d3cad307fb22b741c3131b862a50fd0341b34d81db96e335e82dc1a2",
+      "bytes": 152692
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-cpu-v1/source-manifest-v1.json",
+      "sha256": "2381099a13280571cd3ced1883ad13897e1b8cc176d452322829a5ccda3069b5",
+      "bytes": 55663
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-implementation/docs/experiments/n27_hydra_continuation/controller-contract-v1.md",
+      "sha256": "820feb2629c89164a45dcc22a5f36221b05711987948956f2b5019772efc5864",
+      "bytes": 9836
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-implementation/docs/experiments/n27_hydra_continuation/original-source-v1.json",
+      "sha256": "16a0278124ccde14b852828981a75c1527546a5d3eb605f59f59349d076972b1",
+      "bytes": 53506
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-implementation/docs/experiments/n27_hydra_continuation/protocol-v1.md",
+      "sha256": "d4316e941ed67c246823bfc7143fadf8d50e4cc86cce57b5ac55bac413a71fc0",
+      "bytes": 5957
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-implementation/docs/experiments/n27_hydra_continuation/reverse-source-v1.json",
+      "sha256": "b20650b3b8a97112cdf3a78ec2de86e228b23de687f6404c662717b19aac7407",
+      "bytes": 2348
+    }
+  ]
+}

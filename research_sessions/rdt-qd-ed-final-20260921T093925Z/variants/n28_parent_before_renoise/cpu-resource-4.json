@@ -1,0 +1,27 @@
+{
+  "run": "4",
+  "pytest_exit": 1,
+  "cpu_seconds": 16.952687623,
+  "cumulative_cpu_seconds": 54.149619662000006,
+  "wall_seconds": 12.684161758981645,
+  "affinity": [
+    0,
+    1
+  ],
+  "thread_limit": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "blocked": [],
+  "dependency_exceptions": [
+    "/proc/55254/maps",
+    "dev_null_sink"
+  ],
+  "guard_sha256": "eabb296a0434820c27dca00168bc604ff5c1c84c53d25d52e46f23cecd27c9d8",
+  "test_argv": [
+    "tests/test_n28_execution.py",
+    "tests/test_n28_parent_before_renoise.py",
+    "-k",
+    "parent_proof or full_native or zero_guided or complete_sixteen or invalid_cost or new_marker or full_loop or witness_negative"
+  ],
+  "peak_rss_kib": 652676
+}

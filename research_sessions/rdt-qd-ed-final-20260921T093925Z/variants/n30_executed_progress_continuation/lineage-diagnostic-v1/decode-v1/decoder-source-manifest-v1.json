@@ -1,0 +1,57 @@
+{
+  "schema": "n30-lineage-decoder-source-v1",
+  "source_commit": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "reader": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/decode_cpu_v1.py",
+    "sha256": "3f6404a29c0108f190a5eb83dffbfb0e42696f1cef1be44d9612c5c4dc99263d"
+  },
+  "input_bindings": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/input-bindings.disabled.v1.json",
+    "sha256": "192e4605fa42b834d99bb3083007283c08dbd84e990b94c7d5dd6207b1a9f1ce"
+  },
+  "protocol": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-protocol.disabled.v1.md",
+    "sha256": "28dbfea28ca0a858ebbf29bb4bc4bc64a813a0cf892ed074ae037f911567eccb"
+  },
+  "phase_a_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/root-inventory-review-v1.json",
+    "sha256": "95c126bc4a95180306c974fb91d79592f0e0b8c2b258abc4e4f1cd37516b70f4"
+  },
+  "preparation_scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/root-decoder-preparation-scope-v1.md",
+    "sha256": "1d175453bc3123277ece4b6cea6a21bc2b08dffdc792ca6e570b10236bd9aa7f"
+  },
+  "scientific_source_files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_executed_progress.py",
+      "sha256": "7aead7c81424a2b247e4d74ae211947e0b78a47cf6fa1a8a97fb112a9739d9c0",
+      "bytes": 11581
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/eds_mechanism_trace.py",
+      "sha256": "312087f5c354f81a820f2acb8419c6380e96805de79f1789c5c7ff23a8fcabf3",
+      "bytes": 24129
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/scripts/qd_ed_n30_native.py",
+      "sha256": "c7d8c779f977aaae61976b33d9b52cec5fb068913896f6b09a0d8abecf8067c0",
+      "bytes": 19175
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_ed.py",
+      "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89",
+      "bytes": 46573
+    }
+  ],
+  "source_binding_note": "Five Phase A source hashes bound to frozen 480-file manifest; added qd_ed.py fingerprint_action narrow window/hash at root explicit instruction. Source bytes will be rehashed before payload access, no source import/Git/native replay."
+}

@@ -1,0 +1,25 @@
+{
+  "schema": "n30-initial-observation-repair-resources-v1",
+  "focused_test_cpu_seconds": 15.195151868,
+  "focused_test_budget_seconds": 600,
+  "runs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/cpu-repair-run1-resource.json",
+      "sha256": "410e8e6430ebc1e831857e75d8f263b9c6a3f92471970c48de06db45023dadc2",
+      "bytes": 447
+    }
+  ],
+  "tests_passed": 7,
+  "unexpected_test_failures": 0,
+  "expected_historical_failure_reproduced": true,
+  "guard_denials": 0,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_hidden": true,
+  "cuda_initialized": false,
+  "peak_rss_kib": 825944,
+  "authoring_git_packaging": "Brief stdlib/source/Git work is separate from the focused test-process accounting."
+}

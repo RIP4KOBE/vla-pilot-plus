@@ -1,0 +1,27 @@
+{
+  "schema": "n31-native-metadata-review-v1",
+  "artifacts": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../variants/n31_capture_dwell_proposal/posthoc-native-metadata-v1/inventory.py",
+      "sha256": "9f2e67d5c1d2cba6bf142c89dca0458a096e3ede7ac5ce5beb385b992204bbeb",
+      "bytes": 2496
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../variants/n31_capture_dwell_proposal/posthoc-native-metadata-v1/scope.json",
+      "sha256": "48770b3d24e64f3cbd97abb63dc30ab213dea13df0c4b350e585ce17a84d2aa7",
+      "bytes": 7773
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../variants/n31_capture_dwell_proposal/posthoc-native-metadata-v1/inventory.json",
+      "sha256": "6f63efbf58d42ea37835c412f881d8cb0c7a9aef849e0d3192be7a29ffedc734",
+      "bytes": 15652755
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../variants/n31_capture_dwell_proposal/posthoc-native-metadata-v1/decode-scope-v1.json",
+      "sha256": "e12543bad29f431986995966712b4f4b2ca2ff0f0382f41067918c848e4c7303",
+      "bytes": 2293284
+    }
+  ],
+  "finding": "12 manifests, 1080 decision records; manifest metadata cannot identify changed/selected flags. Decode scope is frozen and not executed.",
+  "target_met": false
+}

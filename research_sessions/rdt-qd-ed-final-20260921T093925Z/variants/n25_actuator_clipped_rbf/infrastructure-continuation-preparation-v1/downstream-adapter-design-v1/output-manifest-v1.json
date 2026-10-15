@@ -1,0 +1,26 @@
+{
+  "schema": "n25-downstream-adapter-design-delivery-v1",
+  "status": "DESIGN_ONLY_AWAITING_ROOT_REVIEW",
+  "implementation_authorized": false,
+  "gpu_authorized": false,
+  "actual_outcomes_read": false,
+  "runtime_imports": 0,
+  "tests_run": 0,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-adapter-design-v1/read-scope-v1.json",
+      "sha256": "e7e4d7fac3d51af39bc2a0b3595e44a22161d48241e15f74d5665e6e8bd7ec6c",
+      "bytes": 6903
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-adapter-design-v1/source-index-v1.json",
+      "sha256": "0d656e55fee077fb8f8f5536a2eeffe122a980819fe0ed1c007d1e31320ea9c4",
+      "bytes": 18074
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-adapter-design-v1/design-v1.md",
+      "sha256": "ddf4ac56526d23bb939d6babedbfca5244028adf7cd353230257a5ab1d1480cc",
+      "bytes": 16164
+    }
+  ]
+}

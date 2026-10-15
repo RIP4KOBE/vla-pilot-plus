@@ -1,0 +1,28 @@
+{
+  "schema": "n27-pure-helper-source-v1",
+  "base_commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+  "commit": "bcec3e5e37ee90374c44ca794c81b86eafcb40d6",
+  "branch": "codex/n27-feasible-ray-update",
+  "changed_files": [
+    {
+      "status": "A",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/implementation/core/qd_feasible_ray_update.py",
+      "bytes": 2773,
+      "sha256": "146163977866af87d2c643b0446be9ebac12f83cf9337d534b736874c623203e"
+    },
+    {
+      "status": "A",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/implementation/tests/test_n27_feasible_ray_update.py",
+      "bytes": 15088,
+      "sha256": "f15a54c25a502ad9c6aa966e02b438abcc2ef02979d219fdf506952e3de86c31"
+    },
+    {
+      "status": "A",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/implementation/docs/n27-feasible-ray-cpu-note.md",
+      "bytes": 4830,
+      "sha256": "c6d5b3a2673085e75836295cd6d5325fb3f695906b86b32325991b4908f64f2e"
+    }
+  ],
+  "existing_source_files_changed": 0,
+  "integration_authorized": false
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "n25-disabled-preparation-template-v1",
+  "executable": false,
+  "authorization": false,
+  "target_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/final-source-runtime-review-v1.json",
+  "missing_prerequisites": [
+    "actual successful, fully metered tensor proof; exact same final source for future Dev"
+  ],
+  "payload": {
+    "schema": "n25-source-runtime-review-v1",
+    "disposition": "NOT_REVIEWED",
+    "source": null,
+    "runtime": null,
+    "protocol": null,
+    "source_plan": null,
+    "source_bridge": null,
+    "predecessor": null,
+    "backend_proof": null,
+    "arithmetic_protocol": null,
+    "no_gpu_release": true
+  }
+}

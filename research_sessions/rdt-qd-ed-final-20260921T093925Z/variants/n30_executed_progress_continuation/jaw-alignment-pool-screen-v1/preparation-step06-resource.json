@@ -1,0 +1,61 @@
+{
+  "cpu_seconds": 0.002401594,
+  "affinity": [
+    0,
+    1
+  ],
+  "read_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962,
+      "ranges": [
+        [
+          5340,
+          5405
+        ],
+        [
+          7332,
+          7365
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241,
+      "ranges": [
+        [
+          208,
+          222
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/scripts/qd_ed_n30_native.py",
+      "sha256": "c7d8c779f977aaae61976b33d9b52cec5fb068913896f6b09a0d8abecf8067c0",
+      "bytes": 19175,
+      "ranges": [
+        [
+          68,
+          88
+        ],
+        [
+          104,
+          120
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+      "bytes": 2380,
+      "ranges": [
+        [
+          1,
+          135
+        ]
+      ]
+    }
+  ]
+}

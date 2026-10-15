@@ -1,0 +1,100 @@
+{
+  "actual_historical_backend_proof_refs": null,
+  "actual_proof_read": false,
+  "actual_runtime_ref": null,
+  "added_files": [
+    "experiments/qd_ed_n26/admission-clarification-v1.md",
+    "experiments/qd_ed_n26/conditional-dev-controller-protocol-v1.md",
+    "experiments/qd_ed_n26/controller-contract-v1.md",
+    "experiments/qd_ed_n26/independent-arithmetic-protocol-v1.md",
+    "experiments/qd_ed_n26/n25-control-source-manifest-v1.json",
+    "experiments/qd_ed_n26/phase-a-source-manifest-v1.json",
+    "experiments/qd_ed_n26/shared-route-insertions-v1.json",
+    "scripts/qd_ed_n26_backend.py",
+    "scripts/qd_ed_n26_bridge.py",
+    "scripts/qd_ed_n26_contract.py",
+    "scripts/qd_ed_n26_native.py",
+    "scripts/qd_ed_n26_preflight.py",
+    "scripts/qd_ed_n26_prepare.py",
+    "scripts/qd_ed_n26_recovery.py",
+    "scripts/qd_ed_n26_reference.py",
+    "scripts/qd_ed_n26_report.py",
+    "scripts/qd_ed_n26_supervise.py",
+    "tests/n26_cpu_synthetic.py",
+    "tests/test_qd_ed_n26_arithmetic.py",
+    "tests/test_qd_ed_n26_backend.py",
+    "tests/test_qd_ed_n26_controller.py",
+    "tests/test_qd_ed_n26_native.py",
+    "tests/test_qd_ed_n26_recovery.py"
+  ],
+  "authorization": false,
+  "commit": "c09dffe956c391d85ecc02e3288b9fa982e86ce7",
+  "executable": false,
+  "native_cuda_result": "UNKNOWN",
+  "note": "CPU static byte bridge only; not an executable source-equivalence bridge. Root must independently construct future runtime/proof/source review after valid N25 rejection.",
+  "phase_a_commit": "8fd01eb77e2e83a100e54b21dc955c34bda9a3cc",
+  "phase_a_files": 263,
+  "phase_a_files_byte_identical": 261,
+  "phase_a_files_changed": [
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n23_worker.py"
+  ],
+  "phase_a_source_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/source-manifest-cpu-v1.json",
+    "sha256": "5e7085f4fd62c9e07af1890ab00d99f2a8bf75965b4130d944e61236926c3300"
+  },
+  "reverse_index": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/implementation/experiments/qd_ed_n26/shared-route-insertions-v1.json",
+    "sha256": "a4f8c8b80501dd4fadd3a85bcae18eb36932de1c00deb5f91c497dcfdf897267"
+  },
+  "schema": "n26-cpu-source-bridge-controller-v1",
+  "scientific_source_unchanged_from_phase_a": true,
+  "shared_route_checks": [
+    {
+      "existing_functions_changed": [
+        "check_budget",
+        "check_retry",
+        "expand_candidate",
+        "is_n23_plan",
+        "is_n23_v2_plan",
+        "is_n25_plan",
+        "is_n7_plan",
+        "metered_plan",
+        "metered_support",
+        "reconcile_ledger",
+        "run_plan",
+        "typed_metered_plan",
+        "validate_plan"
+      ],
+      "existing_functions_unchanged": 77,
+      "functions_added": [
+        "is_n26_plan"
+      ],
+      "functions_removed": [],
+      "new_sha256": "bc7bbff41fc623d4b3c388ed8c13fe7b6a0360238cae4c36200b157b9711c327",
+      "old_sha256": "b3e5ccd90b4ae0eee036560809dcdb74ff68bbaecb56792d676b64bec6e2f7f5",
+      "path": "scripts/qd_ed_final_runner.py",
+      "reverse_sha256": "b3e5ccd90b4ae0eee036560809dcdb74ff68bbaecb56792d676b64bec6e2f7f5",
+      "whole_file_reverse_exact": true
+    },
+    {
+      "existing_functions_changed": [
+        "run_worker",
+        "validate_context",
+        "verify_receipt"
+      ],
+      "existing_functions_unchanged": 13,
+      "functions_added": [],
+      "functions_removed": [],
+      "new_sha256": "664738f1dd1c8c264a4c7dd72f0d5388cf81a0a9fb15cd2e2bcba1e1f41579ea",
+      "old_sha256": "dd162c7bd0d9cf91da064fcb2652aa5ee3a0a48d4c70940dfa3ce4cdab5bc74e",
+      "path": "scripts/qd_ed_n23_worker.py",
+      "reverse_sha256": "dd162c7bd0d9cf91da064fcb2652aa5ee3a0a48d4c70940dfa3ce4cdab5bc74e",
+      "whole_file_reverse_exact": true
+    }
+  ],
+  "source_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/source-manifest-controller-v1.json",
+    "sha256": "8cae3e7bb0104cb978237b5d4323909e13ffc8a03036958717c5378960ca9bdf"
+  }
+}

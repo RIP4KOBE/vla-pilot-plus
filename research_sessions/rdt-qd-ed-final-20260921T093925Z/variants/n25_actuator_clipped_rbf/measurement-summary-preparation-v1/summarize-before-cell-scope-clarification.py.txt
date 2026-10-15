@@ -1,0 +1,238 @@
+"""N25 JSON-only descriptive measurements. No native arithmetic replay or outcome gate."""
+import argparse, hashlib, json, math, os, signal, statistics, sys, time
+from pathlib import Path
+
+COMMIT='5a65ef15968cc68c82314e8c0773b3365ad45fa0'
+PLAN_SHA='1f0c94ccd3458a3a786acb9525728a1b64e3df439e4f920731f6566dd3a95eb3'
+MODE='actuator_clipped_eef_v1'
+SOURCE='core.qd_actuator_clipped_rbf:clipped_rbf_gradient:v1'
+GATE='n25_actuator_clipped_rbf_audit'
+FIELDS=('gradient_before_normalization','gradient_after_normalization','masked_gradient','update_operand')
+DTYPES=('torch.float32','torch.bfloat16')
+SLOTS=(('initial',-1),)+tuple(('rollout',i) for i in range(10))
+ROLES={'metrics':'eds_metrics.jsonl','compute':'episode_compute.jsonl',
+       'receipt':'in-worker-audit-receipt.json','audit':'decision-evidence-audit.json'}
+MAX_FILE,MAX_TOTAL,MAX_SECONDS=16*1024**2,128*1024**2,60
+
+def require(ok,msg):
+    if not ok: raise ValueError(msg)
+
+def sha(data): return hashlib.sha256(data).hexdigest()
+def integer(x): return type(x) is int and x>=0
+def number(x): return type(x) in (float,int) and math.isfinite(x) and x>=0
+
+def distribution(values):
+    """Statistics of recorded native scalar norms, p90 = nearest rank."""
+    values=sorted(values);n=len(values)
+    return dict(observed=n,mean=statistics.fmean(values) if n else None,
+                median=statistics.median(values) if n else None,
+                p90=values[math.ceil(.9*n)-1] if n else None,
+                min=values[0] if n else None,max=values[-1] if n else None)
+
+def summarize_group(rows,missing):
+    cats=('clipped_components','boundary_components','interior_components')
+    complete=[r for r in rows if all(integer(r.get(k)) for k in cats)
+              and sum(r[k] for k in cats)==384 and r.get('translation_components')==384]
+    zeros=[r['zero_gradient'] for r in rows if type(r.get('zero_gradient')) is bool]
+    norms={}
+    for field in FIELDS:
+        good=[]
+        for r in rows:
+            v=r.get(field)
+            if (isinstance(v,dict) and v.get('finite') is True and number(v.get('norm'))
+                and type(v.get('zero')) is bool and v.get('norm_dtype') in DTYPES
+                and (not v['zero'] or v['norm']==0)): good.append(v)
+        norms[field]={'by_native_dtype':{d:distribution([v['norm'] for v in good if v['norm_dtype']==d]) for d in DTYPES},
+                      'unknown_calls':len(rows)-len(good)}
+    return dict(observed_call_rows=len(rows),missing_decision_groups=missing,components_per_call=384,
+        expected_components_for_observed_rows=384*len(rows),component_complete_calls=len(complete),
+        component_unknown_calls=len(rows)-len(complete),observed_component_denominator=384*len(complete),
+        **{k:sum(r[k] for r in complete) if complete else None for k in cats},
+        zero_gradient=dict(true=sum(zeros),known_calls=len(zeros),unknown_calls=len(rows)-len(zeros),
+                           ratio=sum(zeros)/len(zeros) if zeros else None),native_norms=norms)
+
+def grouped(pools,missing):
+    allrows=[r for s in SLOTS for r in pools[s]]
+    return {'all_calls':summarize_group(allrows,sum(missing.values())),
+        'phase_totals':{p:summarize_group([r for s in SLOTS if s[0]==p for r in pools[s]],
+                            sum(missing[s] for s in SLOTS if s[0]==p)) for p in ('initial','rollout')},
+        'groups':[dict(phase=s[0],iteration=s[1],**summarize_group(pools[s],missing[s])) for s in SLOTS]}
+
+def summarize_cell(meta,metrics,compute,receipt,audit):
+    issues=[];pools={s:[] for s in SLOTS};missing={s:0 for s in SLOTS};first=[]
+    def check(field,got,want):
+        if got is None or want is None:
+            issues.append(dict(field=field,status='Unknown',recorded=got,expected=want))
+        elif type(got)!=type(want) or got!=want:
+            issues.append(dict(field=field,status='inconsistent',recorded=got,expected=want))
+    steps=[]
+    for mi,m in enumerate(metrics):
+        steps.append(m.get('global_step'))
+        for key in ('initial_diversity_descriptor_mode','rollout_diversity_descriptor_mode'):
+            check(f'metric[{mi}].{key}',m.get(key),MODE)
+        initial=m.get('initial_direction_rbf_evidence_by_step')
+        rollout=m.get('rollout_direction_rbf_evidence_by_iter')
+        groups=[initial]+[rollout[i] if isinstance(rollout,list) and len(rollout)==10 else None for i in range(10)]
+        for slot,rows in zip(SLOTS,groups):
+            if not isinstance(rows,list) or any(not isinstance(r,dict) for r in rows):
+                missing[slot]+=1;issues.append(dict(field=f'metric[{mi}].{slot}',status='Unknown'));continue
+            if mi==0 and rows:first.append(list(slot))
+            pools[slot].extend(rows)
+            for ri,row in enumerate(rows):
+                expected={'phase':slot[0],'iteration':slot[1],'global_step':m.get('global_step'),
+                    'descriptor_mode':MODE,'source':SOURCE,'schema':'n25-rbf-call-summary-v1',
+                    'summary_only_not_exact_replay':True,'absolute_fallback_used':False,
+                    'input_shape':[16,64,128],'horizon':8,'translation_indices':[39,40,41],
+                    'translation_components':384,'update_operand_is_measured_output_delta':False,'nonfinite_count':0}
+                for k,v in expected.items():check(f'metric[{mi}].{slot}.row[{ri}].{k}',row.get(k),v)
+                after=row.get('gradient_after_normalization',{})
+                check(f'metric[{mi}].{slot}.row[{ri}].zero_binding',row.get('zero_gradient'),
+                      after.get('zero') if isinstance(after,dict) else None)
+        check(f'metric[{mi}].initial_steps',m.get('initial_diversity_steps'),len(initial) if isinstance(initial,list) else None)
+        if isinstance(rollout,list) and len(rollout)==10 and all(isinstance(x,list) for x in rollout):
+            check(f'metric[{mi}].rollout_steps',m.get('rollout_diversity_steps_applied'),sum(map(len,rollout)))
+        for k,v in [('score_call_count',11),('search_evaluation_count',176),('resample_count',10),
+                    ('renoise_count',10),('rollout_count',10)]:
+            check(f'metric[{mi}].{k}',m.get(k),v)
+    if any(type(s) is not int for s in steps) or len(set(s for s in steps if type(s) is int))!=len(steps):
+        issues.append(dict(field='decision_global_steps',status='inconsistent_or_missing'))
+    allrows=[r for s in SLOTS for r in pools[s]];gate=audit.get(GATE,{})
+    if not isinstance(gate,dict):gate={}
+    native=receipt.get('n25_native_counts',{})
+    check('audit.schema',gate.get('schema'),'n25-native-rbf-audit-v1');check('audit.accepted',gate.get('accepted'),True)
+    if not integer(compute.get('unguided_chunks')):
+        issues.append(dict(field='compute.unguided_chunks',status='Unknown_or_malformed'))
+    for k,v in [('guided_chunks',len(metrics)),('rbf_gradient_calls',len(allrows)),('rbf_gradient_batch_rows',16*len(allrows))]:
+        check('compute.'+k,compute.get(k),v)
+    for k,v in [('guided_decisions',len(metrics)),('all_call_summaries_verified',len(allrows))]:
+        check('audit.'+k,gate.get(k),v);check('receipt.'+k,native.get(k),v)
+    observed=audit.get('observed_counts')
+    canonical=observed.get('canonical_candidate_batch',0) if isinstance(observed,dict) else None
+    check('audit.canonical_batches',canonical,11*len(metrics))
+    expected_witness=None if any(missing.values()) else len(first)
+    check('audit.witness_calls_verified',gate.get('witness_calls_verified'),expected_witness)
+    check('receipt.witness_calls_verified',native.get('witness_calls_verified'),gate.get('witness_calls_verified'))
+    checks=gate.get('witness_checks')
+    check('audit.witness_checks.length',len(checks) if isinstance(checks,list) else None,gate.get('witness_calls_verified'))
+    if isinstance(checks,list):
+        for n,c in enumerate(checks):check(f'witness[{n}].accepted',c.get('accepted'),True)
+    size=gate.get('witness_numeric_bytes')
+    if not integer(size) or size>225280:issues.append(dict(field='witness_numeric_bytes',status='Unknown_or_inconsistent'))
+    for key,field in [('zero_gradient_calls','zero_gradient'),('clipped_components','clipped_components')]:
+        values=[r[field] for r in allrows if (type(r.get(field)) is bool if field=='zero_gradient' else integer(r.get(field)))]
+        expected=sum(values) if len(values)==len(allrows) else None
+        check('audit.'+key,gate.get(key),expected);check('receipt.'+key,native.get(key),expected)
+    groups=grouped(pools,missing);g=groups['all_calls']
+    if g['component_unknown_calls'] or g['zero_gradient']['unknown_calls'] or any(v['unknown_calls'] for v in g['native_norms'].values()):
+        issues.append(dict(field='scalar_measurements',status='Unknown_or_malformed'))
+    report=dict(attempt_id=meta['attempt_id'],episode_key=meta['episode_key'],task_id=meta['task_id'],
+        recorded_metrics=len(metrics),**groups,
+        cost_consistency=dict(status='consistent' if not issues else 'Unknown_or_inconsistent',issues=issues,
+            recorded_compute={k:compute.get(k) for k in ('guided_chunks','unguided_chunks','rbf_gradient_calls','rbf_gradient_batch_rows')},
+            recorded_native_canonical_batches=canonical,receipt_worker_wall_seconds=receipt.get('worker_wall_seconds'),
+            receipt_audit_seconds=receipt.get('audit_seconds'),ledger_gpu_seconds='Unknown_not_read'),
+        bounded_witness=dict(first_guided_expected_slots=first,expected_calls=expected_witness,
+            recorded_verified_calls=gate.get('witness_calls_verified'),recorded_numeric_bytes=size,
+            exact_audit_call_coverage=gate['witness_calls_verified']/len(allrows)
+                if integer(gate.get('witness_calls_verified')) and allrows else None,
+            evidence_basis='Existing accepted in-worker auditor JSON; tensors not read/replayed',
+            slot_identity_independently_verified=False))
+    return report,pools,missing
+
+def summarize(cells):
+    reports=[];pools={s:[] for s in SLOTS};missing={s:0 for s in SLOTS}
+    for args in cells:
+        report,part,miss=summarize_cell(*args);reports.append(report)
+        for s in SLOTS:pools[s].extend(part[s]);missing[s]+=miss[s]
+    return dict(schema='n25-terminal-measurement-summary-v1',descriptive_only=True,efficacy_or_promotion_gate=False,
+        source_commit=COMMIT,plan_sha256=PLAN_SHA,cells=reports,accepted_cells_in_frozen_input=len(cells),
+        aggregate=grouped(pools,missing),limitations=[
+        'Scalar summaries cannot prove CUDA replay outside bounded native witnesses.',
+        'Update operand norms are not measured model-output deltas.',
+        'Zero gradients are legal; no activation/efficacy threshold is imposed.',
+        'No N23 raw-gradient pairing or physical grasp/causal/task-benefit inference.',
+        'Missing measurements remain Unknown. Norm distributions describe recorded native scalars.',
+        'Root supplies accepted-cell designation; this reader does not re-adjudicate outcomes.'])
+
+def load_cells(manifest,read_bytes):
+    require(manifest.get('schema')=='n25-measurement-input-manifest-v1' and manifest.get('executable') is True,'disabled/wrong manifest')
+    require(manifest.get('source_commit')==COMMIT and manifest.get('plan_sha256')==PLAN_SHA,'source/plan mismatch')
+    cells=manifest.get('cells');require(isinstance(cells,list) and 1<=len(cells)<=10,'cell cap')
+    att=manifest.get('root_attestation',{})
+    require(att.get('terminal_cohort') is True and att.get('all_accepted_N25_cells') is True
+        and att.get('no_inflight') is True and type(att.get('expected_cell_count')) is int and att['expected_cell_count']==len(cells), 'root complete-input attestation absent')
+    paths=set();ids=set();tasks=set();loaded=[];total=0;reads=[]
+    for cell in cells:
+        require(cell.get('accepted_by_root') is True and cell.get('profile')=='N25','unaccepted/wrong profile')
+        require(type(cell.get('task_id')) is int and 0<=cell['task_id']<10 and cell['task_id'] not in tasks,'task duplicate/range')
+        require(isinstance(cell.get('attempt_id'),str) and cell['attempt_id'] not in ids
+                and isinstance(cell.get('episode_key'),str),'attempt identity')
+        tasks.add(cell['task_id']);ids.add(cell['attempt_id'])
+        refs=cell.get('files',{});require(set(refs)==set(ROLES),'four exact roles required');obj={}
+        for role,name in ROLES.items():
+            ref=refs[role];p=Path(ref['path'])
+            require(p.is_absolute() and p.name==name and str(p.resolve()) not in paths,'unsafe/duplicate path');paths.add(str(p.resolve()))
+            if role=='metrics' and ref.get('present') is False:
+                require(ref.get('sha256') is None and not p.exists(),'absent metrics changed');obj[role]=[];continue
+            require(ref.get('present',True) is True,'mandatory input absent')
+            data=read_bytes(p,min(MAX_FILE,MAX_TOTAL-total));total+=len(data)
+            require(len(data)<=MAX_FILE and total<=MAX_TOTAL,'byte cap');require(sha(data)==ref.get('sha256'),'input hash mismatch')
+            reads.append(dict(path=str(p),sha256=sha(data),bytes=len(data),read_count=1))
+            obj[role]=[json.loads(line) for line in data.splitlines() if line.strip()] if role in ('metrics','compute') else json.loads(data)
+        require(len(obj['compute'])==1,'compute row count')
+        compute=obj['compute'][0];receipt=obj['receipt'];audit=obj['audit']
+        require(receipt.get('schema')=='n23-in-worker-audit-receipt-v1'
+            and receipt.get('attempt_id')==cell['attempt_id'] and receipt.get('episode_key')==cell['episode_key']
+            and receipt.get('profile')=='N25' and receipt.get('accepted') is True
+            and receipt.get('main_exit_code')==0 and receipt.get('process_unchanged') is True,'receipt not accepted/bound')
+        require(receipt.get('source',{}).get('commit')==COMMIT and receipt.get('plan',{}).get('sha256')==PLAN_SHA,'receipt source/plan differs')
+        require(audit.get('accepted') is True and audit.get('evidence_complete') is True,'audit not accepted')
+        for role,value in [('metrics',receipt.get('n25_metrics',{})),('audit',receipt.get('audit_report',{}))]:
+            require(value.get('sha256')==refs[role]['sha256']
+                and Path(value.get('path','')).resolve()==Path(refs[role]['path']).resolve(),role+' receipt ref differs')
+        require(receipt.get('n25_metrics',{}).get('present')==refs['metrics'].get('present',True),'metrics presence differs')
+        bound=[x for x in receipt.get('evidence',{}).get('files',[]) if x.get('path')=='eds_eval/episode_compute.jsonl']
+        require(len(bound)==1 and bound[0].get('sha256')==refs['compute']['sha256'],'compute evidence ref differs')
+        if refs['metrics'].get('present') is False:
+            require(type(compute.get('guided_chunks')) is int and compute['guided_chunks']==0
+                and isinstance(audit.get('observed_counts'),dict)
+                and audit['observed_counts'].get('canonical_candidate_batch',0)==0
+                and audit.get(GATE,{}).get('guided_decisions')==0
+                and receipt.get('n25_native_counts',{}).get('guided_decisions')==0,'absent guided metrics')
+        loaded.append((cell,obj['metrics'],compute,receipt,audit))
+    return loaded,dict(files=reads,file_count=len(reads),bytes=total,tensor_reads=0)
+
+def main():
+    ap=argparse.ArgumentParser()
+    ap.add_argument('--manifest',required=True);ap.add_argument('--release',required=True);ap.add_argument('--output',required=True)
+    args=ap.parse_args();home=Path(__file__).resolve().parent
+    paths=[Path(x).resolve() for x in (args.manifest,args.release,args.output)]
+    require(all(p.parent==home for p in paths),'control files must be directly in preparation directory')
+    data=paths[0].read_bytes();release=json.loads(paths[1].read_bytes())
+    require(release.get('schema')=='n25-measurement-read-release-v1' and release.get('executable') is True
+        and release.get('manifest_sha256')==sha(data) and release.get('reader_sha256')==sha(Path(__file__).read_bytes())
+        and release.get('guard_sha256')==sha((home/'guard_v1.py').read_bytes())
+        and release.get('output')==str(paths[2]) and release.get('max_wall_seconds')==MAX_SECONDS,'missing exact future root release')
+    require(not paths[2].exists(),'output already exists');manifest=json.loads(data)
+    from guard_v1 import install
+    allowed=[v['path'] for c in manifest.get('cells',[]) for v in c.get('files',{}).values()]
+    guard=install(read_paths=allowed,write_paths=[str(paths[2])]);started=time.monotonic();reads={}
+    signal.signal(signal.SIGALRM,lambda *_:(_ for _ in ()).throw(TimeoutError('60-second cap')))
+    signal.setitimer(signal.ITIMER_REAL,MAX_SECONDS)
+    def once(path,limit):
+        require(str(path) not in reads,'second payload read');reads[str(path)]=1
+        with path.open('rb') as f:
+            require(os.fstat(f.fileno()).st_size<=limit,'payload byte cap before read')
+            return f.read(limit)
+    try:
+        cells,coverage=load_cells(manifest,once);result=summarize(cells)
+        result.update(input_coverage=coverage,input_manifest_sha256=sha(data),
+                      elapsed_seconds=time.monotonic()-started,guard=guard)
+    except Exception as exc:
+        result=dict(schema='n25-terminal-measurement-summary-error-v1',error=str(exc),
+                    payload_read_counts=reads,guard=guard,elapsed_seconds=time.monotonic()-started,automatic_retry_allowed=False)
+        paths[2].write_text(json.dumps(result,indent=2,allow_nan=False)+'\n');raise
+    finally:signal.setitimer(signal.ITIMER_REAL,0)
+    paths[2].write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
+
+if __name__=='__main__':main()

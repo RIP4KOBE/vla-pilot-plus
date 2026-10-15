@@ -1,0 +1,48 @@
+# N25 named infrastructure continuation protocol v1
+
+Status: root accepts bounded CPU implementation and synthetic review; actual history sealing, integration, authority adoption and GPU release remain separately recorded steps. This is an administrative continuation of the user's ongoing expressly invoked Arbor task and subsequent instruction to continue without intervention, not a new user-audited budget. No additional budget is adopted by this protocol.
+
+## Observed immutable predecessor and exact exception
+
+The original N25 cohort has closed INVALID_OR_INTERRUPTED with 18 accepted cells in original task-major order: tasks0..3 C0/Q0/N23/N25, then task4 C0/Q0. The root terminal reconstruction passed while all257 source files at 5a65ef15968cc68c82314e8c0773b3365ad45fa0 were intact. Counts are C0=0/5, Q0=0/5, N23=0/4, N25=1/4; no success-based prefix selection is permitted.
+
+The only permitted exceptional repeat is exact attempt rdt-qd-ed-final-20260921T093925Z__n25_dev_t04_n23_20260930__8b236af507d8, original scientific index18, task4/N23. Its immutable terminal literally records event=valid, outcome_valid=false, reason=TimeoutExpired, compute_outcome=completed, gpu_process_wall_seconds=1801.4751812220784. Original transport counts are43 logical,37 completed,6 failed,37 usage-complete. Six recorded codex_timeout events contain stream_error/item_error lifecycle evidence; their actual ordered identities and signatures must be sealed from existing metadata. In-worker audit receipt and independent native report are absent. Native arithmetic, unmeasured safety/semantic gates and API-only causal attribution remain UNKNOWN/UNPROVEN. This exception authorizes exactly one new attempt; it never validates, repairs or discards the old one. Do not use or weaken the old single-timeout classifier.
+
+Implement the design-v1 boundary together with the separately preserved v2 incomplete-infrastructure addendum. The root must inspect the implementation before actual metadata sealing. The sealer must verify the root terminal review, immutable result/status/ledger, original257 source closure and exact18-cell accepted prefix; source/plan/runtime/identity/start/process/receipt/audit and recorded evidence-index digests. It may consume only bounded JSON/public metadata and approved source records. Do not deserialize or rehash referenced tensor bundles, invoke the old full validator if that follows tensor paths, reopen model weights, perform GPU replay, call an API or use an environment. Historical native acceptance is explicitly the original metered audit attested by hash-bound receipts and the root review; the new seal is a metadata attestation, not another native audit. Preserve this reliance in the seal.
+
+Seal all19 old attempts and their costs, the exact failed-call signature and typed absence of the two audit files; verify old controller/worker/owned descendants are dead using boot/PID/ticks and owned-process metadata. The sealer must fail on unexpected contradictions, changed source/identity, unsettled/later reservations, missing accepted-cell metadata or a delayed audit writer. Recheck typed absence and process cleanup before actual release. Unknown historical gates must never be substituted with true. Capture existing results/compute files only as hash-bound presence evidence, not a passing scientific outcome.
+
+## Successor scientific mapping and limits
+
+Use distinct cohort N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930. Imported prefix18 consists only of original metadata references, no synthetic new events or dispatchable rows. Exactly22 possible new rows map indices18..39: one named repeat at18, recovery bucket/retry_of the exact failed attempt, then index19 N25 and tasks5..9 all original four arms. Same task/seed/init/profile/input/runtime/science/Stage/action/timeout fields; only operational key/cohort/source/plan and the named recovery lineage/bucket change. Reject dispatch of any valid historical scientific cell, repeated index, another already exposed suffix or a reordered mapping.
+
+Every NEW attempt must pass all original normal source/native/transport/cost/safety/result gates. The named repeat may validly fail the task and then continue. Any NEW invalidity immediately closes the successor INVALID with all costs; no further retries, automatic resume or reused pure-timeout allowance. A reservation consumes the single-launch opportunity.
+
+Original and successor combined: maximum42 dispatched attempts, maximum2 recovery attempts, at most1 recovery per scientific cell. Actual observed history19 with no earlier recoveries implies at most41 total for full completion. Keep original adopted local22 GPU-hour ceiling across both, subtract8201.788167113322 seconds already charged; do not reset time. Actual successor cap must be frozen at release no greater than min(22 minus original charged hours, actual remaining unprotected cumulative hours). Each dispatch requires1800+40 seconds room. Existing private caps494/100GPUh and bucket55baseline/199development/180validation/40formal/20recovery remain; validation/formal reserves32/12 cumulative hours remain. Expected remaining demand5baseline+16development+1recovery must fit actual release-time ledger; otherwise close admission, never borrow reserves. Original failed costs and six unknown-token calls remain included exactly once with partial observed token totals.
+
+Promotion remains complete40 valid, N25>=5/10 and >=all three matched controls, with substantive QD/ED and every unchanged gate. Evaluate numerical futility only at complete original quadruples. Any source/report/controller-journal disagreement is INVALID, not futility or promotion. An incomplete cohort never makes unrun cells failures.
+
+## Source boundary and preparation
+
+Create isolated implementation from exact5a under this variant; never mutate active study source/state in CPU preparation. Add small continuation contract, sealer, bridge, prepare/supervise/report/terminal-reader and synthetic fixtures as necessary. Only permitted shared-function edits: runner.metered_support, runner.check_budget, runner.check_retry, worker.validate_context, using closed versioned routes. Preserve original whole files by exact reverse patch and AST function parity. All other255 original files and all scientific/native/projector/reference/RDT/Stage/provider/config functions stay byte-identical. In particular run_plan, build_command, run_worker, verify_receipt and original N25 supervisor/classifier remain unchanged. No global monkeypatch/function cloning in the new route.
+
+Reuse the original n25_cohort audit-family marker to retain same-worker C0/Q0 CPU audit and N23/N25 GPU7 CUDA audit. An administrative source bridge must explicitly bind historical5a proof/source to successor routing; never claim the old proof was generated by the new commit. No new numerical GPU preflight is justified by pure administrative source changes. Root independently reviews full shared diff/source closure, synthetic controls, all failure logs and proof seals before integrating. If required implementation exceeds these four functions or alters math/provider/scientific semantics, stop dependent implementation and explain concretely; do not expand scope silently.
+
+Synthetic checks must cover exact named failed-signature/Unknown semantics, imported prefix and all22 mappings, accepted historical identity rejection, consumed retry and prior reservation, changed/late audit files, live/stale processes, complete source bridge and unchanged old routing, independent new receipts, every bucket/combined/local/cumulative/protected-time limit, charge-before-launch, worker deadline, any later invalidity and status/report failure with full ledger reconstruction. Tests use no real attempt/protected payloads, API/GPU/model/sim or credentials. Keep previous failed synthetic checks and issue fixes. Deliver disabled templates with explicit unresolved refs, clean isolated commit/manifests, guard logs and CPU report. All new outputs stay beneath N25; native attempts retain the original artifact root.
+
+## Activation and downstream boundary
+
+Root order: review CPU delivery -> run separately frozen metadata sealing under old5a -> validate immutable prefix/fault proof -> integrate exact reviewed administrative source -> source/runtime/resource/budget/final-review authority -> freeze exact22-row plan and independently inspect commands -> explicit one-launch release -> supervise GPU7 only. Provider remains current managed Codex CLI login, gpt-6-astra/low/E2/180s, no Poe or alternative fallback; preserve saved credentials. Only one owned GPU worker.
+
+Old original INVALID result/status/ledger are never overwritten. Successor result distinguishes imported/new evidence, every old/new attempt and combined costs, historical Unknowns, original INVALID versus logical-cohort disposition. Prebuilt N25 validation and N26 predecessor gate remain INACTIVE. Any future logical promotion/rejection requires a separate reviewed evidence/source adapter; current engineering INVALID satisfies neither. No protected-phase launcher is added here.
+
+## Frozen parent references
+
+- design-v1: `8daceadf71cbf081ed137919aeced134cf06ab8ea127d3624600267ad591a610`
+- design-v2: `156f31dc996df99b434366161c7ffd39856c4d4a2179272ccd409db7bc0bea3b`
+- result: `8005d67dc8cc04c764838d703c06dd8e14aeeae6b2312ba5bfe9b483228ac3b1`
+- terminal-review: `a0b225efd8e35c17b5c6e801c3188a63b178079b7d31274f8b189a5641c59052`
+- original-plan: `1f0c94ccd3458a3a786acb9525728a1b64e3df439e4f920731f6566dd3a95eb3`
+- source: `fafcb0d881c95d567cb14a6690145d4ad933abc84a5e0175dfbe1512efd836ee`
+
+Recorded UTC: 2026-09-30T23:01:54.120419+00:00

@@ -1,0 +1,87 @@
+{
+  "root_terminal_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-v1/root-terminal-review-v1.json",
+    "sha256": "c382801b52bb2c50c660da0ab9ba9e92285bff0780df7938b5e0565829b41af8"
+  },
+  "collector": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-root-activation-v1/root-collect-logical-dev-v1.py",
+    "sha256": "c215ac288ea710a821206b3ac0098744955a154cad76dae9822b6010bf677e89"
+  },
+  "collected_at": "2026-10-01T01:10:25.799654+00:00",
+  "all_matching_events_included": true,
+  "protected_events_included": false,
+  "schema": "n25-current-resource-projection-v1",
+  "source_ledger": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+    "sha256": "aab06a2927b30c25cc57359ae64a5be3b9052dd6a410152023bf13552347b489"
+  },
+  "resource_id": "rdt-qd-ed-final-20260921T093925Z__n25_tensor_arithmetic_v1",
+  "resource_kind": "n25_tensor_arithmetic_v1",
+  "events": [
+    {
+      "admission": {
+        "external_compute_processes": 0,
+        "memory_used_mib": 197,
+        "physical_gpu": 7
+      },
+      "budget_bucket": "recovery",
+      "episode_attempts": 0,
+      "event": "reserved",
+      "kind": "n25_tensor_arithmetic_v1",
+      "output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/arithmetic-preflight/worker",
+      "physical_gpu": 7,
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/arithmetic-preflight/plan.frozen.v1.json",
+        "sha256": "57327ae84a582ae3d7d2b4facb7af18f465e69ec5a6a9a65a370a8f949267dca"
+      },
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__n25_tensor_arithmetic_v1",
+      "source_commit": "5a65ef15968cc68c82314e8c0773b3365ad45fa0",
+      "time_unix": 1790799269.6950994
+    },
+    {
+      "budget_bucket": "recovery",
+      "episode_attempts": 0,
+      "event": "dispatched",
+      "kind": "n25_tensor_arithmetic_v1",
+      "output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/arithmetic-preflight/worker",
+      "physical_gpu": 7,
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/arithmetic-preflight/plan.frozen.v1.json",
+        "sha256": "57327ae84a582ae3d7d2b4facb7af18f465e69ec5a6a9a65a370a8f949267dca"
+      },
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__n25_tensor_arithmetic_v1",
+      "source_commit": "5a65ef15968cc68c82314e8c0773b3365ad45fa0",
+      "time_unix": 1790799272.621575,
+      "timeout_seconds": 60
+    },
+    {
+      "budget_bucket": "recovery",
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "episode_attempts": 0,
+      "event": "completed",
+      "failure": null,
+      "gpu_process_wall_seconds": 10.955759774893522,
+      "kind": "n25_tensor_arithmetic_v1",
+      "measurement": "whole exclusive process wall including cleanup",
+      "output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/arithmetic-preflight/worker",
+      "physical_gpu": 7,
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/arithmetic-preflight/plan.frozen.v1.json",
+        "sha256": "57327ae84a582ae3d7d2b4facb7af18f465e69ec5a6a9a65a370a8f949267dca"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/arithmetic-preflight/worker/process.json",
+        "sha256": "dda68d4e32aa929f1362a7dd300ec47a06de5649d12c6545f321a1512e66606d"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/arithmetic-preflight/worker/report.json",
+        "sha256": "1e9ee4c57cb305628c182cdc37d615ea78b7af9f59d4d39c7576f0e57ae24903"
+      },
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__n25_tensor_arithmetic_v1",
+      "source_commit": "5a65ef15968cc68c82314e8c0773b3365ad45fa0",
+      "time_unix": 1790799283.7845016
+    }
+  ],
+  "event_count": 3
+}

@@ -1,0 +1,25 @@
+# N30 initial-observation repair continuation — CPU preparation
+
+Frozen clean commit **b2775fa2008a8a88e374c43a5753f8862485af1f**, based on accepted repair **7c0d80d734fa8300173e56d9a8de03415bc55fe2**; protocol precommit67b9f98. No GPU/API/model/simulator/actual attempt execution, state/budget change or protected input read occurred. This delivery does not authorize dispatch or establish task benefit.
+
+The five new modules provide a finite historical metadata bridge, contract, prepare, supervisor and combined report. Only existing runner/worker administrative routes change. The full source manifest contains457 files:439 of441 repair-base files are unchanged and the two changed files reverse exactly to their base bytes; all16 added files are included. Main's accepted raw-cache initialization, helper, policy, native audit, scientific profile and Codex transport remain byte-identical to7c0. All457 file bytes equal their committed Git blobs. The current worktree is clean.
+
+Exactly two old control cells retain original4ce2 provenance. The original cohort and failed task0 N30 remain INVALID; its original `valid` ledger event, `outcome_valid=false` and `task_failure` label are retained. New execution permits only the named recovery in recovery bucket and original nine unrun rows. Any previous linked recovery in any cohort blocks a second consumption. No resume or extra retry. Combined costs include all original1090.1433259700425 seconds once, new attempts and attributed preparation;6h combined and578/100 caps remain. A complete triple uses the original3-of4 mathematical futility/gate. Status/journal disagreement retains the longer independently reconstructed prefix and all costs, forces INVALID, and cannot promote.
+
+Historical metadata checking uses the exact root closure/source/plan/control context/receipt/audit/error hashes,8MiB per file and64MiB total. It does not follow old tensor evidence refs. Historical raw integrity and cleanup remain explicitly inherited from root's old-HEAD review. New cells retain the full original same-process CPU native N30 audit and receipt. Resource admission preserves original current source/runtime/provider/GPU checks, protected reserves and full1840s per attempt. Future QD-off, validation and formal remain closed.
+
+## Focused evidence
+
+- **run1:**32 passed,5.827362977 process CPU seconds. Real generic validate_plan and actual Hydra three-arm command composition with synthetic runtime/authority; source/profile/mixed-marker/storage/seed gates; runner retry/budget routing; same-process worker/receipt; combined counts, unknown costs and futility; status mismatch.
+- **run2:**18 additional passed,16 deselected,3.667179281 CPU seconds. Exact historical control/source/receipt/error/prefix/hash positive and tamper negatives, bounded reader allocation, remaining finite slot/protected capacity, immutable plan/missing authority and prepare science preservation.
+- **run3:**1 additional passed,3.343367057 CPU seconds. Exact whole-file reversal positive and unauthorized immutable-source drift negative. This was the final required bridge check; no numerical or Main suite was repeated.
+
+Total **51 distinct passed;12.837909315 CPU seconds of1200**. All3 invocations guard-clean, zero denied reads, affinity[0,1], threads2, CUDA invisible and `torch.cuda.is_initialized()==false`. Logs and exact pytest selections are preserved in cpu-run1/2/3.log and resource JSON. There were no failed test invocations. Synthetic worker tests replace CUDA identity/backend and raw audit, so they prove administrative wiring rather than a future native outcome. Full initial-observation Main regression remains the accepted prior7 tests and was not rerun. Current tests do not certify live resources or old payloads.
+
+One authoring boundary deviation is disclosed: an accidental empty `/tmp/n30_unused` file was created and then moved intact to this directory as `empty-authoring-transient-v1.txt`; no source/payload content was written/read there. No experimental source/state was affected. Brief stdlib/Git packaging is separately recorded and did not import production modules.
+
+## Handoff
+
+Exact artifact schemas, API and activation order are in committed `docs/experiments/n30/r1/controller-contract-v1.md`. Root should use `bridge.build(source,runtime,root)` then publish bridge→independent final review→finite authority/adoption→prepare.freeze→exact execution release→single supervisor launch. P/artifacts remains the attempt root; K/execution is the separate controller root. The root must recheck GPU7 idle ownership, original runtime/current Codex account, current budget/old ledger subset and20GiB on the actual destination device. All five delivered templates are explicitly disabled with unresolved actual refs. No source integration, actual history closure build or GPU release was performed by this executor.
+
+Root independently reviews the actual terminal and owned process exits after the future continuation. No downstream protected phase is authorized by this delivery. Task score remains Unknown.

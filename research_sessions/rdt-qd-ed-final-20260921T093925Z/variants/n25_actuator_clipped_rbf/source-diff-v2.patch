@@ -1,0 +1,1020 @@
+diff --git a/configs/qd_ed_final/candidate_n25.json b/configs/qd_ed_final/candidate_n25.json
+new file mode 100644
+index 0000000..e9c7937
+--- /dev/null
++++ b/configs/qd_ed_final/candidate_n25.json
+@@ -0,0 +1,108 @@
++{
++  "action_chunk_horizon": 8,
++  "algorithm_contract": "n25_actuator_clipped_eef_rbf_v1",
++  "baseline_provenance": {
++    "path": "configs/qd_ed_final/baseline_profiles.json",
++    "profile": "Q0.restored_profile",
++    "sha256": "75ba829fc29db71ae31669cd803c24fbe8ea96fe347160539a273f9d73551690"
++  },
++  "baseline_reference": "N23",
++  "label": "N25",
++  "only_algorithm_change": {
++    "initial_diversity_descriptor_mode": {
++      "before": "absolute_eef",
++      "after": "actuator_clipped_eef_v1"
++    },
++    "rollout_diversity_descriptor_mode": {
++      "before": "absolute_eef",
++      "after": "actuator_clipped_eef_v1"
++    }
++  },
++  "parent_candidate": {
++    "path": "configs/qd_ed_final/candidate_n23.json",
++    "sha256": "b6048a33d9259abd21a08ae8eca2d7fecebe16ac86b511fd7400b17caf0f2242"
++  },
++  "profile": {
++    "adaptive_early_stop_patience": 2,
++    "adaptive_min_cem_iters": 4,
++    "adaptive_reward_improvement_eps": 0.001,
++    "cem_iters": 10,
++    "chunk_memory_fraction": 0.0,
++    "chunk_memory_renoise_steps": 2,
++    "chunk_memory_reward_guard_quantile": 0.25,
++    "chunk_population_mode": "fresh",
++    "elite_carryover_count": 0,
++    "execution_contact_distance": 0.04,
++    "execution_horizon_contact": 2,
++    "execution_horizon_far": 8,
++    "execution_horizon_mode": "fixed",
++    "execution_horizon_near": 4,
++    "execution_near_distance": 0.08,
++    "gemini_grounding_enabled": false,
++    "initial_diversity_descriptor_mode": "actuator_clipped_eef_v1",
++    "initial_diversity_scale": 20.0,
++    "initial_diversity_start_ratio": 0.8,
++    "initial_sampling_mode": "rbf_diverse_denoise",
++    "label": "eds_quality_diversity_sparse_primary",
++    "max_episode_steps": 720,
++    "method": "eds_quality_diversity_sparse_primary",
++    "num_elites": 16,
++    "p2_joblib_multiprocessing": false,
++    "p2_render_gpu_index": 7,
++    "parent_anchor_count": 0,
++    "parent_anchor_reward_quantile": 0.5,
++    "parent_coverage_mode": "none",
++    "parent_weighting_mode": "legacy_temperature",
++    "population_size": 16,
++    "qd_archive_mode": "grid_archive",
++    "qd_bounds_expand_fraction": 0.1,
++    "qd_bounds_quantiles": [
++      0.05,
++      0.95
++    ],
++    "qd_bounds_update_policy": "fixed_initial",
++    "qd_cell_capacity": 1,
++    "qd_degenerate_fallback_policy": "none",
++    "qd_descriptor": "target_xy_quadrant_signed_height_v1",
++    "qd_final_selection_mode": "terminal_grasp_proximity_v1",
++    "qd_global_quality_anchor_count": 0,
++    "qd_grid_shape": [
++      4,
++      4
++    ],
++    "qd_metrics_observer": true,
++    "qd_min_axis_span_m": 0.08,
++    "qd_overflow_policy": "clamp_edge",
++    "qd_parent_sampling": "sparse_priority",
++    "qd_secondary_lane_mode": "none",
++    "qd_sparse_exponent": 1.0,
++    "qd_tie_break": "stable_fingerprint",
++    "renoise_t_max": 3,
++    "renoise_t_min": 1,
++    "reward_mode": "normal",
++    "role": "sampling_attribution",
++    "rollout_diversity_band_ratio": 0.2,
++    "rollout_diversity_control_mode": "fixed",
++    "rollout_diversity_decay_floor": 0.25,
++    "rollout_diversity_descriptor_mode": "actuator_clipped_eef_v1",
++    "rollout_diversity_iters": "all",
++    "rollout_diversity_scale": 20.0,
++    "rollout_diversity_scale_max": 20.0,
++    "rollout_diversity_scale_min": 0.0,
++    "rollout_diversity_skip_final_steps": 0,
++    "rollout_diversity_start_ratio": 0.6,
++    "rollout_diversity_target_ratio": 1.0,
++    "save_mechanism_trace_to_qualitative": true,
++    "search_schedule_mode": "legacy_linear",
++    "seed": 0,
++    "selection_beta_max": 100.0,
++    "selection_bisection_steps": 24,
++    "selection_ess_target_ratio": 0.6,
++    "stage_recognition_enabled": true,
++    "temperature": 0.1,
++    "truncated_rollout_mode": "rbf_diverse",
++    "use_cem": false,
++    "qd_quality_mode": "actuator_clipped_provider_v1"
++  },
++  "schema_version": "qd-ed-final-candidate-profile-v1"
++}
+diff --git a/core/qd_actuator_clipped_rbf.py b/core/qd_actuator_clipped_rbf.py
+new file mode 100644
+index 0000000..bde5f5f
+--- /dev/null
++++ b/core/qd_actuator_clipped_rbf.py
+@@ -0,0 +1,213 @@
++"""N25 opt-in RBF geometry. No scoring, model calls, RNG or execution changes."""
++from __future__ import annotations
++
++import math
++import json
++
++import torch
++
++MODE = "actuator_clipped_eef_v1"
++HORIZON = 8
++TRANSLATION = (39, 40, 41)
++SOURCE = "core.qd_actuator_clipped_rbf:clipped_rbf_gradient:v1"
++
++
++class _StrictInteriorClip(torch.autograd.Function):
++    """Native clamp forward; explicitly zero derivative at both exact bounds."""
++
++    @staticmethod
++    def forward(ctx, values):
++        ctx.save_for_backward((values > -1) & (values < 1))
++        return values.clamp(-1, 1)
++
++    @staticmethod
++    def backward(ctx, upstream):
++        (interior,) = ctx.saved_tensors
++        return upstream * interior.to(dtype=upstream.dtype)
++
++
++def strict_interior_clip(values):
++    return _StrictInteriorClip.apply(values)
++
++
++def tensor_summary(value):
++    """Native scalar summaries, explicitly not a byte-exact replay witness."""
++    value = value.detach()
++    if not bool(torch.isfinite(value).all()):
++        raise ValueError("N25 nonfinite tensor")
++    norm = float(torch.norm(value).item())
++    if not math.isfinite(norm):
++        raise ValueError("N25 nonfinite norm")
++    return {"finite": True, "zero": not bool(torch.count_nonzero(value)),
++            "norm": norm, "norm_dtype": str(value.dtype)}
++
++
++def clipped_rbf_gradient(x_t, *, project, horizon, capture_out=None):
++    """Use the SAME per-row native projector/origin calls as absolute RBF.
++
++    Only its temporary RBF input has clipped translation. In particular, this
++    does not replace the policy's score/descriptor/decoder projector. The native
++    LIBERO projector provides origin+cumsum(delta*.01), including its start row.
++    """
++    if (x_t.ndim != 3 or tuple(x_t.shape[1:]) != (64, 128)
++            or x_t.shape[0] < 2 or horizon != HORIZON
++            or x_t.dtype not in (torch.float32, torch.bfloat16)):
++        raise ValueError("N25 requires B>=2, (B,64,128), horizon8 and FP32/BF16")
++    if not bool(torch.isfinite(x_t).all()):
++        raise ValueError("N25 nonfinite input")
++    B = x_t.shape[0]
++    with torch.enable_grad():
++        x_grad = x_t.detach().requires_grad_(True)
++        proposal = x_grad.clone()
++        translation = x_grad[:, :HORIZON, TRANSLATION]
++        proposal[:, :HORIZON, TRANSLATION] = strict_interior_clip(translation)
++        # Preserve absolute RBF's per-candidate projection and concatenation.
++        projections = []
++        origins = []
++        for b in range(B):
++            if capture_out is None:
++                projections.append(project(proposal[b:b + 1]))
++            else:
++                metadata = {}
++                projections.append(project(proposal[b:b + 1], origin_out=metadata))
++                if len(metadata.get("source_origins", [])) != 1:
++                    raise ValueError("N25 missing same-call origin witness")
++                origins.append(metadata["source_origins"][0])
++        trajs = torch.cat(projections, dim=0)
++        if tuple(trajs.shape) != (B, HORIZON + 1, 3) or trajs.dtype != x_t.dtype:
++            raise ValueError("N25 projector shape/dtype mismatch")
++        if trajs.device != x_t.device or not bool(torch.isfinite(trajs).all()):
++            raise ValueError("N25 projector device/nonfinite mismatch")
++        flat = trajs[:, 1:, :3].reshape(B, -1)
++        sq_dist = torch.sum((flat.unsqueeze(1) - flat.unsqueeze(0)) ** 2, dim=2)
++        mask = ~torch.eye(B, dtype=torch.bool, device=x_t.device)
++        dist = torch.sqrt(sq_dist + 1e-6)
++        inv_dist = (1.0 / (dist + 1e-6)) * mask.float()
++        potential = inv_dist.sum()
++        if not bool(torch.isfinite(potential)):
++            raise ValueError("N25 nonfinite potential")
++        grad = torch.autograd.grad(potential, x_grad, create_graph=False, allow_unused=True)[0]
++        if grad is None:
++            raise ValueError("N25 missing gradient; no fallback")
++        before = tensor_summary(grad)
++        g_norm = before["norm"]
++        normalized = grad / (g_norm + 1e-8) if g_norm > 1e-8 else grad
++        after = tensor_summary(normalized)
++        if capture_out is not None:
++            capture_out.update({
++                "input_xyz": translation.detach().clone(),
++                "source_origins": torch.stack(origins),
++                "cast_origins": trajs[:, 0, :].detach().clone(),
++                "projected_xyz": trajs[:, 1:, :].detach().clone(),
++                "gradient_before": grad[:, :HORIZON, TRANSLATION].detach().clone(),
++                "gradient_after": normalized[:, :HORIZON, TRANSLATION].detach().clone(),
++            })
++    raw = translation.detach()
++    evidence = {
++        "descriptor_mode": MODE, "source": SOURCE, "schema": "n25-rbf-call-summary-v1",
++        "summary_only_not_exact_replay": True, "absolute_fallback_used": False,
++        "input_shape": list(x_t.shape), "input_dtype": str(x_t.dtype),
++        "input_stride": list(x_t.stride()), "horizon": HORIZON,
++        "translation_indices": list(TRANSLATION), "translation_components": raw.numel(),
++        "clipped_components": int(((raw < -1) | (raw > 1)).sum().item()),
++        "boundary_components": int(((raw == -1) | (raw == 1)).sum().item()),
++        "interior_components": int(((raw > -1) & (raw < 1)).sum().item()),
++        "gradient_before_normalization": before, "gradient_after_normalization": after,
++        "zero_gradient": after["zero"], "nonfinite_count": 0,
++        "projection_origin_binding": "same per-row native projector invocation; no second read",
++    }
++    return normalized, evidence
++
++
++def applied_evidence(evidence, *, masked, update, phase, iteration, step, timestep):
++    """Observe already computed operands; no shadow gradient/projector/model."""
++    evidence.update({"phase": phase, "iteration": iteration, "denoising_step": step,
++                     "timestep": timestep, "masked_gradient": tensor_summary(masked),
++                     "update_operand": tensor_summary(update),
++                     "update_operand_is_measured_output_delta": False,
++                     "decision_binding": "enclosing EDSChunkMetrics; global_step/stage attached at loop closure"})
++
++
++def bind_decision_metrics(metrics, *, global_step, stage):
++    groups = [metrics.initial_direction_rbf_evidence_by_step,
++              *metrics.rollout_direction_rbf_evidence_by_iter]
++    for group in groups:
++        for row in group:
++            if row.get("descriptor_mode") == MODE:
++                row.update({"global_step": int(global_step), "stage": int(stage)})
++
++
++class BoundedWitness:
++    """First guided decision only; first active call per fixed stage/iteration.
++
++    Reset by policy episode reset, never by Stage. Selection does not inspect
++    values, outcome or recorder availability. No backfill across decisions.
++    """
++    NUMERIC_CALL_CAP = 20 * 1024
++    NUMERIC_EPISODE_CAP = 220 * 1024
++    METADATA_CALL_CAP = 16 * 1024
++    SLOTS = (("initial", -1),) + tuple(("rollout", i) for i in range(10))
++
++    def __init__(self):
++        self.first_consumed = False
++        self.active = False
++        self.seen = set()
++        self.numeric_bytes = 0
++        self.recorded = []
++
++    def begin(self, recorder):
++        self.active = not self.first_consumed
++        self.first_consumed = True
++        self.recorder = recorder
++        self.seen = set()
++
++    def prepare(self, phase, iteration):
++        key = (phase, iteration)
++        if not self.active or key in self.seen:
++            return None
++        if key not in self.SLOTS:
++            raise ValueError("N25 witness unregistered slot")
++        self.seen.add(key)
++        return {} if self.recorder is not None else None
++
++    def emit(self, capture, evidence):
++        if capture is None:
++            return
++        if not self.active or self.recorder is None:
++            raise ValueError("N25 witness outside first guided decision")
++        key = (evidence["phase"], evidence["iteration"])
++        if key not in self.seen or key in self.recorded or len(self.recorded) >= 11:
++            raise ValueError("N25 witness duplicate/unselected call")
++        expected = {"input_xyz", "source_origins", "cast_origins", "projected_xyz",
++                    "gradient_before", "gradient_after", "update_operand",
++                    "model_output_before", "model_output_after"}
++        if set(capture) != expected:
++            raise ValueError("N25 witness tensor fields mismatch")
++        for name, value in capture.items():
++            shape = (16, 3) if name in {"source_origins", "cast_origins"} else (16, 8, 3)
++            if not torch.is_tensor(value) or tuple(value.shape) != shape:
++                raise ValueError("N25 witness tensor shape mismatch")
++            if not bool(torch.isfinite(value).all()):
++                raise ValueError("N25 witness nonfinite tensor")
++        count = sum(v.numel() * v.element_size() for v in capture.values())
++        if count > self.NUMERIC_CALL_CAP or self.numeric_bytes + count > self.NUMERIC_EPISODE_CAP:
++            raise ValueError("N25 witness numeric byte cap exceeded")
++        metadata = {"schema": "n25-bounded-rbf-witness-v1", "source": SOURCE,
++                    "call": dict(evidence), "numeric_bytes": count,
++                    "tensors": {name:{"dtype":str(value.dtype), "shape":list(value.shape),
++                                      "capture_stride_before_serialization":list(value.stride())} for name,value in capture.items()},
++                    "identity_binding": "enclosing decision event and metered worker source/runtime receipt; no identity probe here",
++                    "exact_cuda_replay_claim": False}
++        if len(json.dumps(metadata, allow_nan=False).encode()) > self.METADATA_CALL_CAP:
++            raise ValueError("N25 witness identity metadata cap exceeded")
++        self.recorder.record("n25_rbf_witness", metadata=metadata, tensors=capture)
++        self.numeric_bytes += count
++        self.recorded.append(key)
++
++    def finish(self):
++        if self.active and self.recorder is not None:
++            self.recorder.record("n25_rbf_witness_coverage", selected_slots=[list(x) for x in self.recorded],
++                                 missing_slots=[list(x) for x in self.SLOTS if x not in self.recorded],
++                                 numeric_bytes=self.numeric_bytes, max_calls=11,
++                                 numeric_cap_bytes=self.NUMERIC_EPISODE_CAP)
++        self.active = False
+diff --git a/core/rdt_policy_steer.py b/core/rdt_policy_steer.py
+index 949d8c8..95be175 100644
+--- a/core/rdt_policy_steer.py
++++ b/core/rdt_policy_steer.py
+@@ -39,6 +39,9 @@ from core.qd_executed_quality import (
+     ExecutedPrefixContract, executed_prefix_quality, recognize_executed_prefix_provider,
+ )
+ from core.qd_actuator_clipped_quality import MODE as ACTUATOR_CLIPPED_MODE, ActuatorClippedContract
++from core.qd_actuator_clipped_rbf import (
++    MODE as CLIPPED_RBF_MODE, clipped_rbf_gradient, applied_evidence, bind_decision_metrics, BoundedWitness,
++)
+ from core.qd_lift_quality import (
+     HOLD_MODE as HOLD_LIFT_MODE, LIFT_MODES,
+     LiftAfterCloseContract, close_then_lift_bonus, close_hold_then_lift_bonus,
+@@ -98,7 +101,7 @@ RDT_GUIDANCE_SIGN = 1.0
+ RDT_DIVERSITY_SIGN = -1.0
+ EDS_INITIAL_SAMPLING_MODES = {"iid", "rbf_diverse_denoise"}
+ EDS_TRUNCATED_ROLLOUT_MODES = {"baseline", "rbf_diverse"}
+-EDS_DIVERSITY_DESCRIPTOR_MODES = {"absolute_eef", "direction_normalized_eef"}
++EDS_DIVERSITY_DESCRIPTOR_MODES = {"absolute_eef", "direction_normalized_eef", CLIPPED_RBF_MODE}
+ 
+ 
+ @dataclass(frozen=True)
+@@ -999,6 +1002,7 @@ class RDTSteer:
+         self._debug_first_step = False
+         self._action_summary_logged = False
+         self._last_visualization_action_candidates: Optional[Tensor] = None
++        self._n25_rbf_witness = BoundedWitness()
+         self._last_eds_metrics: Optional[dict] = None
+         self._last_eds_artifacts: Optional[dict] = None
+         self._last_eds_initial_sampler_info: Optional[dict] = None
+@@ -1383,6 +1387,7 @@ class RDTSteer:
+         return self
+ 
+     def reset(self) -> None:
++        self._n25_rbf_witness = BoundedWitness()
+         self.reset_episode_compute_counters()
+         if hasattr(self, "_executed_feedback"):
+             self._executed_feedback.clear("episode_reset", reset=True)
+@@ -2950,6 +2955,8 @@ class RDTSteer:
+         cfg: _EDSConfig,
+     ) -> tuple[Tensor, dict]:
+         if x_t.shape[0] <= 1:
++            if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
++                raise ValueError("N25 requires population>=2; no fallback")
+             return self._eds_initial_fallback_to_iid(
+                 x_t=x_t,
+                 cond=cond,
+@@ -2983,10 +2990,13 @@ class RDTSteer:
+                 model_output = self._counted_dit(population, t, cond)
+ 
+             if int(t.item()) > start_step:
++                capture = (self._n25_rbf_witness.prepare("initial", -1)
++                           if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE else None)
+                 div_grad, descriptor_evidence = self._compute_eds_diversity_gradient(
+                     population,
+                     descriptor_mode=cfg.initial_diversity_descriptor_mode,
+                     descriptor_cfg=cfg.__dict__,
++                    **({"capture_out": capture} if capture is not None else {}),
+                 )
+                 descriptor_evidence_by_step.append(descriptor_evidence)
+                 if div_grad is None:
+@@ -3019,14 +3029,29 @@ class RDTSteer:
+                     dtype=model_output.dtype,
+                 )
+                 grad_norms.append(float(masked_div.detach().norm().cpu().item()))
+-                model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
+-                    RDT_DIVERSITY_SIGN
+-                    * float(cfg.initial_diversity_scale)
+-                    * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
+-                )
++                if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
++                    update = (RDT_DIVERSITY_SIGN * float(cfg.initial_diversity_scale)
++                              * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES])
++                    applied_evidence(descriptor_evidence, masked=masked_div, update=update,
++                                     phase="initial", iteration=-1, step=i, timestep=int(t.item()))
++                    if capture is not None:
++                        capture["update_operand"] = update[:, :8, :].detach().clone()
++                        capture["model_output_before"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
++                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += update
++                    if capture is not None:
++                        capture["model_output_after"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
++                        self._n25_rbf_witness.emit(capture, descriptor_evidence)
++                else:
++                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
++                        RDT_DIVERSITY_SIGN
++                        * float(cfg.initial_diversity_scale)
++                        * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
++                    )
+                 diversity_steps += 1
+ 
+             if not torch.isfinite(model_output).all():
++                if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
++                    raise ValueError("N25 nonfinite model_output; no fallback")
+                 return self._eds_initial_fallback_to_iid(
+                     x_t=x_t,
+                     cond=cond,
+@@ -3040,6 +3065,8 @@ class RDTSteer:
+                 dtype=x_t.dtype
+             )
+             if not torch.isfinite(population).all():
++                if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
++                    raise ValueError("N25 nonfinite population; no fallback")
+                 return self._eds_initial_fallback_to_iid(
+                     x_t=x_t,
+                     cond=cond,
+@@ -3131,7 +3158,8 @@ class RDTSteer:
+                 expected_shape=tuple(x_t.shape),
+             )
+         except (TypeError, ValueError) as exc:
+-            if cfg.initial_sampling_mode != "rbf_diverse_denoise":
++            if (cfg.initial_sampling_mode != "rbf_diverse_denoise"
++                    or cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE):
+                 raise
+             population, info = self._eds_initial_fallback_to_iid(
+                 x_t=x_t,
+@@ -3807,6 +3835,8 @@ class RDTSteer:
+         rbf_step_flags: list[bool] = []
+ 
+         if actual_scale > 0.0 and x_t.shape[0] <= 1:
++            if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE:
++                raise ValueError("N25 requires population>=2; no fallback")
+             return self._eds_rollout_fallback_to_baseline(
+                 reason="population_size<=1",
+                 iter_idx=iter_idx,
+@@ -3835,10 +3865,13 @@ class RDTSteer:
+                 rollout_timesteps,
+                 local_step,
+             ):
++                capture = (self._n25_rbf_witness.prepare("rollout", int(iter_idx))
++                           if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE else None)
+                 div_grad, descriptor_evidence = self._compute_eds_diversity_gradient(
+                     x_t,
+                     descriptor_mode=cfg.rollout_diversity_descriptor_mode,
+                     descriptor_cfg=cfg.__dict__,
++                    **({"capture_out": capture} if capture is not None else {}),
+                 )
+                 info.setdefault("direction_rbf_evidence_by_step", []).append(
+                     descriptor_evidence
+@@ -3884,17 +3917,33 @@ class RDTSteer:
+                     dtype=model_output.dtype,
+                 )
+                 grad_norms.append(float(masked_div.detach().norm().cpu().item()))
+-                model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
+-                    RDT_DIVERSITY_SIGN
+-                    * actual_scale
+-                    * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
+-                )
++                if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE:
++                    update = (RDT_DIVERSITY_SIGN * actual_scale
++                              * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES])
++                    applied_evidence(descriptor_evidence, masked=masked_div, update=update,
++                                     phase="rollout", iteration=int(iter_idx),
++                                     step=local_step, timestep=int(t.item()))
++                    if capture is not None:
++                        capture["update_operand"] = update[:, :8, :].detach().clone()
++                        capture["model_output_before"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
++                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += update
++                    if capture is not None:
++                        capture["model_output_after"] = model_output[:, :8, RDT_GUIDED_TRANSLATION_INDICES].detach().clone()
++                        self._n25_rbf_witness.emit(capture, descriptor_evidence)
++                else:
++                    model_output[:, :, RDT_GUIDED_TRANSLATION_INDICES] += (
++                        RDT_DIVERSITY_SIGN
++                        * actual_scale
++                        * masked_div[:, :, RDT_GUIDED_TRANSLATION_INDICES]
++                    )
+                 steps_applied += 1
+                 applied_this_step = True
+ 
+             rbf_step_flags.append(bool(applied_this_step))
+ 
+             if not torch.isfinite(model_output).all():
++                if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE:
++                    raise ValueError("N25 nonfinite model_output; no fallback")
+                 return self._eds_rollout_fallback_to_baseline(
+                     reason=f"non-finite_model_output_at_step={local_step}_t={int(t.item())}",
+                     iter_idx=iter_idx,
+@@ -3916,6 +3965,8 @@ class RDTSteer:
+             if applied_this_step:
+                 after_rbf_population = x_t.detach()
+             if not torch.isfinite(x_t).all():
++                if cfg.rollout_diversity_descriptor_mode == CLIPPED_RBF_MODE:
++                    raise ValueError("N25 nonfinite x_t; no fallback")
+                 return self._eds_rollout_fallback_to_baseline(
+                     reason=f"non-finite_population_at_step={local_step}_t={int(t.item())}",
+                     iter_idx=iter_idx,
+@@ -4921,6 +4972,8 @@ class RDTSteer:
+         current_stage: int,
+     ) -> Tensor:
+         cfg = eds_config
++        if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
++            self._n25_rbf_witness.begin(getattr(self, "_decision_evidence", None))
+         contact_sweep_mode = cfg.qd_final_selection_mode == CONTACT_SWEEP_MODE
+         grasp_timing_mode = cfg.qd_final_selection_mode in {GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}
+         terminal_mode = cfg.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}
+@@ -7326,6 +7379,9 @@ class RDTSteer:
+             ):
+                 raise RuntimeError("QD archive hard-gate violation")
+ 
++        if cfg.initial_diversity_descriptor_mode == CLIPPED_RBF_MODE:
++            bind_decision_metrics(metrics, global_step=global_step, stage=current_stage)
++            self._n25_rbf_witness.finish()
+         self._last_eds_metrics = metrics.to_jsonable()
+         self._last_eds_artifacts = {
+             "initial_actions": initial_action_candidates,
+@@ -7692,8 +7748,16 @@ class RDTSteer:
+         *,
+         descriptor_mode: str,
+         descriptor_cfg: Mapping[str, object],
++        capture_out: dict | None = None,
+     ) -> tuple[Optional[Tensor], dict[str, object]]:
+         """Dispatch the config-controlled EEF descriptor without mutable scope state."""
++        if descriptor_mode == CLIPPED_RBF_MODE:
++            if self._adapter is None:
++                raise ValueError("N25 requires the native adapter; no fallback")
++            self._increment_compute("rbf_gradient_calls")
++            self._increment_compute("rbf_gradient_batch_rows", x_t.shape[0])
++            return clipped_rbf_gradient(x_t, project=self._rdt_sample_to_trajectory_3d,
++                                        horizon=self._action_chunk_horizon, capture_out=capture_out)
+         if descriptor_mode == "absolute_eef":
+             return self._compute_diversity_gradient(x_t), {
+                 "descriptor_mode": descriptor_mode,
+@@ -8429,6 +8493,20 @@ class RDTSteer:
+         if resolved.qd_tie_break != "stable_fingerprint":
+             raise ValueError("EDS qd_tie_break must be stable_fingerprint")
+ 
++        clipped_rbf = CLIPPED_RBF_MODE in {
++            resolved.initial_diversity_descriptor_mode, resolved.rollout_diversity_descriptor_mode}
++        if clipped_rbf:
++            n25_required = {
++                "initial_diversity_descriptor_mode": CLIPPED_RBF_MODE,
++                "rollout_diversity_descriptor_mode": CLIPPED_RBF_MODE,
++                "qd_archive_mode": "grid_archive", "qd_quality_mode": ACTUATOR_CLIPPED_MODE,
++                "qd_descriptor": DIRECTION_HEIGHT_DESCRIPTOR,
++                "qd_final_selection_mode": GRASP_TIMING_MODE,
++                "qd_gripper_rescue_mode": "none", "qd_parent_survivor_count": 0,
++            }
++            for field_name, expected in n25_required.items():
++                if getattr(resolved, field_name) != expected:
++                    raise ValueError(f"N25 requires {field_name}={expected!r}")
+         if resolved.qd_archive_mode == "grid_archive":
+             required = {
+                 "population_size": 16,
+@@ -8437,11 +8515,11 @@ class RDTSteer:
+                 "renoise_t_max": 3,
+                 "renoise_t_min": 1,
+                 "initial_sampling_mode": "rbf_diverse_denoise",
+-                "initial_diversity_descriptor_mode": "absolute_eef",
++                "initial_diversity_descriptor_mode": CLIPPED_RBF_MODE if clipped_rbf else "absolute_eef",
+                 "initial_diversity_scale": 20.0,
+                 "initial_diversity_start_ratio": 0.8,
+                 "truncated_rollout_mode": "rbf_diverse",
+-                "rollout_diversity_descriptor_mode": "absolute_eef",
++                "rollout_diversity_descriptor_mode": CLIPPED_RBF_MODE if clipped_rbf else "absolute_eef",
+                 "rollout_diversity_scale": 20.0,
+                 "rollout_diversity_start_ratio": 0.6,
+                 "rollout_diversity_iters": "all",
+diff --git a/docs/03_evidence/qd_ed_final/n25/conditional-cpu-protocol-v1.md b/docs/03_evidence/qd_ed_final/n25/conditional-cpu-protocol-v1.md
+new file mode 100644
+index 0000000..32277e0
+--- /dev/null
++++ b/docs/03_evidence/qd_ed_final/n25/conditional-cpu-protocol-v1.md
+@@ -0,0 +1,31 @@
++# N25 conditional CPU preparation: actuator-clipped EEF RBF geometry
++
++This freezes one mechanism for source-isolated CPU preparation only. N24 remains the active frozen Dev candidate. This document does not register a new online candidate, expand budgets, release GPU/model/API/simulator work, or open protected data. If N24 promotes, its independent validation takes priority; any subsequent N25 online test requires a separate complete prospective protocol, source/compute review and actual capacity check after N24 disposition.
++
++## Rationale and unknowns
++
++Root accepted N24/outer-loop-review-v1/root-review-v1.json (b224db6ea09cd66dc6189e1b58bfd0a4a61d669464df04376252de6ff9677a0a). Existing absolute RBF is already based on projected EEF trajectories, not 128D latent distances. N23 changed internal quality only; the proposed intervention changes the ED proposal gradient geometry. Closed N24 task0 terminal evidence has202/224 rows with out-of-range translation, but actual noisy RBF x_t saturation remains Unknown. CPU N5 clipping eligibility did not rescue the two focal rejected full8 cases. Neither that evidence nor a gradient change proves physical utility.
++
++Hypothesis: differentiating the existing repulsion through actuator-input-equivalent translation can redirect fixed-budget proposals toward differences that survive input clipping. Risks include clipping inappropriate noisy states, identical clipped trajectories and zero gradients, and concentrating the unchanged globally normalized force into fewer unsaturated coordinates. This does not claim accurate physical dynamics or weaker overall force.
++
++## Exactly one scientific intervention
++
++Base source: 3b7afa02757eb3519d95547e4b6e6e939f7068f2, with candidate_n23 profile as scientific parent (N24 parent rescue OFF). Add explicit opt-in descriptor mode actuator_clipped_eef_v1 to both existing initial and rollout RBF descriptor call sites. Leave absolute_eef/direction_normalized_eef/default paths unchanged.
++
++For current x_t, use the first8 translation indices39,40,41 and the existing same-call projection origin. Replace only the RBF projected path with origin+cumsum(clipped_translation*0.01), retaining the native dtype, original horizon convention and existing projection-origin semantics. Define clipping forward as componentwise bounds[-1,1]. Its custom subgradient is1 strictly inside(-1,1),0 at either exact boundary and outside. This is an explicit prospective choice, not torch.clamp default differentiation. Do not use straight-through or raw fallback.
++
++Keep the original inverse-distance potential/epsilons, gradient normalization and threshold, update sign/scales20, timing masks, RNG/noise/scheduler, 16 population/10 iterations/176 canonical evaluations/11 score batches, and all model/provider call counts. Do not change the reward/quality projection, QD descriptor/archive/allocation/N5 final selection, RDT decoder, Stage/perception/cache/prompt/provider, simulation or execution semantics. Do not combine this with mode birth, continuity, forced close, surviving elites or N24 parent rescue.
++
++## CPU preparation deliverables and evidence
++
++Create only variants/n25_actuator_clipped_rbf/implementation as an isolated worktree, new codex/n25-actuator-clipped-rbf branch at the exact base. Preserve all existing worktrees/source/state/ledgers. Prepare the smallest helper/wiring/profile and meaningful CPU tests, plus source/diff manifests and an implementation report. Necessary opt-in enum validation/config forwarding may change; inventory every source edit. No runner/controller/GPU release or budget adoption in this phase.
++
++Tests must independently check strict-interior parity to the original RBF, declared exact +/-1 derivatives, saturated and coincident trajectories, zero-gradient validity and finite handling, batch/dtype/horizon/index binding, nontranslation zero updates, unchanged sign/normalization/schedules/RNG/model-call accounting and default-off/source-profile parity. Use constant synthetic tensors and fake source adapters only; FP32/BF16 CPU correctness is not exact CUDA arithmetic evidence. Run directly relevant existing regression checks; no gratuitous full-suite repetition. Nonfinite is an error. A correctly produced all-zero gradient is a valid mechanism outcome, not a retryable infrastructure failure.
++
++Prepare passive per-call telemetry for the new mode only, separately identifying initial vs rollout, decision/iteration/timestep, source/shape/dtype, clipping/boundary counts, pre/post-normalization and actually applied masked-update finite/zero/norm counters. Derive these from existing computations: no second shadow gradient, model call, scoring, simulator branch or outcome label. Optional minimal input/output capture for independent audit must be proposed and explicitly bounded before implementation; do not copy full latent tensors by default or invent GPU equivalence from rounded summaries. Native production source/cost auditing will be completed in a separately reviewed phase before any deployment.
++
++## Boundaries
++
++CPU only, at most2 threads; hide CUDA and block network/process/model/simulator execution in the test boundary using the existing proven CPU-test practices. Do not claim an OS guard or CPU usage was measured unless it was. Only frozen source, existing closed narrative review and synthetic fixtures; no raw attempts/.pt/Stage/image/observation/protected outcomes/credential data. No Poe client or alternate account. All future online stages remain current-account codex_cli/chatgpt only.
++
++Do not modify W/research-state.yaml, tree, checkpoint, ledgers, live plans or supervisor. Write artifacts only under N25. Keep failed tests/logs and fixes visible; do not modify scientific definition after seeing experiments. Stop CPU phase on completion with exact commit/hash report for root review. This conditional preparation has0 GPU attempts,0API/model/simulator calls and no efficacy claim.
+diff --git a/docs/03_evidence/qd_ed_final/n25/cpu-implementation-contract-v1.md b/docs/03_evidence/qd_ed_final/n25/cpu-implementation-contract-v1.md
+new file mode 100644
+index 0000000..4546db9
+--- /dev/null
++++ b/docs/03_evidence/qd_ed_final/n25/cpu-implementation-contract-v1.md
+@@ -0,0 +1,11 @@
++# N25 conditional CPU implementation
++
++No online registration/admission/controller is provided. Current N24 owns the online queue. This is source preparation from3b7afa0, with N23 scientific profile and N24 rescue disabled. The two descriptor fields alone change to `actuator_clipped_eef_v1`; all original profiles are byte unchanged.
++
++The new helper creates a temporary RBF input, replaces only first8 translation indices39/40/41 with component clamp[-1,1], and calls the original projector once per candidate, in original order. The original native0.01/cumsum/origin convention is therefore retained without touching the shared score/descriptor/decoder projector. Its strict-interior derivative is1; at exact±1 or beyond it is0. No straight-through or raw fallback. Inverse-distance potential, masking, normalization threshold/epsilon, signs, scales and schedules match absolute RBF. Default paths remain unchanged. Nonfinite or unavailable gradient raises; correctly all-zero gradient returns zero and remains a valid scientific outcome.
++
++The new mode records native scalar summaries in the existing per-step evidence lists, including phase/iteration/timestep, shape/dtype/stride, clipping/boundary counts, pre/post normalization, masked gradient and scaled update operand. Global step/Stage bind at guided-loop closure; enclosing event/metrics bind the decision. `update_operand` is NOT measured model-output delta. These rounded scalars are not exact native arithmetic proof. Both initial and rollout are reported separately. No new tensor appears in JSON metrics.
++
++Under the separate CPU witness authority, the first guided decision per episode records at most11 fixed slots: first active initial call and first active call of each rollout iteration0..9. No value/outcome sampling or backfill; Stage reset does not reset this budget, episode reset does. Missing recorder on the first decision does not shift capture to a later decision. Missing scheduled calls are explicit in the coverage event. Numeric caps are20KiB/call and220KiB/episode, identity metadata16KiB/call. Input is translation-only, with same-call pre-cast/cast origins, projected xyz, gradient before/after normalization, update operand and actual model-output slices immediately before/after the unchanged +=. There is no full latent dump, second origin read/projector/gradient/model call or identity probe. Recorder envelope and the later metered worker receipt must bind attempt/reset/decision/source/runtime identity; this CPU phase does not invent that future runtime evidence. Stored tensor capture strides are labeled as such, distinct from input strides or future serialization layout.
++
++Finite new geometry does not imply useful exploration: multiple clipped paths can coincide and global normalization can concentrate unchanged total norm on fewer coordinates. No activity threshold is imposed. New-mode CPU correctness and bounded synthetic recording are established; exact CUDA replay, independent native N25 witness audit, controller profile gate, worker/source/proof bridge, whole-cohort protocol, capacity/admission and efficacy remain later reviewed work. This phase runs no real model/API/simulator/GPU and makes no task-score claim.
+diff --git a/docs/03_evidence/qd_ed_final/n25/native-witness-cpu-authority-v1.json b/docs/03_evidence/qd_ed_final/n25/native-witness-cpu-authority-v1.json
+new file mode 100644
+index 0000000..d51e9e3
+--- /dev/null
++++ b/docs/03_evidence/qd_ed_final/n25/native-witness-cpu-authority-v1.json
+@@ -0,0 +1,41 @@
++{
++  "schema": "n25-conditional-native-witness-cpu-preparation-authority-v1",
++  "time": "2026-09-30T19:04:24.947056+00:00",
++  "proposal": {
++    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/optional-native-witness-proposal-v1.md",
++    "sha256": "0756cca41304a29aa6ac9bb08dd3263a429b4dffcdfa4eadbb5ba681eca8e000"
++  },
++  "decision": "APPROVE_BOUNDED_CPU_CAPTURE_IMPLEMENTATION_NOT_EXECUTION",
++  "capture_selection": "First guided decision per episode/reset lifecycle only; first active initial call and first active call in each of10rollout iterations, at most11. No saturation/reward/outcome-dependent selection or backfill. Missing scheduled calls explicit.",
++  "numeric_cap_bytes_per_call": 20480,
++  "numeric_cap_bytes_per_episode": 225280,
++  "identity_metadata_cap_bytes_per_call": 16384,
++  "selection_counters_must_reset_with_episode": true,
++  "native_payload_fields": [
++    "first8 xyz16x8x3 only",
++    "same-call pre-cast and cast origins16x3",
++    "projected xyz16x8x3",
++    "pre-normalization xyz gradient",
++    "normalized xyz gradient",
++    "scaled masked xyz update operand",
++    "actual translation model-output slice before update",
++    "actual translation model-output slice after update"
++  ],
++  "binding": [
++    "existing attempt/reset/decision/source/runtime identity",
++    "phase/iteration/timestep/source dtype/shape/stride",
++    "existing runtime GPU identity without additional probe",
++    "actual normalization scalar and dtype"
++  ],
++  "additional_requirements": [
++    "Do not label intended update operand as measured actual output delta. Record actual before/after from original operation for witness.",
++    "No second gradient/projector/origin fetch/model/API/simulator call; preserve original per-candidate projector acquisition/order.",
++    "All-call scalar telemetry remains distinct from first-decision bounded native witness.",
++    "CPU fake-input serialization/roundtrip and caps checked explicitly; no real native payload reads or GPU execution.",
++    "No claim CPU replay certifies CUDA arithmetic.",
++    "No change to activeN24/source/state/ledger/controller/release; later native delivery/audit may remain separate phase."
++  ],
++  "execution_authorized": false,
++  "gpu_model_api_simulator_authorized": false,
++  "phase": "conditional CPU source/test preparation only"
++}
+diff --git a/tests/test_n25_clipped_rbf.py b/tests/test_n25_clipped_rbf.py
+new file mode 100644
+index 0000000..87d7352
+--- /dev/null
++++ b/tests/test_n25_clipped_rbf.py
+@@ -0,0 +1,322 @@
++"""N25 uses synthetic tensors/models/adapters only; no runtime/environment import."""
++import ast
++import copy
++import inspect
++import json
++from pathlib import Path
++from types import MethodType, SimpleNamespace
++
++import numpy as np
++import pytest
++import torch
++
++from test_rdt_steer import (_patch_core_imports, stub_steer, stub_adapter,
++                            _rollout_cond, _n2_fixture_provider)
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def native_adapter(adapter, monkeypatch):
++    """Compile only frozen pure projection method; never import an env runtime."""
++    tree = ast.parse((ROOT/'core/env_adapters/libero_adapter.py').read_text())
++    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name=='LiberoAdapter')
++    node = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name=='delta_actions_to_ee_trajectory')
++    import __future__
++    scope={'np':np,'torch':torch}
++    exec(compile(ast.Module(body=[node],type_ignores=[]),'pure_adapter_projection','exec',
++                 flags=__future__.annotations.compiler_flag),scope)
++    origins=[]
++    def origin():
++        origins.append(1)
++        return SimpleNamespace(position=np.array([.12317,-.17312,.23141]))
++    monkeypatch.setattr(adapter,'get_ee_pose_world',origin,raising=False)
++    monkeypatch.setattr(adapter,'delta_actions_to_ee_trajectory',
++                        MethodType(scope['delta_actions_to_ee_trajectory'],adapter))
++    return origins
++
++
++def config(steer, mode='N25'):
++    raw=json.loads((ROOT/f'configs/qd_ed_final/candidate_{mode.lower()}.json').read_text())
++    return steer._resolve_eds_config_with_reference_defaults(raw['profile'])
++
++
++def input_tensor(dtype, B=4):
++    x=torch.zeros(B,64,128,dtype=dtype)
++    x[:,:8,39]=torch.linspace(-.7,.7,B,dtype=dtype)[:,None]
++    x[:,:8,40]=torch.linspace(.6,-.4,B,dtype=dtype)[:,None]
++    x[:,:8,41]=torch.arange(8,dtype=dtype)[None,:]/32
++    x[:,:,10]=.25
++    return x
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++def test_custom_derivative_and_native_forward(dtype):
++    from core.qd_actuator_clipped_rbf import strict_interior_clip
++    values=torch.tensor([-2.,-1.,-.5,0.,.5,1.,2.],dtype=dtype,requires_grad=True)
++    out=strict_interior_clip(values)
++    assert torch.equal(out,values.detach().clamp(-1,1))
++    out.sum().backward()
++    assert torch.equal(values.grad,torch.tensor([0,0,1,1,1,0,0],dtype=dtype))
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++@pytest.mark.parametrize('batch',[4,16])
++def test_interior_original_bitwise_parity_origin_count_rng(stub_steer,stub_adapter,monkeypatch,dtype,batch):
++    from core.qd_actuator_clipped_rbf import MODE
++    origins=native_adapter(stub_adapter,monkeypatch)
++    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=batch,
++                         policy_config={'action_chunk_horizon':8})
++    x=input_tensor(dtype,batch);saved=x.clone();rng=torch.random.get_rng_state().clone()
++    old=stub_steer._compute_diversity_gradient(x)
++    new,evidence=stub_steer._compute_eds_diversity_gradient(x,descriptor_mode=MODE,descriptor_cfg={})
++    assert torch.equal(old.contiguous().view(torch.uint8),new.contiguous().view(torch.uint8))
++    assert len(origins)==2*batch and torch.equal(x,saved)
++    assert torch.equal(rng,torch.random.get_rng_state())
++    assert evidence['clipped_components']==evidence['boundary_components']==0
++    assert evidence['interior_components']==batch*8*3
++    assert evidence['summary_only_not_exact_replay'] is True
++    assert torch.count_nonzero(new[:,8:])==0
++    inactive=[k for k in range(128) if k not in (39,40,41)]
++    assert torch.count_nonzero(new[:,:,inactive])==0
++    counters=stub_steer.get_episode_compute_counters()
++    assert counters['rbf_gradient_calls']==2 and counters['rbf_gradient_batch_rows']==2*batch
++    assert counters['model_forward_calls']==counters['reward_calls']==0
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++@pytest.mark.parametrize('scenario',['coincident','all_saturated','mixed'])
++def test_saturation_zero_valid_nontranslation_and_global_norm(stub_steer,stub_adapter,monkeypatch,dtype,scenario):
++    from core.qd_actuator_clipped_rbf import MODE
++    native_adapter(stub_adapter,monkeypatch)
++    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=4,
++                         policy_config={'action_chunk_horizon':8})
++    x=input_tensor(dtype)
++    if scenario=='coincident':x[:,:8,39:42]=.25
++    elif scenario=='all_saturated':x[:,:8,39:42]=torch.tensor([2.,-2.,1.,-1.],dtype=dtype)[:,None,None]
++    else:x[0,:8,39:42]=2.;x[1,:8,39]=1.;x[2,:8,40]=-1.
++    gradient,e=stub_steer._compute_eds_diversity_gradient(x,descriptor_mode=MODE,descriptor_cfg={})
++    values=x[:,:8,39:42];g=gradient[:,:8,39:42]
++    assert torch.count_nonzero(g[(values<=-1)|(values>=1)])==0
++    assert torch.isfinite(gradient).all()
++    if scenario!='mixed':assert torch.count_nonzero(gradient)==0 and e['zero_gradient']
++    else:
++        assert not e['zero_gradient']
++        assert e['gradient_after_normalization']['norm']==pytest.approx(1.,abs=.02)
++    assert e['interior_components']+e['boundary_components']+e['clipped_components']==4*8*3
++
++
++@pytest.mark.parametrize('fault',['nan','inf','shape','dtype','horizon','batch','adapter','projection_nonfinite','projection_shape'])
++def test_fail_closed_without_baseline_fallback(stub_steer,stub_adapter,monkeypatch,fault):
++    from core.qd_actuator_clipped_rbf import MODE
++    native_adapter(stub_adapter,monkeypatch)
++    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=4,
++                         policy_config={'action_chunk_horizon':8})
++    x=input_tensor(torch.float32)
++    if fault=='nan':x[0,0,0]=float('nan')
++    if fault=='inf':x[0,0,39]=float('inf')
++    if fault=='shape':x=x[:,:8]
++    if fault=='dtype':x=x.double()
++    if fault=='horizon':stub_steer._action_chunk_horizon=7
++    if fault=='batch':x=x[:1]
++    if fault=='adapter':stub_steer._adapter=None
++    if fault=='projection_nonfinite':monkeypatch.setattr(stub_steer,'_rdt_sample_to_trajectory_3d',lambda _:torch.full((1,9,3),float('nan')))
++    if fault=='projection_shape':monkeypatch.setattr(stub_steer,'_rdt_sample_to_trajectory_3d',lambda _:torch.zeros(1,8,3))
++    monkeypatch.setattr(stub_steer,'_compute_diversity_gradient',lambda _:pytest.fail('raw fallback'))
++    with pytest.raises(ValueError):stub_steer._compute_eds_diversity_gradient(x,descriptor_mode=MODE,descriptor_cfg={})
++
++
++def test_profile_only_two_modes_parent_rescue_default_off_and_config_closed(stub_steer):
++    a=json.loads((ROOT/'configs/qd_ed_final/candidate_n23.json').read_text())['profile']
++    b=json.loads((ROOT/'configs/qd_ed_final/candidate_n25.json').read_text())['profile']
++    changed={k for k in a.keys()|b.keys() if a.get(k)!=b.get(k)}
++    assert changed=={'initial_diversity_descriptor_mode','rollout_diversity_descriptor_mode'}
++    cfg=config(stub_steer);assert cfg.qd_gripper_rescue_mode=='none'
++    assert cfg.population_size==16 and cfg.cem_iters==10
++    for change in [{'initial_diversity_descriptor_mode':'absolute_eef'},
++                   {'rollout_diversity_descriptor_mode':'absolute_eef'},
++                   {'qd_gripper_rescue_mode':'full_close_parent_rescue_v1'},
++                   {'qd_quality_mode':'provider'},{'population_size':8},{'initial_diversity_scale':21.}]:
++        with pytest.raises(ValueError):stub_steer._resolve_eds_config_with_reference_defaults(b|change)
++    assert config(stub_steer,'N23').initial_diversity_descriptor_mode=='absolute_eef'
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++def test_initial_and_rollout_actual_schedule_model_rng_and_summary(stub_steer,stub_adapter,monkeypatch,dtype):
++    from core.qd_actuator_clipped_rbf import MODE
++    native_adapter(stub_adapter,monkeypatch)
++    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=16,
++                         policy_config={'action_chunk_horizon':8})
++    cond=_rollout_cond(stub_steer);x=input_tensor(dtype,16)
++    # Score adapter synthetic only: this test observes proposal schedules, not quality.
++    monkeypatch.setattr(stub_steer,'_eds_score_population_as_cost',
++                        lambda values,**kw:(torch.zeros(16,dtype=dtype),{}))
++    runs=[]
++    for mode in ['N23','N25']:
++        stub_steer.reset_episode_compute_counters();stub_steer._noise_scheduler.last_step_args=[]
++        torch.manual_seed(251)
++        cfg=config(stub_steer,mode)
++        initial,ii=stub_steer._eds_initial_denoise_rbf_diverse(x_t=x.clone(),cond=cond,cfg=cfg)
++        initial_steps=[t for _,t in stub_steer._noise_scheduler.last_step_args]
++        stub_steer._noise_scheduler.last_step_args=[]
++        final,costs,ri=stub_steer._eds_rollout_rbf_diverse_reference(cond=cond,action_mask=cond['action_mask'],
++            noisy_action=x.clone(),keypoints=torch.zeros(1,3,dtype=dtype),guidance_fns=[],n_trunc_steps=3,
++            cfg=cfg,iter_idx=2,reward_mode='normal',shuffle_seed=0)
++        runs.append((stub_steer.get_episode_compute_counters(),torch.random.get_rng_state().clone(),initial_steps,
++                     [t for _,t in stub_steer._noise_scheduler.last_step_args]))
++        if mode=='N25':
++            for phase,items in [('initial',ii['direction_rbf_evidence_by_step']),('rollout',ri['direction_rbf_evidence_by_step'])]:
++                assert items
++                for row in items:
++                    assert row['phase']==phase and row['descriptor_mode']==MODE
++                    assert row['iteration']==(-1 if phase=='initial' else 2)
++                    assert row['masked_gradient']['finite'] and row['update_operand']['finite']
++                    assert row['summary_only_not_exact_replay']
++            assert ri['rollout_diversity_fallback_used'] is False
++            assert ii['initial_diversity_fallback_used'] is False
++            # Every synthetic scheduler delta touches only the original translation indices.
++            for output,t in stub_steer._noise_scheduler.last_step_args:
++                assert torch.count_nonzero(output[:,8:])==0
++                assert torch.count_nonzero(output[:,:,[k for k in range(128) if k not in (39,40,41)]])==0
++    assert runs[0][0]==runs[1][0]
++    assert torch.equal(runs[0][1],runs[1][1])
++    assert runs[0][2:]==runs[1][2:]
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++def test_full_synthetic_guided_loop_176_11_and_json_telemetry(stub_steer,stub_adapter,monkeypatch,dtype):
++    from test_qd_actuator_clipped_quality import static_adapter_fixture
++    for name,value in vars(static_adapter_fixture()).items():monkeypatch.setattr(stub_adapter,name,value,raising=False)
++    native_adapter(stub_adapter,monkeypatch)
++    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=16,
++                         policy_config={'action_chunk_horizon':8})
++    provider=_n2_fixture_provider(index=0)
++    points=torch.tensor([[.1124,-.071,.3154],[.13,-.21,.39]],dtype=dtype)
++    x=input_tensor(dtype,16);runs=[]
++    for mode in ['N23','N25']:
++        stub_steer.reset();torch.manual_seed(2525)
++        selected=stub_steer._eds_guided_denoise_loop(x_t=x.clone(),cond=_rollout_cond(stub_steer),
++            keypoints=points,guidance_fns=[provider],eds_config=config(stub_steer,mode),
++            verbose=False,global_step=24,current_stage=1)
++        metrics=stub_steer.get_last_eds_metrics();compute=stub_steer.get_episode_compute_counters()
++        assert metrics['search_evaluation_count']==176 and metrics['score_call_count']==11
++        assert metrics['resample_count']==metrics['renoise_count']==metrics['rollout_count']==10
++        assert not any(key.startswith('qd_gripper_rescue_') for key in metrics)
++        assert torch.isfinite(selected).all()
++        if mode=='N25':
++            groups=[metrics['initial_direction_rbf_evidence_by_step'],*metrics['rollout_direction_rbf_evidence_by_iter']]
++            rows=[row for group in groups for row in group]
++            assert len(rows)==compute['rbf_gradient_calls'] and rows
++            assert {row['phase'] for row in rows}=={'initial','rollout'}
++            for row in rows:assert row['global_step']==24 and row['stage']==1
++            json.dumps(metrics,allow_nan=False)
++        runs.append((compute,torch.random.get_rng_state().clone()))
++    assert runs[0][0]==runs[1][0]
++    assert torch.equal(runs[0][1],runs[1][1])
++    assert not torch.cuda.is_initialized()
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++def test_native_witness_roundtrip_caps_first_decision_and_instrumentation_parity(stub_steer,stub_adapter,monkeypatch,tmp_path,dtype):
++    from core.decision_evidence import DecisionEvidence
++    from core.qd_actuator_clipped_rbf import BoundedWitness
++    from test_qd_actuator_clipped_quality import static_adapter_fixture
++    for name,value in vars(static_adapter_fixture()).items():monkeypatch.setattr(stub_adapter,name,value,raising=False)
++    origins=native_adapter(stub_adapter,monkeypatch)
++    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=16,
++                         policy_config={'action_chunk_horizon':8})
++    provider=_n2_fixture_provider(index=0)
++    points=torch.tensor([[.1124,-.071,.3154],[.13,-.21,.39]],dtype=dtype)
++    x=input_tensor(dtype,16);runs=[]
++    for instrumented in [False,True]:
++        stub_steer.reset();torch.manual_seed(2525);origins.clear()
++        rec=DecisionEvidence(tmp_path/'captured',episode=0) if instrumented else None
++        stub_steer._decision_evidence=rec
++        monkeypatch.setattr(stub_adapter,'_decision_evidence',rec,raising=False)
++        if rec:rec.begin_decision(global_step=24,stage=1,use_guidance=True,keypoints=points,providers=[provider])
++        selected=stub_steer._eds_guided_denoise_loop(x_t=x.clone(),cond=_rollout_cond(stub_steer),
++            keypoints=points,guidance_fns=[provider],eds_config=config(stub_steer),verbose=False,
++            global_step=24,current_stage=1)
++        metrics=stub_steer.get_last_eds_metrics();json.dumps(metrics,allow_nan=False)
++        runs.append((selected.clone(),torch.random.get_rng_state().clone(),
++                     stub_steer.get_episode_compute_counters(),len(origins)))
++        if rec:
++            rec.flush();assert not rec.failed
++            events=[e for p in sorted(rec.root.glob('bundle_*.pt'))
++                    for e in torch.load(p,map_location='cpu',weights_only=True)['events']]
++            witnesses=[e for e in events if e['event']=='n25_rbf_witness']
++            cover=[e for e in events if e['event']=='n25_rbf_witness_coverage']
++            assert len(witnesses)==11 and len(cover)==1
++            assert cover[0]['values']['missing_slots']==[]
++            assert cover[0]['values']['numeric_bytes']<=220*1024
++            for event in witnesses:
++                assert event['decision_id']==rec.decision_id and event['global_step']==24
++                tensors=event['values']['tensors'];meta=event['values']['metadata']
++                assert meta['numeric_bytes']<=20*1024
++                assert len(json.dumps(meta).encode())<=16*1024
++                assert tensors['input_xyz'].shape==(16,8,3)
++                assert tensors['input_xyz'].dtype==dtype
++                assert torch.equal(tensors['model_output_after'],tensors['model_output_before']+tensors['update_operand'])
++                assert meta['call']['update_operand_is_measured_output_delta'] is False
++            manager=stub_steer._n25_rbf_witness
++            manager.begin(rec)
++            assert manager.prepare('initial',-1) is None
++            manager.finish()  # No backfill or extra coverage for a second guided decision.
++            assert manager.numeric_bytes==cover[0]['values']['numeric_bytes']
++            stub_steer.reset()
++            assert not stub_steer._n25_rbf_witness.first_consumed
++    assert torch.equal(runs[0][0],runs[1][0])
++    assert torch.equal(runs[0][1],runs[1][1])
++    assert runs[0][2:]==runs[1][2:]
++
++
++def test_witness_fixed_selection_missing_slots_no_backfill_and_caps():
++    from core.qd_actuator_clipped_rbf import BoundedWitness
++    events=[];rec=SimpleNamespace(record=lambda event,**values:events.append((event,values)))
++    m=BoundedWitness();m.begin(None)
++    assert m.prepare('initial',-1) is None
++    m.finish();m.begin(rec)
++    assert m.prepare('rollout',0) is None  # Missing recorder does not shift sampling later.
++    m=BoundedWitness();m.begin(rec)
++    sample=m.prepare('initial',-1);assert sample=={}
++    assert m.prepare('initial',-1) is None
++    m.finish();assert len(events)==1 and len(events[0][1]['missing_slots'])==11
++    fields={'input_xyz','source_origins','cast_origins','projected_xyz','gradient_before','gradient_after',
++            'update_operand','model_output_before','model_output_after'}
++    capture={k:torch.zeros((16,3) if 'origins' in k else (16,8,3)) for k in fields}
++    for fault in ['fields','shape','numeric_call','numeric_episode','metadata','duplicate','nonfinite']:
++        m=BoundedWitness();m.begin(rec);m.prepare('initial',-1)
++        value=copy.deepcopy(capture);e={'phase':'initial','iteration':-1}
++        if fault=='fields':value['full_latent']=torch.zeros(16,64,128)
++        if fault=='shape':value['input_xyz']=torch.zeros(16,64,3)
++        if fault=='numeric_call':m.NUMERIC_CALL_CAP=1
++        if fault=='numeric_episode':m.numeric_bytes=m.NUMERIC_EPISODE_CAP
++        if fault=='metadata':e['bad']='x'*16384
++        if fault=='duplicate':m.recorded=[('initial',-1)]
++        if fault=='nonfinite':value['input_xyz'][0,0,0]=float('nan')
++        with pytest.raises(ValueError):m.emit(value,e)
++
++
++@pytest.mark.parametrize('phase',['initial','rollout'])
++def test_nonfinite_model_output_does_not_replay_baseline(stub_steer,stub_adapter,monkeypatch,phase):
++    native_adapter(stub_adapter,monkeypatch)
++    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=16,
++                         policy_config={'action_chunk_horizon':8})
++    cfg=config(stub_steer);cond=_rollout_cond(stub_steer);x=input_tensor(torch.float32,16)
++    monkeypatch.setattr(stub_steer,'_counted_dit',lambda values,*a:torch.full_like(values,float('inf')))
++    monkeypatch.setattr(stub_steer,'_eds_initial_fallback_to_iid',lambda **kw:pytest.fail('IID fallback'))
++    monkeypatch.setattr(stub_steer,'_eds_rollout_fallback_to_baseline',lambda **kw:pytest.fail('baseline fallback'))
++    with pytest.raises(ValueError,match='nonfinite'):
++        if phase=='initial':stub_steer._eds_initial_denoise_rbf_diverse(x_t=x,cond=cond,cfg=cfg)
++        else:stub_steer._eds_rollout_rbf_diverse_reference(cond=cond,action_mask=cond['action_mask'],
++            noisy_action=x,keypoints=torch.zeros(1,3),guidance_fns=[],n_trunc_steps=3,cfg=cfg,
++            iter_idx=0,reward_mode='normal',shuffle_seed=0)
++
++
++def test_missing_autograd_gradient_rejected(stub_steer,stub_adapter,monkeypatch):
++    from core.qd_actuator_clipped_rbf import MODE
++    native_adapter(stub_adapter,monkeypatch)
++    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=16,
++                         policy_config={'action_chunk_horizon':8})
++    monkeypatch.setattr(torch.autograd,'grad',lambda *a,**kw:(None,))
++    with pytest.raises(ValueError,match='missing gradient'):
++        stub_steer._compute_eds_diversity_gradient(input_tensor(torch.float32,16),descriptor_mode=MODE,descriptor_cfg={})

@@ -1,0 +1,1 @@
+{"event": "initial git add refused ignored docs/experiments paths", "exit": 1, "source_or_test_execution": false, "repair": "explicit git add -f of the two named new protocol copies only"}

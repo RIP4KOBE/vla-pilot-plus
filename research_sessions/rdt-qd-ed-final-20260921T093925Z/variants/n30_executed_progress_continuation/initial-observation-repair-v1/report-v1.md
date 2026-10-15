@@ -1,0 +1,18 @@
+# N30 initial observation repair — CPU complete
+
+Clean commit **7c0d80d734fa8300173e56d9a8de03415bc55fe2**, based exactly4ce2b95757c1c0d662696ba19d6a9a14d2e59b49. The sole production change is three lines in Main._run_episode: when N30 continuation is enabled, initialize local obs from adapter.get_obs() before the first decision. That accessor returns the already received _last_obs cache. The processed policy observation remains separate; subsequent feedback still uses the unchanged adapter.step result. Default-off behavior and all policy/helper/profile/auditor/controller code remain byte-identical.
+
+The previous implementation incorrectly passed an uninitialized local obs at step0. Earlier callback tests did not exercise the full Main lifecycle and therefore missed this integration defect. The new regression compiles the complete actual _run_episode and _get_policy_observation AST bodies, plus actual passive adapter access/preprocessing methods. It does not import Main's production bootstrap or substitute a duplicate loop. Real RDT policy/search, ProgressContinuation, converter and DecisionEvidence run against synthetic model/environment/Stage/video dependencies.
+
+**7 tests passed in15.195151868 process CPU seconds /600** (11.497577964 wall seconds), affinity[0,1], two threads, CUDA hidden and uninitialized, guard0, no unexpected test failures. The old4ce2 complete method reproduces UnboundLocalError at the initial call with zero policy model forwards and zero environment steps; that expected failure is retained as an explicit passing regression. The warnings are from the unchanged core/fkd_class.py docstring.
+
+- FP32/BF16 policy cases run17 actual loop steps: first two full8-step prefixes complete, then a third decision terminates. The original float64 EEF/target bytes remain bound despite processed policy state deliberately removing robot_state and changing/casting its representation. Independent unchanged N30 audit verifies2 insertions,2 completed prefixes and17 acknowledgments.
+- A24-step guided→unguided→guided sequence tests both terminated and truncated exits. Neither gap nor reset-returned EEF=99 can certify old progress; pending/completed history clears. No new measurement is used.
+- C0/Q0 complete old/new loop cases preserve action bytes, RNG bytes, model/RBF/score counters and cache/policy-observation/tracker/render/step counts. They perform zero new get_obs calls. N30 performs exactly one additional passive cache access; no added reset, environment query, model/score or tracker measurement.
+
+The fixture retains production auxiliary pretest scoring flags but suppresses trace-file persistence, using synthetic external services. It proves the wiring and counter parity in that controlled domain; it does not claim a real model/simulator outcome or full production launch. No real attempt payload, protected input, GPU/API/model/simulator, state/ledger/budget or W source was touched.
+
+The original cohort remains INVALID_OR_INTERRUPTED and all original facts/costs remain immutable. This repair does not authorize restarting it, inheriting controls under a new source label, retrying an episode, or issuing a GPU release. The old source bridge intentionally remains unchanged and will reject this repair under the old plan. A future limited continuation requires root's separately frozen administrative source bridge/authority. There are no remaining CPU repair blockers.
+
+Reproduce the focused suite from this repair directory with a new unique run identifier:
+`/home/hynx/miniconda3/envs/vla-pilot/bin/python cpu_guard_v1.py repair-review-run tests/test_n30_initial_observation_repair.py -q`

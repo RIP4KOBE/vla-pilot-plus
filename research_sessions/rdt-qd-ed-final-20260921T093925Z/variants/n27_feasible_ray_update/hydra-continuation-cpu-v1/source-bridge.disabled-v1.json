@@ -1,0 +1,17 @@
+{
+  "schema": "n27-hydra-source-bridge-v1",
+  "old_source": null,
+  "new_source": null,
+  "changed_existing": [
+    "configs/config.yaml",
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n23_worker.py"
+  ],
+  "unchanged_original_files": 342,
+  "reverse_exact": null,
+  "historical_backend_proof": null,
+  "new_numerical_preflight": false,
+  "runtime": null,
+  "executable": false,
+  "reason": "CPU preparation only; actual root seal, source review, finite adoption and release absent"
+}

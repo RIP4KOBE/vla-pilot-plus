@@ -1,0 +1,35 @@
+{
+  "schema": "n30-r1-root-source-adoption-v1",
+  "at": "2026-10-03T21:34:12.241649+00:00",
+  "old_commit": "4ce2b95757c1c0d662696ba19d6a9a14d2e59b49",
+  "repair_base": "7c0d80d734fa8300173e56d9a8de03415bc55fe2",
+  "commit": "b2775fa2008a8a88e374c43a5753f8862485af1f",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/source-manifest-execution-v1.json",
+    "sha256": "5ecec50164559cd96f86140c481d78d41120be9a1a3da3802fc7774d7912c01f"
+  },
+  "cpu_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/root-cpu-integration-review-v1.json",
+    "sha256": "03568e6f2f30c272b6824d91af6c149e557e49d63cb273058befe1c6249f8e5a"
+  },
+  "source_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/root-source-review-execution-v1.json",
+    "sha256": "39711184553d4cb06a43edf75c9e73720afb759e8f64608a55bf56d902caf682"
+  },
+  "source_files_verified": 457,
+  "operational_dirty_files_unchanged_through_fast_forward": {
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/checkpoint.json": "e6188808639edb03a39033987a5c2a71cb52b7c46b108a396db93865bfe91a59",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.json": "b47605353b232dbede3945e724f157dd9663eaa4643b5c573cf83e5416b47c00",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.md": "aea384f704807ace367edeac30af8269ceca49646313dc3e61d98e61d49bdc8e",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/REPORT.md": "d1b7abd4117b84523e042df9d2213cfa2582f3b43c77bc53207976fcacd8f167",
+    "data/attempt-ledger.jsonl": "c4bef9e7835697c1e195bb1fb1dca4e0273a1ef977fb4c97ea224941770b0459",
+    "data/exposure-registry.jsonl": "b628db432f3536424a9c69157a39d522dc3ea9782f1b0d877b31a3a285013c71",
+    "data/gpu-healthcheck-ledger.jsonl": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7",
+    "data/gpu-hour-reservation-ledger.jsonl": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+    "docs/03_evidence/qd_ed_final/iteration-ledger.md": "b245f69dd62a3eaf91b99997613d5869b8c1abc316f8a14f63586040e6a09b9d",
+    "research-state.yaml": "2168ca76504ed4d04547a626d89939669a6fe8fb5c91b3e8b1855a313c7ec7c3",
+    "research_config.yaml": "bf57edd90999c7aaf7c662166e4ffa5b450a73e3b9aca47a15993eba8f32449a"
+  },
+  "gpu_dispatched": false,
+  "budget_changed": false
+}

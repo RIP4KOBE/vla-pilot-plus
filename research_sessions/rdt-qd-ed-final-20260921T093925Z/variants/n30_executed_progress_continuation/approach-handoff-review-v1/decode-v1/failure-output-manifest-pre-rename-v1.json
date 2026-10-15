@@ -1,0 +1,42 @@
+{
+  "schema": "n30-handoff-execution-output-manifest-v1",
+  "status": "FAILED_BEFORE_READER_AUTHORIZATION_OR_PAYLOAD",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/execution-v1.log",
+      "sha256": "eb2dcd4c18c6a3d6d39bec249c4a6065c61e2839811185902afa1d80901a72ab",
+      "bytes": 396
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/external-execution-v1.json",
+      "sha256": "70c529523d24adab575aba770287d3b1fa6f54b12574f610c17c30862e305bf5",
+      "bytes": 1908
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/administrative-inspection-v1.json",
+      "sha256": "a76efd378c8cdebc1ccbbcfbde4290947e83d75c1499de2039effa9d0aaaeec9",
+      "bytes": 320
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/execution-closure-v1.json",
+      "sha256": "eb9f7f8e70c7785602a1d028d36f5fe981fb5d3f5dfa141b6809a05104c06f1f",
+      "bytes": 4017
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/summary-v1.md",
+      "sha256": "7f525cc7a3838224654e47e1992838d98809fde8fd51b0ea5de68ddd7db95999",
+      "bytes": 1193
+    }
+  ],
+  "reader": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/decode_cpu_v1.py",
+    "sha256": "4f11e72f7e15c81c5fe5094499e74ebbfed5113e05e467e2adae33f108497ed0",
+    "bytes": 36543
+  },
+  "release": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/root-execution-release-v1.json",
+    "sha256": "244827f622422add4b043f777490fa91e890d11cc10cc668166631171994773a",
+    "bytes": 2951
+  },
+  "packaging_cpu_seconds": 0.0009044470000000027
+}

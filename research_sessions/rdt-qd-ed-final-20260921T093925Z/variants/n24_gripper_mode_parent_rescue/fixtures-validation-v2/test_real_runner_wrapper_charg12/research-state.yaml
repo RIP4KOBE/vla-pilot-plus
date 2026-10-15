@@ -1,0 +1,51 @@
+artifacts: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/fixtures-validation-v2/test_real_runner_wrapper_charg12/artifact
+budget:
+  amendment:
+    physical_gpu: 7
+    proposal_sha256: 6a5704152a2e783b3769648e915e458d4f08e8d75f12bde47a2b95ed1ebdc7ee
+    schema: gpu7-n23-budget-amendment-v2
+  dispatched: 1
+  gpu_hour_reservations:
+    formal: 12.0
+    validation: 32.0
+  gpu_hours_consumed: 5.034772200613386e-07
+  max_episode_attempts: 478
+  max_gpu_hours: 100.0
+  reserved:
+    baseline: 51
+    development: 187
+    formal: 40
+    recovery: 20
+    validation: 180
+  running: 0
+  aborted: 0
+  valid: 0
+  invalid: 1
+  completed: 1
+gpu_pool:
+- 7
+max_concurrent_gpu_workers: 1
+resource_isolation:
+  private_budget: true
+  status: ACTIVE
+  validation_status: PASS
+run_name: CPU
+worktree: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/fixtures-validation-v2/test_real_runner_wrapper_charg12
+runner:
+  by_bucket:
+    baseline: 0
+    development: 0
+    validation: 1
+    formal: 0
+    recovery: 0
+  reserved_attempts: 1
+  gpu_hours_by_bucket:
+    baseline: 0.0
+    development: 0.0
+    validation: 5.034772200613386e-07
+    formal: 0.0
+    recovery: 0.0
+  gpu_healthcheck_hours: 0.0
+  gpu_healthcheck_inflight: 0
+  last_attempt_id: CPU__n24v_c2_b1_t00_c0_20260930__5b6077a57035
+  last_event: valid

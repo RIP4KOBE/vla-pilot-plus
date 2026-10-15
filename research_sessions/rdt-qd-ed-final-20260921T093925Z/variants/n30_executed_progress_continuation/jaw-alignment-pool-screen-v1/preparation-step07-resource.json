@@ -1,0 +1,21 @@
+{
+  "cpu_seconds": 0.18460231,
+  "metadata_reads": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/attempts/rdt-qd-ed-final-20260921T093925Z__n30_r2_dev_t00_n30_20261003__4300bcf89485/eds_eval/decision_evidence/episode_000/events.jsonl",
+      "sha256": "656732e96b82574408631e59c0ce80bd63ceac7c4b4cc16d7c25e5a693bd3512",
+      "bytes": 9577102
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/attempts/rdt-qd-ed-final-20260921T093925Z__n30_r2_dev_t01_n30_20261003__1e52b07e1725/eds_eval/decision_evidence/episode_000/events.jsonl",
+      "sha256": "d3c45e711325ce85ee77b81ee844b28706f032ed17998420cf3ebccbedebd31a",
+      "bytes": 3061645
+    }
+  ],
+  "payload_reads": 0,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads": 2
+}

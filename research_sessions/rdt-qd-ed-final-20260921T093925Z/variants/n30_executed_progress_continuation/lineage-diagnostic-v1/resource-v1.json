@@ -1,0 +1,40 @@
+{
+  "schema": "n30-lineage-phase-a-resource-v1",
+  "measured_input_reader_source_cpu_seconds": 0.9174162969999999,
+  "this_packaging_cpu_seconds_before_write": 0.024096475000000003,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads_environment": 2,
+  "cpu_limit_seconds": 300,
+  "exact_end_to_end_cpu_measured": false,
+  "unmeasured": "Small own-file authoring/inspection Python and shell startup; detailed note in cpu-measurements-v1.json. No long-running subprocess, tests or production execution.",
+  "existing_input_bytes_including_repeats": 19298082,
+  "own_generated_json_inspection_conservative_allowance_bytes": 65270520,
+  "conservative_combined_bytes": 84568602,
+  "metadata_limit_bytes": 134217728,
+  "listed_payloads_statted": 4500,
+  "listed_payload_stat_bytes": 378217122,
+  "proposed_decode_containers": 34,
+  "proposed_decode_stat_bytes": 24273690,
+  "payload_opens": 0,
+  "payload_hash_measurements": 0,
+  "payload_decodes": 0,
+  "torch_numpy_production_imports": 0,
+  "gpu_api_simulator_model_calls": 0,
+  "reader_guard_denials": 0,
+  "failed_invocations": [
+    {
+      "source": "inventory_metadata_v1.py",
+      "log": "metadata-run-v1.log",
+      "error": "Markdown parsed as JSON",
+      "payload_reads": 0
+    }
+  ],
+  "successful_invocations": [
+    "metadata-run-v2.log",
+    "index-run-v1.log"
+  ],
+  "decode_authorized": false
+}

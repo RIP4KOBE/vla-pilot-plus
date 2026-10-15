@@ -1,0 +1,167 @@
+{
+  "schema": "n30-jaw-pool-repair-source-v2",
+  "executable_one_pass": false,
+  "requires_manual_root_release": true,
+  "reader": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/calculate_pool_v2.py",
+    "sha256": "e7036561b172bc8fdc359b24fb9a5329c9d69ab9c5186a67e517b7cb9a69a8b8",
+    "bytes": 27506
+  },
+  "input_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/input-manifest.frozen.v1.json",
+    "sha256": "5d56abae37a421420f203649ccbe0afe9268cc5fc369adb13e6a34ee686c6f64",
+    "bytes": 1409965
+  },
+  "measurement_declaration": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/measurement-declaration-v2.json",
+    "sha256": "4b898fcd0ad05495b3e124c6506c5af97fe554621340d99ed37ad96f33b91535",
+    "bytes": 7090
+  },
+  "static_source_files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962,
+      "windows": [
+        [
+          1923,
+          1945
+        ],
+        [
+          2102,
+          2206
+        ],
+        [
+          5320,
+          5327
+        ],
+        [
+          5379,
+          5423
+        ],
+        [
+          5473,
+          5480
+        ],
+        [
+          5508,
+          5516
+        ],
+        [
+          6299,
+          6303
+        ],
+        [
+          6445,
+          6485
+        ],
+        [
+          6576,
+          6584
+        ],
+        [
+          6704,
+          6721
+        ],
+        [
+          7153,
+          7177
+        ],
+        [
+          7318,
+          7363
+        ],
+        [
+          7568,
+          7570
+        ]
+      ],
+      "read_mode": "source_only"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_ed.py",
+      "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89",
+      "bytes": 46573,
+      "windows": [
+        [
+          81,
+          86
+        ],
+        [
+          541,
+          557
+        ],
+        [
+          582,
+          604
+        ],
+        [
+          648,
+          655
+        ],
+        [
+          810,
+          845
+        ]
+      ],
+      "read_mode": "source_only"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241,
+      "windows": [
+        [
+          136,
+          158
+        ],
+        [
+          208,
+          221
+        ]
+      ],
+      "read_mode": "source_only"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160,
+      "windows": [
+        [
+          1151,
+          1176
+        ],
+        [
+          1650,
+          1688
+        ]
+      ],
+      "read_mode": "source_only"
+    }
+  ],
+  "successful_archive_lineage_reader": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/decode_cpu_v1.py",
+    "sha256": "3f6404a29c0108f190a5eb83dffbfb0e42696f1cef1be44d9612c5c4dc99263d",
+    "bytes": 32681
+  },
+  "old_reader": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/calculate_pool_v1.py",
+    "sha256": "e3aa094a2843627fe0db95be75904882214305d47fd5857a2de4a9b8d76e5219",
+    "bytes": 22019
+  },
+  "old_failure_resource": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/resource-v1.json",
+    "sha256": "680f47d07a17303063656390e21a42d1f35190a100f5e084792efee95910a535",
+    "bytes": 166431
+  },
+  "old_external_receipt": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/external-execution-v1.json",
+    "sha256": "149121118dbce8620c85c7714ecf8aebc8c5f8483e3b561843f43b51464442f5",
+    "bytes": 1077
+  },
+  "repair_scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/root-repair-scope-v2.md",
+    "sha256": "90ab527360cc24e18b935b125f98e3a3e4061244822487bfa1c88f8cc7d818fb",
+    "bytes": 3212
+  }
+}

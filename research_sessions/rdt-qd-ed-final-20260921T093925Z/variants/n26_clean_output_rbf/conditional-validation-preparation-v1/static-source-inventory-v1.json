@@ -1,0 +1,243 @@
+{
+  "schema": "n26-conditional-validation-static-source-inventory-v1",
+  "mode": "STATIC_DESIGN_ONLY",
+  "source_count": 24,
+  "protocol": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-validation-preparation-v1/root-static-design-protocol-v1.md",
+    "sha256": "11d902d99ca3f504c7e1d3da90eeda4ea2e72beb51aa38d8e7f21f276a8d1c66"
+  },
+  "sources": [
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "scripts/qd_ed_n25_validation_bridge.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/scripts/qd_ed_n25_validation_bridge.py",
+      "sha256": "6cbd0a0dd163833991e8efb5f9d5c81ff38c5c357d1c3e53fe78677019713913"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "scripts/qd_ed_n25_validation_contract.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/scripts/qd_ed_n25_validation_contract.py",
+      "sha256": "b8731b4ed0d70c885a511fa3514a28211d05f66e653d87f690e49db7adba9c13"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "scripts/qd_ed_n25_validation_evidence.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/scripts/qd_ed_n25_validation_evidence.py",
+      "sha256": "303abd529bccfb3e7b4df4c12d84d12fc82f7a5ff8502dbfd53e3c28950a0306"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "scripts/qd_ed_n25_validation_identity.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/scripts/qd_ed_n25_validation_identity.py",
+      "sha256": "86c8df44070a790717f59cc2ec32b2ab44873243bb7a1ed7a57f5ff845f22825"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "scripts/qd_ed_n25_validation_prepare.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/scripts/qd_ed_n25_validation_prepare.py",
+      "sha256": "7be9344cc5e286557c9d08cdb6409b65e99f39861be1ec3d306868c0ed14673d"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "scripts/qd_ed_n25_validation_recovery.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/scripts/qd_ed_n25_validation_recovery.py",
+      "sha256": "911e96f77b871e55ef694dc74fce89cc1500f667705661b2203b057e54436412"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "scripts/qd_ed_n25_validation_report.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/scripts/qd_ed_n25_validation_report.py",
+      "sha256": "42a0a95502e8dfc85f5a5bd0c1d0a00c293993f52e02dd7bb6e8ff266fd30cca"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "scripts/qd_ed_n25_validation_supervise.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/scripts/qd_ed_n25_validation_supervise.py",
+      "sha256": "26d00d4a547a0294c2ecc054eab220cb59ef1d589d63d73ba1432817865d74ec"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "scripts/qd_ed_final_runner.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/scripts/qd_ed_final_runner.py",
+      "sha256": "550c6d9bc97d2b131e1de266108733549714c6bdea133789f1a845738ba3b106"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "scripts/qd_ed_n23_worker.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/scripts/qd_ed_n23_worker.py",
+      "sha256": "841cb02654acb5cab85bcf7fae3b3f402e233d5ea9ec1bb42726410d9e6d15cc"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "experiments/qd_ed_n25/protocol-validation-conditional-v1.md",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/experiments/qd_ed_n25/protocol-validation-conditional-v1.md",
+      "sha256": "5ed12805f71bfb2a727af4489fd1ccc0fcb962b48641679a4ad935e935e1df35"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "experiments/qd_ed_n25/protocol-validation-routing-addendum-v1.md",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/experiments/qd_ed_n25/protocol-validation-routing-addendum-v1.md",
+      "sha256": "42632edf9bec27791fa77e6dc163f806f0305ba9d8b60958a7de64a78caef0f0"
+    },
+    {
+      "commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation",
+      "path": "experiments/qd_ed_n25/validation-controller-contract-v1.md",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/validation_implementation/experiments/qd_ed_n25/validation-controller-contract-v1.md",
+      "sha256": "4c195cb7b06c9ea8264640555409c5c6b41d05f9b0644762d66764f0e3d6fae3"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "scripts/qd_ed_n26_contract.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_contract.py",
+      "sha256": "e7a58c965f635062ba72a81acf2e84c26bcae735ca6b580862adae426d4d299f"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "scripts/qd_ed_n26_bridge.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_bridge.py",
+      "sha256": "1a9354faecf3a182f27187666beaf22e8e560727a2d4e3666bce50be55283fc7"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "scripts/qd_ed_n26_logical.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_logical.py",
+      "sha256": "d5fde7a827c29a4e60789947701f4abb079e80399e45de69b6f1f1f877f6c7fe"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "scripts/qd_ed_n26_backend.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_backend.py",
+      "sha256": "53970bca912aa8d413fae17ca9e9df243e6f8538344d7448f5efab387b1e4062"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "scripts/qd_ed_n26_report.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_report.py",
+      "sha256": "d0d37c3fcb751c674316c255834648eddf11cacb98e3cddb7c0f17576e600ec5"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "scripts/qd_ed_n26_supervise.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_supervise.py",
+      "sha256": "57dfae9e54d0087d233f8554dd432bef12f6cf076728f28ee97f7e38c3cf7772"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "scripts/qd_ed_n26_native.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_native.py",
+      "sha256": "7454ba0be79e9568252f2d55e2ec3a96da7e81d3030b71b42a8eca8104eabf62"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "scripts/qd_ed_final_runner.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_final_runner.py",
+      "sha256": "cff374a636a410579aaaff679c52f07eeda6fce9fb6cdf6b71773ab1f8f68806"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "scripts/qd_ed_n23_worker.py",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n23_worker.py",
+      "sha256": "58ca3729fbb4d80aeac441a68d6b6a13c5d0b06ccce9a7329007a1731be59ce1"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "experiments/qd_ed_n26_logical/controller-contract-v1.md",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/experiments/qd_ed_n26_logical/controller-contract-v1.md",
+      "sha256": "532c4ecabe366f83f47cbcfa07b89850e9487e5e804d5b119f87be9d406986f1"
+    },
+    {
+      "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+      "path": "docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "absolute_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+    }
+  ],
+  "payload_runtime_history_protected_reads_authorized": false,
+  "network_gpu_api_model_simulator_tests_authorized": false,
+  "source_mutations_authorized": false,
+  "allowed_delta_proposal_location": "design.md (proposal only; implementation requires separate root authorization)",
+  "locator_note": "Git tree names and exact branch HEAD/status only; no historical payloads followed.",
+  "initial_static_scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-validation-preparation-v1/read-scope-static-v1.json",
+    "sha256": "f8664a472b56e0b5dcc76498779f1bb6a573c50386553c60ad3c242a16cbc9da"
+  },
+  "proposed_allowed_delta": {
+    "status": "DESIGN_ONLY_REQUIRES_SEPARATE_IMPLEMENTATION_AUTHORIZATION",
+    "base_commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+    "historical_reference_commit": "79caa4b6f8a3cc67a379b8da510dc9ab745b4c14",
+    "new_modules": [
+      "scripts/qd_ed_n26_validation_bridge.py",
+      "scripts/qd_ed_n26_validation_contract.py",
+      "scripts/qd_ed_n26_validation_evidence.py",
+      "scripts/qd_ed_n26_validation_identity.py",
+      "scripts/qd_ed_n26_validation_recovery.py",
+      "scripts/qd_ed_n26_validation_prepare.py",
+      "scripts/qd_ed_n26_validation_supervise.py",
+      "scripts/qd_ed_n26_validation_report.py",
+      "scripts/qd_ed_n26_validation_terminal.py"
+    ],
+    "modified_existing": {
+      "scripts/qd_ed_final_runner.py": {
+        "new_functions": [
+          "is_n26_validation_plan"
+        ],
+        "limited_route_functions": [
+          "is_n26_plan",
+          "is_n25_plan",
+          "is_n7_plan",
+          "is_n23_plan",
+          "is_n23_v2_plan",
+          "metered_plan",
+          "typed_metered_plan",
+          "metered_support",
+          "validate_plan",
+          "check_budget",
+          "check_retry",
+          "append_event_locked",
+          "run_plan",
+          "reconcile_ledger"
+        ],
+        "restrictions": "evaluation routing, original two E2/runtime checks, identity exposure registration and dispatched labels only; execution/locking/accounting/cleanup primitives unchanged"
+      },
+      "scripts/qd_ed_n23_worker.py": {
+        "limited_route_functions": [
+          "validate_context"
+        ],
+        "all_other_functions": "byte_identical_including_run_worker_and_verify_receipt"
+      }
+    },
+    "other_additions": "prospectively frozen N26 validation protocols/reverse-bridge records and focused synthetic tests/fixtures/guard",
+    "unchanged_existing_files": 313,
+    "unchanged_scope": "All other N26 Dev scientific, profile, native/reference, proof, common/continuation/controller modules",
+    "new_gpu_preflight": false,
+    "implementation_performed": false
+  },
+  "design": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-validation-preparation-v1/design.md",
+    "sha256": "27d333b97f788783fd8859d921c3d896d956e5c7bc5d11bb567fe12352ecc0c9"
+  }
+}

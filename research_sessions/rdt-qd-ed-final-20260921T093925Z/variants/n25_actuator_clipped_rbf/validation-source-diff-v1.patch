@@ -1,0 +1,2152 @@
+diff --git a/experiments/qd_ed_n25/protocol-validation-conditional-v1.md b/experiments/qd_ed_n25/protocol-validation-conditional-v1.md
+new file mode 100644
+index 0000000..bc47b45
+--- /dev/null
++++ b/experiments/qd_ed_n25/protocol-validation-conditional-v1.md
+@@ -0,0 +1,25 @@
++# N25 conditional validation preparation v1
++
++CPU source preparation only while the frozen N25 Dev controller runs. This is a new preparation scope after completed Phase B, not activation of protected validation. Current Dev source, plan, release, controller, state, budgets and all outcomes remain untouched.
++
++## Entry and immutable science
++
++Require the actual immutable N25 Dev result and root terminal review: all 40 accepted cells, N25 >=5/10 and >= C0/Q0/N23, all existing native/source/compute/cost/substantive-QD/ED gates. Partial, numeric-futility and INVALID dispositions cannot enter. Frozen Dev plan SHA 1f0c94ccd3458a3a786acb9525728a1b64e3df439e4f920731f6566dd3a95eb3; source commit 5a65ef15968cc68c82314e8c0773b3365ad45fa0, 257-file manifest SHA fafcb0d881c95d567cb14a6690145d4ad933abc84a5e0175dfbe1512efd836ee. Preserve every scientific/config/provider/native arithmetic and evidence file; N25 clipped RBF modes, N23 quality, N7 descriptor, N5 selection and rescue OFF unchanged. C0/Q0 unchanged. 720 steps,20Hz,8 actions,pop16,10 rounds,176 canonical evaluations/11 batches unchanged.
++
++The existing N24 conditional validation implementation is a source reference only, never an authority for N25. Create an isolated validation_implementation under this N25 variant from exact Dev commit. Only new validation identity/evaluation/accounting modules and a minimal explicit worker validate_context routing insertion may change. Every other existing worker function and shared runner/core file remains identical. Provide a full exact 257-file bridge and reverse insertion; no copied function code or shared-global replacement. Preserve existing native N25 first-guided witnesses/all-call scalar checks and original cost accounting, including valid zero-gradient behavior and strict zero-guided accounting. Reuse settled native proof only via exact unchanged arithmetic source plus explicit Dev-to-validation source bridge; no new GPU probe.
++
++## Closed evaluation protocol
++
++Prepare exactly 60 matched primary cells: two task blocks0..9, arms C0/Q0/N25,20 per arm. At later root adoption choose first completely unused preregistered validation cohort c1..c4 from frozen identity metadata, exposure registry and dispatched identity metadata only. Any exposure/dispatch consumes its whole cohort regardless of outcome/validity/arm. Never read protected outcome to choose seeds; no partial-cohort replacement or per-task tuning. This measures same-layout seed robustness. One protected cohort per candidate, no restart after INVALID or rejection.
++
++At most two narrowly typed sole-Codex-timeout whole-episode recoveries, one per cell, max62 attempts; use unchanged Dev E2 classifier and all evidence/source/cost requirements. No retry of valid failure, arithmetic or algorithm error, absent evidence or other invalidity. Retain invalid originals and first-valid selection. One serial GPU7, same UUID/EGL/runtime,1800s+40s per episode, local32 GPU-process hours maximum, all historical costs retained. Cumulative494 attempts/100 GPU hours; buckets55 baseline/199 development/180 validation/40 formal/20 recovery; protected validation/formal reserves32/12 hours unchanged. No budget amendment or transfer here. Full required attempt/hour capacity and formal reserve must actually fit at adoption and before every dispatch; otherwise no launch.
++
++All60 accepted cells and N25 >=10/20 and >=C0/Q0 plus existing gates required. No partial promotion or outcome-driven early stop rule. Report paired outcomes, actual denominators, errors/recoveries and measured costs. Root consumes aggregate validation disposition for subsequent decisions; protected per-task/seed outcomes are not tuning data. Formal acceptance and substantive compute-matched QD-replacement ablation remain separately closed. No formal launcher in this scope.
++
++## Provider, preparation and activation
++
++Online Stage remains only current managed Codex login via codex_cli/chatgpt, gpt-6-astra/low/E2/180s. No Poe, alternate account, provider fallback, new guidance/grounding API or credential inspection/copy/hash; preserve saved Poe credentials untouched. Frozen cached guidance only.
++
++CPU executor may read only frozen source/metadata and closed implementation reports, use synthetic fixtures with two CPU threads and an explicit guard blocking real attempt/protected payloads, network, model/API/simulator, GPU initialization and dispatch. No active W/state/budget/ledger/Arbor mutation. Do not inspect actual Dev outcome payloads during preparation. Own all new artifacts beneath N25/validation_implementation and distinctly named N25 validation-preparation files. Preserve failures and avoid duplicate unrelated tests. Deliver clean commit, exact source/reverse bridge, substantive synthetic tests (including split artifact/controller paths), disabled templates and honest unresolved limitations.
++
++Protected execution requires, in order, actual complete Dev promotion and root terminal review; root review/integration of exact validation source; metadata-only fresh identities and sufficient capacity; adopted specific validation authority; frozen plan and separate exact execution release. Preparation or a ready template grants none of these. Do not interrupt or modify active N25 Dev to accelerate readiness.
+diff --git a/experiments/qd_ed_n25/protocol-validation-routing-addendum-v1.md b/experiments/qd_ed_n25/protocol-validation-routing-addendum-v1.md
+new file mode 100644
+index 0000000..799a8ca
+--- /dev/null
++++ b/experiments/qd_ed_n25/protocol-validation-routing-addendum-v1.md
+@@ -0,0 +1,11 @@
++# N25 validation preparation: explicit runner routing addendum v1
++
++This addendum supersedes only the previous requirement that the shared runner remain wholly byte-identical in protocol-validation-conditional-v1.md (SHA5ed12805f71bfb2a727af4489fd1ccc0fcb962b48641679a4ad935e935e1df35). All science, budgets, gates, no-real-data CPU boundary, independent worktree and future adoption requirements remain unchanged.
++
++Root inspected exact frozen runner source and the previous N24 validation diff. New N25 validation plans must keep n25_cohort for unchanged native audit activation, but the frozen runner currently classifies any such plan as Dev and requires its 40-cell contract. A separate validation dispatch implementation would duplicate resource/accounting admission. Permit the same narrow explicit evaluation-routing pattern already reviewed for N24, entirely inside the isolated future validation source; current W/Dev source remains untouched.
++
++Permitted shared-runner edits are limited to: new is_n25_validation_plan predicate; exclusion of that explicit marker from is_n25_plan and legacy is_n7_plan/is_n23_plan/is_n23_v2_plan classification; inclusion in metered_plan/typed_metered_plan; validation contract selection before Dev in metered_support; marker inclusion in the two existing E2/runtime-condition checks in validate_plan; validation budget-contract route in check_budget; validation recovery route in check_retry; validation exposure-registration hook in append_event_locked; and explicit validation dispatched-label selection in run_plan/reconcile_ledger terminal metadata. Do not modify primitive locking, subprocess/resource ownership, actual execution, metering, cleanup, timeout, provider, native arithmetic, or original Dev acceptance semantics. Report any additional needed edit before proceeding.
++
++Worker edits remain only a minimal explicit validate_context route. run_worker, verify_receipt and all other original worker functions remain byte-identical. No function-code cloning, monkey-patching or shared-global replacement. New validation code must implement its independent stricter gates rather than treating Dev acceptance as validation acceptance.
++
++Provide exact whole-file reverse replacements for every permitted shared-runner and worker insertion/change. They must reconstruct both original Dev files byte-for-byte and separately show all other255 original files unchanged. Use synthetic plans/rows to demonstrate original Dev and older routes are unchanged, validation reaches its own contract, missing/wrong markers or authority fail, original N25 native audit remains active and protected source/identity checks cannot downgrade into Dev. Root reviews this future bridge before any integration. No current running source or phase release changes.
+diff --git a/experiments/qd_ed_n25/validation-controller-contract-v1.md b/experiments/qd_ed_n25/validation-controller-contract-v1.md
+new file mode 100644
+index 0000000..64b2aa0
+--- /dev/null
++++ b/experiments/qd_ed_n25/validation-controller-contract-v1.md
+@@ -0,0 +1,47 @@
++# Conditional N25 validation controller v1
++
++This is CPU preparation, not a release. The protocol and routing addendum in this directory are authoritative. Every old N25 Dev scientific, profile, provider, controller arithmetic, native witness and cost function is retained. No efficacy claim follows from synthetic checks.
++
++## Source and evidence bridge
++
++`qd_ed_n25_validation_bridge.source_record` inventories all 257 files of Dev commit `5a65ef15968cc68c82314e8c0773b3365ad45fa0`, plus 13 evaluation files. The only two modified old files are `qd_ed_final_runner.py` and `qd_ed_n23_worker.py`. Exact reverse replacements reconstruct both original files byte for byte. The other 255 old files are unchanged. The worker insertion is solely within `validate_context`; `run_worker`, `verify_receipt` and every other function remain byte-identical. Production never clones function code or replaces shared globals.
++
++The explicit `n25_validation` marker is routed before old Dev contracts. The plan retains an exact `n25_cohort.worker_audit` binding so the unchanged worker applies the original N25 native audit, including first-guided bounded witnesses, all-call summaries, profile-bound gates and valid zero gradients. Controls retain original CPU native audit; N25 retains assigned CUDA native arithmetic inside the same metered process. There is no supervisor CUDA audit or new preflight.
++
++The original Dev writer remains source-bound. Promotion is reconstructed from its actual result, status, Dev-only journal snapshot, all 40 accepted cells and all attempts, immutable receipts/contexts/process identities, original source manifest, original 12-case tensor proof and the earlier settled quality proof. Historical verification uses the recorded Dev source and process identity, not a demand that the new evaluation HEAD equal old HEAD. Original tensor authority schema, budget/source-review links and recorded boot ID are retained. Both proofs must remain settled and correctly charged. Reference paths may resolve through compatibility symlinks only with identical bytes and same resolved file. The private identity verifier is imported lazily by the new evidence module; old helpers are unchanged.
++
++## Separate gates and schemas
++
++All authority documents are external, hash-bound records. They do not occur inside their own source manifest. Exact live locations are under the N25 variant; disabled examples live separately in `validation-cpu-templates-v1` and are never admitted as live authority.
++
++* `validation-dev-promotion-review-v1.json`: schema `n25-dev-promotion-review-v1`; exact keys `schema, disposition, dev_plan, dev_status, dev_result, dev_source_bridge, allow_validation`. Requires disposition `promoted`, allow-validation true and actual complete 40-cell Dev promotion. All numeric/native/cost/status conditions are independently reconstructed; numeric futility, invalid, incomplete and fake promotion fail.
++* `validation-source-review-v1.json`: schema `n25-validation-source-review-v1`; exact keys `schema, disposition, dev_plan, protocol, routing_addendum, source, source_bridge, runtime, dev_source_bridge, no_execution_release`. Accepted review binds the complete evaluation source record and reverse bridge, immutable protocols and unchanged runtime. It grants no execution.
++* `validation-adoption-v1/authority.json`: schema `n25-validation-authority-v1`; exact keys `schema, cohort_id, seed_cohort, source, dev_review, source_review, protocol, routing_addendum, runtime, limits, caps, recorded_at, authority_interpretation, validation_authorized, formal_authorized`. A separate private-state `n25_validation_authority` hash reference is required. Cohort is `N25_VALIDATION_20260930`, seed cohort is the currently first unused c1..c4, validation true and formal false. The existing N25 budget authority must independently match exact caps.
++* `validation-plan.frozen.v1.gpu7.json`: original runtime/scientific profiles, new 270-file source and exact 60-row matrix; `n25_validation` carries `schema, cohort_id, seed_cohort, limits, protocol, routing_addendum, dev_review, source_review, authority, source_bridge, metadata_selection`. Only the prepare freeze path may bind actual gates and freeze it.
++* `validation-execution-release-v1.json`: schema `n25-validation-execution-release-v1`; exact keys `schema, plan, source_commit, cohort_id, seed_cohort, episode_keys, limits, dev_review, source_review, authority, physical_gpu, uuid, validation_authorized, formal_authorized`. All values must equal the frozen plan, GPU7 and frozen UUID. Fresh metadata is checked again under the original locks before the first dispatch.
++
++Paths/SHA references contain exactly `path, sha256`. The executable schemas deliberately reject disabled-template wrappers. No actual future result/status/review hash is invented during preparation.
++
++## Matrix, identity and budget
++
++Order is block b1 then b2, task0..9, C0/Q0/N25: 60 primaries, 20 per arm. Select the first completely untouched preregistered cohort using frozen identity metadata, historical exposure inventory, exposure registry and reserved/dispatched identity fields only. Outcomes are not selection inputs. Any prior exposure consumes the entire cohort. Release rechecks freshness; later dispatches allow only this cohort's already registered prefix. Registration appends identity-only exposure after the original journal write while its state lock is held.
++
++Exact cumulative caps are 494 attempts / 100 GPU hours and buckets baseline55/development199/validation180/formal40/recovery20, with protected validation32/formal12 hours. No mutation or transfer is implemented. Full remaining primary/recovery capacity and the remaining 32-hour local allowance must fit while retaining formal reserves. Each episode must also fit a full 1800+40 seconds in the local allowance. All original invalid attempts and costs remain charged. No model/provider/simulation cost is omitted.
++
++Only the unchanged E2 sole-Codex-timeout classifier may authorize at most two whole-episode recovery attempts, at most one per cell. The original terminal must be complete, native accepted, and have only the narrowly enumerated timeout derivative failures. Missing, nonfinite, semantic, interruption, worker timeout, other API, failed recovery and valid task failure never retry. Original incomplete tokens stay incomplete; unknown counts are not zero-imputed. Strict zero-guided missing-metrics compatibility retains agreement between original terminal, native canonical count and episode compute, plus evidence-reader identity and absent-file binding. Removing all N25 markers cannot downgrade the profile even for zero-guided episodes.
++
++## Reporting and ownership
++
++Controller files belong exactly to `N25/validation-execution`; attempt payloads stay under the frozen attempt artifact root. Both paths are independently owned; neither is treated as the other's child. Symlink/path escapes fail. The original runner locks, admission, cleanup, process identity, timeout, managed Codex login and append-only costs are reused without copying `run_plan`.
++
++No partial promotion or numeric futility is applied. All 60 native-valid cells, substantive QD/ED, N25 >=10/20 and >=C0/Q0 are needed. A status/postprocessing failure after valid journaling preserves the journal prefix, controller count disagreement and all attempt costs, and yields INVALID. No restart/resume is authorized. Detailed paired outcomes/errors/denominators/costs remain on disk in `protected-detail-v1.json`; CLI and `aggregate-disposition-v1.json` expose only aggregate disposition. If adjudication itself fails, the unadjudicated protected record preserves the complete local events and fails closed. Formal remains closed and the overall research goal is still unmet.
++
++## Root-only prospective activation
++
++1. After immutable complete Dev promotion, root writes the actual Dev promotion review and reviews the final evaluation commit, all source bytes/reverse bridge, runtime and historical settled proofs. If Dev does not promote, stop here.
++2. Root integrates only the exact reviewed commit after Dev ends, checks metadata-only freshness and capacity under original locks, writes source review and separate finite authority, and adopts its exact reference. No authority from N24 or Dev substitutes for this step.
++3. From that owning worktree run `scripts/qd_ed_n25_validation_prepare.py --freeze --output <N25>/validation-plan.frozen.v1.gpu7.json` with the existing Python environment. The command must pass actual admission; a preview is never executable.
++4. Root writes the exact execution release from the frozen plan, then invokes `scripts/qd_ed_n25_validation_supervise.py --plan <frozen-plan> --release <exact-release> --output-dir <N25>/validation-execution`. It rechecks source/runtime/identity/authority/resource/capacity and never creates a new GPU proof.
++5. Root uses only aggregate validation disposition for further algorithm steering. The detailed protected report is final evaluation evidence, not development input. Formal acceptance and compute-matched replacement ablation remain separately closed.
++
++These commands are prospective documentation only. CPU preparation does not read actual Dev/protected payloads, alter active state, adopt authority, integrate source or launch them.
+diff --git a/scripts/qd_ed_final_runner.py b/scripts/qd_ed_final_runner.py
+index ac98d2a..8e2520f 100644
+--- a/scripts/qd_ed_final_runner.py
++++ b/scripts/qd_ed_final_runner.py
+@@ -479,7 +479,7 @@ def is_n6_plan(plan):
+ 
+ 
+ def is_n7_plan(plan):
+-    return not is_n25_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})
++    return not is_n25_validation_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and not is_n23_plan(plan) and (plan.get('n7_cohort') is not None or ('N7' in plan.get('candidate_profiles', {})
+             and not is_n9_plan(plan) and not is_n11_plan(plan)
+             and not is_n17_plan(plan)))
+ 
+@@ -541,8 +541,12 @@ def is_n20_plan(plan):
+     return plan.get('n20_cohort') is not None or 'N20' in plan.get('candidate_profiles', {})
+ 
+ 
++def is_n25_validation_plan(plan):
++    return plan.get('n25_validation') is not None
++
++
+ def is_n25_plan(plan):
+-    return plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {})
++    return not is_n25_validation_plan(plan) and (plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {}))
+ 
+ 
+ def is_n24_plan(plan):
+@@ -550,11 +554,11 @@ def is_n24_plan(plan):
+ 
+ 
+ def is_n23_v2_plan(plan):
+-    return not is_n25_plan(plan) and not is_n24_plan(plan) and plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2'
++    return not is_n25_validation_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and plan.get('n23_cohort', {}).get('schema') == 'n23-clipped-quality-dev-v2'
+ 
+ 
+ def is_n23_plan(plan):
+-    return not is_n25_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))
++    return not is_n25_validation_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan) and (plan.get('n23_cohort') is not None or 'N23' in plan.get('candidate_profiles', {}))
+ 
+ 
+ def is_n22_plan(plan):
+@@ -641,14 +645,17 @@ def n23_support(plan=None):
+ 
+ 
+ def metered_plan(plan):
+-    return is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)
++    return is_n25_validation_plan(plan) or is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)
+ 
+ 
+ def typed_metered_plan(plan):
+-    return is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)
++    return is_n25_validation_plan(plan) or is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)
+ 
+ 
+ def metered_support(plan):
++    if is_n25_validation_plan(plan):
++        from scripts import qd_ed_n25_validation_contract
++        return qd_ed_n25_validation_contract
+     if is_n25_plan(plan):
+         from scripts import qd_ed_n25_contract
+         return qd_ed_n25_contract
+@@ -842,9 +849,9 @@ def validate_plan(path, *, root=ROOT, require_frozen=True):
+     require(Path(runtime['artifact_root']).resolve() == artifact_root, 'runtime artifact root mismatch')
+     stage_overrides(runtime)
+     require((runtime.get('stage_recovered_error_condition') is not None) ==
+-            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan)),
++            (plan.get('n7_e2_passive_diagnostic') is not None or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n25_validation_plan(plan)),
+             'E2 Stage condition requires its dedicated prospective cohort plan')
+-    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan)),
++    require((runtime.get('stage_engineering_condition') is not None)==(is_n4e1_plan(plan) or is_n5_plan(plan) or is_n6_plan(plan) or is_n7_plan(plan) or is_n9_plan(plan) or is_n11_plan(plan) or is_n17_plan(plan) or is_n18_plan(plan) or is_n19_plan(plan) or is_n20_plan(plan) or is_n21_plan(plan) or is_n22_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan) or is_n25_plan(plan) or is_n25_validation_plan(plan)),
+         '180s transport requires its dedicated prospective cohort')
+     physical_gpu = runtime_gpu(runtime, state)
+     if require_frozen:
+@@ -1249,7 +1256,11 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(),
+     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
+             'GPU policy/runtime physical device mismatch')
+     amendment = budget.get('amendment')
+-    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':
++    if row.get('iteration') == 'N25_VALIDATION_20260930':
++        from scripts import qd_ed_n25_validation_contract as validation
++        validation.require_budget_state(state, globals())
++        bucket_caps = validation.CAPS['buckets']
++    elif row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':
+         from scripts import qd_ed_n25_contract as n25
+         n25.require_state(state, globals())
+         bucket_caps = n25.budget_authority()['caps']['buckets']
+@@ -1361,6 +1372,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(),
+ 
+ 
+ def check_retry(events, row):
++    if row.get('n25_validation_recovery_eligibility') is not None:
++        from scripts import qd_ed_n25_validation_recovery as recovery
++        return recovery.check_retry(events, row, globals())
+     if row.get('n25_recovery_eligibility') is not None:
+         from scripts import qd_ed_n25_recovery as recovery
+         return recovery.check_retry(events, row, globals())
+@@ -1406,6 +1420,9 @@ def append_event_locked(root, event):
+     with ledger.open('a') as stream:
+         stream.write(json.dumps(event,sort_keys=True,allow_nan=False)+'\n'); stream.flush(); os.fsync(stream.fileno())
+     sync_state_from_journal(root,[*events,event])
++    if event.get('identity', {}).get('iteration') == 'N25_VALIDATION_20260930':
++        from scripts import qd_ed_n25_validation_identity as validation_identity
++        validation_identity.register_dispatch(root, event)
+ 
+ 
+ def sync_state_from_journal(root,events):
+@@ -1943,7 +1960,7 @@ def run_plan(plan_path, *, split, iteration, episode_keys=None, root=ROOT):
+                 if is_n21_plan(plan):
+                     terminal['n21_episode_dispatched']=dispatched
+                 if metered_plan(plan):
+-                    terminal['n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched
++                    terminal['n25_validation_episode_dispatched' if is_n25_validation_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched
+                 if is_n22_plan(plan):
+                     terminal['n22_episode_dispatched']=dispatched
+                 append_event(root,terminal)
+@@ -2009,7 +2026,7 @@ def reconcile_ledger(plan_path, attempt_id, *, root=ROOT):
+         if is_n19_plan(plan):terminal['n19_episode_dispatched']=dispatched is not None
+         if is_n20_plan(plan):terminal['n20_episode_dispatched']=dispatched is not None
+         if is_n21_plan(plan):terminal['n21_episode_dispatched']=dispatched is not None
+-        if metered_plan(plan):terminal['n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched is not None
++        if metered_plan(plan):terminal['n25_validation_episode_dispatched' if is_n25_validation_plan(plan) else 'n25_episode_dispatched' if is_n25_plan(plan) else 'n24_episode_dispatched' if is_n24_plan(plan) else 'n23_episode_dispatched']=dispatched is not None
+         if is_n22_plan(plan):terminal['n22_episode_dispatched']=dispatched is not None
+         append_event(root,terminal); durable_json(output/'attempt-result.json',terminal)
+         return terminal
+diff --git a/scripts/qd_ed_n23_worker.py b/scripts/qd_ed_n23_worker.py
+index 74c5177..469e83a 100644
+--- a/scripts/qd_ed_n23_worker.py
++++ b/scripts/qd_ed_n23_worker.py
+@@ -135,6 +135,9 @@ def validate_context(context, main_argv):
+     require(root == ROOT.resolve() and context['main_argv'] == list(main_argv)
+             and main_argv[0] == str(root / 'main.py') and output.name == context['attempt_id'], "worker command/root/attempt differs")
+     plan, runtime = read_ref(context['plan']), read_ref(context['runtime'])
++    if plan.get('n25_validation') is not None:
++        from scripts import qd_ed_n25_validation_contract as validation
++        return validation.validate_worker_context(context, main_argv, root, output, plan, runtime)
+     if plan.get('n25_cohort') is not None:
+         from scripts import qd_ed_n25_contract as n25
+         return n25.validate_worker_context(context, main_argv, root, output, plan, runtime)
+diff --git a/scripts/qd_ed_n25_validation_bridge.py b/scripts/qd_ed_n25_validation_bridge.py
+new file mode 100644
+index 0000000..5836175
+--- /dev/null
++++ b/scripts/qd_ed_n25_validation_bridge.py
+@@ -0,0 +1,97 @@
++"""Exact, reversible evaluation-only bridge from all257 frozen N25 Dev files."""
++import hashlib
++import subprocess
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w
++DEV_COMMIT='5a65ef15968cc68c82314e8c0773b3365ad45fa0'
++WORKER_INSERT="""    if plan.get('n25_validation') is not None:
++        from scripts import qd_ed_n25_validation_contract as validation
++        return validation.validate_worker_context(context, main_argv, root, output, plan, runtime)
++"""
++RUNNER_EDITS=[('def is_n25_plan(plan):\n'
++  "    return plan.get('n25_cohort') is not None or 'N25' in plan.get('candidate_profiles', {})",
++  'def is_n25_validation_plan(plan):\n'
++  "    return plan.get('n25_validation') is not None\n"
++  '\n'
++  '\n'
++  'def is_n25_plan(plan):\n'
++  "    return not is_n25_validation_plan(plan) and (plan.get('n25_cohort') is not None or 'N25' in "
++  "plan.get('candidate_profiles', {}))",
++  1),
++ ('return not is_n25_plan(plan) and not is_n24_plan(plan)',
++  'return not is_n25_validation_plan(plan) and not is_n25_plan(plan) and not is_n24_plan(plan)',
++  3),
++ ('    return is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)',
++  '    return is_n25_validation_plan(plan) or is_n25_plan(plan) or is_n23_plan(plan) or is_n24_plan(plan)',
++  1),
++ ('    return is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)',
++  '    return is_n25_validation_plan(plan) or is_n25_plan(plan) or is_n23_v2_plan(plan) or is_n24_plan(plan)',
++  1),
++ ('def metered_support(plan):\n',
++  'def metered_support(plan):\n'
++  '    if is_n25_validation_plan(plan):\n'
++  '        from scripts import qd_ed_n25_validation_contract\n'
++  '        return qd_ed_n25_validation_contract\n',
++  1),
++ ('or is_n25_plan(plan)),', 'or is_n25_plan(plan) or is_n25_validation_plan(plan)),', 2),
++ ("    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':",
++  "    if row.get('iteration') == 'N25_VALIDATION_20260930':\n"
++  '        from scripts import qd_ed_n25_validation_contract as validation\n'
++  '        validation.require_budget_state(state, globals())\n'
++  "        bucket_caps = validation.CAPS['buckets']\n"
++  "    elif row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':",
++  1),
++ ('def check_retry(events, row):\n',
++  'def check_retry(events, row):\n'
++  "    if row.get('n25_validation_recovery_eligibility') is not None:\n"
++  '        from scripts import qd_ed_n25_validation_recovery as recovery\n'
++  '        return recovery.check_retry(events, row, globals())\n',
++  1),
++ ('    sync_state_from_journal(root,[*events,event])\n',
++  '    sync_state_from_journal(root,[*events,event])\n'
++  "    if event.get('identity', {}).get('iteration') == 'N25_VALIDATION_20260930':\n"
++  '        from scripts import qd_ed_n25_validation_identity as validation_identity\n'
++  '        validation_identity.register_dispatch(root, event)\n',
++  1),
++ ("terminal['n25_episode_dispatched' if is_n25_plan(plan)",
++  "terminal['n25_validation_episode_dispatched' if is_n25_validation_plan(plan) else "
++  "'n25_episode_dispatched' if is_n25_plan(plan)",
++  2)]
++ADDITIONS={f'scripts/qd_ed_n25_validation_{name}.py' for name in ('bridge','contract','identity','evidence','recovery','prepare','supervise','report')}|{
++ 'tests/test_qd_ed_n25_validation.py','tests/test_qd_ed_n25_validation_runtime.py',
++ 'experiments/qd_ed_n25/protocol-validation-conditional-v1.md',
++ 'experiments/qd_ed_n25/protocol-validation-routing-addendum-v1.md','experiments/qd_ed_n25/validation-controller-contract-v1.md'}
++MODIFIED={'scripts/qd_ed_final_runner.py','scripts/qd_ed_n23_worker.py'}
++
++
++def original(root,path):return subprocess.check_output(['git','show',DEV_COMMIT+':'+path],cwd=root)
++
++
++def verify_delta(root,parent):
++    root=Path(root)
++    w.require(parent['source_commit']==DEV_COMMIT and len(parent['code_files'])==257,'N25 validation original Dev source/count differs')
++    changed=set(subprocess.check_output(['git','diff','--name-only',DEV_COMMIT,'HEAD'],cwd=root,text=True).splitlines())
++    w.require(changed<=ADDITIONS|MODIFIED,'N25 validation exceeds evaluation-only file scope')
++    for item in parent['code_files']:
++        name=item['path'];before=original(root,name);after=(root/name).read_bytes()
++        w.require(hashlib.sha256(before).hexdigest()==item['sha256'],'N25 original257 committed bytes differ')
++        if name=='scripts/qd_ed_n23_worker.py':
++            w.require(after.count(WORKER_INSERT.encode())==1,'N25 validation worker exact insertion differs')
++            after=after.replace(WORKER_INSERT.encode(),b'',1)
++        elif name=='scripts/qd_ed_final_runner.py':
++            for old,new,count in reversed(RUNNER_EDITS):
++                w.require(after.count(new.encode())==count,'N25 validation runner exact insertion differs')
++                after=after.replace(new.encode(),old.encode(),count)
++        w.require(after==before,'N25 validation changed science/worker/old evaluation semantics')
++    return sorted(changed)
++
++
++def source_record(root,parent,protocol_sha,addendum_sha):
++    changed=verify_delta(root,parent)
++    w.require(w.sha(Path(root)/'experiments/qd_ed_n25/protocol-validation-conditional-v1.md')==protocol_sha,'N25 tracked validation protocol drift')
++    w.require(w.sha(Path(root)/'experiments/qd_ed_n25/protocol-validation-routing-addendum-v1.md')==addendum_sha,'N25 tracked routing addendum drift')
++    source=w.source_record(root,{x['path'] for x in parent['code_files']}|ADDITIONS)
++    return source,{'schema':'n25-validation-source-bridge-v1','dev_source':{'commit':DEV_COMMIT,'files':parent['code_files'],
++        'sha256':w.canonical_sha(parent['code_files'])},'validation_source':source,'changed_paths':changed,
++        'scientific_unchanged':True,'worker_change':'exact_validate_context_route_only',
++        'runner_change':'exact_closed_validation_routing_insertions','new_gpu_preflight':False}
+diff --git a/scripts/qd_ed_n25_validation_contract.py b/scripts/qd_ed_n25_validation_contract.py
+new file mode 100644
+index 0000000..9287ef6
+--- /dev/null
++++ b/scripts/qd_ed_n25_validation_contract.py
+@@ -0,0 +1,281 @@
++"""Separate, conditional N25 protected validation; no authority from Dev alone."""
++from contextlib import contextmanager
++import json
++import os
++from pathlib import Path
++import threading
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n25_contract as dev
++from scripts import qd_ed_n25_native as native
++from scripts import qd_ed_n25_validation_bridge as bridge
++ROOT=Path(__file__).resolve().parents[1]
++RUN_DIR=dev.RUN_DIR
++COHORT='N25_VALIDATION_20260930'
++ARMS=('C0','Q0','N25')
++FIELDS=('task_id','env_seed','policy_seed','init_index','init_row_sha256','init_file_sha256','bddl_sha256')
++DEV_COMMIT=bridge.DEV_COMMIT
++DEV_PLAN=RUN_DIR/'plan.frozen.v1.gpu7.json'
++DEV_PLAN_SHA='1f0c94ccd3458a3a786acb9525728a1b64e3df439e4f920731f6566dd3a95eb3'
++DEV_RESULT=RUN_DIR/'result-v1.json'
++DEV_STATUS=RUN_DIR/'execution/supervisor-status-v1.json'
++DEV_REVIEW=RUN_DIR/'validation-dev-promotion-review-v1.json'
++SOURCE_REVIEW=RUN_DIR/'validation-source-review-v1.json'
++AUTHORITY=RUN_DIR/'validation-adoption-v1/authority.json'
++PROTOCOL=RUN_DIR/'protocol-validation-conditional-v1.md'
++PROTOCOL_SHA='5ed12805f71bfb2a727af4489fd1ccc0fcb962b48641679a4ad935e935e1df35'
++ROUTING_ADDENDUM=RUN_DIR/'protocol-validation-routing-addendum-v1.md'
++ROUTING_SHA='42632edf9bec27791fa77e6dc163f806f0305ba9d8b60958a7de64a78caef0f0'
++CAPS={'attempts':494,'gpu_hours':100.,'buckets':{'baseline':55,'development':199,'validation':180,'formal':40,'recovery':20},
++ 'protected_gpu_hours':{'validation':32.,'formal':12.}}
++VALIDATION_PLAN=RUN_DIR/'validation-plan.frozen.v1.gpu7.json'
++LIMITS={'primary_cells':60,'dispatches':62,'recoveries':2,'recoveries_per_cell':1,'gpu_hours':32.,
++        'episode_timeout_seconds':1800,'cleanup_seconds':40,'physical_gpu':7}
++WORKER_MARKER={'schema':'n25-validation-worker-native-binding-v1','worker_audit':dev.WORKER_CONTRACT}
++GPU7_UUID=dev.GPU7_UUID
++require=w.require
++sha=w.sha
++ref=dev.ref
++read_ref=w.read_ref
++read=lambda p:json.loads(Path(p).read_text())
++_SCOPE=None
++
++
++def same_ref(a,b):
++    return isinstance(a,dict) and isinstance(b,dict) and set(a)==set(b)=={'path','sha256'} and (
++        Path(a['path']).is_absolute() and Path(b['path']).is_absolute()
++        and Path(a['path']).resolve()==Path(b['path']).resolve() and a['sha256']==b['sha256'])
++
++
++def original_plan():
++    require(sha(DEV_PLAN)==DEV_PLAN_SHA,'N25 validation frozen Dev plan changed')
++    parent=read(DEV_PLAN)
++    require(parent['source_commit']==DEV_COMMIT and len(parent['code_files'])==257 and parent.get('frozen') is True
++        and parent['episodes']==dev.expected_rows() and parent['phase_authorization']=={'dev':True,'validation':False,'formal':False},
++        'N25 validation requires exact original complete Dev matrix/source')
++    return parent
++
++
++def manifest(plan,r):
++    value=r['read_json'](plan['profiles_path'])
++    for arm,reference in plan['candidate_profiles'].items():value['profiles'][arm]=r['expand_candidate'](arm,read_ref(reference),value['profiles']['Q0'])
++    return value
++
++
++def source_record(root,parent):return bridge.source_record(root,parent,PROTOCOL_SHA,ROUTING_SHA)
++
++
++def dev_promotion(root,r):
++    from scripts import qd_ed_n25_validation_evidence as evidence
++    from scripts import qd_ed_n25_validation_recovery as recovery
++    from scripts import qd_ed_n25_report as reporting
++    parent=original_plan();review=read_ref(ref(DEV_REVIEW))
++    require(set(review)=={'schema','disposition','dev_plan','dev_status','dev_result','dev_source_bridge','allow_validation'}
++        and review['schema']=='n25-dev-promotion-review-v1' and review['disposition']=='promoted'
++        and review['allow_validation'] is True and same_ref(review['dev_plan'],ref(DEV_PLAN))
++        and same_ref(review['dev_status'],ref(DEV_STATUS)) and same_ref(review['dev_result'],ref(DEV_RESULT)),
++        'N25 validation root review of actual Dev promotion missing')
++    result=read_ref(review['dev_result']);status=read_ref(review['dev_status'])
++    require(result.get('schema')=='n25-dev-cohort-result-v1' and result.get('cohort_id')==dev.COHORT
++        and result.get('source_commit')==DEV_COMMIT and result.get('planned')==result.get('audited_cells')==40
++        and result.get('dev_gate_promoted') is True and result.get('decision')=='ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION'
++        and result.get('goal_status')=='TARGET_NOT_MET' and result.get('controller_evidence',{}).get('consistent') is True,
++        'N25 validation incomplete/invalid/rejected Dev cannot promote')
++    terminal=result.get('terminal_status',{})
++    require(set(terminal)=={'path','sha256','content'} and same_ref({k:terminal[k] for k in ('path','sha256')},review['dev_status'])
++        and terminal['content']==status and status.get('schema')=='n25-dev-supervisor-status-v1'
++        and status.get('status')=='completed_all_forty_audited' and status.get('cohort_id')==dev.COHORT
++        and status.get('source_commit')==DEV_COMMIT and same_ref(status.get('plan'),ref(DEV_PLAN))
++        and status.get('dev_gate_promoted') is True and status.get('completed_keys')==[v['episode_key'] for v in parent['episodes']],
++        'N25 validation actual terminal status differs')
++    source={v['path']:v['sha256'] for v in parent['code_files']}
++    reader=Path(root)/'scripts/qd_ed_n25_report.py'
++    require(sha(reader)==source['scripts/qd_ed_n25_report.py'] and same_ref(result.get('reader'),ref(reader))
++        and same_ref(result.get('plan'),ref(DEV_PLAN)) and result.get('source_bridge')==review['dev_source_bridge'],
++        'N25 validation Dev reader/source provenance differs')
++    events=r['read_events'](Path(root)/'data/attempt-ledger.jsonl')
++    local=[e for e in events if e.get('identity',{}).get('iteration')==dev.COHORT]
++    require(read_ref(result['ledger_snapshot'])==local,'N25 validation Dev-only terminal snapshot differs')
++    evidence.historical_backend(review['dev_source_bridge'],parent,events,
++        r['read_events'](Path(root)/'data/gpu-healthcheck-ledger.jsonl'),r)
++    def accept(row,local):
++        final=recovery.historical_dev_cell(parent,row,local,root,r);out=Path(final['output_dir'])
++        report=evidence.historical_receipt(final,row,parent,ref(DEV_PLAN),r)
++        counts,aux=native.from_output(row['profile'],out,report,final.get('guided_chunks'))
++        return {'episode_key':row['episode_key'],'task_id':row['task_id'],'profile':row['profile'],'attempt_id':final['attempt_id'],
++            'success':final['success'],'audit':ref(out/'eds_eval/decision-evidence-audit.json'),
++            'worker_context':ref(out/'n23-worker-context.json'),'worker_receipt':ref(out/'eds_eval/in-worker-audit-receipt.json'),
++            'attempt_result':ref(out/'attempt-result.json')},counts,aux
++    rebuilt=reporting.analyze(parent,local,accept)
++    require(rebuilt['dev_gate_promoted'] is True and rebuilt['audited_cells']==40 and 40<=rebuilt['dispatched']<=42
++        and all(result.get(k)==v for k,v in rebuilt.items()),'N25 validation independently reconstructed Dev promotion/cost differs')
++    prefix=[x['episode_key'] for x in rebuilt['accepted_cells']]
++    require(result['controller_evidence']=={'completed_keys':prefix,'journal_accepted_keys':prefix,'consistent':True,'status_phase':'completed_all_forty_audited'},
++        'N25 validation Dev controller disagreement')
++    outcomes=[{'episode_key':x['episode_key'],'task_id':x['task_id'],'profile':x['profile'],'success':x['success'],
++        'attempt_id':x['attempt_id'],'recovered':bool(next(a['terminal'].get('retry_of') for a in rebuilt['attempts'] if a['attempt_id']==x['attempt_id']))} for x in rebuilt['accepted_cells']]
++    require(status['attempts']==rebuilt['attempts'] and status['outcomes']==outcomes
++        and status['successes']=={a:rebuilt['counts'][a]['success'] for a in dev.ARMS}
++        and status['native']==rebuilt['native'] and status['auxiliary']==rebuilt['auxiliary']
++        and all(status.get(k)==v for k,v in reporting.summary(outcomes,rebuilt['attempts']).items()),
++        'N25 validation all-attempt costs/native/status reconciliation differs')
++    return ref(DEV_REVIEW)
++
++
++def review_source(source,source_bridge,parent):
++    record=read_ref(ref(SOURCE_REVIEW))
++    require(record=={'schema':'n25-validation-source-review-v1','disposition':'accepted','dev_plan':ref(DEV_PLAN),
++        'protocol':ref(PROTOCOL),'routing_addendum':ref(ROUTING_ADDENDUM),'source':source,'source_bridge':source_bridge,
++        'runtime':{'path':parent['runtime_manifest_path'],'sha256':parent['runtime_manifest_sha256']},
++        'dev_source_bridge':read_ref(ref(DEV_REVIEW))['dev_source_bridge'],'no_execution_release':True},
++        'N25 validation exact root source review missing')
++    return ref(SOURCE_REVIEW)
++
++
++def authority(source,source_bridge,parent,state=None):
++    record=read_ref(ref(AUTHORITY))
++    require(set(record)=={'schema','cohort_id','seed_cohort','source','dev_review','source_review','protocol','routing_addendum','runtime','limits','caps',
++        'recorded_at','authority_interpretation','validation_authorized','formal_authorized'}
++        and record['schema']=='n25-validation-authority-v1' and record['cohort_id']==COHORT and record['seed_cohort'] in {'c1','c2','c3','c4'}
++        and record['source']==source and record['dev_review']==ref(DEV_REVIEW)
++        and record['source_review']==review_source(source,source_bridge,parent) and record['protocol']==ref(PROTOCOL)
++        and record['routing_addendum']==ref(ROUTING_ADDENDUM)
++        and record['runtime']=={'path':parent['runtime_manifest_path'],'sha256':parent['runtime_manifest_sha256']}
++        and record['limits']==LIMITS and record['caps']==CAPS
++        and all(isinstance(record[k],str) and record[k].strip() for k in ('recorded_at','authority_interpretation'))
++        and record['validation_authorized'] is True and record['formal_authorized'] is False,
++        'N25 separate finite validation authority missing/differs')
++    if state is not None:require(state.get('n25_validation_authority')==ref(AUTHORITY),'N25 validation authority not adopted')
++    return ref(AUTHORITY)
++
++
++def require_budget_state(state,r):
++    dev.require_budget_state(state,r)
++    require(dev.budget_authority()['caps']==CAPS,'N25 validation exact494 finite caps differ')
++    parent=original_plan();source,source_bridge=source_record(r['ROOT'],parent)
++    authority(source,source_bridge,parent,state)
++
++
++def validate_contract(plan,profiles,runtime,seeds,root,r):
++    from scripts import qd_ed_n25_validation_identity as identity
++    from scripts import qd_ed_n25_validation_prepare as prepare
++    require(plan==read(VALIDATION_PLAN) and plan.get('frozen') is True,'N25 validation exact frozen plan missing')
++    parent=original_plan();source,source_bridge=source_record(root,parent);meta=plan.get('n25_validation',{})
++    require(sha(PROTOCOL)==PROTOCOL_SHA and sha(ROUTING_ADDENDUM)==ROUTING_SHA and meta.get('schema')=='n25-protected-validation-v1' and meta.get('cohort_id')==COHORT
++        and meta.get('limits')==LIMITS and meta.get('protocol')==ref(PROTOCOL)
++        and meta.get('routing_addendum')==ref(ROUTING_ADDENDUM)
++        and meta.get('dev_review')==dev_promotion(root,r) and meta.get('source_review')==review_source(source,source_bridge,parent)
++        and meta.get('authority')==authority(source,source_bridge,parent) and meta.get('source_bridge')==source_bridge,
++        'N25 validation promotion/source/authority differs')
++    expected=prepare.build_plan(parent,seeds,meta['seed_cohort'],source=source,source_bridge=source_bridge,
++        dev_review=meta['dev_review'],source_review=meta['source_review'],authorization=meta['authority'],selection=meta['metadata_selection'])
++    expected['frozen']=True
++    require(plan==expected and plan['n25_cohort']==WORKER_MARKER and set(profiles['profiles'])==set(ARMS)
++        and plan['phase_authorization']=={'dev':False,'validation':True,'formal':False},'N25 validation exact evaluation-only matrix differs')
++    require(plan['candidate_profiles']['N25']==parent['candidate_profiles']['N25']
++        and runtime==read(parent['runtime_manifest_path']),'N25 validation scientific profile/runtime changed')
++    dev.validate_runtime(runtime,root,r)
++    selection=identity.metadata(root,parent)
++    require(identity.first_unused(*selection[:4],allow_own=True)==meta['seed_cohort'],'N25 validation first fresh cohort changed')
++    state=r['read_state'](Path(root)/'research-state.yaml');require_budget_state(state,r)
++    require(read_ref(state['n25_validation_authority'])['seed_cohort']==meta['seed_cohort'],'N25 validation adopted seed cohort differs')
++
++
++def validate_worker_context(context,argv,root,output,plan,runtime):
++    from scripts import qd_ed_final_runner as runner
++    meta=plan.get('n25_validation',{});matches=[x for x in plan['episodes'] if x['episode_key']==context['episode_key']]
++    require(plan.get('frozen') is True and same_ref(context['plan'],ref(VALIDATION_PLAN))
++        and meta.get('schema')=='n25-protected-validation-v1' and meta.get('cohort_id')==COHORT and meta.get('limits')==LIMITS
++        and plan.get('n25_cohort')==WORKER_MARKER and plan['phase_authorization']=={'dev':False,'validation':True,'formal':False}
++        and context['profile'] in ARMS and len(matches)==1 and matches[0]['profile']==context['profile']
++        and matches[0]['split']=='validation' and matches[0]['iteration']==COHORT and matches[0]['timeout_seconds']==1800,
++        'N25 validation worker exact phase/arm/identity differs')
++    require(plan['worktree']==str(root) and output==Path(plan['artifact_root']).resolve()/'attempts'/context['attempt_id']
++        and context['runtime']=={'path':plan['runtime_manifest_path'],'sha256':plan['runtime_manifest_sha256']},
++        'N25 validation worker root/runtime differs')
++    command,expected=runner.build_command(plan,manifest(plan,vars(runner)),runtime,matches[0],context['attempt_id'])
++    require(command[1:]==list(argv) and Path(expected).resolve()==output,'N25 validation worker original Hydra arguments differ')
++    source,source_bridge=source_record(root,original_plan())
++    require(context['source']==source and plan['source_commit']==source['commit'] and plan['code_files']==source['files']
++        and meta['source_bridge']==source_bridge and meta['source_review']==review_source(source,source_bridge,original_plan())
++        and w.cuda_binding(runtime)=={'physical_gpu':7,'uuid':GPU7_UUID,'logical_device':'cuda:0'},
++        'N25 validation worker science source bridge differs')
++    w.verify_source(root,source)
++    return root,output,runtime
++
++
++@contextmanager
++def supervised_scope(plan,root,key,*,eligibility=None):
++    global _SCOPE
++    require(_SCOPE is None,'N25 validation nested scope')
++    _SCOPE=(str(Path(root).resolve()),plan['source_commit'],key,os.getpid(),threading.get_ident(),eligibility)
++    try:yield
++    finally:_SCOPE=None
++
++
++def require_scope(plan,root,r,row=None):
++    require(_SCOPE is not None and _SCOPE[:2]==(str(Path(root).resolve()),plan['source_commit'])
++        and _SCOPE[3:5]==(os.getpid(),threading.get_ident()) and (row is None or row['episode_key']==_SCOPE[2]),
++        'N25 validation exact one-cell supervisor required')
++
++
++def primary_row(plan,row):
++    matches=[x for x in plan['episodes'] if x['episode_key']==row['episode_key']];require(len(matches)==1,'N25 validation unknown cell')
++    primary=matches[0];key='n25_validation_recovery_eligibility'
++    require(row==primary or (set(row)==set(primary)|{'retry_of',key} and row['budget_bucket']=='recovery'
++        and {k:row[k] for k in primary if k!='budget_bucket'}=={k:v for k,v in primary.items() if k!='budget_bucket'}),
++        'N25 validation recovery changed science')
++    return primary
++
++
++def effective_row(plan,row,events,root,r):
++    from scripts import qd_ed_n25_validation_recovery as recovery
++    require_scope(plan,root,r,row)
++    if _SCOPE[5] is None:return row
++    record=recovery.verify_eligibility(_SCOPE[5],plan,row,events,root,r)
++    return {**row,'budget_bucket':'recovery','retry_of':record['primary_attempt_id'],'n25_validation_recovery_eligibility':_SCOPE[5]}
++
++
++def full_capacity(state,events,resources,r):
++    require_budget_state(state,r);snap=r['budget_snapshot'](events,resources)
++    local=[e for e in events if e.get('identity',{}).get('iteration')==COHORT]
++    dispatched=[e for e in local if e['event']=='dispatched'];primary=sum(not e.get('retry_of') for e in dispatched)
++    recovered={e['attempt_id'] for e in local if e.get('retry_of')}
++    spent=sum(e.get('gpu_process_wall_seconds',0.) for e in local if e['event'] in r['TERMINAL'])/3600
++    require(primary<=60 and len(recovered)<=2 and len(dispatched)<=62 and spent<=32.,'N25 validation local finite cap exceeded')
++    require(snap['running']==snap['gpu_healthcheck_inflight']==0 and all(g[-1]['event'] in r['TERMINAL'] for g in r['event_groups'](events).values()),
++        'N25 validation unsettled reservation/worker')
++    needs={'validation':60-primary,'recovery':2-len(recovered)}
++    require(all(state['budget']['reserved'][b]-snap['by_bucket'][b]>=n for b,n in needs.items()),'N25 full validation/recovery capacity missing')
++    formal=max(0,40-snap['by_bucket']['formal']);formal_hours=max(0.,12.-snap['gpu_hours_by_bucket']['formal'])
++    require(snap['dispatched']+sum(needs.values())+formal<=494 and snap['gpu_hours_consumed']+max(0.,32.-spent)+formal_hours<=100.+1e-9,
++        'N25 full remaining validation would borrow formal reserve')
++
++
++def protected_budget(state,events,resources,row,timeout,r,*,plan):
++    primary_row(plan,row)
++    require(row['iteration']==COHORT and row['profile'] in ARMS and row['split']=='validation' and timeout==1800,'N25 validation row/timeout differs')
++    local=[e for e in events if e.get('identity',{}).get('iteration')==COHORT]
++    require(sum(e['event']=='dispatched' for e in local)<62
++        and sum(e.get('gpu_process_wall_seconds',0.) for e in local if e['event'] in r['TERMINAL'])+1840<=32*3600,
++        'N25 validation local time/dispatch ceiling')
++    full_capacity(state,events,resources,r)
++
++
++def read_worker_report(output,r):return dev.read_worker_report(output,r)
++
++
++def accepted_cell(plan,row,events,root,r):
++    from scripts import qd_ed_n25_validation_recovery as recovery
++    return recovery.accepted_cell(plan,row,events,root,r)
++
++
++def admission(plan,runtime,row,events,resources,root,r):
++    from scripts import qd_ed_n25_validation_recovery as recovery
++    primary=primary_row(plan,row);index=plan['episodes'].index(primary)
++    local=[e for e in events if e.get('identity',{}).get('iteration')==COHORT]
++    allowed={x['episode_key'] for x in plan['episodes'][:index]}|({row['episode_key']} if row.get('retry_of') else set())
++    require(all(e.get('episode_key') in allowed for e in local),'N25 validation exact prefix required')
++    for previous in plan['episodes'][:index]:accepted_cell(plan,previous,events,root,r)
++    if row.get('retry_of'):recovery.verify_eligibility(row['n25_validation_recovery_eligibility'],plan,primary,events,root,r)
++    return {'n25_validation_cohort_id':COHORT,'n25_validation_seed_block':row['seed_block'],'n25_validation_protocol_sha256':PROTOCOL_SHA,
++        **({'n25_validation_recovery_eligibility':row['n25_validation_recovery_eligibility']} if row.get('retry_of') else {})}
+diff --git a/scripts/qd_ed_n25_validation_evidence.py b/scripts/qd_ed_n25_validation_evidence.py
+new file mode 100644
+index 0000000..4dbd10b
+--- /dev/null
++++ b/scripts/qd_ed_n25_validation_evidence.py
+@@ -0,0 +1,131 @@
++"""CPU-only historical Dev receipt/proof verification across the exact source bridge."""
++import math
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n25_bridge as dev_bridge
++
++def identity_verifier():
++    # Keep historical contract imports out of CPU preparation/collection.
++    from scripts.qd_ed_n23_arithmetic_repair import verify_identity
++    return verify_identity
++
++def finite(v):return type(v) in (int,float) and math.isfinite(v)
++
++def historical_backend(reference,parent,events,resources,r):
++    """Read only settled old JSON proofs; do not verify old HEAD against new evaluation HEAD."""
++    from scripts import qd_ed_n25_validation_contract as c
++    from scripts import qd_ed_n25_backend as backend
++    source={'commit':parent['source_commit'],'files':parent['code_files'],'sha256':w.canonical_sha(parent['code_files'])}
++    runtime={'path':parent['runtime_manifest_path'],'sha256':parent['runtime_manifest_sha256']}
++    record=w.read_ref(reference)
++    review_ref=parent['n25_cohort']['final_review'];review=w.read_ref(review_ref)
++    authority=w.read_ref(parent['n25_cohort']['authority'])
++    w.require(reference==c.ref(c.dev.BRIDGE) and record.get('schema')=='n25-source-equivalence-bridge-v1'
++        and record.get('new_source')==source and record.get('phase_a_source')==c.dev.PHASE_A
++        and record.get('runtime')==runtime and record.get('new_rbf_arithmetic_proof_required') is True,
++        'validation original Dev source bridge differs')
++    proof_ref=review.get('backend_proof')
++    w.require(review=={'schema':'n25-source-runtime-review-v1','disposition':'accepted','source':source,'runtime':runtime,
++        'protocol':c.ref(c.dev.PROTOCOL),'source_plan':c.ref(c.dev.SOURCE_PLAN),'source_bridge':reference,
++        'predecessor':c.ref(c.dev.PREDECESSOR),'backend_proof':c.ref(c.dev.BACKEND_PROOF),
++        'arithmetic_protocol':c.ref(c.dev.ARITHMETIC_PROTOCOL),'no_gpu_release':True},
++        'validation original Dev final source/runtime/proof review differs')
++    w.require(set(authority)=={'schema','cohort_id','source','runtime','protocol','final_review','budget_authority','limits',
++            'local_gpu_hours','recorded_at','authority_interpretation','validation_authorized','formal_authorized'}
++        and authority.get('schema')=='n25-dev-authority-v1' and authority.get('cohort_id')==c.dev.COHORT
++        and authority.get('source')==source and authority.get('runtime')==runtime
++        and authority.get('protocol')==c.ref(c.dev.PROTOCOL)
++        and authority.get('final_review')==review_ref and authority.get('limits')==c.dev.LIMITS
++        and authority.get('budget_authority')==c.ref(c.dev.BUDGET_AUTHORITY)
++        and type(authority.get('local_gpu_hours')) in (int,float) and 1840/3600<=authority['local_gpu_hours']<=22.
++        and all(isinstance(authority[k],str) and authority[k].strip() for k in ('recorded_at','authority_interpretation'))
++        and authority.get('validation_authorized') is False and authority.get('formal_authorized') is False,
++        'validation original Dev authority differs')
++    proof=w.read_ref(proof_ref)
++    w.require(set(proof)=={'schema','accepted','source','runtime','plan','report','process','terminal'}
++        and proof.get('schema')=='n25-metered-tensor-proof-v1' and proof.get('accepted') is True
++        and proof.get('source')==source and proof.get('runtime')==runtime,
++        'validation settled N25 proof source differs')
++    plan=w.read_ref(proof['plan'])
++    expected=backend.build_plan(source,runtime,Path(parent['worktree']),plan['resource_id'],authority_ref=plan['authority'])
++    expected['frozen']=True
++    w.require(plan==expected and proof['plan']==c.ref(backend.PLAN),'validation original tensor-only plan differs')
++    authority_record=w.read_ref(plan['authority'])
++    process=w.read_ref(proof['process'])
++    w.require(plan['authority']==c.ref(backend.AUTHORITY) and authority_record=={
++        'schema':'n25-arithmetic-resource-authority-v1','source':source,'runtime':runtime,
++        'source_review':c.ref(backend.REVIEW),'budget_authority':c.ref(c.dev.BUDGET_AUTHORITY),
++        'limits':backend.LIMITS,'boot_id':process['boot_id'],'automatic_retry':False,
++        'dev_authorized':False,'validation_authorized':False,'formal_authorized':False},
++        'validation original tensor-only authority differs')
++    pre_review=w.read_ref(authority_record['source_review'])
++    w.require(pre_review=={'schema':'n25-arithmetic-source-review-v1','accepted':True,'source':source,'runtime':runtime,
++        'source_bridge':reference,'phase_b_protocol':c.ref(c.dev.PROTOCOL),
++        'arithmetic_protocol':c.ref(c.dev.ARITHMETIC_PROTOCOL),'predecessor':c.ref(c.dev.PREDECESSOR),
++        'budget_authority':c.ref(c.dev.BUDGET_AUTHORITY),'limits':backend.LIMITS,'gpu_release':False},
++        'validation original arithmetic source review differs')
++    dev_bridge.settled_backend(record,events,r)
++    backend.settled_proof(proof,resources,r)
++    return {'prior_quality_proof':record['prior_backend_proof'],'n25_rbf_proof':proof_ref,
++            'new_gpu_preflight':False}
++
++
++def historical_receipt(final,row,parent,plan_ref,r):
++    """Verify original Dev evidence under its original source, without claiming new HEAD."""
++    from scripts import qd_ed_n25_validation_contract as c
++    output=Path(final['output_dir'])
++    context_ref=c.ref(output/'n23-worker-context.json');context=w.read_ref(context_ref)
++    receipt_ref=c.ref(output/'eds_eval/in-worker-audit-receipt.json');receipt=w.read_ref(receipt_ref)
++    runtime_ref={'path':parent['runtime_manifest_path'],'sha256':parent['runtime_manifest_sha256']}
++    runtime=w.read_ref(runtime_ref)
++    source={'commit':parent['source_commit'],'files':parent['code_files'],'sha256':w.canonical_sha(parent['code_files'])}
++    manifest=c.manifest(parent,r);command,expected_output=r['build_command'](parent,manifest,runtime,row,final['attempt_id'])
++    w.require(Path(expected_output).resolve()==output.resolve() and context=={
++        'schema':'n23-metered-worker-context-v1','attempt_id':final['attempt_id'],'episode_key':row['episode_key'],
++        'profile':row['profile'],'output_dir':str(output.resolve()),'worktree':str(Path(parent['worktree']).resolve()),
++        'main_argv':command[1:],'plan':plan_ref,'runtime':runtime_ref,'source':source},
++        'validation historical worker context/command differs')
++    w.require(w.read_ref(context['plan'])==parent and final.get('n23_worker_receipt')==receipt_ref,
++        'validation historical receipt/plan terminal association differs')
++    process=r['read_json'](output/'process.json');identity={k:process[k] for k in ('pid','proc_start_ticks','boot_id')}
++    start=r['read_json'](output/'eds_eval/in-worker-audit-start.json')
++    w.require(start=={'schema':'n23-worker-start-v1','process':identity,'context':context_ref}
++        and process.get('attempt_id')==final['attempt_id'] and receipt.get('process')==identity
++        and final.get('process')==process and receipt.get('process_unchanged') is True,
++        'validation historical same-process ownership differs')
++    w.require(receipt.get('schema')=='n23-in-worker-audit-receipt-v1' and receipt.get('accepted') is True
++        and receipt.get('main_exit_code')==0 and receipt.get('context')==context_ref
++        and all(receipt.get(k)==context[k] for k in ('attempt_id','episode_key','profile','plan','runtime','source'))
++        and receipt.get('main_argv_sha256')==w.canonical_sha(command[1:])
++        and receipt.get('evidence')==w.evidence_record(output),'validation historical native source/evidence differs')
++    actual=receipt.get('worker_cuda',{});identity_verifier()(actual,runtime)
++    kind='cuda' if row['profile'] in {'N23','N25'} else 'cpu';arithmetic=receipt.get('audit_backend',{})
++    w.require(arithmetic.get('kind')==kind and arithmetic.get('logical_device')==('cuda:0' if kind=='cuda' else 'cpu'),
++        'validation historical audit backend differs')
++    if kind=='cuda':
++        w.require(arithmetic.get('physical_uuid')==actual['physical_uuid']
++            and arithmetic.get('torch_version')==actual.get('torch_version')
++            and arithmetic.get('cuda_version')==actual.get('cuda_version')
++            and isinstance(arithmetic.get('dtype_coverage'),list),'validation historical CUDA identity differs')
++    report_ref=c.ref(output/'eds_eval/decision-evidence-audit.json')
++    w.require(receipt.get('audit_report')==report_ref,'validation historical native report path/hash differs')
++    report=w.read_ref(report_ref)
++    w.require(report.get('accepted') is True and report.get('evidence_complete') is True
++        and report.get('n23_arithmetic_backend')==arithmetic
++        and finite(receipt.get('audit_seconds')) and finite(receipt.get('worker_wall_seconds'))
++        and 0<=receipt['audit_seconds']<=receipt['worker_wall_seconds']<=final['gpu_process_wall_seconds'],
++        'validation historical native report/metering differs')
++    if kind=='cuda':
++        gate=report.get('n23_actuator_clipped_quality_audit')
++        w.require((gate is None and report.get('observed_counts',{}).get('canonical_candidate_batch',0)==0
++            and arithmetic['dtype_coverage']==[]) or (isinstance(gate,dict) and gate.get('candidate_scores_verified',0)>0
++            and arithmetic['dtype_coverage']),'validation historical N23 arithmetic coverage missing')
++    from scripts import qd_ed_n25_native as native
++    metric=output/'eds_eval/eds_metrics.jsonl'
++    w.require(receipt.get('n25_metrics')=={'path':str(metric),'present':metric.is_file(),'sha256':w.sha(metric) if metric.is_file() else None},
++        'validation historical serialized metric binding differs')
++    w.require(type(final.get('guided_chunks')) is int,'validation historical guided count absent')
++    counts,aux=native.from_output(row['profile'],output,report,final['guided_chunks'])
++    w.require(receipt.get('n25_native_counts')==counts and receipt.get('n25_auxiliary')==aux,
++        'validation historical N25 profile native gate/counters differ')
++    return report
+diff --git a/scripts/qd_ed_n25_validation_identity.py b/scripts/qd_ed_n25_validation_identity.py
+new file mode 100644
+index 0000000..c8f0447
+--- /dev/null
++++ b/scripts/qd_ed_n25_validation_identity.py
+@@ -0,0 +1,101 @@
++"""Metadata-only cohort selection and dispatch exposure registration."""
++import hashlib
++import json
++import os
++from pathlib import Path
++from scripts import qd_ed_n25_validation_contract as c
++require=c.require
++sha=c.sha
++ref=c.ref
++read=c.read
++COHORT=c.COHORT
++ARMS=c.ARMS
++FIELDS=c.FIELDS
++HISTORY_SHA='304c99c7f6df75a68c3278df0640c6a5bb744d04b2457d5991881e9ac4b2b573'
++
++def pair(v,key='env_seed'):
++    p=(v.get('task_id'),v.get(key));require(all(type(x) is int for x in p),'validation identity task/seed missing');return p
++
++
++def metadata(root,parent):
++    """Project identity fields only; never inspect or return protected success values."""
++    root=Path(root);seed_path=Path(parent['seed_plan_path'])
++    require(sha(seed_path)==parent['seed_plan_sha256'],'frozen validation seeds changed')
++    paths=[root/'data/historical-exposure-inventory.jsonl',root/'data/exposure-registry.jsonl',root/'data/attempt-ledger.jsonl']
++    blobs=[p.read_bytes() for p in paths]
++    require(hashlib.sha256(blobs[0]).hexdigest()==HISTORY_SHA,'frozen historical identity inventory changed')
++    identities=[]
++    for blob in blobs[:2]:
++        rows=[]
++        for line in blob.splitlines():
++            if not line.strip():continue
++            v=json.loads(line)
++            rows.append({'pair':pair(v,'episode_seed'),'attempt_id':v.get('attempt_id'),
++                         'cohort_id':v.get('cohort_id')})
++        identities.append(rows)
++    ledger=[]
++    for line in blobs[2].splitlines():
++        if not line.strip():continue
++        v=json.loads(line)
++        if v['event'] not in {'reserved','dispatched'}: continue
++        i=v.get('identity',{})
++        require(i.get('split') in {'dev','validation','formal'},'unknown dispatched identity scope')
++        ledger.append({'event':v['event'],'attempt_id':v['attempt_id'],'pair':pair(i),
++                       'iteration':i.get('iteration'),'profile':i.get('profile'),'split':i['split']})
++    require(all(p.read_bytes()==blob for p,blob in zip(paths,blobs)),'metadata changed during identity snapshot')
++    return read(seed_path),identities[0],identities[1],ledger,{'seed_plan':ref(seed_path),
++        'inputs':[{'path':str(p.resolve()),'sha256':hashlib.sha256(blob).hexdigest()} for p,blob in zip(paths,blobs)],
++        'protected_outcomes_read':False}
++
++
++def first_unused(seeds,history,registry,ledger,*,allow_own=False):
++    require(tuple(seeds['backend_task_order'])==tuple(range(10)),'frozen backend task order differs')
++    own={v['attempt_id'] for v in ledger if v['iteration']==COHORT} if allow_own else set()
++    require(not any(v['split']=='validation' and v['profile']=='N25' and v['attempt_id'] not in own for v in ledger),
++            'N25 validation already reserved; one cohort only')
++    require(not any(v['iteration']==COHORT for v in ledger) or allow_own,'N25 cohort already started')
++    registered={tuple(v['pair']) for v in registry}
++    old_dispatched={tuple(v['pair']) for v in ledger if v['split']=='validation' and v['event']=='dispatched' and v['attempt_id'] not in own}
++    require(old_dispatched<=registered,'historical dispatched validation exposure registry needs reconciliation')
++    used={tuple(v['pair']) for v in history}
++    used|={tuple(v['pair']) for v in registry if not(v.get('cohort_id')==COHORT and v.get('attempt_id') in own)}
++    used|={tuple(v['pair']) for v in ledger if v['attempt_id'] not in own}
++    used|={pair(v) for name in ('dev','formal') for v in seeds['blocks'][name]}
++    seen=set();first=None
++    for c in range(1,5):
++        rows=[]
++        for b in (1,2):
++            values=seeds['blocks'][f'validation_c{c}_b{b}']
++            require(len(values)==10 and {v['task_id'] for v in values}==set(range(10)), 'validation block task map changed')
++            require(all(type(v['policy_seed']) is int for v in values),'validation policy seed missing')
++            rows+=values
++        pairs={pair(v) for v in rows}
++        require(len(pairs)==20 and not seen&pairs,'validation seeds duplicate');seen|=pairs
++        if first is None and not pairs&used:first=f'c{c}'
++    require(first is not None,'no untouched complete validation cohort remains')
++    return first
++
++
++def rows_for(seeds,cohort):
++    require(cohort in {'c1','c2','c3','c4'},'invalid validation cohort selection')
++    result=[]
++    for b in (1,2):
++        block=f'validation_{cohort}_b{b}';mapping={v['task_id']:v for v in seeds['blocks'][block]}
++        for task in range(10):
++            for arm in ARMS:
++                result.append({**{k:mapping[task][k] for k in FIELDS},'split':'validation','seed_block':block,
++                    'iteration':COHORT,'profile':arm,'budget_bucket':'validation','timeout_seconds':1800,
++                    'episode_key':f'n25v_{cohort}_b{b}_t{task:02d}_{arm.lower()}_20260930'})
++    return result
++
++
++def register_dispatch(root,event):
++    """Journal-first exposure metadata; caller owns state lock, no outcome read."""
++    if event.get('event')!='dispatched' or event.get('identity',{}).get('iteration')!=COHORT:return
++    path=Path(root)/'data/exposure-registry.jsonl';i=event['identity']
++    value={'schema':'n25-validation-dispatch-exposure-v1','cohort_id':COHORT,'attempt_id':event['attempt_id'],
++        'task_id':i['task_id'],'episode_seed':i['env_seed'],'policy_seed':i['policy_seed'],
++        'seed_block':event['n25_validation_seed_block'],'init_row_sha256':event['init_row_sha256'],
++        'study_role':'validation','exposure_kind':'actual_dispatch','outcomes_read':False}
++    with path.open('a') as stream:
++        stream.write(json.dumps(value,sort_keys=True)+'\n');stream.flush();os.fsync(stream.fileno())
+diff --git a/scripts/qd_ed_n25_validation_prepare.py b/scripts/qd_ed_n25_validation_prepare.py
+new file mode 100644
+index 0000000..ad81ac8
+--- /dev/null
++++ b/scripts/qd_ed_n25_validation_prepare.py
+@@ -0,0 +1,59 @@
++#!/usr/bin/env python3
++"""Illustrative CPU draft or exact root-authorized fresh N25 validation freeze."""
++import argparse
++import copy
++import json
++from pathlib import Path
++import sys
++ROOT=Path(__file__).resolve().parents[1]
++if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
++from scripts import qd_ed_final_runner as r
++from scripts import qd_ed_n25_validation_contract as c
++from scripts import qd_ed_n25_validation_identity as identity
++from scripts import qd_ed_n23_worker as w
++
++
++def build_plan(parent,seeds,cohort,*,source,source_bridge,dev_review=None,source_review=None,authorization=None,selection=None):
++    plan=copy.deepcopy(parent)
++    plan.update(frozen=False,worktree=str(ROOT),source_commit=source['commit'],code_files=source['files'],
++        candidate_profiles={'N25':{'path':str(ROOT/'configs/qd_ed_final/candidate_n25.json'),
++            'sha256':parent['candidate_profiles']['N25']['sha256']}},episodes=identity.rows_for(seeds,cohort),
++        phase_authorization={'dev':False,'validation':True,'formal':False},n25_cohort=c.WORKER_MARKER)
++    plan['n25_validation']={'schema':'n25-protected-validation-v1','cohort_id':c.COHORT,'seed_cohort':cohort,
++        'limits':c.LIMITS,'protocol':c.ref(c.PROTOCOL),'routing_addendum':c.ref(c.ROUTING_ADDENDUM),'dev_review':dev_review,'source_review':source_review,
++        'authority':authorization,'source_bridge':source_bridge,'metadata_selection':selection}
++    return plan
++
++
++def freeze(path):
++    c.require(Path(path).resolve()==c.VALIDATION_PLAN.resolve(),'N25 validation frozen plan path differs')
++    with r.locked(ROOT/'data/qd-ed-runner.lock',nonblocking=True),r.locked(ROOT/'data/qd-ed-state.lock'):
++        parent=c.original_plan();source,source_bridge=c.source_record(ROOT,parent)
++        dev_review=c.dev_promotion(ROOT,vars(r));review=c.review_source(source,source_bridge,parent)
++        seed,hist,registry,ledger,snapshot=identity.metadata(ROOT,parent);cohort=identity.first_unused(seed,hist,registry,ledger)
++        authorization=c.authority(source,source_bridge,parent)
++        c.require(w.read_ref(authorization)['seed_cohort']==cohort,'N25 validation reviewed cohort is no longer first unused')
++        plan=build_plan(parent,seed,cohort,source=source,source_bridge=source_bridge,dev_review=dev_review,source_review=review,
++            authorization=authorization,selection=snapshot)
++        events=r.read_events(ROOT/'data/attempt-ledger.jsonl');state=r.read_state(ROOT/'research-state.yaml')
++        resources=r.read_events(ROOT/'data/gpu-healthcheck-ledger.jsonl')
++        c.protected_budget(state,events,resources,plan['episodes'][0],1800,vars(r),plan=plan)
++        r.check_budget(state,events,plan['episodes'][0],resources,r.read_events(ROOT/'data/gpu-hour-reservation-ledger.jsonl'),physical_gpu=7)
++        plan['frozen']=True;w.atomic_json(path,plan);r.validate_plan(path,root=ROOT)
++        return plan
++
++
++def main():
++    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True);p.add_argument('--freeze',action='store_true')
++    p.add_argument('--preview-cohort',choices=['c1','c2','c3','c4']);args=p.parse_args()
++    if args.freeze:
++        c.require(args.preview_cohort is None,'N25 fresh release cannot use preview identity');plan=freeze(args.output)
++    else:
++        c.require(args.preview_cohort is not None,'N25 CPU preview requires an illustrative cohort')
++        parent=c.original_plan();source,source_bridge=c.source_record(ROOT,parent)
++        plan=build_plan(parent,c.read(parent['seed_plan_path']),args.preview_cohort,source=source,source_bridge=source_bridge,
++            selection={'preview_only':True,'release_authorized':False});w.atomic_json(args.output,plan)
++    print(json.dumps({'path':str(args.output.resolve()),'sha256':c.sha(args.output),'frozen':plan['frozen'],'dispatched':False}))
++
++
++if __name__=='__main__':main()
+diff --git a/scripts/qd_ed_n25_validation_recovery.py b/scripts/qd_ed_n25_validation_recovery.py
+new file mode 100644
+index 0000000..0a06084
+--- /dev/null
++++ b/scripts/qd_ed_n25_validation_recovery.py
+@@ -0,0 +1,102 @@
++"""One validation recovery per cell, two total; exact frozen N25 timeout diagnostic."""
++from pathlib import Path
++from scripts import qd_ed_n25_validation_contract as c
++from scripts import qd_ed_n25_recovery as original
++from scripts import qd_ed_n25_native as native
++from scripts import qd_ed_n23_worker as w
++KEY='n25_validation_recovery_eligibility'
++
++
++def check_cell_history(events,row,primary_id,r,*,historical=False):
++    cohort=c.dev.COHORT if historical else c.COHORT
++    local=[e for e in events if e.get('identity',{}).get('iteration')==cohort]
++    groups=r['event_groups'](local);own=[g for g in groups.values() if g[0]['episode_key']==row['episode_key']]
++    w.require(len(own)==1 and own[0][0]['attempt_id']==primary_id
++        and [e['event'] for e in own[0]]==['reserved','dispatched','valid']
++        and own[0][-1].get('outcome_valid') is False and all(e.get('retry_of') is None for e in own[0])
++        and own[0][0]['identity']==r['episode_identity'](row),'N25 validation recovery primary differs')
++    w.require(len({e['attempt_id'] for e in local if e.get('retry_of')})<2,'N25 validation recovery cap consumed')
++    return own[0][-1]
++
++
++def create_eligibility(plan_path,plan,row,final,profile,runtime,events,root,r,*,historical=False):
++    cohort=c.dev.COHORT if historical else c.COHORT
++    w.require(row in plan['episodes'] and row['iteration']==cohort
++        and check_cell_history(events,row,final['attempt_id'],r,historical=historical)==final,'N25 validation recovery row/journal differs')
++    original.terminal_binding(final,row,plan,c.ref(plan_path),r)
++    output=Path(final['output_dir']);terminal=c.ref(output/'attempt-result.json')
++    w.require(w.read_ref(terminal)==final and final.get('n23_worker_receipt')==c.ref(output/'eds_eval/in-worker-audit-receipt.json'),
++        'N25 validation primary terminal/receipt differs')
++    if historical:
++        from scripts import qd_ed_n25_validation_evidence as evidence
++        report=evidence.historical_receipt(final,row,plan,c.ref(plan_path),r)
++    else:report=c.read_worker_report(output,r)
++    w.require(type(final.get('guided_chunks')) is int,'N25 validation guided telemetry missing')
++    native.from_output(row['profile'],output,report,final['guided_chunks'])
++    diagnostic=original.diagnose(final,row,profile,runtime,r,report)
++    return {'schema':'n25-typed-timeout-eligibility-v1' if historical else 'n25-validation-typed-timeout-eligibility-v1',
++        'cohort_id':cohort,'primary_attempt_id':final['attempt_id'],'episode_key':row['episode_key'],'scientific_row':row,
++        'plan':c.ref(plan_path),'source_commit':plan['source_commit'],'protocol':c.ref(c.dev.PROTOCOL if historical else c.PROTOCOL),
++        'timeout_observability':c.ref(c.dev.OBSERVABILITY),'terminal':terminal,
++        'native_receipt':c.ref(output/'eds_eval/in-worker-audit-receipt.json'),'native_report':c.ref(output/'eds_eval/decision-evidence-audit.json'),
++        'process':c.ref(output/'process.json'),'evidence_files':diagnostic['evidence_files'],'diagnostic':diagnostic,
++        'evidence_packaging_reader':c.ref(original.__file__),
++        'evidence_packaging_mode':'unchanged_original_reader' if (output/'eds_eval/eds_metrics.jsonl').exists() else 'n25_absent_zero_guided_private_reader',
++        'primary_outcome_valid':False,'unknown_token_calls':1,'retry_budget_bucket':'recovery','same_cell_max_recoveries':1}
++
++
++def verify_eligibility(reference,plan,row,events,root,r,*,historical=False):
++    record=w.read_ref(reference);cohort=c.dev.COHORT if historical else c.COHORT
++    w.require(record.get('schema')==('n25-typed-timeout-eligibility-v1' if historical else 'n25-validation-typed-timeout-eligibility-v1')
++        and record.get('cohort_id')==cohort and record.get('scientific_row')==row and record.get('episode_key')==row['episode_key']
++        and record.get('source_commit')==plan['source_commit'] and w.read_ref(record['plan'])==plan,'N25 validation eligibility source/plan differs')
++    final=check_cell_history(events,row,record['primary_attempt_id'],r,historical=historical)
++    profiles=c.manifest(plan,r);runtime=w.read_ref({'path':plan['runtime_manifest_path'],'sha256':plan['runtime_manifest_sha256']})
++    rebuilt=create_eligibility(record['plan']['path'],plan,row,final,profiles['profiles'][row['profile']],runtime,events,root,r,historical=historical)
++    w.require(record==rebuilt,'N25 validation typed evidence changed/non-derivative fault')
++    return record
++
++
++def check_retry(events,row,r):
++    record=w.read_ref(row[KEY]);plan=w.read_ref(record['plan']);primary=c.primary_row(plan,row)
++    w.require(row.get('retry_of')==record['primary_attempt_id'] and row['budget_bucket']=='recovery','N25 validation retry lineage differs')
++    verify_eligibility(row[KEY],plan,primary,events,Path(plan['worktree']),r)
++
++
++def selected_terminal(plan,row,events,root,r,*,historical=False):
++    cohort=c.dev.COHORT if historical else c.COHORT
++    groups=list(r['event_groups']([e for e in events if e.get('identity',{}).get('iteration')==cohort
++        and e.get('episode_key')==row['episode_key']]).values())
++    w.require(1<=len(groups)<=2 and [e['event'] for e in groups[0]]==['reserved','dispatched','valid']
++        and all(e.get('retry_of') is None for e in groups[0]),'N25 validation primary interrupted/duplicate')
++    final=groups[0][-1]
++    if len(groups)==2:
++        key='n25_recovery_eligibility' if historical else KEY
++        primary=final;final=groups[1][-1];reference=groups[1][0].get(key)
++        w.require([e['event'] for e in groups[1]]==['reserved','dispatched','valid'] and primary.get('outcome_valid') is False
++            and final.get('retry_of')==primary['attempt_id'] and final.get('budget_bucket')=='recovery' and reference is not None
++            and all(e.get(key)==reference and e.get('retry_of')==primary['attempt_id'] for e in groups[1]),'N25 validation recovery linkage differs')
++        boundary=next(i for i,e in enumerate(events) if e['attempt_id']==final['attempt_id'])
++        verify_eligibility(reference,plan,row,events[:boundary],root,r,historical=historical)
++    w.require(final.get('outcome_valid') is True and final.get('required_cost_telemetry_complete') is True and type(final.get('success')) is bool,
++        'N25 validation no first valid outcome')
++    original.terminal_binding(final,row,plan,c.ref(c.DEV_PLAN if historical else c.VALIDATION_PLAN),r)
++    output=Path(final['output_dir']);context=w.read_ref(c.ref(output/'n23-worker-context.json'))
++    w.require(w.read_ref(c.ref(output/'attempt-result.json'))==final
++        and final.get('n23_worker_receipt')==c.ref(output/'eds_eval/in-worker-audit-receipt.json')
++        and c.same_ref(context['plan'],c.ref(c.DEV_PLAN if historical else c.VALIDATION_PLAN))
++        and w.read_ref(context['plan'])==plan,'N25 validation terminal/plan/receipt artifact differs')
++    return final
++
++
++def historical_dev_cell(plan,row,events,root,r):return selected_terminal(plan,row,events,root,r,historical=True)
++
++
++def accepted_cell(plan,row,events,root,r):
++    final=selected_terminal(plan,row,events,root,r)
++    n=final.get('guided_chunks')
++    w.require(type(n) is int and n>=0 and final.get('candidate_evaluations')==176*n and final.get('score_batches')==11*n,
++        'N25 validation canonical denominator differs')
++    report=c.read_worker_report(final['output_dir'],r)
++    native.from_output(row['profile'],final['output_dir'],report,n)
++    return final
+diff --git a/scripts/qd_ed_n25_validation_report.py b/scripts/qd_ed_n25_validation_report.py
+new file mode 100644
+index 0000000..5e4593e
+--- /dev/null
++++ b/scripts/qd_ed_n25_validation_report.py
+@@ -0,0 +1,80 @@
++"""Immutable protected evidence; independent aggregate disposition only for steering."""
++from pathlib import Path
++from scripts import qd_ed_n25_validation_contract as c
++from scripts import qd_ed_n25_report as dev_reporting
++from scripts import qd_ed_n25_native as native
++from scripts import qd_ed_n23_worker as w
++
++
++def output_directory(directory,r):
++    """Controller evidence belongs to the fixed variant directory, not attempt storage."""
++    path=r['owned'](directory,c.RUN_DIR)
++    c.require(path==(c.RUN_DIR/'validation-execution').resolve(),'N25 exact validation controller directory differs')
++    return path
++
++
++def summarize(plan,events,root,r,*,force_invalid=False,controller_completed=None):
++    local=[e for e in events if e.get('identity',{}).get('iteration')==c.COHORT]
++    keys=[x['episode_key'] for x in plan['episodes']]
++    c.require(len(keys)==len(set(keys))==60 and all(e.get('episode_key') in keys for e in local),'N25 validation report matrix differs')
++    groups=r['event_groups'](local);attempts=[];cells=[];outcomes=[];invalid=force_invalid
++    native_totals={a:{} for a in c.ARMS};auxiliary={a:{} for a in c.ARMS};prefix=[];closed=False
++    for row in plan['episodes']:
++        own=[g for g in groups.values() if g[0]['episode_key']==row['episode_key']]
++        for g in own:
++            c.require(g[-1]['event'] in r['TERMINAL'],'N25 validation report unfinished attempt')
++            attempts.append({'attempt_id':g[-1]['attempt_id'],'episode_key':row['episode_key'],'profile':row['profile'],'terminal':g[-1]})
++        final=None;error=None
++        if own:
++            if closed:invalid=True;error='journal_outside_first_valid_prefix'
++            else:
++                try:
++                    final=c.accepted_cell(plan,row,local,root,r)
++                    counts,aux=native.from_output(row['profile'],final['output_dir'],c.read_worker_report(final['output_dir'],r),final['guided_chunks'])
++                    for k,v in counts.items():native_totals[row['profile']][k]=native_totals[row['profile']].get(k,0)+v
++                    for k,v in aux.items():auxiliary[row['profile']][k]=auxiliary[row['profile']].get(k,0)+v
++                except (ValueError,RuntimeError,KeyError,OSError,TypeError) as exc:invalid=True;error=type(exc).__name__;final=None
++        if final is None:closed=True
++        else:
++            prefix.append(row['episode_key'])
++            outcomes.append({'task_id':(row['seed_block'],row['task_id']),'profile':row['profile'],'success':final['success'],
++                'attempt_id':final['attempt_id'],'recovered':bool(final.get('retry_of'))})
++        cells.append({**row,'accepted_attempt_id':final['attempt_id'] if final else None,'success':final['success'] if final else None,
++            'status':'accepted_native' if final else 'invalid' if own else 'not_run','attempts':own,'adjudication_error_class':error,
++            'audit':c.ref(Path(final['output_dir'])/'eds_eval/decision-evidence-audit.json') if final else None,
++            'receipt':c.ref(Path(final['output_dir'])/'eds_eval/in-worker-audit-receipt.json') if final else None})
++    if controller_completed is not None and controller_completed!=len(prefix):invalid=True
++    summary=dev_reporting.summary(outcomes,attempts)
++    for field in ('accepted_cell_denominators','primary_attempt_denominators','all_attempt_denominators','all_attempt_costs'):
++        summary[field]={a:summary[field][a] for a in c.ARMS}
++    summary['matched_comparisons']={a:summary['matched_comparisons'][a] for a in ('C0','Q0')}
++    counts={a:sum(x['success'] is True for x in outcomes if x['profile']==a) for a in c.ARMS}
++    full=len(prefix)==60 and not invalid
++    active=native_totals['N25'].get('guided_decisions',0)>0 and native_totals['N25'].get('parent_rounds_verified',0)>0
++    promoted=full and active and counts['N25']>=10 and counts['N25']>=max(counts[a] for a in ('C0','Q0'))
++    decision='PROMOTE' if promoted else 'REJECT' if full else 'INVALID' if invalid else 'INCOMPLETE'
++    detail={'schema':'n25-protected-validation-detail-v1','cohort_id':c.COHORT,'seed_cohort':plan['n25_validation']['seed_cohort'],
++        'plan':c.ref(c.VALIDATION_PLAN),'source_commit':plan['source_commit'],'source_bridge':plan['n25_validation']['source_bridge'],
++        'dev_review':plan['n25_validation']['dev_review'],'cells':cells,'attempts':attempts,'native':native_totals,'auxiliary':auxiliary,
++        'dispatched':sum(e['event']=='dispatched' for e in local),'recoveries':len({e['attempt_id'] for e in local if e.get('retry_of')}),
++        'accepted_cells':len(prefix),'success_counts':counts,'decision':decision,'controller_completed':controller_completed,
++        'journal_accepted_keys':prefix,'metadata_selection':plan['n25_validation']['metadata_selection'],
++        'same_layout_seed_robustness':True,'new_layout_generalization':False,'formal_authorized':False,**summary}
++    aggregate={'schema':'n25-validation-aggregate-disposition-v1','cohort_id':c.COHORT,'aggregate_only':True,
++        'terminal':decision!='INCOMPLETE','outcome_valid':bool(full),'gate_passed':bool(promoted),'decision':decision,
++        'dev_promoted':True,'formal_authorized':False,'goal_status':'TARGET_NOT_MET'}
++    return detail,aggregate
++
++
++def write_reports(plan,events,directory,root,r,*,force_invalid=False,controller_completed=None):
++    directory=output_directory(directory,r);directory.mkdir(parents=True,exist_ok=True)
++    try:detail,aggregate=summarize(plan,events,root,r,force_invalid=force_invalid,controller_completed=controller_completed)
++    except (ValueError,RuntimeError,KeyError,OSError,TypeError) as exc:
++        detail={'schema':'n25-protected-validation-unadjudicated-v1','failure_class':type(exc).__name__,
++            'planned_rows':plan['episodes'],'events':[e for e in events if e.get('identity',{}).get('iteration')==c.COHORT]}
++        aggregate={'schema':'n25-validation-aggregate-disposition-v1','cohort_id':c.COHORT,'aggregate_only':True,
++            'terminal':True,'outcome_valid':False,'gate_passed':False,'decision':'INVALID','dev_promoted':True,
++            'formal_authorized':False,'goal_status':'TARGET_NOT_MET'}
++    w.atomic_json(directory/'protected-detail-v1.json',detail)
++    w.atomic_json(directory/'aggregate-disposition-v1.json',aggregate)
++    return aggregate
+diff --git a/scripts/qd_ed_n25_validation_supervise.py b/scripts/qd_ed_n25_validation_supervise.py
+new file mode 100644
+index 0000000..089954b
+--- /dev/null
++++ b/scripts/qd_ed_n25_validation_supervise.py
+@@ -0,0 +1,102 @@
++#!/usr/bin/env python3
++"""One conditional protected cohort; only aggregate disposition is printed."""
++import argparse
++import json
++from pathlib import Path
++import signal
++import sys
++ROOT=Path(__file__).resolve().parents[1]
++if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
++from scripts import qd_ed_final_runner as r
++from scripts import qd_ed_n25_validation_contract as c
++from scripts import qd_ed_n25_validation_identity as identity
++from scripts import qd_ed_n25_validation_recovery as recovery
++from scripts import qd_ed_n25_validation_report as reporting
++from scripts import qd_ed_n25_supervise as dev_supervisor
++from scripts import qd_ed_n23_worker as w
++
++
++def release_check(path,plan_path,plan):
++    c.require(Path(path).resolve()==(c.RUN_DIR/'validation-execution-release-v1.json').resolve(),'N25 validation release path differs')
++    c.require(w.read_ref(c.ref(path))=={'schema':'n25-validation-execution-release-v1','plan':c.ref(plan_path),
++        'source_commit':plan['source_commit'],'cohort_id':c.COHORT,'seed_cohort':plan['n25_validation']['seed_cohort'],
++        'episode_keys':[x['episode_key'] for x in plan['episodes']],'limits':c.LIMITS,
++        'dev_review':plan['n25_validation']['dev_review'],'source_review':plan['n25_validation']['source_review'],
++        'authority':plan['n25_validation']['authority'],'physical_gpu':7,'uuid':c.GPU7_UUID,
++        'validation_authorized':True,'formal_authorized':False},'N25 exact protected release differs')
++    with r.locked(ROOT/'data/qd-ed-runner.lock',nonblocking=True),r.locked(ROOT/'data/qd-ed-state.lock'):
++        metadata=identity.metadata(ROOT,c.original_plan())
++        c.require(identity.first_unused(*metadata[:4])==plan['n25_validation']['seed_cohort'],'N25 validation release freshness changed')
++        events=r.read_events(ROOT/'data/attempt-ledger.jsonl');resources=r.read_events(ROOT/'data/gpu-healthcheck-ledger.jsonl')
++        state=r.read_state(ROOT/'research-state.yaml');c.full_capacity(state,events,resources,vars(r))
++        r.check_budget(state,events,plan['episodes'][0],resources,r.read_events(ROOT/'data/gpu-hour-reservation-ledger.jsonl'),physical_gpu=7)
++
++
++def one_attempt(plan_path,plan,row,*,eligibility=None):
++    seen={e['attempt_id'] for e in r.read_events(ROOT/'data/attempt-ledger.jsonl')}
++    with c.supervised_scope(plan,ROOT,row['episode_key'],eligibility=eligibility):
++        try:
++            values=r.run_plan(plan_path,split='validation',iteration=c.COHORT,episode_keys=[row['episode_key']],root=ROOT)
++            c.require(len(values)==1,'N25 validation one-cell result missing');return values[0]
++        except r.GateError:
++            finals=[e for e in r.read_events(ROOT/'data/attempt-ledger.jsonl') if e['attempt_id'] not in seen and e['event'] in r.TERMINAL
++                and e.get('identity',{}).get('iteration')==c.COHORT and e.get('episode_key')==row['episode_key']]
++            if len(finals)!=1:raise
++            return finals[0]
++
++
++def execute(plan_path,plan,profiles,runtime,output):
++    output=reporting.output_directory(output,vars(r));output.mkdir(parents=True,exist_ok=True)
++    status=output/'aggregate-progress-v1.json';c.require(not status.exists(),'N25 validation cannot resume')
++    completed=0;failed=True
++    def progress(phase):
++        r.durable_json(status,{'schema':'n25-validation-progress-v1','phase':phase,'accepted_cells':completed,
++            'expected_cells':60,'protected_outcomes_disclosed':False})
++    try:
++        progress('started')
++        for row in plan['episodes']:
++            dev_supervisor.device_check();result=one_attempt(plan_path,plan,row)
++            if result.get('outcome_valid') is not True:
++                events=r.read_events(ROOT/'data/attempt-ledger.jsonl')
++                record=recovery.create_eligibility(plan_path,plan,row,result,profiles['profiles'][row['profile']],runtime,events,ROOT,vars(r))
++                path=c.RUN_DIR/'validation-eligibility-v1'/f"{result['attempt_id']}.json";w.atomic_json(path,record)
++                dev_supervisor.device_check();result=one_attempt(plan_path,plan,row,eligibility=c.ref(path))
++            final=c.accepted_cell(plan,row,r.read_events(ROOT/'data/attempt-ledger.jsonl'),ROOT,vars(r))
++            c.require(final['attempt_id']==result['attempt_id'],'N25 validation accepted result is not first valid')
++            completed+=1;progress('cell_audited')
++        progress('completed');failed=False
++    except BaseException:
++        try:progress('invalid_or_interrupted')
++        except OSError:pass
++        raise
++    finally:
++        reporting.write_reports(plan,r.read_events(ROOT/'data/attempt-ledger.jsonl'),output,ROOT,vars(r),
++            force_invalid=failed,controller_completed=completed)
++    return w.read_ref(c.ref(output/'aggregate-disposition-v1.json'))
++
++
++def launch(plan_path,release,output):
++    plan,profiles,runtime=r.validate_plan(plan_path,root=ROOT)
++    output=reporting.output_directory(output,vars(r))
++    output.mkdir(parents=True,exist_ok=True)
++    with r.locked(Path(output)/'supervisor.lock',nonblocking=True):
++        c.require(not (Path(output)/'aggregate-progress-v1.json').exists() and not (Path(output)/'aggregate-disposition-v1.json').exists(),
++            'N25 validation no restart/result overwrite')
++        release_check(release,plan_path,plan)
++        return execute(plan_path,plan,profiles,runtime,output)
++
++
++def main():
++    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--plan',type=Path,required=True);p.add_argument('--release',type=Path,required=True)
++    p.add_argument('--output-dir',type=Path,required=True);args=p.parse_args()
++    try:aggregate=launch(args.plan,args.release,args.output_dir)
++    except BaseException as exc:
++        # Detailed protected evidence stays on disk; exception text never becomes a tuning summary.
++        print(json.dumps({'schema':'n25-validation-launch-status-v1','aggregate_only':True,'status':'INVALID_OR_NOT_ADMITTED',
++            'failure_class':type(exc).__name__,'formal_authorized':False}));raise SystemExit(1)
++    print(json.dumps(aggregate))
++
++
++if __name__=='__main__':
++    signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(KeyboardInterrupt()))
++    main()
+diff --git a/tests/test_qd_ed_n25_validation.py b/tests/test_qd_ed_n25_validation.py
+new file mode 100644
+index 0000000..6dc63e5
+--- /dev/null
++++ b/tests/test_qd_ed_n25_validation.py
+@@ -0,0 +1,428 @@
++"""Synthetic protected-validation readiness; no real outcome inputs or release."""
++import copy
++import json
++from pathlib import Path
++import pytest
++from scripts import qd_ed_final_runner as r
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n25_contract as dev
++from scripts import qd_ed_n25_report as dev_report
++from scripts import qd_ed_n25_validation_contract as c
++from scripts import qd_ed_n25_validation_identity as identity
++from scripts import qd_ed_n25_validation_bridge as bridge
++from scripts import qd_ed_n25_validation_prepare as prep
++from scripts import qd_ed_n25_validation_evidence as evidence
++from scripts import qd_ed_n25_validation_recovery as recovery
++from test_qd_ed_n25_controller import write,rows as dev_rows,metric,native_report,state
++
++
++# N25-specific fixtures use the real metric serializer and its native profile gate.
++from core.eds_eval_metrics import EDSChunkMetrics
++from test_qd_ed_n25_controller import metric as old_metric,native_report as old_native_report,state as old_state
++from n25_cpu_synthetic import old_builders,install_classifier
++from test_qd_ed_n25_backend import proof_fixture
++
++@pytest.fixture(autouse=True)
++def synthetic_classifier(monkeypatch):
++    install_classifier(monkeypatch)
++    import ast
++    from scripts.qd_ed_audit_backend import canonical_cuda_uuid
++    path=r.ROOT/'scripts/qd_ed_n23_uuid_native_repair.py'
++    tree=ast.parse(path.read_text());node=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='verify_identity')
++    scope={'w':w,'canonical_cuda_uuid':canonical_cuda_uuid}
++    exec(compile(ast.Module(body=[node],type_ignores=[]),str(path),'exec'),scope)
++    monkeypatch.setattr(evidence,'identity_verifier',lambda:scope['verify_identity'])
++
++def state():
++    value=old_state();value['budget'].update(max_episode_attempts=494,reserved=copy.deepcopy(c.CAPS['buckets']))
++    return value
++
++def metric(arm,substitutions=0,zero=False):
++    value=old_metric(arm)
++    if arm!='N25':return value
++    m=EDSChunkMetrics()
++    for k,v in value.items():
++        if hasattr(m,k):setattr(m,k,v)
++    m.global_step=24
++    m.initial_diversity_descriptor_mode=m.rollout_diversity_descriptor_mode='actuator_clipped_eef_v1'
++    def call(phase,iteration,step):
++        norm={'finite':True,'zero':zero,'norm':0. if zero else 20.,'norm_dtype':'torch.bfloat16'}
++        return {'schema':'n25-rbf-call-summary-v1','descriptor_mode':'actuator_clipped_eef_v1',
++            'source':'core.qd_actuator_clipped_rbf:clipped_rbf_gradient:v1',
++            'summary_only_not_exact_replay':True,'absolute_fallback_used':False,
++            'input_shape':[16,64,128],'input_dtype':'torch.bfloat16','horizon':8,'translation_indices':[39,40,41],
++            'translation_components':384,'clipped_components':3,'boundary_components':1,'interior_components':380,
++            'zero_gradient':zero,'nonfinite_count':0,'phase':phase,'iteration':iteration,'denoising_step':step,
++            'timestep':20-step,'global_step':24,'stage':1,'update_operand_is_measured_output_delta':False,
++            **{key:copy.deepcopy(norm) for key in ('gradient_before_normalization','gradient_after_normalization','masked_gradient','update_operand')}}
++    m.initial_direction_rbf_evidence_by_step=[call('initial',-1,0)]
++    lengths=(3,2,2,2,2,1,1,1,1,1)
++    m.rollout_direction_rbf_evidence_by_iter=[[call('rollout',i,j) for j in range(2 if length>1 else 1)] for i,length in enumerate(lengths)]
++    m.initial_diversity_steps=1;m.rollout_diversity_steps_applied=15
++    m.rollout_rbf_steps_by_iter=[{'iter_idx':i,'n_trunc_steps':length,'step_indices':list(range(2 if length>1 else 1)),
++        'step_flags':[j<(2 if length>1 else 1) for j in range(length)],
++        'step_count':2 if length>1 else 1,'fallback_used':False} for i,length in enumerate(lengths)]
++    return m.to_jsonable()
++
++def native_report(arm,substitutions=0,zero=False):
++    value=old_native_report(arm)
++    if arm=='N25':
++        value['n25_actuator_clipped_rbf_audit']={'schema':'n25-native-rbf-audit-v1','accepted':True,
++            'guided_decisions':1,'all_call_summaries_verified':16,'witness_calls_verified':11,
++            'witness_numeric_bytes':210000,'zero_gradient_calls':16 if zero else 0,'clipped_components':48,
++            'witness_checks':[{'accepted':True} for _ in range(11)]}
++    return value
++
++
++@pytest.mark.parametrize('fault',['none','bridge_source','review','authority','proof_source','plan','tensor_authority',
++    'pre_review','missing_resource','unsettled_resource','old_cost','old_arithmetic','new_arithmetic'])
++def test_historical_backend_reuses_settled_proofs_without_new_head(proof_fixture,monkeypatch,fault):
++    from scripts import qd_ed_n25_backend as backend,qd_ed_n24_contract as n24
++    root,source,runtime,plan,process,report,resources,proof=proof_fixture
++    source['sha256']=w.canonical_sha(source['files'])
++    for name in ('BRIDGE','PROTOCOL','SOURCE_PLAN','PREDECESSOR','ARITHMETIC_PROTOCOL','BUDGET_AUTHORITY'):
++        path=root/(name.lower()+'.json');write(path,{});monkeypatch.setattr(dev,name,path)
++    old_plan={'source':{'commit':n24.BASE},'runtime':runtime}
++    old_plan_ref=write(root/'old-plan.json',old_plan)
++    item={'candidates':16,'dtype':'torch.bfloat16','accepted':True,'mismatches':[],
++        'production_helper_passed':True,'independent_passed':True,'wrong_score_rejected':True}
++    old_report={'schema':'n23-backend-preflight-proof-v2','accepted':True,'task_outcome':False,
++        'attempt_id':'old','plan':old_plan_ref,'source':old_plan['source'],'runtime':runtime,'process':{'pid':2},
++        'worker_wall_seconds':1.,'batches':[copy.deepcopy(item) for _ in range(176)],
++        'synthetic':[{**item,'candidates':4,'dtype':d} for d in ('torch.float32','torch.bfloat16')],
++        'wrong_bounds_rejected':True,'errors':[],'backend':{'kind':'cuda','logical_device':'cuda:0',
++        'physical_uuid':dev.GPU7_UUID,'dtype_coverage':['torch.float32','torch.bfloat16']}}
++    if fault=='old_arithmetic':old_report['batches'][0]['accepted']=False
++    old_proof={'attempt_id':'old','plan':old_plan_ref,'report':write(root/'old-report.json',old_report)}
++    old_event={'attempt_id':'old','outcome_valid':True,'budget_bucket':'recovery','backend_preflight_report':old_proof['report'],
++        'process':old_report['process'],'gpu_process_wall_seconds':0. if fault=='old_cost' else 2.}
++    events=[{**old_event,'event':e} for e in ('reserved','dispatched','valid')]
++    bridge_record={'schema':'n25-source-equivalence-bridge-v1','new_source':source,'phase_a_source':dev.PHASE_A,
++        'runtime':runtime,'new_rbf_arithmetic_proof_required':True,'prior_backend_proof':old_proof}
++    if fault=='bridge_source':bridge_record['new_source']={**source,'commit':'wrong'}
++    bridge_ref=write(dev.BRIDGE,bridge_record)
++    pre_review={'schema':'n25-arithmetic-source-review-v1','accepted':True,'source':source,'runtime':runtime,
++        'source_bridge':bridge_ref,'phase_b_protocol':c.ref(dev.PROTOCOL),'arithmetic_protocol':c.ref(dev.ARITHMETIC_PROTOCOL),
++        'predecessor':c.ref(dev.PREDECESSOR),'budget_authority':c.ref(dev.BUDGET_AUTHORITY),'limits':backend.LIMITS,'gpu_release':False}
++    if fault=='pre_review':pre_review['gpu_release']=True
++    tensor_authority={'schema':'n25-arithmetic-resource-authority-v1','source':source,'runtime':runtime,
++        'limits':backend.LIMITS,'automatic_retry':False,'boot_id':process['boot_id'],
++        'budget_authority':c.ref(dev.BUDGET_AUTHORITY),
++        'dev_authorized':False,'validation_authorized':False,'formal_authorized':False,
++        'source_review':write(backend.REVIEW,pre_review)}
++    if fault=='tensor_authority':tensor_authority['automatic_retry']=True
++    plan['authority']=write(backend.AUTHORITY,tensor_authority)
++    if fault=='plan':plan['limits']={**backend.LIMITS,'timeout_seconds':61}
++    plan_ref=write(backend.PLAN,plan);report['plan']=plan_ref
++    if fault=='new_arithmetic':report['cases'][0]['accepted']=False
++    report_ref=write(root/'report.json',report)
++    for event in resources:event['plan']=plan_ref
++    resources[-1]['report']=report_ref
++    proof.update(plan=plan_ref,report=report_ref,terminal=write(root/'terminal.json',resources[-1]))
++    if fault=='proof_source':proof['source']={**source,'commit':'wrong'}
++    write(dev.BACKEND_PROOF,proof)
++    final_review={'schema':'n25-source-runtime-review-v1','disposition':'accepted','source':source,'runtime':runtime,
++        'protocol':c.ref(dev.PROTOCOL),'source_plan':c.ref(dev.SOURCE_PLAN),'source_bridge':bridge_ref,
++        'predecessor':c.ref(dev.PREDECESSOR),'backend_proof':c.ref(dev.BACKEND_PROOF),
++        'arithmetic_protocol':c.ref(dev.ARITHMETIC_PROTOCOL),'no_gpu_release':True}
++    if fault=='review':final_review['source']={**source,'commit':'wrong'}
++    review_ref=write(root/'final-review.json',final_review)
++    authority={'schema':'n25-dev-authority-v1','cohort_id':dev.COHORT,'source':source,'runtime':runtime,
++        'protocol':c.ref(dev.PROTOCOL),'recorded_at':'synthetic','authority_interpretation':'synthetic fixture only',
++        'final_review':review_ref,'limits':dev.LIMITS,'budget_authority':c.ref(dev.BUDGET_AUTHORITY),
++        'local_gpu_hours':10.,'validation_authorized':False,'formal_authorized':False}
++    if fault=='authority':authority['formal_authorized']=True
++    parent={'source_commit':source['commit'],'code_files':source['files'],'runtime_manifest_path':runtime['path'],
++        'runtime_manifest_sha256':runtime['sha256'],'worktree':str(root),
++        'n25_cohort':{'final_review':review_ref,'authority':write(root/'dev-authority.json',authority)}}
++    if fault=='missing_resource':resources=[]
++    if fault=='unsettled_resource':resources[-1]['event']='aborted'
++    monkeypatch.setattr(w,'verify_source',lambda *a:pytest.fail('historical source must not be equated to current HEAD'))
++    if fault=='none':
++        result=evidence.historical_backend(bridge_ref,parent,events,resources,vars(r))
++        assert result=={'prior_quality_proof':old_proof,'n25_rbf_proof':c.ref(dev.BACKEND_PROOF),'new_gpu_preflight':False}
++    else:
++        with pytest.raises(ValueError):evidence.historical_backend(bridge_ref,parent,events,resources,vars(r))
++
++
++@pytest.mark.parametrize('zero_guided',[False,True])
++@pytest.mark.parametrize('missing_gate',[False,True])
++def test_validation_n25_zero_gradient_and_zero_guided_are_valid_but_never_downgrade(tmp_path,zero_guided,missing_gate):
++    from scripts import qd_ed_n25_native as native
++    if zero_guided:
++        write(tmp_path/'eds_eval/episode_compute.jsonl',[{'policy_counters_available':True,'guided_chunks':0}],True)
++        report={'accepted':True,'evidence_complete':True,'checked_decisions':0,
++            'observed_counts':{'canonical_candidate_batch':0},native.GATE:{'schema':'n25-native-rbf-audit-v1','accepted':True,
++            'guided_decisions':0,'all_call_summaries_verified':0,'witness_calls_verified':0,'zero_gradient_calls':0,'clipped_components':0}}
++    else:
++        write(tmp_path/'eds_eval/episode_compute.jsonl',[{'policy_counters_available':True,'guided_chunks':1}],True)
++        write(tmp_path/'eds_eval/eds_metrics.jsonl',[metric('N25',zero=True)],True)
++        report=native_report('N25',zero=True)
++    if missing_gate:report.pop(native.GATE)
++    if missing_gate:
++        with pytest.raises(ValueError,match='profile gate'):native.from_output('N25',tmp_path,report,0 if zero_guided else 1)
++    else:
++        counts,_=native.from_output('N25',tmp_path,report,0 if zero_guided else 1)
++        assert counts['zero_gradient_calls']==(0 if zero_guided else 16)
++
++def seeds():
++    blocks={}
++    for i,name in enumerate(['dev','formal']+[f'validation_c{a}_b{b}' for a in range(1,5) for b in (1,2)]):
++        blocks[name]=[dict(task_id=t,env_seed=1000*i+t,policy_seed=20000+1000*i+t,init_index=0,
++            init_row_sha256=f'{t:064x}',init_file_sha256='a'*64,bddl_sha256='b'*64) for t in range(10)]
++    return {'backend_task_order':list(range(10)),'blocks':blocks}
++
++
++def events_for(row,aid='fixture',*,valid=True,success=False,retry=None):
++    base={'attempt_id':aid,'identity':r.episode_identity(row),'episode_key':row['episode_key'],
++        'budget_bucket':'recovery' if retry else row['budget_bucket'],'retry_of':retry}
++    return [{**base,'event':'reserved'},{**base,'event':'dispatched'},{**base,'event':'valid','outcome_valid':valid,
++        'success':success,'gpu_process_wall_seconds':1.,'guided_chunks':1,'candidate_evaluations':176,'score_batches':11,
++        'required_cost_telemetry_complete':valid,'provider_logical_call_attempts':2,'provider_usage_complete_calls':2 if valid else 1,
++        'provider_token_usage_complete':valid}]
++
++
++def test_matrix_route_preserves_dev_and_native_binding():
++    rows=identity.rows_for(seeds(),'c2')
++    assert [(x['seed_block'],x['task_id'],x['profile']) for x in rows]==[(f'validation_c2_b{b}',t,a) for b in (1,2) for t in range(10) for a in c.ARMS]
++    assert len(rows)==60 and all(x['split']==x['budget_bucket']=='validation' for x in rows)
++    plan={'n25_validation':{},'n25_cohort':c.WORKER_MARKER,'candidate_profiles':{'N25':{}}}
++    assert r.metered_plan(plan) and r.typed_metered_plan(plan) and r.metered_support(plan) is c
++    assert not any(f(plan) for f in (r.is_n25_plan,r.is_n23_plan,r.is_n23_v2_plan,r.is_n7_plan))
++    assert r.metered_support({'n25_cohort':{},'candidate_profiles':{'N23':{},'N25':{}}}) is dev
++
++
++@pytest.mark.parametrize('source',['history','registry','reserved','dispatched'])
++def test_any_exposure_consumes_entire_cohort(source):
++    seed=seeds();pair=identity.pair(seed['blocks']['validation_c1_b2'][9])
++    hist=[{'pair':pair}] if source=='history' else []
++    registry=[{'pair':pair}] if source in {'registry','dispatched'} else []
++    ledger=[{'pair':pair,'attempt_id':'old','iteration':'old','profile':'C0','split':'validation','event':source}] if source in {'reserved','dispatched'} else []
++    assert identity.first_unused(seed,hist,registry,ledger)=='c2'
++    if source=='dispatched':
++        with pytest.raises(ValueError,match='reconciliation'):identity.first_unused(seed,[],[],ledger)
++
++
++@pytest.mark.parametrize('fault',['duplicate','task_order','policy_missing','all_used','previous_candidate','own_initial','foreign_overlap'])
++def test_no_substitution_or_second_validation(fault):
++    seed=seeds();pair=identity.pair(seed['blocks']['validation_c1_b1'][0]);hist=[];registry=[];ledger=[]
++    if fault=='duplicate':seed['blocks']['validation_c1_b2'][0]['env_seed']=pair[1]
++    if fault=='task_order':seed['backend_task_order'].reverse()
++    if fault=='policy_missing':seed['blocks']['validation_c1_b1'][0]['policy_seed']=None
++    if fault=='all_used':hist=[{'pair':identity.pair(seed['blocks'][f'validation_c{i}_b1'][0])} for i in range(1,5)]
++    if fault in {'previous_candidate','own_initial','foreign_overlap'}:
++        ledger=[{'pair':pair,'attempt_id':'prior','iteration':'OTHER' if fault=='previous_candidate' else c.COHORT,'profile':'N25','split':'validation','event':'dispatched'}]
++        registry=[{'pair':pair,'attempt_id':'prior','cohort_id':ledger[0]['iteration']}]
++    if fault=='foreign_overlap':
++        registry.append({'pair':pair,'attempt_id':'foreign','cohort_id':'OTHER'})
++        assert identity.first_unused(seed,hist,registry,ledger,allow_own=True)=='c2'
++    else:
++        with pytest.raises(ValueError):identity.first_unused(seed,hist,registry,ledger)
++
++
++def test_metadata_only_projection_and_exposure_append(tmp_path,monkeypatch):
++    seed=write(tmp_path/'seed.json',seeds());data=tmp_path/'data'
++    history=write(data/'historical-exposure-inventory.jsonl',[{'task_id':0,'episode_seed':9,'success':'PROTECTED_SENTINEL'}],True)
++    monkeypatch.setattr(identity,'HISTORY_SHA',history['sha256']);write(data/'exposure-registry.jsonl',[],True)
++    write(data/'attempt-ledger.jsonl',[{'event':'dispatched','attempt_id':'a','identity':{'task_id':0,'env_seed':9,'split':'validation','iteration':'OLD','profile':'C0'},'success':'PROTECTED_SENTINEL'},
++        {'event':'valid','attempt_id':'a','success':'PROTECTED_SENTINEL'}],True)
++    value=identity.metadata(tmp_path,{'seed_plan_path':seed['path'],'seed_plan_sha256':seed['sha256']})
++    assert 'PROTECTED_SENTINEL' not in json.dumps(value) and value[-1]['protected_outcomes_read'] is False
++    row=identity.rows_for(seeds(),'c2')[0];event=events_for(row)[1]
++    event.update(n25_validation_seed_block=row['seed_block'],init_row_sha256=row['init_row_sha256'])
++    identity.register_dispatch(tmp_path,event)
++    stored=json.loads((data/'exposure-registry.jsonl').read_text());assert stored['attempt_id']=='fixture' and stored['outcomes_read'] is False
++    assert not any(k in stored for k in ('success','reward','native'))
++
++
++@pytest.mark.parametrize('fault',['none','budget','bucket','hold','gpu','resource','missing_authority'])
++def test_separate_validation_budget_authority(tmp_path,monkeypatch,fault):
++    st=state();monkeypatch.setattr(c,'original_plan',lambda:{})
++    monkeypatch.setattr(dev,'require_budget_state',lambda state,env:c.require(state['budget']['max_episode_attempts']==494 and state['budget']['reserved']==c.CAPS['buckets'] and state['resource_isolation']['private_budget'] and not state.get('external_resource_hold',{}).get('do_not_auto_resume',False) and state['gpu_pool']==[7],'budget/resource differs'))
++    monkeypatch.setattr(dev,'budget_authority',lambda:{'caps':copy.deepcopy(c.CAPS)})
++    monkeypatch.setattr(c,'source_record',lambda *a:({},{}));seen=[]
++    monkeypatch.setattr(c,'authority',lambda *a:(c.require(fault!='missing_authority','missing') or seen.append(a)))
++    if fault=='budget':st['budget']['max_episode_attempts']=479
++    if fault=='bucket':st['budget']['reserved']['formal']=39
++    if fault=='hold':st['external_resource_hold']={'do_not_auto_resume':True}
++    if fault=='gpu':st['gpu_pool']=[3]
++    if fault=='resource':st['resource_isolation']['private_budget']=False
++    if fault=='none':c.require_budget_state(st,vars(r));assert seen
++    else:
++        with pytest.raises((ValueError,r.GateError)):c.require_budget_state(st,vars(r))
++
++
++@pytest.mark.parametrize('fault',['none','hours','validation','recovery','formal_attempts','running','unsettled'])
++def test_full_matrix_and_formal_reserve(fault,monkeypatch):
++    monkeypatch.setattr(c,'require_budget_state',lambda *a:None);snap=r.budget_snapshot([]);snap['gpu_hours_consumed']=55.;events=[]
++    if fault=='hours':snap['gpu_hours_consumed']=57.
++    if fault=='validation':snap['by_bucket']['validation']=121
++    if fault=='recovery':snap['by_bucket']['recovery']=19
++    if fault=='formal_attempts':snap['dispatched']=393
++    if fault=='running':snap['running']=1
++    if fault=='unsettled':events=events_for(identity.rows_for(seeds(),'c2')[0])[:2]
++    env=dict(vars(r),budget_snapshot=lambda *a:snap)
++    if fault=='none':c.full_capacity(state(),events,[],env)
++    else:
++        with pytest.raises((ValueError,r.GateError)):c.full_capacity(state(),events,[],env)
++
++
++def test_exact_reversible_source_changes_and_worker_functions():
++    original_root=Path(r.ROOT).parent/'implementation'
++    before=(original_root/'scripts/qd_ed_n23_worker.py').read_text();after=(r.ROOT/'scripts/qd_ed_n23_worker.py').read_text()
++    assert after.count(bridge.WORKER_INSERT)==1 and after.replace(bridge.WORKER_INSERT,'',1)==before
++    before=(original_root/'scripts/qd_ed_final_runner.py').read_text();after=(r.ROOT/'scripts/qd_ed_final_runner.py').read_text()
++    for old,new,count in reversed(bridge.RUNNER_EDITS):assert after.count(new)==count;after=after.replace(new,old,count)
++    assert after==before
++
++
++@pytest.mark.parametrize('fault',['none','core','worker_run','old_runner','manifest'])
++def test_source_bridge_all257_scope(fault,monkeypatch):
++    original_root=Path(r.ROOT).parent/'implementation'
++    source=json.loads((original_root.parent/'source-manifest-controller-v1.json').read_text())
++    parent={'source_commit':source['commit'],'code_files':source['files']}
++    monkeypatch.setattr(bridge,'original',lambda root,path:(original_root/path).read_bytes())
++    monkeypatch.setattr(bridge.subprocess,'check_output',lambda *a,**k:'scripts/qd_ed_n23_worker.py\nscripts/qd_ed_final_runner.py\n')
++    original=Path.read_bytes
++    def read(path):
++        data=original(path)
++        if fault=='core' and path==r.ROOT/'core/qd_gripper_parent_rescue.py':return data+b'\n# changed'
++        if fault=='worker_run' and path==r.ROOT/'scripts/qd_ed_n23_worker.py':return data.replace(b'def run_worker(',b'def changed_worker(')
++        if fault=='old_runner' and path==r.ROOT/'scripts/qd_ed_final_runner.py':return data+b'\n# changed'
++        return data
++    monkeypatch.setattr(Path,'read_bytes',read)
++    if fault=='manifest':parent['code_files']=parent['code_files'][:-1]
++    if fault=='none':bridge.verify_delta(r.ROOT,parent)
++    else:
++        with pytest.raises(ValueError):bridge.verify_delta(r.ROOT,parent)
++
++
++@pytest.fixture
++def promoted_dev(tmp_path,monkeypatch):
++    root=tmp_path/'root';path=root/'scripts/qd_ed_n25_report.py';path.parent.mkdir(parents=True);path.write_bytes((r.ROOT/'scripts/qd_ed_n25_report.py').read_bytes())
++    parent={'source_commit':c.DEV_COMMIT,'episodes':dev_rows(),'code_files':[{'path':'scripts/qd_ed_n25_report.py','sha256':w.sha(path)}]}
++    planref=write(tmp_path/'dev-plan.json',parent);monkeypatch.setattr(c,'DEV_PLAN',Path(planref['path']));monkeypatch.setattr(c,'original_plan',lambda:parent)
++    for key,name in [('DEV_RESULT','result.json'),('DEV_STATUS','status.json'),('DEV_REVIEW','review.json')]:monkeypatch.setattr(c,key,tmp_path/name)
++    events=[];entries={};native={}
++    for i,row in enumerate(parent['episodes']):
++        group=events_for(row,str(i),success=row['profile']=='N25' and row['task_id']<5);final=group[-1];out=tmp_path/'outputs'/str(i)
++        final['output_dir']=str(out);events+=group;entries[row['episode_key']]=final
++        native[row['episode_key']]=native_report(row['profile'])
++        write(out/'eds_eval/eds_metrics.jsonl',[metric(row['profile'])],True)
++        write(out/'eds_eval/episode_compute.jsonl',[{'policy_counters_available':True,'guided_chunks':1}],True)
++        for name in ('attempt-result.json','eds_eval/decision-evidence-audit.json','eds_eval/in-worker-audit-receipt.json','n23-worker-context.json'):write(out/name,final if name=='attempt-result.json' else {})
++    monkeypatch.setattr(recovery,'historical_dev_cell',lambda plan,row,*a:entries[row['episode_key']])
++    monkeypatch.setattr(evidence,'historical_receipt',lambda final,row,*a:native[row['episode_key']])
++    monkeypatch.setattr(evidence,'historical_backend',lambda *a:None)
++    monkeypatch.setattr(r,'read_events',lambda path:events)
++    def accept(row,local):
++        final=entries[row['episode_key']];out=Path(final['output_dir'])
++        counts,aux=c.native.from_output(row['profile'],out,native[row['episode_key']],1)
++        return {'episode_key':row['episode_key'],'task_id':row['task_id'],'profile':row['profile'],'attempt_id':final['attempt_id'],'success':final['success'],
++            'audit':c.ref(out/'eds_eval/decision-evidence-audit.json'),'worker_context':c.ref(out/'n23-worker-context.json'),
++            'worker_receipt':c.ref(out/'eds_eval/in-worker-audit-receipt.json'),'attempt_result':c.ref(out/'attempt-result.json')},counts,aux
++    result=dev_report.analyze(parent,events,accept)
++    prefix=[x['episode_key'] for x in result['accepted_cells']]
++    outcomes=[{'episode_key':x['episode_key'],'task_id':x['task_id'],'profile':x['profile'],'success':x['success'],'attempt_id':x['attempt_id'],'recovered':False} for x in result['accepted_cells']]
++    status={'schema':'n25-dev-supervisor-status-v1','status':'completed_all_forty_audited','cohort_id':dev.COHORT,'source_commit':c.DEV_COMMIT,
++        'plan':planref,'completed_keys':prefix,'dev_gate_promoted':True,'attempts':result['attempts'],'outcomes':outcomes,
++        'successes':{a:result['counts'][a]['success'] for a in dev.ARMS},'native':result['native'],'auxiliary':result['auxiliary'],**dev_report.summary(outcomes,result['attempts'])}
++    write(c.DEV_STATUS,status);snapshot=write(tmp_path/'dev-only-ledger.json',events);source_bridge=write(tmp_path/'bridge.json',{})
++    result.update(plan=planref,terminal_status={**c.ref(c.DEV_STATUS),'content':status},ledger_snapshot=snapshot,reader=c.ref(path),source_bridge=source_bridge,
++        controller_evidence={'completed_keys':prefix,'journal_accepted_keys':prefix,'consistent':True,'status_phase':'completed_all_forty_audited'})
++    write(c.DEV_RESULT,result)
++    review={'schema':'n25-dev-promotion-review-v1','disposition':'promoted','dev_plan':planref,'dev_status':c.ref(c.DEV_STATUS),
++        'dev_result':c.ref(c.DEV_RESULT),'dev_source_bridge':source_bridge,'allow_validation':True};write(c.DEV_REVIEW,review)
++    return root,parent,result,status,review,entries,native
++
++
++@pytest.mark.parametrize('fault',['none','incomplete','invalid','root_reject','source','reader','status','counts','cost','guided_missing','result_plan','prefix_mismatch','path_alias'])
++def test_actual_dev_result_schema_promotion_recomputed(promoted_dev,fault):
++    root,parent,result,status,review,entries,native=promoted_dev
++    if fault=='incomplete':result['audited_cells']=39
++    if fault=='invalid':result['decision']='INVALID_OR_INTERRUPTED'
++    if fault=='root_reject':review['allow_validation']=False
++    if fault=='source':result['source_commit']='wrong'
++    if fault=='reader':result['reader']['sha256']='wrong'
++    if fault=='status':status['status']='failed'
++    if fault=='counts':result['counts']['N25']['success']=6
++    if fault=='cost':result['all_attempt_costs']['N25']['gpu_process_wall_seconds']['observed_total']+=1
++    if fault=='guided_missing':native[parent['episodes'][3]['episode_key']].pop('n25_actuator_clipped_rbf_audit')
++    if fault=='result_plan':result['plan']['sha256']='other'
++    if fault=='prefix_mismatch':result['controller_evidence']['consistent']=False
++    write(c.DEV_STATUS,status);review['dev_status']=c.ref(c.DEV_STATUS);result['terminal_status']={**c.ref(c.DEV_STATUS),'content':status}
++    if fault=='path_alias':
++        alias=c.DEV_STATUS.parent/'logical-status.json';alias.symlink_to(c.DEV_STATUS)
++        result['terminal_status']['path']=str(alias)
++    write(c.DEV_RESULT,result);review['dev_result']=c.ref(c.DEV_RESULT);write(c.DEV_REVIEW,review)
++    if fault in {'none','path_alias'}:assert c.dev_promotion(root,vars(r))==c.ref(c.DEV_REVIEW)
++    else:
++        with pytest.raises((ValueError,r.GateError)):c.dev_promotion(root,vars(r))
++
++@pytest.fixture
++def validation_draft(tmp_path,monkeypatch):
++    parent={'source_commit':c.DEV_COMMIT,'code_files':[],'candidate_profiles':{'N25':{'path':str(r.ROOT/'configs/qd_ed_final/candidate_n25.json'),
++        'sha256':w.sha(r.ROOT/'configs/qd_ed_final/candidate_n25.json')}},'episodes':dev_rows(),
++        'runtime_manifest_path':str(tmp_path/'runtime.json'),'runtime_manifest_sha256':write(tmp_path/'runtime.json',{})['sha256']}
++    source={'commit':'synthetic','files':[],'sha256':w.canonical_sha([])};source_bridge={'synthetic':True}
++    monkeypatch.setattr(c,'original_plan',lambda:parent);monkeypatch.setattr(c,'source_record',lambda *a:(source,source_bridge))
++    monkeypatch.setattr(c,'VALIDATION_PLAN',tmp_path/'validation-plan.json')
++    monkeypatch.setattr(c,'dev_promotion',lambda *a:{'dev-review':True});monkeypatch.setattr(c,'review_source',lambda *a:{'source-review':True})
++    auth=write(tmp_path/'authority.json',{'seed_cohort':'c2'});monkeypatch.setattr(c,'authority',lambda *a:auth)
++    monkeypatch.setattr(c,'require_budget_state',lambda *a:None);monkeypatch.setattr(r,'read_state',lambda *a:{'n25_validation_authority':auth})
++    monkeypatch.setattr(dev,'validate_runtime',lambda *a:None)
++    monkeypatch.setattr(identity,'metadata',lambda *a:(seeds(),[],[],[],{}));monkeypatch.setattr(identity,'first_unused',lambda *a,**k:'c2')
++    plan=prep.build_plan(parent,seeds(),'c2',source=source,source_bridge=source_bridge,
++        dev_review={'dev-review':True},source_review={'source-review':True},authorization=auth,selection={})
++    profiles={'profiles':dict.fromkeys(c.ARMS,{})}
++    return plan,profiles,parent,source,source_bridge
++
++
++@pytest.mark.parametrize('fault',['none','draft','row','source','mode_marker','phase','profile','runtime','freshness','missing_promotion','missing_adoption','metadata'])
++def test_frozen_contract_closes_matrix_source_and_freshness(validation_draft,monkeypatch,fault):
++    plan,profiles,parent,source,source_bridge=validation_draft
++    plan['frozen']=True
++    if fault=='draft':plan['frozen']=False
++    if fault=='row':plan['episodes'][59]['env_seed']+=1
++    if fault=='source':plan['source_commit']='different'
++    if fault=='mode_marker':plan['n25_cohort']={}
++    if fault=='phase':plan['phase_authorization']['formal']=True
++    if fault=='profile':plan['candidate_profiles']['N25']['sha256']='wrong'
++    if fault=='runtime':plan['runtime_manifest_sha256']='wrong'
++    if fault=='freshness':monkeypatch.setattr(identity,'first_unused',lambda *a,**k:'c3')
++    if fault=='missing_promotion':monkeypatch.setattr(c,'dev_promotion',lambda *a:(_ for _ in ()).throw(ValueError('no promotion')))
++    if fault=='missing_adoption':monkeypatch.setattr(c,'require_budget_state',lambda *a:(_ for _ in ()).throw(ValueError('no adoption')))
++    if fault=='metadata':plan['n25_validation']['protocol']['sha256']='changed'
++    write(c.VALIDATION_PLAN,plan)
++    if fault=='none':c.validate_contract(plan,profiles,{},seeds(),r.ROOT,vars(r))
++    else:
++        with pytest.raises((ValueError,r.GateError)):c.validate_contract(plan,profiles,{},seeds(),r.ROOT,vars(r))
++
++
++@pytest.mark.parametrize('fault',['none','missing','rootreview','source','runtime','caps','scope','seed','adopted','formal'])
++def test_exact_separate_authority_and_non_circular_root_review(tmp_path,monkeypatch,fault):
++    parent={'runtime_manifest_path':str(tmp_path/'runtime.json'),'runtime_manifest_sha256':'runtime'}
++    source={'commit':'synthetic','files':[],'sha256':'source'};source_bridge={'dev_source':'old','validation_source':source}
++    for key in ('DEV_PLAN','DEV_REVIEW','SOURCE_REVIEW','AUTHORITY'):monkeypatch.setattr(c,key,tmp_path/(key+'.json'))
++    write(c.DEV_PLAN,{});write(c.DEV_REVIEW,{'dev_source_bridge':{'old-proof':True}})
++    review={'schema':'n25-validation-source-review-v1','disposition':'accepted','dev_plan':c.ref(c.DEV_PLAN),
++        'protocol':c.ref(c.PROTOCOL),'routing_addendum':c.ref(c.ROUTING_ADDENDUM),'source':source,'source_bridge':source_bridge,'runtime':{'path':parent['runtime_manifest_path'],'sha256':'runtime'},
++        'dev_source_bridge':{'old-proof':True},'no_execution_release':True}
++    if fault=='rootreview':review['no_execution_release']=False
++    write(c.SOURCE_REVIEW,review)
++    auth={'schema':'n25-validation-authority-v1','cohort_id':c.COHORT,'seed_cohort':'c2','source':copy.deepcopy(source),
++        'dev_review':c.ref(c.DEV_REVIEW),'source_review':c.ref(c.SOURCE_REVIEW),'protocol':c.ref(c.PROTOCOL),'routing_addendum':c.ref(c.ROUTING_ADDENDUM),'runtime':copy.deepcopy(review['runtime']),
++        'limits':copy.deepcopy(c.LIMITS),'caps':copy.deepcopy(c.CAPS),'recorded_at':'synthetic','authority_interpretation':'synthetic',
++        'validation_authorized':True,'formal_authorized':False}
++    if fault=='source':auth['source']['commit']='old'
++    if fault=='runtime':auth['runtime']['sha256']='wrong'
++    if fault=='caps':auth['caps']['attempts']=479
++    if fault=='scope':auth['limits']['recoveries']=3
++    if fault=='seed':auth['seed_cohort']='c5'
++    if fault=='formal':auth['formal_authorized']=True
++    if fault!='missing':write(c.AUTHORITY,auth)
++    st={'n25_validation_authority':c.ref(c.AUTHORITY)} if fault!='missing' else {}
++    if fault=='adopted':st={}
++    if fault=='none':assert c.authority(source,source_bridge,parent,st)==c.ref(c.AUTHORITY)
++    else:
++        with pytest.raises((OSError,ValueError)):c.authority(source,source_bridge,parent,st)
+diff --git a/tests/test_qd_ed_n25_validation_runtime.py b/tests/test_qd_ed_n25_validation_runtime.py
+new file mode 100644
+index 0000000..68f4a02
+--- /dev/null
++++ b/tests/test_qd_ed_n25_validation_runtime.py
+@@ -0,0 +1,472 @@
++"""Reuse actual original validator synthetic builders; never legacy real-data tests."""
++import copy
++import importlib.util
++import json
++import os
++from pathlib import Path
++from types import SimpleNamespace
++import pytest
++import yaml
++from scripts import qd_ed_final_runner as r
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n25_validation_contract as c
++from scripts import qd_ed_n25_validation_recovery as recovery
++from scripts import qd_ed_n25_recovery as frozen_recovery
++from scripts import qd_ed_n25_validation_identity as identity
++from scripts import qd_ed_n25_validation_report as reporting
++from scripts import qd_ed_n25_validation_supervise as sup
++from test_qd_ed_n25_validation import seeds,events_for,metric,native_report,state,synthetic_classifier
++from test_qd_ed_n25_controller import write,triplet
++
++def rows():return identity.rows_for(seeds(),"c2")
++
++from n25_cpu_synthetic import old_builders
++old=old_builders()
++
++@pytest.mark.parametrize('fault',['none','agent','completed','other_error','missing_events','extra_failure','native',
++    'valid','recovery','interrupted','wall_timeout','qpos','config','counter_missing','scoring_postgate','source','receipt','safety_presence','absent_metrics','absent_then_present','absent_terminal_unknown','absent_native_nonzero','absent_compute_nonzero'])
++def test_actual_classifier_and_new_eligibility_envelope(tmp_path,monkeypatch,fault):
++    monkeypatch.setattr(old.c,'OBSERVABILITY',r.ROOT/'experiments/iteration_023_actuator_clipped_quality/timeout-observability-addendum-v2.md')
++    output=tmp_path/'output';output.mkdir()
++    rr,row,profile,runtime,final,stage,compute=old.failing_case(output,monkeypatch)
++    row.update(iteration=c.COHORT,split="validation",budget_bucket="validation",episode_key='n25_timeout_fixture');final.update(identity=rr.episode_identity(row),episode_key=row['episode_key'])
++    manifest=write(tmp_path/'profiles.json',{'profiles':{'C0':profile}});rt=write(tmp_path/'runtime.json',runtime)
++    for module,k in ((c,'PROTOCOL'),(c.dev,'OBSERVABILITY')):
++        p=tmp_path/k;p.write_text(k);monkeypatch.setattr(module,k,p)
++    plan={'episodes':[row],'source_commit':'synthetic','profiles_path':manifest['path'],'profiles_sha256':manifest['sha256'],
++        'candidate_profiles':{},'runtime_manifest_path':rt['path'],'runtime_manifest_sha256':rt['sha256'],
++        'runtime_inventory_sha256':'inventory','artifact_root':str(tmp_path),'worktree':str(tmp_path)}
++    planref=write(tmp_path/'plan.json',plan);receipt=write(output/'eds_eval/in-worker-audit-receipt.json',{})
++    report=old.native_report(output);report['observed_counts']={'decision_context':1}
++    final.update(plan_sha256=planref['sha256'],profile_manifest_sha256=manifest['sha256'],runtime_manifest_sha256=rt['sha256'],
++        runtime_inventory_sha256='inventory',physical_gpu=7,n23_worker_receipt=receipt,budget_bucket='validation')
++    if fault=='agent':stage[1]['transport']['item_types']=['agent_message']
++    if fault=='completed':stage[1]['transport']['event_types'].append('turn.completed')
++    if fault=='other_error':stage[1]['error']='codex_transport_failure'
++    if fault=='missing_events':stage[1]['transport'].pop('event_types')
++    if fault=='extra_failure':stage[0]['query_ok']=False
++    if fault=='native':report['accepted']=False
++    if fault=='valid':final['outcome_valid']=True
++    if fault=='recovery':final['retry_of']='earlier'
++    if fault=='interrupted':final['event']='aborted'
++    if fault=='wall_timeout':final['gpu_process_wall_seconds']=1801.
++    if fault=='qpos':write(output/'eds_eval/safety_events.jsonl',[{'event':'gripper_qpos_violation','count':1}],True)
++    if fault=='config':p=output/'.hydra/config.yaml';v=yaml.safe_load(p.read_text());v['seed']=-1;p.write_text(yaml.safe_dump(v))
++    if fault=='counter_missing':compute.pop('model_forward_calls')
++    if fault in {'scoring_postgate','absent_compute_nonzero'}:compute['guided_chunks']=1
++    if fault.startswith('absent'):(output/'eds_eval/eds_metrics.jsonl').unlink()
++    if fault=='absent_terminal_unknown':final['guided_chunks']=None
++    if fault=='absent_native_nonzero':report['observed_counts']['canonical_candidate_batch']=11
++    write(output/'eds_eval/stage_events.jsonl',stage,True);write(output/'eds_eval/episode_compute.jsonl',[compute],True)
++    write(output/'eds_eval/decision-evidence-audit.json',report);write(output/'process.json',{'pid':1})
++    write(output/'attempt-result.json',final)
++    journal=triplet(row,final['attempt_id'],valid=False);journal[-1]=final
++    monkeypatch.setattr(c,'read_worker_report',lambda *a:report)
++    if fault not in {'none','source','receipt','safety_presence','absent_metrics','absent_then_present'}:
++        with pytest.raises((ValueError,r.GateError,rr.GateError,KeyError)):
++            recovery.create_eligibility(planref['path'],plan,row,final,profile,runtime,journal,tmp_path,vars(rr))
++        return
++    # Absence is a real legal no-event state, bound without creating a historical file.
++    (output/'eds_eval/safety_events.jsonl').unlink()
++    original_reader=frozen_recovery.classifier().evidence_files
++    record=recovery.create_eligibility(planref['path'],plan,row,final,profile,runtime,journal,tmp_path,vars(rr))
++    assert frozen_recovery.classifier().evidence_files is original_reader
++    assert record['evidence_packaging_reader']==c.ref(frozen_recovery.__file__)
++    assert record['diagnostic']['diagnostic_reader']==c.ref(frozen_recovery.classifier().__file__)
++    if fault.startswith('absent'):assert record['evidence_packaging_mode']=='n25_absent_zero_guided_private_reader' and record['evidence_files']['metrics']['present'] is False
++    assert record['diagnostic']['outcome_valid'] is False and record['unknown_token_calls']==1
++    assert final['provider_token_usage_complete'] is False and final['required_cost_telemetry_complete'] is False
++    reference=write(tmp_path/'eligibility.json',record)
++    if fault=='source':record['source_commit']='other';reference=write(tmp_path/'eligibility.json',record)
++    if fault=='receipt':write(output/'eds_eval/in-worker-audit-receipt.json',{'changed':True})
++    if fault=='safety_presence':write(output/'eds_eval/safety_events.jsonl',[],True)
++    if fault=='absent_then_present':write(output/'eds_eval/eds_metrics.jsonl',[],True)
++    if fault in {'none','absent_metrics'}:
++        assert recovery.verify_eligibility(reference,plan,row,journal,tmp_path,vars(rr))==record
++        with c.supervised_scope(plan,tmp_path,row['episode_key'],eligibility=reference):
++            actual=c.effective_row(plan,row,journal,tmp_path,vars(rr))
++            assert actual==dict(row,budget_bucket='recovery',retry_of=final['attempt_id'],n25_validation_recovery_eligibility=reference)
++        with pytest.raises(rr.GateError):rr.validate_result(output,row,profile,runtime)
++    else:
++        with pytest.raises((ValueError,rr.GateError)):recovery.verify_eligibility(reference,plan,row,journal,tmp_path,vars(rr))
++
++
++@pytest.mark.parametrize('fault',['none','valid','duplicate','two_prior','recovery','aborted','missing','identity'])
++def test_one_recovery_per_cell_two_total(fault):
++    row=rows()[0];events=triplet(row,'a',valid=False)
++    if fault=='valid':events[-1]['outcome_valid']=True
++    if fault=='duplicate':events+=triplet(row,'b',valid=False)
++    if fault=='two_prior':
++        for i in (1,2):events+=triplet(rows()[i],str(i),retry='earlier')
++    if fault=='recovery':events[0]['retry_of']='earlier'
++    if fault=='aborted':events[-1]['event']='aborted'
++    if fault=='missing':events.pop(1)
++    if fault=='identity':events[0]['identity']['task_id']=9
++    if fault=='none':assert recovery.check_cell_history(events,row,'a',vars(r))==events[-1]
++    else:
++        with pytest.raises((ValueError,r.GateError)):recovery.check_cell_history(events,row,'a',vars(r))
++
++
++@pytest.mark.parametrize('arm',c.ARMS)
++@pytest.mark.parametrize('scenario',['valid','typed_recovery','failed_recovery','missing_receipt','timeout','launch_error'])
++def test_real_runner_wrapper_charge_cleanup_and_same_cell(tmp_path,monkeypatch,arm,scenario):
++    (tmp_path/'data').mkdir();st=state();st['budget'].update(dispatched=0,gpu_hours_consumed=0.,running=0);st.update(run_name='CPU',worktree=str(tmp_path),artifacts=str(tmp_path/'artifact'))
++    (tmp_path/'research-state.yaml').write_text(yaml.safe_dump(st));write(tmp_path/'data/gpu-hour-reservation-ledger.jsonl',old.reservations(),True)
++    row=next(v for v in rows() if v['profile']==arm)
++    plan={'source_commit':'synthetic','run_name':'CPU','worktree':str(tmp_path),'artifact_root':st['artifacts'],
++        'candidate_profiles':{'N25':{}},'n25_cohort':c.WORKER_MARKER,'n25_validation':{},'episodes':[row],
++        'phase_authorization':{'dev':False,'validation':True,'formal':False},'profiles_sha256':'p',
++        'runtime_manifest_sha256':'r','runtime_manifest_path':'synthetic','runtime_inventory_sha256':'i'}
++    path=tmp_path/'plan.json';write(path,plan)
++    runtime={'gpu_mapping':{'physical_gpu':7,'uuid':c.GPU7_UUID,'egl_device_index':4},'environment':{}}
++    monkeypatch.setattr(r,'validate_plan',lambda *a,**k:(plan,{'profiles':{arm:{}}},runtime))
++    monkeypatch.setattr(c,'require_budget_state',lambda *a:None);monkeypatch.setattr(c,'protected_budget',lambda *a,**k:None)
++    monkeypatch.setattr(c,'admission',lambda *a,**k:{'n25_validation_cohort_id':c.COHORT,'n25_validation_seed_block':row['seed_block']})
++    monkeypatch.setattr(r,'gpu_admission',lambda **k:{});monkeypatch.setattr(r,'child_environment',lambda *a:{})
++    providers=[];monkeypatch.setattr(r,'verify_provider',lambda *a,**k:providers.append(1))
++    monkeypatch.setattr(w,'build_context',lambda *a:{'synthetic':True})
++    original=[str(r.PYTHON),str(tmp_path/'main.py'),'policy.type=rdt','literal=value with spaces']
++    selected=[];launched=[];cleaned=[]
++    def command(p,m,rt,row,aid):selected.append(copy.deepcopy(row));return original,Path(p['artifact_root'])/'attempts'/aid
++    monkeypatch.setattr(r,'build_command',command)
++    def popen(argv,**kwargs):
++        launched.append(argv);assert argv[argv.index('--')+1:]==original[2:] and str(tmp_path/'main.py') in argv
++        assert r.read_events(tmp_path/'data/attempt-ledger.jsonl')[-1]['event']=='dispatched'
++        if scenario=='launch_error':raise OSError('synthetic launch failure')
++        return SimpleNamespace(pid=os.getpid())
++    monkeypatch.setattr(r.subprocess,'Popen',popen)
++    def wait(p,t,**kwargs):
++        assert t==1800
++        if scenario=='timeout':raise TimeoutError('whole worker timeout')
++        return 0
++    monkeypatch.setattr(r,'wait_exclusively',wait);monkeypatch.setattr(r,'terminate_owned',lambda p:cleaned.append(p))
++    def outcome(*a):
++        if scenario in {'typed_recovery','failed_recovery'} and (len(launched)==1 or scenario=='failed_recovery'):raise r.GateError('Codex token usage incomplete')
++        return {'success':False,'outcome_valid':True,'required_cost_telemetry_complete':True}
++    monkeypatch.setattr(r,'validate_result',outcome)
++    def audit(output,env):
++        if scenario=='missing_receipt':raise ValueError('missing receipt')
++        assert json.loads((output/'process.json').read_text())['pid']==os.getpid()
++        write(output/'eds_eval/in-worker-audit-receipt.json',{})
++        return {'accepted':True,'evidence_complete':True}
++    monkeypatch.setattr(c,'read_worker_report',audit)
++    with c.supervised_scope(plan,tmp_path,row['episode_key']):
++        if scenario=='valid':r.run_plan(path,split='validation',iteration=c.COHORT,root=tmp_path)
++        else:
++            with pytest.raises(r.GateError):r.run_plan(path,split='validation',iteration=c.COHORT,root=tmp_path)
++    primary=r.read_events(tmp_path/'data/attempt-ledger.jsonl')[-1]
++    if scenario in {'typed_recovery','failed_recovery'}:
++        assert primary['n23_worker_receipt'] and primary['process']['pid']==os.getpid()
++        record={'primary_attempt_id':primary['attempt_id'],'plan':c.ref(path)};ref=write(tmp_path/'eligibility.json',record)
++        monkeypatch.setattr(recovery,'verify_eligibility',lambda *a:record)
++        with c.supervised_scope(plan,tmp_path,row['episode_key'],eligibility=ref):
++            if scenario=='typed_recovery':r.run_plan(path,split='validation',iteration=c.COHORT,root=tmp_path)
++            else:
++                with pytest.raises(r.GateError):r.run_plan(path,split='validation',iteration=c.COHORT,root=tmp_path)
++        assert selected[1]==dict(row,budget_bucket='recovery',retry_of=primary['attempt_id'],n25_validation_recovery_eligibility=ref)
++    events=r.read_events(tmp_path/'data/attempt-ledger.jsonl');snap=r.budget_snapshot(events)
++    expected=2 if 'recovery' in scenario else 1
++    assert snap['dispatched']==expected and snap['running']==0 and len(launched)==len(providers)==len(cleaned)==expected
++    assert snap['by_bucket'][row['budget_bucket']]==1 and snap['by_bucket']['recovery']==expected-1
++    assert all(e['identity']==r.episode_identity(row) for e in events)
++    assert events[-1]['outcome_valid'] is (scenario in {'valid','typed_recovery'}) and events[-1]['n25_validation_episode_dispatched']
++
++@pytest.fixture
++def cohort(tmp_path,monkeypatch):
++    plan={'source_commit':'synthetic','artifact_root':str(tmp_path),'episodes':rows(),
++        'n25_validation':{'seed_cohort':'c2','source_bridge':{},'dev_review':{'synthetic':True},'metadata_selection':{'protected_outcomes_read':False}}}
++    planpath=tmp_path/'validation-plan.json';write(planpath,plan);monkeypatch.setattr(c,'VALIDATION_PLAN',planpath)
++    monkeypatch.setattr(sup,'ROOT',tmp_path);monkeypatch.setattr(c,'RUN_DIR',tmp_path)
++    ledger=[];reports={}
++    def add(row,valid=True,success=False,retry=None):
++        aid=str(len(ledger));group=events_for(row,aid,valid=valid,success=success,retry=retry);out=tmp_path/'attempts'/aid
++        final=group[-1];final.update(output_dir=str(out));ledger.extend(group)
++        reports[str(out)]=native_report(row['profile'])
++        write(out/'eds_eval/eds_metrics.jsonl',[metric(row['profile'])],True)
++        write(out/'eds_eval/episode_compute.jsonl',[{'policy_counters_available':True,'guided_chunks':1}],True)
++        for file in ('attempt-result.json','eds_eval/in-worker-audit-receipt.json','eds_eval/decision-evidence-audit.json'):write(out/file,final if file=='attempt-result.json' else {})
++        return final
++    def accept(plan,row,events,*args):
++        groups=list(r.event_groups([e for e in events if e['episode_key']==row['episode_key']]).values())
++        c.require(bool(groups) and groups[-1][-1]['outcome_valid'] is True,'synthetic invalid')
++        return groups[-1][-1]
++    monkeypatch.setattr(c,'accepted_cell',accept);monkeypatch.setattr(c,'read_worker_report',lambda output,*a:reports[str(output)])
++    monkeypatch.setattr(r,'read_events',lambda *a:ledger)
++    monkeypatch.setattr(sup.dev_supervisor,'device_check',lambda:None)
++    return SimpleNamespace(plan=plan,path=planpath,ledger=ledger,add=add,output=tmp_path/'validation-execution',reports=reports)
++
++
++@pytest.mark.parametrize('case',['promote','reject','control_better','incomplete','invalid','recovered','failed_recovery','controller_fault','markers_deleted'])
++def test_full_denominator_cost_and_aggregate_privacy(cohort,case):
++    j=cohort
++    for i,row in enumerate(j.plan['episodes'][:3 if case=='incomplete' else 60]):
++        recovered=case in {'recovered','failed_recovery'} and i<2
++        primary=j.add(row,valid=not recovered,success=row['profile']=='N25' and case not in {'reject','control_better'})
++        if recovered:j.add(row,valid=case=='recovered',success=False,retry=primary['attempt_id'])
++        if case=='control_better' and row['profile']=='C0':primary['success']=True
++    if case=='invalid':j.ledger[2]['outcome_valid']=False
++    if case=='markers_deleted':
++        out=j.ledger[8]['output_dir'];j.reports[out].pop('n25_actuator_clipped_rbf_audit')
++        write(Path(out)/'eds_eval/eds_metrics.jsonl',[metric('N23')],True)
++    detail,aggregate=reporting.summarize(j.plan,j.ledger,sup.ROOT,vars(r),force_invalid=case=='controller_fault',controller_completed=59 if case=='controller_fault' else None)
++    assert aggregate['aggregate_only'] and not any(k in aggregate for k in ('cells','success_counts','attempts','task_id','seed_cohort'))
++    assert detail['dispatched']==(3 if case=='incomplete' else 62 if case in {'recovered','failed_recovery'} else 60)
++    assert sum(v['gpu_process_wall_seconds']['observed_total'] for v in detail['all_attempt_costs'].values())==detail['dispatched']
++    assert sum(detail['all_attempt_denominators'].values())==detail['dispatched']
++    if case in {'promote','recovered'}:
++        assert aggregate['decision']=='PROMOTE' and detail['accepted_cells']==60
++        assert detail['accepted_cell_denominators']==dict.fromkeys(c.ARMS,20)
++        if case=='recovered':
++            assert detail['recoveries']==2 and detail['unknown_token_calls']==2
++    elif case in {'reject','control_better'}:
++        assert aggregate['decision']=='REJECT' and detail['accepted_cells']==60
++    elif case=='incomplete':assert aggregate['decision']=='INCOMPLETE' and detail['accepted_cells']==3
++    else:assert aggregate['decision']=='INVALID' and not aggregate['outcome_valid']
++
++
++@pytest.mark.parametrize('case',['all_failed','promoted','recover','failed_recovery','invalid_primary','status_after_terminal','postprocessing'])
++def test_supervisor_60cells_no_futility_and_terminal_fault_retention(cohort,monkeypatch,case):
++    j=cohort;calls=[];device=[]
++    monkeypatch.setattr(sup.dev_supervisor,'device_check',lambda:device.append(1))
++    def attempt(path,plan,row,eligibility=None):
++        i=len(calls);calls.append((row['episode_key'],eligibility))
++        invalid=case in {'recover','failed_recovery','invalid_primary'} and i==0 or case=='failed_recovery' and i==1
++        final=j.add(row,valid=not invalid,success=case=='promoted' and row['profile']=='N25',retry='0' if eligibility else None)
++        return final
++    monkeypatch.setattr(sup,'one_attempt',attempt)
++    def eligibility(*a):
++        c.require(case!='invalid_primary','not typed');return {'synthetic':True}
++    monkeypatch.setattr(recovery,'create_eligibility',eligibility)
++    if case=='status_after_terminal':
++        original=r.durable_json
++        def durable(path,value):
++            if value.get('accepted_cells')==1:raise OSError('synthetic status write failure')
++            return original(path,value)
++        monkeypatch.setattr(r,'durable_json',durable)
++    if case=='postprocessing':monkeypatch.setattr(c,'accepted_cell',lambda *a:(_ for _ in ()).throw(ValueError('synthetic postprocessor failure')))
++    profiles={'profiles':{a:{} for a in c.ARMS}}
++    if case in {'all_failed','promoted','recover'}:
++        result=sup.execute(j.path,j.plan,profiles,{},j.output)
++        assert result['decision']==('PROMOTE' if case=='promoted' else 'REJECT')
++        assert len(calls)==(61 if case=='recover' else 60) # no validation futility rule
++    else:
++        with pytest.raises((OSError,ValueError)):sup.execute(j.path,j.plan,profiles,{},j.output)
++    detail=json.loads((j.output/'protected-detail-v1.json').read_text());aggregate=json.loads((j.output/'aggregate-disposition-v1.json').read_text())
++    assert detail['dispatched']==len(calls)==len(device)
++    assert sum(v['gpu_process_wall_seconds']['observed_total'] for v in detail['all_attempt_costs'].values())==len(calls)
++    if case=='status_after_terminal':assert detail['accepted_cells']==1 and detail['controller_completed']==1 and aggregate['decision']=='INVALID'
++    if case=='postprocessing':assert detail['accepted_cells']==0 and detail['attempts'][0]['terminal']['outcome_valid'] is True
++    if case in {'failed_recovery','invalid_primary'}:assert aggregate['decision']=='INVALID' and not aggregate['outcome_valid']
++    with pytest.raises(ValueError,match='cannot resume'):sup.execute(j.path,j.plan,profiles,{},j.output)
++
++
++@pytest.mark.parametrize('fault',['none','duplicate','recovery','receipt','plan_sha','terminal_identity','markers','guided_bool'])
++def test_real_terminal_schema_and_profile_gate(tmp_path,monkeypatch,fault):
++    row=rows()[2];plan={'episodes':[row],'source_commit':'synthetic','profiles_sha256':'profiles',
++        'runtime_manifest_sha256':'runtime','runtime_inventory_sha256':'inventory','artifact_root':str(tmp_path)}
++    path=tmp_path/'plan.json';reference=write(path,plan);monkeypatch.setattr(c,'VALIDATION_PLAN',path)
++    output=tmp_path/'output';receipt=write(output/'eds_eval/in-worker-audit-receipt.json',{})
++    write(output/'n23-worker-context.json',{'plan':reference})
++    group=events_for(row,'primary');final=group[-1]
++    final.update(output_dir=str(output),source_commit='synthetic',plan_sha256=reference['sha256'],profile_manifest_sha256='profiles',
++        runtime_manifest_sha256='runtime',runtime_inventory_sha256='inventory',physical_gpu=7,init_row_sha256=row['init_row_sha256'],n23_worker_receipt=receipt)
++    if fault=='plan_sha':final['plan_sha256']='wrong'
++    if fault=='terminal_identity':final['identity']['init_index']=1
++    if fault=='guided_bool':final['guided_chunks']=True
++    write(output/'attempt-result.json',final)
++    if fault=='receipt':write(output/'eds_eval/in-worker-audit-receipt.json',{'changed':True})
++    if fault in {'duplicate','recovery'}:group+=events_for(row,'duplicate',retry=final['attempt_id'] if fault=='recovery' else None)
++    write(output/'eds_eval/eds_metrics.jsonl',[metric('N23' if fault=='markers' else 'N25')],True)
++    write(output/'eds_eval/episode_compute.jsonl',[{'policy_counters_available':True,'guided_chunks':1}],True)
++    monkeypatch.setattr(c,'read_worker_report',lambda *a:native_report('N23' if fault=='markers' else 'N25'))
++    if fault=='none':assert recovery.accepted_cell(plan,row,group,tmp_path,vars(r))==final
++    else:
++        with pytest.raises((ValueError,r.GateError)):recovery.accepted_cell(plan,row,group,tmp_path,vars(r))
++
++from test_qd_ed_n24_controller import worker_job
++from scripts import qd_ed_n25_validation_evidence as evidence
++
++@pytest.fixture
++def validation_worker(worker_job,monkeypatch):
++    import torch
++    job=worker_job;job.row=copy.deepcopy(rows()[2]);job.plan.pop('n23_cohort')
++    job.plan.update(frozen=True,n25_cohort=c.WORKER_MARKER,n25_validation={'schema':'n25-protected-validation-v1','cohort_id':c.COHORT,
++        'limits':c.LIMITS,'source_bridge':{'synthetic':True},'source_review':{'review':True}},episodes=[job.row],
++        phase_authorization={'dev':False,'validation':True,'formal':False})
++    job.context.update(profile='N25',episode_key=job.row['episode_key'])
++    job.context['plan']=write(Path(job.plan_ref['path']),job.plan);job.context_path=job.output/'n23-worker-context.json';write(job.context_path,job.context)
++    monkeypatch.setattr(c,'VALIDATION_PLAN',Path(job.plan_ref['path']));monkeypatch.setattr(c,'original_plan',lambda:{})
++    monkeypatch.setattr(c,'source_record',lambda *a:(job.context['source'],{'synthetic':True}))
++    monkeypatch.setattr(c,'review_source',lambda *a:{'review':True});monkeypatch.setattr(c,'manifest',lambda *a:{})
++    monkeypatch.setattr(r,'build_command',lambda *a:(job.command,job.output))
++    assigned=w.assigned_cuda_identity
++    def identity(binding):
++        value=assigned(binding);value['identity_diagnostic']={'schema':'n23-public-cuda-identity-diagnostic-v1',
++            'expected_physical_gpu':7,'expected_uuid':c.GPU7_UUID,'cuda_visible_devices':'7','visible_device_count':1,'current_device':0,
++            'uuid_public_type':'builtins.str','serialized_raw_uuid':c.GPU7_UUID,'canonical_uuid':c.GPU7_UUID,'status':'matched'}
++        return value
++    monkeypatch.setattr(w,'assigned_cuda_identity',identity)
++    def audit(episode,compute,*,arithmetic_backend):
++        job.calls.append('audit');arithmetic_backend.native(torch.zeros(1,dtype=torch.bfloat16))
++        return {**native_report(job.context['profile']),'n23_arithmetic_backend':arithmetic_backend.report()}
++    monkeypatch.setattr(w.audit,'audit_episode',audit)
++    from scripts import qd_ed_n25_native as native
++    monkeypatch.setattr(native,'audit_output',lambda profile,output,report,backend:report)
++    write(job.output/'eds_eval/episode_compute.jsonl',[{'policy_counters_available':True,'guided_chunks':1}],True)
++    write(job.output/'eds_eval/eds_metrics.jsonl',[metric('N25')],True)
++    return job
++
++
++@pytest.mark.parametrize('fault',['none','phase','mode_marker','row','limits','plan','source_bridge','source_review','argv'])
++def test_validation_worker_explicit_route_and_same_process(validation_worker,monkeypatch,fault):
++    job=validation_worker
++    if fault=='phase':job.plan['phase_authorization']['dev']=True
++    if fault=='mode_marker':job.plan['n25_cohort']={}
++    if fault=='row':job.plan['episodes'][0]['split']='dev'
++    if fault=='limits':job.plan['n25_validation']['limits']={}
++    if fault=='source_bridge':job.plan['n25_validation']['source_bridge']={}
++    if fault=='source_review':job.plan['n25_validation']['source_review']={}
++    job.context['plan']=write(Path(job.plan_ref['path']),job.plan)
++    if fault=='plan':monkeypatch.setattr(c,'VALIDATION_PLAN',job.root/'missing.json')
++    if fault=='argv':job.context['main_argv'].append('altered=true')
++    write(job.context_path,job.context)
++    if fault=='none':
++        assert w.run_worker(job.context_path,job.command[1:])==0
++        assert job.calls==['identity','cuda','audit'];job.calls.clear()
++        assert w.verify_receipt(job.context_path,job.process)['accepted'] and not job.calls
++        receipt=json.loads((job.output/'eds_eval/in-worker-audit-receipt.json').read_text())
++        assert receipt['n25_native_counts']['guided_decisions']==1 and receipt['n25_metrics']['present']
++    else:
++        with pytest.raises((ValueError,OSError)):w.run_worker(job.context_path,job.command[1:])
++        assert not job.calls
++
++
++@pytest.mark.parametrize('fault',['none','plan','argv','process','start','receipt','runtime','uuid','backend','audit','cost','metrics','marker','old_source'])
++def test_historical_dev_receipt_remains_bound_to_original_source(validation_worker,monkeypatch,fault):
++    job=validation_worker
++    assert w.run_worker(job.context_path,job.command[1:])==0
++    write(job.output/'process.json',job.process)
++    final={'output_dir':str(job.output),'attempt_id':job.output.name,'n23_worker_receipt':c.ref(job.output/'eds_eval/in-worker-audit-receipt.json'),
++        'process':copy.deepcopy(job.process),'gpu_process_wall_seconds':60.,'guided_chunks':1}
++    # The historical checker consumes the recorded source without requiring current evaluation HEAD.
++    monkeypatch.setattr(w,'verify_source',lambda *a:pytest.fail('historical receipt must not verify against current HEAD'))
++    receipt_path=job.output/'eds_eval/in-worker-audit-receipt.json';receipt=json.loads(receipt_path.read_text())
++    if fault=='plan':job.plan['changed']=True
++    if fault=='argv':receipt['main_argv_sha256']='wrong'
++    if fault=='process':final['process']['proc_start_ticks']='wrong'
++    if fault=='start':write(job.output/'eds_eval/in-worker-audit-start.json',{})
++    if fault=='receipt':receipt['accepted']=False
++    if fault=='runtime':receipt['runtime']['sha256']='wrong'
++    if fault=='uuid':receipt['worker_cuda']['identity_diagnostic']['visible_device_count']=2
++    if fault=='backend':receipt['audit_backend']['kind']='cpu'
++    if fault=='audit':receipt['audit_report']['sha256']='wrong'
++    if fault=='cost':final['gpu_process_wall_seconds']=0.
++    if fault=='metrics':write(job.output/'eds_eval/eds_metrics.jsonl',[metric('N23')],True)
++    if fault=='marker':receipt['n25_native_counts']={}
++    if fault=='old_source':job.plan['source_commit']='other_original_source'
++    write(receipt_path,receipt);final['n23_worker_receipt']=c.ref(receipt_path)
++    if fault=='none':assert evidence.historical_receipt(final,job.row,job.plan,c.ref(job.plan_ref['path']),vars(r))['accepted']
++    else:
++        with pytest.raises((ValueError,OSError)):evidence.historical_receipt(final,job.row,job.plan,c.ref(job.plan_ref['path']),vars(r))
++
++
++@pytest.mark.parametrize('index',[0,1,3,24,59])
++def test_validation_prefix_has_no_development_futility(index,monkeypatch):
++    plan={'episodes':rows()};prior=[e for i,row in enumerate(rows()[:index]) for e in events_for(row,str(i))]
++    checked=[];monkeypatch.setattr(c,'accepted_cell',lambda plan,row,*a:checked.append(row['episode_key']) or {'success':False})
++    assert c.admission(plan,{},rows()[index],prior,[],r.ROOT,vars(r))['n25_validation_cohort_id']==c.COHORT
++    assert len(checked)==index
++    with pytest.raises(ValueError,match='prefix'):c.admission(plan,{},rows()[index],prior+events_for(rows()[-1],'future'),[],r.ROOT,vars(r))
++
++@pytest.mark.parametrize('fault',['none','release','freshness','capacity','running','already_started'])
++def test_release_rechecks_metadata_capacity_and_no_restart(tmp_path,monkeypatch,fault):
++    from contextlib import nullcontext
++    monkeypatch.setattr(c,'RUN_DIR',tmp_path);monkeypatch.setattr(sup,'ROOT',tmp_path)
++    plan={'source_commit':'synthetic','episodes':rows(),'n25_validation':{'seed_cohort':'c2','dev_review':{},'source_review':{},'authority':{}}}
++    path=tmp_path/'plan.json';write(path,plan);out=tmp_path/'validation-execution';release=tmp_path/'validation-execution-release-v1.json'
++    value={'schema':'n25-validation-execution-release-v1','plan':c.ref(path),'source_commit':'synthetic','cohort_id':c.COHORT,
++        'seed_cohort':'c2','episode_keys':[x['episode_key'] for x in rows()],'limits':c.LIMITS,'dev_review':{},'source_review':{},'authority':{},
++        'physical_gpu':7,'uuid':c.GPU7_UUID,'validation_authorized':True,'formal_authorized':False}
++    if fault=='release':value['episode_keys'].pop()
++    write(release,value)
++    monkeypatch.setattr(r,'locked',lambda *a,**k:nullcontext());monkeypatch.setattr(c,'original_plan',lambda:{})
++    monkeypatch.setattr(identity,'metadata',lambda *a:(seeds(),[],[],[],{}))
++    monkeypatch.setattr(identity,'first_unused',lambda *a,**k:'c3' if fault=='freshness' else 'c2')
++    monkeypatch.setattr(r,'read_events',lambda *a:[]);monkeypatch.setattr(r,'read_state',lambda *a:{})
++    monkeypatch.setattr(c,'full_capacity',lambda *a:c.require(fault not in {'capacity','running'},'synthetic full-capacity rejection'))
++    monkeypatch.setattr(r,'check_budget',lambda *a,**k:None);monkeypatch.setattr(r,'validate_plan',lambda *a,**k:(plan,{},{}))
++    called=[];monkeypatch.setattr(sup,'execute',lambda *a:called.append(1) or {'aggregate_only':True})
++    if fault=='already_started':write(out/'aggregate-progress-v1.json',{'phase':'started'})
++    if fault=='none':assert sup.launch(path,release,out)=={'aggregate_only':True} and called==[1]
++    else:
++        with pytest.raises(ValueError):sup.launch(path,release,out)
++        assert not called
++
++
++@pytest.mark.parametrize('old_arm',['C0','Q0','N23','N25'])
++def test_existing_worker_dev_routes_remain_unchanged(worker_job,monkeypatch,old_arm):
++    import torch
++    job=worker_job;job.plan.pop('n23_cohort');job.plan['n25_cohort']={'worker_audit':c.dev.WORKER_CONTRACT};job.plan['frozen']=True
++    job.plan['episodes'][0].update(iteration=c.dev.COHORT,profile=old_arm);job.context['profile']=old_arm
++    job.context['plan']=write(Path(job.plan_ref['path']),job.plan);write(job.context_path,job.context)
++    write(job.output/'eds_eval/episode_compute.jsonl',[{'policy_counters_available':True,'guided_chunks':1}],True)
++    write(job.output/'eds_eval/eds_metrics.jsonl',[metric(old_arm)],True)
++    def audit(*a,arithmetic_backend):
++        job.calls.append('audit')
++        if old_arm in {'N23','N25'}:arithmetic_backend.native(torch.zeros(1,dtype=torch.bfloat16))
++        return {**native_report(old_arm),'n23_arithmetic_backend':arithmetic_backend.report()}
++    monkeypatch.setattr(w.audit,'audit_episode',audit)
++    from scripts import qd_ed_n25_native as native
++    monkeypatch.setattr(native,'audit_output',lambda profile,output,report,backend:report)
++    assert w.run_worker(job.context_path,job.command[1:])==0
++    assert job.calls==['identity','cuda' if old_arm in {'N23','N25'} else 'cpu','audit']
++    job.calls.clear();assert w.verify_receipt(job.context_path,job.process)['accepted'] and not job.calls
++
++@pytest.mark.parametrize('fault',['none','different_variant','attempt_root','escape_link'])
++def test_production_split_variant_and_attempt_roots(tmp_path,monkeypatch,fault):
++    variant=tmp_path/'source-volume/variant';variant.mkdir(parents=True)
++    artifacts=tmp_path/'artifact-volume/attempt-data';artifacts.mkdir(parents=True)
++    monkeypatch.setattr(c,'RUN_DIR',variant);monkeypatch.setattr(sup,'ROOT',tmp_path/'worktree')
++    plan={'source_commit':'synthetic','artifact_root':str(artifacts),'episodes':rows(),
++        'n25_validation':{'seed_cohort':'c2','source_bridge':{},'dev_review':{},'metadata_selection':{}}}
++    path=variant/'plan.json';write(path,plan);monkeypatch.setattr(c,'VALIDATION_PLAN',path)
++    output=variant/'validation-execution'
++    if fault=='different_variant':output=variant/'elsewhere'
++    if fault=='attempt_root':output=artifacts/'validation-execution'
++    if fault=='escape_link':output.symlink_to(artifacts/'escaped-controller',target_is_directory=True)
++    monkeypatch.setattr(r,'validate_plan',lambda *a,**k:(plan,{'profiles':{}},{}))
++    monkeypatch.setattr(r,'read_events',lambda *a:[])
++    monkeypatch.setattr(sup,'release_check',lambda *a:None)
++    monkeypatch.setattr(sup.dev_supervisor,'device_check',lambda:None)
++    monkeypatch.setattr(sup,'one_attempt',lambda *a,**k:(_ for _ in ()).throw(ValueError('synthetic before first attempt')))
++    if fault=='none':
++        with pytest.raises(ValueError,match='synthetic'):sup.launch(path,variant/'release.json',output)
++        assert (output/'aggregate-disposition-v1.json').is_file()
++        value=json.loads((output/'protected-detail-v1.json').read_text())
++        assert value['dispatched']==0 and value['accepted_cells']==0 and value['decision']=='INVALID'
++        assert list(artifacts.iterdir())==[]
++    else:
++        # Every public boundary enforces the same exact owned controller path.
++        for call in (lambda:sup.launch(path,variant/'release.json',output),
++                     lambda:sup.execute(path,plan,{'profiles':{}},{},output),
++                     lambda:reporting.write_reports(plan,[],output,tmp_path,vars(r))):
++            with pytest.raises((ValueError,r.GateError)):call()
++        assert not (artifacts/'escaped-controller').exists()
++
++@pytest.mark.parametrize('name',['execution/attempt.json','validation-execution/protected-detail-v1.json','validation-execution-release-v1.json',
++    'plan.frozen.v1.gpu7.json','validation-plan.frozen.v1.gpu7.json','result-v1.json','root-review-v1.json',
++    'adoption-v1/authority.json','validation-adoption-v1/authority.json','validation-source-review-v1.json'])
++def test_guard_v3_sensitive_paths_deny_read_and_write_without_io(tmp_path,name):
++    import ast
++    # Execute only the guard callback in a synthetic namespace, never open a sensitive path.
++    tree=ast.parse((Path(r.ROOT).parent/'n25_validation_cpu_guard_v1.py').read_text())
++    node=next(x for x in tree.body if isinstance(x,ast.FunctionDef) and x.name=='audit')
++    namespace={'Path':Path,'os':os,'HERE':tmp_path/'variant','W':tmp_path/'variant/validation_implementation',
++        'I':tmp_path/'variant/implementation','ENV':Path('/synthetic_env'),'PUBLIC':set(),'BLOCKED':[]}
++    exec(compile(ast.Module(body=[node],type_ignores=[]),'<synthetic-guard-callback>','exec'),namespace)
++    for mode,flags in [('r',os.O_RDONLY),('w',os.O_WRONLY|os.O_CREAT),('a',os.O_WRONLY|os.O_APPEND)]:
++        with pytest.raises(PermissionError):namespace['audit']('open',(str(namespace['HERE']/name),mode,flags))
++    assert len(namespace['BLOCKED'])==3 and not namespace['HERE'].exists()
++    # Drafts are in the distinct non-executable template directory, never execution-prefix exceptions.
++    namespace['audit']('open',(str(namespace['HERE']/'validation-cpu-templates-v1/release.json'),'w',os.O_WRONLY|os.O_CREAT))
++    assert len(namespace['BLOCKED'])==3

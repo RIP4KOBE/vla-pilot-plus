@@ -1,0 +1,8 @@
+{
+  "mode": "stdlib/Git byte verification; no experiment imports",
+  "cpu_seconds": 0.232985141,
+  "affinity": [
+    0,
+    1
+  ]
+}

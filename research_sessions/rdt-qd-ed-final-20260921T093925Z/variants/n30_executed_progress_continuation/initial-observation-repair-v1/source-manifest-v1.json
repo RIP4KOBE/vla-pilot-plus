@@ -1,0 +1,25 @@
+{
+  "schema": "n30-initial-observation-repair-source-v1",
+  "base_commit": "4ce2b95757c1c0d662696ba19d6a9a14d2e59b49",
+  "commit": "7c0d80d734fa8300173e56d9a8de03415bc55fe2",
+  "files": [
+    {
+      "path": "main.py",
+      "sha256": "5209b0ac07362e1df85bf2fd842e57d4786e24c0a625ee5b9e49bee48f528f93",
+      "bytes": 108959
+    },
+    {
+      "path": "tests/n30_initial_observation_original.json",
+      "sha256": "09bedf6f014a84edff03e9754b71dff57e5e6761c9d1ae336fd3a0b33215af6a",
+      "bytes": 30941
+    },
+    {
+      "path": "tests/test_n30_initial_observation_repair.py",
+      "sha256": "3a20181ff534dc410698ba7e1f7dce87b8aa764c9c834bee57b9e6a83f27c6ff",
+      "bytes": 12813
+    }
+  ],
+  "sole_production_file": "main.py",
+  "all_other_existing_files_unchanged": true,
+  "clean_git_status": true
+}

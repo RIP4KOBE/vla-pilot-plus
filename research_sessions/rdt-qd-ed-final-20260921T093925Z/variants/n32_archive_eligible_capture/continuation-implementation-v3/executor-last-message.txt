@@ -1,0 +1,5 @@
+Committed `36aac818c8ea0ec3ce18413e678963818bb5bb5d`. Worktree is clean; **127 focused CPU tests passed**. Scientific files and historical N32R2 modules remain unchanged.
+
+No dispatch, budget adoption, owning-study adoption, or scientific success. Release still requires independent source review, fresh manifests, accounting/admission, and detached approval.
+
+Artifacts: [Report](../continuation-implementation-v3/report-v1.md), [result](../continuation-implementation-v3/implementation-result-v1.json), [exact diff](../continuation-implementation-v3/exact-diff-v1.patch), [hash-bound index](../continuation-implementation-v3/artifact-index-v1.json).

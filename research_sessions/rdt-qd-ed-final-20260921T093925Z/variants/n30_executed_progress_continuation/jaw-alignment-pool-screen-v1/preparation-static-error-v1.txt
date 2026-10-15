@@ -1,0 +1,1 @@
+Source-window display failed with IndexError at stdin line11 because the requested old-reader window ended at475 but file ended468. No payload read, no calculation started, no source changed. Subsequent static windows are bounded by min(file_length,end).

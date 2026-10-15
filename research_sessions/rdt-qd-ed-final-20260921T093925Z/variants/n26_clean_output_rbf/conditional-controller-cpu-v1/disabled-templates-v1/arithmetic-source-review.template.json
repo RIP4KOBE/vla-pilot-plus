@@ -1,0 +1,60 @@
+{
+  "executable": false,
+  "root_authorized": false,
+  "actual_evidence_read": false,
+  "intended_future_location": "N26/arithmetic-preflight-source-review-v1.json",
+  "record": {
+    "schema": "n26-arithmetic-source-review-v1",
+    "accepted": false,
+    "source": null,
+    "runtime": {
+      "path": null,
+      "sha256": null
+    },
+    "source_bridge": {
+      "path": null,
+      "sha256": null
+    },
+    "phase_b_protocol": {
+      "path": null,
+      "sha256": null
+    },
+    "arithmetic_protocol": {
+      "path": null,
+      "sha256": null
+    },
+    "admission_clarification": {
+      "path": null,
+      "sha256": null
+    },
+    "predecessor": {
+      "path": null,
+      "sha256": null
+    },
+    "budget_authority": {
+      "path": null,
+      "sha256": null
+    },
+    "composition_protocol": {
+      "path": null,
+      "sha256": null
+    },
+    "logical_admission_addendum": {
+      "path": null,
+      "sha256": null
+    },
+    "limits": {
+      "resource_processes": 1,
+      "episode_attempts": 0,
+      "model_calls": 0,
+      "api_calls": 0,
+      "simulation_steps": 0,
+      "timeout_seconds": 60,
+      "cleanup_seconds": 40,
+      "physical_gpu": 7,
+      "health_gpu_hours_bucket": "recovery"
+    },
+    "gpu_release": false
+  },
+  "notes": "Unresolved template; do not supply this wrapper to any production gate. Root must independently create and review the exact record after actual prerequisite closure."
+}

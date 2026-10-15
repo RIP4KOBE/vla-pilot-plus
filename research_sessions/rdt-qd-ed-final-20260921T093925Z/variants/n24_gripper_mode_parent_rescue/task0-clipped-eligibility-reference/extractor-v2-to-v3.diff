@@ -1,0 +1,101 @@
+--- extract_cpu_v2.py
++++ extract_cpu_v3.py
+@@ -7,20 +7,23 @@
+ os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
+ import sys
+ sys.dont_write_bytecode = True
+-import json, hashlib, io, csv, time, signal, traceback
++import json, hashlib, io, csv, time, signal, traceback, stat
+ from pathlib import Path
+ from collections import Counter
+ 
+ HERE = Path(__file__).resolve().parent
+ SCOPE_SHA = '9845a9915caaffff30d33b0ab5e41b4a618fce2f01ef95bc671ddf5c379cef28'
+ PYROOT = Path('/home/hynx/miniconda3/envs/vla-pilot').resolve()
++PRIOR_SECONDS = 0.5686100150924176
++REMAINING_SECONDS = 120.0 - PRIOR_SECONDS
++ATTEMPT_ID = 'rdt-qd-ed-final-20260921T093925Z__n24_dev_t00_n24_20260930__169d5a090d1b'
+ START = time.monotonic()
+ BLOCKED = []
+ READS = Counter()
+ LOADS = []
+ NATIVE_BYTES = 0
+-ALLOWED = {HERE / 'read-scope-v1.json', HERE / 'input-manifest-v2.json', Path(__file__).resolve()}
+-OUTPUTS = {HERE / n for n in ('result-v1.json', 'partial-v1.json', 'error-v1.json', 'all-decisions-v1.csv', 'all-candidates-v1.csv', 'guard-result-v1.json')}
++ALLOWED = {HERE / 'read-scope-v1.json', HERE / 'input-manifest-v3.json', Path(__file__).resolve()}
++OUTPUTS = {HERE / n for n in ('result-v2.json', 'partial-v2.json', 'error-v2.json', 'all-decisions-v2.csv', 'all-candidates-v2.csv', 'guard-result-v2.json')}
+ 
+ def deny(event, obj):
+     BLOCKED.append({'event': event, 'value': str(obj)})
+@@ -33,6 +36,9 @@
+         p = Path(os.fsdecode(path)).absolute()
+         resolved = p.resolve()
+         writing = (isinstance(mode, str) and any(x in mode for x in 'wax+')) or (isinstance(flags, int) and bool(flags & (os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND)))
++        # Exact startup dependencies only; neither exception allows payload reads.
++        if p == resolved == Path('/dev/null') and stat.S_ISCHR(os.stat(p).st_mode): return
++        if not writing and p == Path('/proc/self/maps') and resolved == Path('/proc') / str(os.getpid()) / 'maps': return
+         if writing:
+             if p not in OUTPUTS or resolved != p: deny('write', p)
+             return
+@@ -83,10 +89,17 @@
+ TORCH=None
+ try:
+     signal.signal(signal.SIGALRM, expire)
+-    signal.setitimer(signal.ITIMER_REAL, 120)
++    signal.setitimer(signal.ITIMER_REAL, REMAINING_SECONDS)
+     scope = json.loads(read({'path':str(HERE/'read-scope-v1.json'),'sha256':SCOPE_SHA}))
+-    manifest = json.loads((HERE/'input-manifest-v2.json').read_bytes())
++    manifest = json.loads((HERE/'input-manifest-v3.json').read_bytes())
+     need(manifest['scope']['sha256'] == SCOPE_SHA, 'manifest scope')
++    need(manifest['attempt_id'] == ATTEMPT_ID, 'manifest exact attempt')
++    attempt_root = Path(scope['inputs']['terminal']['path']).parent
++    need(attempt_root.name == ATTEMPT_ID, 'terminal path exact attempt')
++    for name in ('terminal', 'native_audit', 'native_receipt'):
++        need(Path(scope['inputs'][name]['path']).is_relative_to(attempt_root), 'evidence path exact attempt')
++    for b in scope['bundles']:
++        need(Path(b['path']).parent == attempt_root / 'eds_eval' / 'decision_evidence' / 'episode_000', 'bundle exact attempt path')
+     need(ref(__file__) == manifest['extractor'], 'extractor frozen bytes')
+     for item in manifest['inputs'] + manifest['source_files'] + manifest['bundles']:
+         p = Path(item['path']); need(p.is_absolute(), 'relative input'); ALLOWED.add(p)
+@@ -161,7 +174,10 @@
+         target=tensor(keypoints[0],(3,),translation.dtype)
+         positives=tensor(grasp['positive_commands'],(16,8),torch.bool)
+         need(torch.equal(grip>=0,positives),'native recorded deployed signs')
+-        need(positives.tolist()==[[v>0 for v in row] for row in canonical['gripper_prefix']],'closed canonical signs')
++        grip_record = canonical['gripper_prefix']
++        need(type(grip_record)==dict and grip_record['shape']==[16,8] and grip_record['dtype']==str(grip.dtype), 'closed gripper record schema')
++        need(type(grip_record['values'])==list and len(grip_record['values'])==16 and all(type(row)==list and len(row)==8 for row in grip_record['values']), 'closed gripper values shape')
++        need(positives.tolist()==[[v>=0 for v in row] for row in grip_record['values']], 'closed canonical signs')
+         dist=tensor(grasp['projected_distances_m'],(16,8),torch.float32)
+         original=grasp['eligible_indices']
+         need(original==member['eligible_indices']==ids(elig(dist,positives)),'recorded authoritative membership')
+@@ -188,23 +204,23 @@
+         DECISIONS.append(row)
+         for i in range(16):
+             CANDIDATES.append({'decision_id':decision,'global_step':row['global_step'],'candidate_index':i,'occurrence_id':canonical['row_occurrence_ids'][i],'recorded_fingerprint':canonical['row_fingerprints'][i],'positive_commands':int(positives[i].sum()),'full8':i in full_ids,'original_selected':i==selected,'recorded_eligible':i in original,'raw_projection_cpu_norm_eligible':i in raw_ids,'cpu_clipped_reference_eligible':i in clip_ids,'gained':i in gains,'lost':i in losses,'first7_clipping':bool(mask7[i]),'full8_clipping':bool(mask8[i]),'raw_reconstruction_byte_equal':bytesame(raw_cpu[i],xyz[i,1:9]),'raw_reconstruction_max_abs_error_m':float((raw_cpu[i].float()-xyz[i,1:9].float()).abs().max()),'recorded_distances_m':dist[i].tolist(),'cpu_clipped_reference_distances_m':clip_dist[i].tolist(),'hypothetical_cuda_clipped_membership':'Unknown'})
+-        write('partial-v1.json', {'completed_pools':len(DECISIONS),'decisions':DECISIONS,'candidates':CANDIDATES,'native_bytes_read':NATIVE_BYTES,'native_loads':LOADS})
++        write('partial-v2.json', {'completed_pools':len(DECISIONS),'decisions':DECISIONS,'candidates':CANDIDATES,'native_bytes_read':NATIVE_BYTES,'native_loads':LOADS})
+         print(json.dumps({'completed':len(DECISIONS),'step':row['global_step'],'raw_cpu_norm_agrees':row['raw_norm_membership_equal'],'gain':gains,'loss':losses,'cuda':'Unknown'}),flush=True)
+         del payload,events,ev,population,cv,sv,fv,terminal,grasp
+     need(len(DECISIONS)==14 and len(CANDIDATES)==224 and NATIVE_BYTES==243123318 and len(LOADS)==14,'coverage mismatch')
+     need(not BLOCKED and not torch.cuda.is_initialized(),'runtime boundary')
+-    result={'schema':'n24-clipped-eligibility-cpu-reference-v1','status':'COMPLETED_CPU_REFERENCE_ONLY','scope':manifest['scope'],'input_manifest':ref(HERE/'input-manifest-v2.json'),'extractor':manifest['extractor'],'source_commit':scope['source_commit'],'decisions':DECISIONS,'candidates':CANDIDATES,'summary':{'pools':14,'rows':224,'changed_pools':sum(bool(r['gained_indices'] or r['lost_indices']) for r in DECISIONS),'gained_rows':sum(len(r['gained_indices']) for r in DECISIONS),'lost_rows':sum(len(r['lost_indices']) for r in DECISIONS),'gained_full8_rows':sum(len(r['gained_full8_indices']) for r in DECISIONS),'lost_full8_rows':sum(len(r['lost_full8_indices']) for r in DECISIONS),'raw_norm_membership_agreed_pools':sum(r['raw_norm_membership_equal'] for r in DECISIONS),'raw_reconstruction_byte_equal_pools':sum(r['raw_reconstruction_byte_equal'] for r in DECISIONS),'raw_norm_max_abs_error_m':max(r['raw_norm_max_abs_error_m'] for r in DECISIONS),'raw_reconstruction_max_abs_error_m':max(r['raw_reconstruction_max_abs_error_m'] for r in DECISIONS),'categories':dict(Counter(r['category'] for r in DECISIONS))},'native_bytes_read':NATIVE_BYTES,'native_loads':LOADS,'elapsed_seconds':time.monotonic()-START,'guard':summary_guard(),'limitations':['All hypothetical CUDA memberships Unknown.','CPU reference, not production arithmetic/trajectory/efficacy proof.','Eight-point clipping is prospective hypothesis; production N23 quality uses seven points.','Original recorded eligibility remains authoritative.','No costs/quality/provider values, ranking, new selection or physical outcome inference.','Full candidate fingerprints are recorded identity only; no disallowed native dimensions rehashed.']}
+-    write('result-v1.json',result)
+-    for name,rows in [('all-decisions-v1.csv',DECISIONS),('all-candidates-v1.csv',CANDIDATES)]:
++    result={'schema':'n24-clipped-eligibility-cpu-reference-v1','status':'COMPLETED_CPU_REFERENCE_ONLY','scope':manifest['scope'],'input_manifest':ref(HERE/'input-manifest-v3.json'),'extractor':manifest['extractor'],'source_commit':scope['source_commit'],'attempt_id':ATTEMPT_ID,'scope_attempt_id_null_disclosure':'Frozen scope top-level null is a metadata omission; exact attempt is bound by original refs/path IDs and explicit continuation manifest, never a wildcard.','prior_failed_startup_seconds':PRIOR_SECONDS,'cumulative_seconds':PRIOR_SECONDS+time.monotonic()-START,'decisions':DECISIONS,'candidates':CANDIDATES,'summary':{'pools':14,'rows':224,'changed_pools':sum(bool(r['gained_indices'] or r['lost_indices']) for r in DECISIONS),'gained_rows':sum(len(r['gained_indices']) for r in DECISIONS),'lost_rows':sum(len(r['lost_indices']) for r in DECISIONS),'gained_full8_rows':sum(len(r['gained_full8_indices']) for r in DECISIONS),'lost_full8_rows':sum(len(r['lost_full8_indices']) for r in DECISIONS),'raw_norm_membership_agreed_pools':sum(r['raw_norm_membership_equal'] for r in DECISIONS),'raw_reconstruction_byte_equal_pools':sum(r['raw_reconstruction_byte_equal'] for r in DECISIONS),'raw_norm_max_abs_error_m':max(r['raw_norm_max_abs_error_m'] for r in DECISIONS),'raw_reconstruction_max_abs_error_m':max(r['raw_reconstruction_max_abs_error_m'] for r in DECISIONS),'categories':dict(Counter(r['category'] for r in DECISIONS))},'native_bytes_read':NATIVE_BYTES,'native_loads':LOADS,'elapsed_seconds':time.monotonic()-START,'guard':summary_guard(),'limitations':['All hypothetical CUDA memberships Unknown.','CPU reference, not production arithmetic/trajectory/efficacy proof.','Eight-point clipping is prospective hypothesis; production N23 quality uses seven points.','Original recorded eligibility remains authoritative.','No costs/quality/provider values, ranking, new selection or physical outcome inference.','Full candidate fingerprints are recorded identity only; no disallowed native dimensions rehashed.']}
++    write('result-v2.json',result)
++    for name,rows in [('all-decisions-v2.csv',DECISIONS),('all-candidates-v2.csv',CANDIDATES)]:
+         with (HERE/name).open('w',newline='') as stream:
+             writer=csv.DictWriter(stream,fieldnames=list(rows[0]));writer.writeheader()
+             for row in rows:writer.writerow({k:json.dumps(v) if isinstance(v,(list,dict)) else v for k,v in row.items()})
+     print(json.dumps({'status':result['status'],'summary':result['summary'],'seconds':result['elapsed_seconds'],'guard':result['guard']},sort_keys=True),flush=True)
+ except BaseException as exc:
+     ERROR={'type':type(exc).__name__,'message':str(exc),'traceback':traceback.format_exc(),'completed_pools':len(DECISIONS),'native_bytes_read':NATIVE_BYTES,'native_loads':LOADS,'elapsed_seconds':time.monotonic()-START,'rerun_authorized':False}
+-    write('error-v1.json',ERROR)
++    write('error-v2.json',ERROR)
+     print(json.dumps(ERROR),flush=True)
+ finally:
+     signal.setitimer(signal.ITIMER_REAL,0)
+-    write('guard-result-v1.json',{'blocked':BLOCKED,'native_read_counts':{k:v for k,v in READS.items() if k.endswith('.pt')},'cuda_initialized':None if TORCH is None else TORCH.cuda.is_initialized(),'cpu_threads':None if TORCH is None else TORCH.get_num_threads(),'error':ERROR is not None})
++    write('guard-result-v2.json',{'blocked':BLOCKED,'native_read_counts':{k:v for k,v in READS.items() if k.endswith('.pt')},'cuda_initialized':None if TORCH is None else TORCH.cuda.is_initialized(),'cpu_threads':None if TORCH is None else TORCH.get_num_threads(),'error':ERROR is not None})
+ if ERROR is not None: sys.exit(1)

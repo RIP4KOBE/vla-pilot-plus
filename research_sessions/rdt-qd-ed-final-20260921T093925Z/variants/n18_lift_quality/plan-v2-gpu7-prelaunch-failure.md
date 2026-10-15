@@ -1,0 +1,3 @@
+# GPU7 plan v2: prelaunch path validation failure
+
+`plan.frozen.v2.gpu7.json` was created after the user's GPU7 authorization, but `runner.validate_plan` rejected its new EGL metadata fingerprint path: it was written through the session's archival `artifacts` symlink, while `verify_files` requires the lexical path to be under the physical owned artifact root. The source/runtime/scientific plan and original failed bytes remain preserved. No N18 episode or GPU7 healthcheck was dispatched. The corrected v3 plan binds the same verified GPU7 mapping/proof by its physical `/mnt/data/shared2/...` artifact path and repeats full validation before release.

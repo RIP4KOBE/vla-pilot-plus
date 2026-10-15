@@ -1,0 +1,133 @@
+{
+  "calls": [
+    {
+      "phase": "static_math_source_and_base_check",
+      "self_cpu_seconds": 0.0004548929999999979,
+      "children_cpu_seconds": 0.00203,
+      "cpu_limit_seconds": 180,
+      "threads": 2
+    },
+    {
+      "phase": "isolated_worktree_creation",
+      "command": [
+        "git",
+        "-C",
+        "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree",
+        "worktree",
+        "add",
+        "-b",
+        "codex/n29-population-relative-trust-20261001",
+        "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/implementation",
+        "52b9eb0a8a365ee2ea12daffdb7a98c76bec0a72"
+      ],
+      "self_cpu_seconds": 0.002052797000000002,
+      "children_cpu_seconds": 2.1629899999999997,
+      "wall_seconds": 2.166969932965003,
+      "exit_code": 0
+    },
+    {
+      "phase": "new_helper_tests_arithmetic_spec_write",
+      "self_cpu_seconds": 6.29340000000006e-05,
+      "children_cpu_seconds": 0
+    },
+    {
+      "phase": "focused_synthetic_run1",
+      "command": [
+        "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+        "-B",
+        "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/cpu_guard_v1.py"
+      ],
+      "environment": {
+        "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "CUDA_VISIBLE_DEVICES": "",
+        "OMP_NUM_THREADS": "2",
+        "MKL_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2"
+      },
+      "self_cpu_seconds": 0.0015434960000000053,
+      "children_cpu_seconds": 1.727088,
+      "wall_seconds": 1.6197760519571602,
+      "exit_code": 2,
+      "log": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/cpu-test-run1.log"
+    },
+    {
+      "phase": "focused_synthetic_run2",
+      "command": [
+        "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+        "-B",
+        "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/cpu_guard_v2.py"
+      ],
+      "environment": {
+        "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "CUDA_VISIBLE_DEVICES": "",
+        "OMP_NUM_THREADS": "2",
+        "MKL_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2"
+      },
+      "self_cpu_seconds": 0.002220374000000004,
+      "children_cpu_seconds": 3.264336,
+      "wall_seconds": 3.174808708950877,
+      "exit_code": 0,
+      "log": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/cpu-test-run2.log"
+    },
+    {
+      "phase": "source_status_review",
+      "command": [
+        "git",
+        "-C",
+        "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/implementation",
+        "status",
+        "--short"
+      ],
+      "exit_code": 0,
+      "children_cpu_seconds": 0.016904,
+      "wall_seconds": 0.01631155703216791,
+      "self_cpu_seconds": 0
+    },
+    {
+      "phase": "focused_synthetic_run3",
+      "command": [
+        "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+        "-B",
+        "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/cpu_guard_v3.py"
+      ],
+      "environment": {
+        "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "CUDA_VISIBLE_DEVICES": "",
+        "OMP_NUM_THREADS": "2",
+        "MKL_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2"
+      },
+      "self_cpu_seconds": 0.002152348999999998,
+      "children_cpu_seconds": 3.2394369999999997,
+      "wall_seconds": 3.1199608659371734,
+      "exit_code": 0,
+      "log": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/cpu-test-run3.log"
+    },
+    {
+      "phase": "source_review_and_local_commit",
+      "children_cpu_seconds": 0.062957,
+      "self_cpu_seconds": 0.002056136,
+      "wall_seconds": 0.05904644902329892,
+      "exit_code": 0
+    },
+    {
+      "phase": "source_manifest_diff_and_byte_check",
+      "self_cpu_seconds": 0.002389275999999999,
+      "children_cpu_seconds": 0.034148,
+      "wall_seconds": 0.03680635301861912,
+      "exit_code": 0
+    }
+  ],
+  "startup_allowance_seconds": 1,
+  "tests_started": true,
+  "additional_preparation_allowance_seconds": 10,
+  "cumulative_accounted_cpu_seconds": 21.522822255,
+  "closed": true,
+  "final_packaging_within_preparation_allowance": true,
+  "cap_seconds": 180,
+  "measured_test_child_cpu_seconds": 8.230860999999999
+}

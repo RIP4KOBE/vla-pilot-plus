@@ -1,0 +1,10 @@
+{
+  "cpu_seconds": 0.010065403,
+  "static_syntax_only": true,
+  "payload_reads": 0,
+  "threads": 2,
+  "affinity": [
+    0,
+    1
+  ]
+}

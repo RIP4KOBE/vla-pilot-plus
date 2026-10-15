@@ -1,0 +1,203 @@
+{
+  "entries": [
+    {
+      "finding": "Exact old release/single-row run_plan, typed recovery, terminal finally, no resume after any old reservation/status.",
+      "line_spans": [
+        [
+          17,
+          35
+        ],
+        [
+          45,
+          83
+        ],
+        [
+          86,
+          96
+        ]
+      ],
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/scripts/qd_ed_n25_supervise.py",
+        "sha256": "f3fb5547a6b8c02a020de129de4ba7f34fc3b82c5886b9350050b2c14935026d"
+      }
+    },
+    {
+      "finding": "Old forty-row plan and freeze cannot be reused as a successor authority.",
+      "line_spans": [
+        [
+          15,
+          45
+        ]
+      ],
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/scripts/qd_ed_n25_prepare.py",
+        "sha256": "33be58503e69d19e12ae95b390919549680c56e706d6fc80bf581faffe5abe20"
+      }
+    },
+    {
+      "finding": "Original row construction, finite adopted caps, prefix admission, fixed cohort source and worker context; historical accepted_cell re-enters live source verification.",
+      "line_spans": [
+        [
+          68,
+          80
+        ],
+        [
+          112,
+          158
+        ],
+        [
+          161,
+          201
+        ],
+        [
+          225,
+          260
+        ],
+        [
+          266,
+          307
+        ],
+        [
+          351,
+          380
+        ]
+      ],
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/scripts/qd_ed_n25_contract.py",
+        "sha256": "5d991948ea897b12eab87f9d86de776dec350aa06c11e44ee2e1ae6d1c9fdd67"
+      }
+    },
+    {
+      "finding": "Original single-pure-timeout classifier envelope and one/two recovery lineage stay unchanged.",
+      "line_spans": [
+        [
+          9,
+          26
+        ],
+        [
+          31,
+          57
+        ],
+        [
+          59,
+          100
+        ]
+      ],
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/scripts/qd_ed_n25_recovery.py",
+        "sha256": "f6b2ac19be3a53348e83a9e098324bd72823bbdf0fe28350fb1f1203c8f50ffd"
+      }
+    },
+    {
+      "finding": "Complete/partial token and cost accounting; old cohort filtering; exact accepted prefix, whole-quad futility and status/journal disagreement INVALID.",
+      "line_spans": [
+        [
+          13,
+          37
+        ],
+        [
+          40,
+          79
+        ],
+        [
+          83,
+          113
+        ]
+      ],
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/scripts/qd_ed_n25_report.py",
+        "sha256": "eb37f2e3742d7dfe3fbaa512034b288985fa9b150e360b3eedc48a84cf7fc6a3"
+      }
+    },
+    {
+      "finding": "Identity includes iteration; metered support route and budget/retry hooks; append-only primary runner and process accounting can remain unchanged.",
+      "line_spans": [
+        [
+          220,
+          221
+        ],
+        [
+          544,
+          545
+        ],
+        [
+          643,
+          659
+        ],
+        [
+          879,
+          911
+        ],
+        [
+          1246,
+          1256
+        ],
+        [
+          1363,
+          1392
+        ],
+        [
+          1720,
+          1766
+        ],
+        [
+          1832,
+          1866
+        ],
+        [
+          1918,
+          1952
+        ]
+      ],
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/scripts/qd_ed_final_runner.py",
+        "sha256": "b3e5ccd90b4ae0eee036560809dcdb74ff68bbaecb56792d676b64bec6e2f7f5"
+      }
+    },
+    {
+      "finding": "One validate_context route sufficient if new plan retains frozen N25 audit metadata; run_worker/verify_receipt stay unchanged. Old receipt checking otherwise calls current-source verify_source.",
+      "line_spans": [
+        [
+          130,
+          140
+        ],
+        [
+          193,
+          226
+        ],
+        [
+          244,
+          263
+        ],
+        [
+          297,
+          312
+        ]
+      ],
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/scripts/qd_ed_n23_worker.py",
+        "sha256": "dd162c7bd0d9cf91da064fcb2652aa5ee3a0a48d4c70940dfa3ce4cdab5bc74e"
+      }
+    },
+    {
+      "finding": "Existing bridge is tied to original final source/proof. New administrative-only reverse bridge must be explicit, not a forged old proof for a new commit.",
+      "line_spans": [
+        [
+          19,
+          47
+        ],
+        [
+          50,
+          65
+        ]
+      ],
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/scripts/qd_ed_n25_bridge.py",
+        "sha256": "46999b04dc86621ab08e16d7fbb90c2d91f5136de09b499b3b4ea334d6efc942"
+      }
+    }
+  ],
+  "method": "Static text only, no Python module imports/tests or runtime/proof/outcome payload reads.",
+  "schema": "n25-infrastructure-continuation-static-source-index-v1",
+  "source_commit": "5a65ef15968cc68c82314e8c0773b3365ad45fa0"
+}

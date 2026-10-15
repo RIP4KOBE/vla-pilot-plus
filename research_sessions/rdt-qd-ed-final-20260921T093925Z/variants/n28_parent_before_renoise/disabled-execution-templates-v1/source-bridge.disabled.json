@@ -1,0 +1,26 @@
+{
+  "schema": "n28-disabled-template-v1",
+  "executable": false,
+  "root_authorized": false,
+  "target_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/source-equivalence-bridge-v1.json",
+  "missing_required": [
+    "owning exact source/runtime recheck",
+    "bridge.build output; do not manually fabricate"
+  ],
+  "source_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/source-manifest-execution-v1.json",
+    "sha256": "a26a52fa413c43778a341d72b85e570892a13933954c4fa0b78c5a6357c1ef12"
+  },
+  "record": {
+    "schema": "n28-source-equivalence-bridge-v1",
+    "new_source": null,
+    "base_source": null,
+    "runtime": null,
+    "accepted_history_refs": null,
+    "changed_existing": null,
+    "unchanged_old_files": 355,
+    "historical_trust": null,
+    "new_proof_required": null,
+    "gpu_release": false
+  }
+}

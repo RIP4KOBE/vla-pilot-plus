@@ -1,0 +1,11 @@
+{
+  "files": {
+    "regenerable_historical_intermediate_3d_plot": 94880,
+    "regenerable_python_or_test_cache": 3897
+  },
+  "allocated_bytes": {
+    "regenerable_historical_intermediate_3d_plot": 10062684160,
+    "regenerable_python_or_test_cache": 111153152
+  },
+  "plan_sha256": "0120fcd882c57e419d55cd018d24c6a4ad9569cfaf3c47b51efc1dfd6aeb7f3f"
+}

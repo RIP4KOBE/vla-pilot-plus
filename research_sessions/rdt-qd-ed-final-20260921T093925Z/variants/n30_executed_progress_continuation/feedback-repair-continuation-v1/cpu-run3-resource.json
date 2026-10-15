@@ -1,0 +1,22 @@
+{
+  "schema": "n30-r2-cpu-resource-v1",
+  "run": "run3",
+  "pytest_exit": 0,
+  "process_cpu_seconds": 4.213587143,
+  "wall_seconds": 4.114852449973114,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "denied": [],
+  "guard_clean": true,
+  "test_args": [
+    "-q",
+    "tests/test_n30_r2_admission.py::test_complete_admission_rejects_boundary_mismatch[r1_marker]",
+    "tests/test_n30_r2_worker.py::test_same_process_worker_n30_route_and_no_supervisor_cuda[N30-zero_guided]"
+  ],
+  "peak_rss_kib": 508048
+}

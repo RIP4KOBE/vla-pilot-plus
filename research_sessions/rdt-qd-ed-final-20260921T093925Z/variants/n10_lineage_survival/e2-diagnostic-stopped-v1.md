@@ -1,0 +1,11 @@
+# E2 passive tracking diagnostic stopped at task 0
+
+The frozen GPU3 E2 cohort `N7_E2_PASSIVE_TRACKING_DEV_20260928` dispatched only task 0. The attempt completed 720 simulator steps and failed the task. It is scientifically invalid under the frozen Stage evidence gate; tasks 3, 6 and 9 were not dispatched, and there is no retry. The two-distinct-task tracking gate was therefore not met. This cohort cannot promote a feedback candidate.
+
+The 26 Stage calls comprised 23 successful calls and three `codex_expected_one_completed_turn` failures at steps 288, 296 and 328. Those failures had no complete usage and caused fallback behavior. Two other calls, at steps 344 and 704, correctly accepted E2's narrowly allowed recovered pre-final error events. The episode was charged as one development attempt and 581.555418 GPU-process seconds (0.161543 h). GPU3 cumulative accounting is 185 attempts and 24.341062 GPUh.
+
+The first reported gate error, `E2 observed recovered-error transport metadata differs`, exposes a separate audit implementation mismatch: the episode's `stage_transport` is static recognizer metadata, while counts of recovered error events are recorded on individual rows in `eds_eval/stage_events.jsonl`. This static/count mismatch is fixable for future prospective plans, but it does not rescue this attempt. The three incomplete Stage calls independently invalidate it, and its outcome remains `outcome_valid=false` in the append-only ledger.
+
+Frozen plan SHA-256: `784de904a2ba0dab10cff3cb3179d13b81504172756226c503f2f874554a7831`; release SHA-256: `726fbd829af36278844de7431a8f89cefa58b8517af22835b4c30d07aa2988ad`. The attempt's Stage event log SHA-256 is `1e9627ff8baa7a952d3fe0c0acec3a1804ddc19c23531120489da3c5fdb96d44`; episode-compute record SHA-256 is `738f9f30e87c3ecf5ca1417076b5aba41e045590db41a152647acddd73c8d604`. The unified-root `e2_diagnostic_runs` link indexes the frozen output and attempt link.
+
+Next scientific branch: document and test a distinct parent-to-offspring survival mechanism under the amended budget. E2 tracking evidence from this invalid cohort is excluded from selection. Any Stage transport change beyond E2 requires a separate explicit authorization under the original Stage freeze.

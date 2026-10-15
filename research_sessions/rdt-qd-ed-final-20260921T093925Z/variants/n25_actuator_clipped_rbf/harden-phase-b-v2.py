@@ -1,0 +1,12 @@
+from pathlib import Path
+p=Path('scripts/qd_ed_n25_backend.py');s=p.read_text();s=s.replace("        resource_id=state['run_name']+'__n25_tensor_arithmetic_v1'", "        admission_record=r.gpu_admission(physical_gpu=7,expected_uuid=c.GPU7_UUID)\n        resource_id=state['run_name']+'__n25_tensor_arithmetic_v1'")
+s=s.replace("        admission_record=r.gpu_admission(physical_gpu=7,expected_uuid=c.GPU7_UUID)\n        base=", "        base=")
+s=s.replace("        finally:\n            r.terminate_owned(process)\n            elapsed=", "        finally:\n            cleanup_complete=True\n            try:r.terminate_owned(process)\n            except BaseException as exc:\n                cleanup_complete=False;event='aborted';reason={'type':type(exc).__name__,'message':'Owned cleanup failed; root reconciliation required'}\n            elapsed=")
+s=s.replace("'report':report_ref,'process':process_ref,'failure':reason,'measurement':", "'report':report_ref,'process':process_ref,'failure':reason,'cleanup_complete':cleanup_complete,\n                'cost_measurement_complete':cleanup_complete,'measurement':")
+s=s.replace("and final.get('resource_id')==process.get('resource_id')==plan['resource_id']", "and final.get('resource_id')==process.get('resource_id')==plan['resource_id']\n        and final.get('cleanup_complete') is True and final.get('cost_measurement_complete') is True")
+s=s.replace("w.require(terminal.get('event')=='completed' and terminal.get('report')==proof['report']", "w.require(terminal.get('event')=='completed' and terminal.get('cleanup_complete') is True\n        and terminal.get('cost_measurement_complete') is True and terminal.get('report')==proof['report']")
+p.write_text(s)
+p=Path('tests/test_qd_ed_n25_backend.py');s=p.read_text().replace("'event':'completed','report':report_ref", "'event':'completed','cleanup_complete':True,'cost_measurement_complete':True,'report':report_ref")
+s=s.replace("['none','timeout','launch_error','bad_report']", "['none','timeout','launch_error','bad_report','cleanup_error']")
+s=s.replace("monkeypatch.setattr(r,'wait_exclusively',wait);monkeypatch.setattr(r,'terminate_owned',lambda p:cleaned.append(p))", "monkeypatch.setattr(r,'wait_exclusively',wait)\n    def cleanup(p):\n        cleaned.append(p)\n        if fault=='cleanup_error':raise RuntimeError('synthetic cleanup')\n    monkeypatch.setattr(r,'terminate_owned',cleanup)")
+p.write_text(s)

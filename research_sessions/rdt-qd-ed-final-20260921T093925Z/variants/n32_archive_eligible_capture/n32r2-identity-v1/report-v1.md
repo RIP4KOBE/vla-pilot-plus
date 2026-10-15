@@ -1,0 +1,7 @@
+Node 15.2 — CPU identity engineering complete; review pending.
+
+Advanced the current contract from N32R1 to N32R2 by exactly two identity substitutions. Generated 30 distinct new identities (10 baseline C0, 20 development Q0/N32). Compared every row against the exact base contract: only iteration and episode_key differ. Both owning ledger snapshots contain no new cohort or episode keys; their amendment prefixes match and their full hashes remained unchanged through delivery.
+
+Extended focused synthetic regressions to cover both original N32 and previous N32R1 identities. Old cohort/key combinations are rejected, old outcomes cannot supply new accepted cells, and historical invalid charges remain accounted globally. All 25 focused tests passed, including existing real -m worker entrypoint attestation checks intercepted before dispatch. The source change leaves the scientific algorithm, gates, limits, deadline, audits, source attestation, and prior engineering fixes untouched.
+
+Limitations: CPU identity and synthetic regression evidence only. No GPU dispatch, evaluation, scientific score or success claim, protocol release, source/runtime release refresh, or owning state/ledger adoption. Ledger absence is a read-only point-in-time observation, not a reservation. Fresh release bindings and owning adoption remain outside this delivery. No coordinator/executor was invoked, no provider/network/credential access was performed, and no protected result or untracked stage guidance was read or changed.

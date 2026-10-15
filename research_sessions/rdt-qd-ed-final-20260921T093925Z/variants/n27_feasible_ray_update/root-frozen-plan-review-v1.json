@@ -1,0 +1,87 @@
+{
+  "schema": "n27-root-frozen-plan-review-v1",
+  "recorded_at": "2026-10-01T08:13:17.366542+00:00",
+  "decision": "ACCEPT_FINITE_DEV_RELEASE",
+  "plan": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/plan.frozen.v1.gpu7.json",
+    "sha256": "8632a2f39f0cde0c198f358c1b1700907707d3e0474a75df6b9296cf18f7441f"
+  },
+  "source_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/final-source-runtime-review-v1.json",
+    "sha256": "5b0d4869fe422ab870bb95b5b2a2f888348a6c357b3866b6a6c6e7cb34d3d597"
+  },
+  "native_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/root-native-proof-review-v1.json",
+    "sha256": "8577c6fa631fdbd490f123f19865f9a75ed94dad2d4c4edf7ee1aa6c2d376965"
+  },
+  "rows": [
+    [
+      0,
+      "C0"
+    ],
+    [
+      0,
+      "Q0"
+    ],
+    [
+      0,
+      "N26"
+    ],
+    [
+      0,
+      "N27"
+    ],
+    [
+      1,
+      "C0"
+    ],
+    [
+      1,
+      "Q0"
+    ],
+    [
+      1,
+      "N26"
+    ],
+    [
+      1,
+      "N27"
+    ],
+    [
+      2,
+      "C0"
+    ],
+    [
+      2,
+      "Q0"
+    ],
+    [
+      2,
+      "N26"
+    ],
+    [
+      2,
+      "N27"
+    ],
+    [
+      3,
+      "C0"
+    ],
+    [
+      3,
+      "Q0"
+    ],
+    [
+      3,
+      "N26"
+    ],
+    [
+      3,
+      "N27"
+    ]
+  ],
+  "provider": "codex_cli/chatgpt/current managed login/gpt-6-astra/low/180s",
+  "poe_fallback": false,
+  "protected_authorized": false,
+  "scope": "Complete16 first-valid cells; maximum18 dispatches including2 narrowly typed recoveries; valid failure never retried; complete screen only admits separately frozen full-Dev preparation if gate passes."
+}

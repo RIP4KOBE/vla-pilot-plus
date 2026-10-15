@@ -1,0 +1,6 @@
+synthetic prompt
+
+Bound handoff: {"path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/synthetic/tmpaeyu_9gw/autonomy/handoff.json", "sha256": "784c67fe6334a3953be2462d8d49deb0273f98350df12ec3589fc319c7f5acb9"}
+Exact authority: {"path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/synthetic/tmpaeyu_9gw/autonomy/authorization.json", "sha256": "78c16a5330b799a45e936e535c919d5505b071d986448e0eeeaa50367fe621c3"}
+Local driver status: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/synthetic/tmpaeyu_9gw/autonomy/driver-status.json
+Prior turn records: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/synthetic/tmpaeyu_9gw/autonomy/turns

@@ -1,0 +1,38 @@
+{
+  "schema": "n24-task0-selection-exact-input-manifest-v1",
+  "scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-selection-membership-diagnostic/read-scope-v1.json",
+    "sha256": "064f5674a25da0e52514d840ca958a1c4ac593b2d8d2ef753d6cf452363cacad"
+  },
+  "extractor": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-selection-membership-diagnostic/extract_cpu_v1.py",
+    "sha256": "f8515f0c4248df76a56550c8867f65f356b04da453332cfefea8ad9d70b7065b"
+  },
+  "source_commit": "3b7afa02757eb3519d95547e4b6e6e939f7068f2",
+  "inputs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/result-v1.json",
+      "sha256": "a64c5dca8291ec2846e75fe25170e4b8da158294eebe2ee7b68fe0b543bdee4d"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/root-review-v1.json",
+      "sha256": "8701cca41b4994c1abd7139de5d645bec98f9c132bbcab38cdf49a37d1147774"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n24_dev_t00_n24_20260930__169d5a090d1b/eds_eval/eds_metrics.jsonl",
+      "sha256": "b80ca4ebc9ae17e19db06dde1756045e7523dc33611c695cda1eb4df078d12f7"
+    }
+  ],
+  "metrics": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n24_dev_t00_n24_20260930__169d5a090d1b/eds_eval/eds_metrics.jsonl",
+    "sha256": "b80ca4ebc9ae17e19db06dde1756045e7523dc33611c695cda1eb4df078d12f7"
+  },
+  "limits": {
+    "cpu_threads": 2,
+    "seconds": 30,
+    "metric_payload_passes": 1,
+    "extra_actions": 0
+  },
+  "protected_execution_authorized": false,
+  "algorithm_change_authorized": false
+}

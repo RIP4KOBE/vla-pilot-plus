@@ -1,0 +1,8 @@
+Committed as `1065f38122379a515b60a9a424f574330405b66f`.
+
+- 25 focused CPU tests passed.
+- Verified 30 unique N32R2 identities absent owning ledgers; rows differ only in iteration/key.
+- Old identities rejected; scientific behavior preserved.
+- Worktree clean. No GPU/evaluation, release, or owning-state writes. No scientific success claim.
+
+[Delivery record](../n32r2-identity-v1/delivery-v1.json) includes hash-bound evidence, report, and limitations.

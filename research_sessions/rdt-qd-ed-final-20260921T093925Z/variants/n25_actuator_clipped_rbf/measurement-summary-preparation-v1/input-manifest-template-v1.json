@@ -1,0 +1,60 @@
+{
+  "schema": "n25-measurement-input-manifest-v1",
+  "executable": false,
+  "source_commit": "5a65ef15968cc68c82314e8c0773b3365ad45fa0",
+  "plan_sha256": "1f0c94ccd3458a3a786acb9525728a1b64e3df439e4f920731f6566dd3a95eb3",
+  "root_attestation": {
+    "all_listed_cells_accepted_and_terminal": false,
+    "no_listed_cell_inflight": false,
+    "expected_cell_count": null
+  },
+  "selection_rule": "Root must freeze the selected accepted N25 Dev cell IDs before this reader opens any payload; list membership is not automatically the cohort denominator.",
+  "root_review_ref": {
+    "path": null,
+    "sha256": null
+  },
+  "cells": [],
+  "cell_template": {
+    "attempt_id": null,
+    "episode_key": null,
+    "task_id": null,
+    "profile": "N25",
+    "accepted_by_root": false,
+    "files": {
+      "metrics": {
+        "path": null,
+        "present": true,
+        "sha256": null,
+        "required_basename": "eds_metrics.jsonl"
+      },
+      "compute": {
+        "path": null,
+        "present": true,
+        "sha256": null,
+        "required_basename": "episode_compute.jsonl"
+      },
+      "receipt": {
+        "path": null,
+        "present": true,
+        "sha256": null,
+        "required_basename": "in-worker-audit-receipt.json"
+      },
+      "audit": {
+        "path": null,
+        "present": true,
+        "sha256": null,
+        "required_basename": "decision-evidence-audit.json"
+      }
+    }
+  },
+  "limits": {
+    "max_cells": 10,
+    "max_payload_files": 40,
+    "max_file_bytes": 16777216,
+    "max_total_bytes": 134217728,
+    "max_wall_seconds": 60,
+    "cpu_threads": 2,
+    "tensor_reads": 0
+  },
+  "real_input_authorized_now": false
+}

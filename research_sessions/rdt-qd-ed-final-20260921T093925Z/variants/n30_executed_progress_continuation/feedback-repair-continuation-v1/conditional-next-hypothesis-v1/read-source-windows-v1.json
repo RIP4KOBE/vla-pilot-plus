@@ -1,0 +1,51 @@
+{
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+    "file_stat_bytes": 415962,
+    "ranges": [
+      [
+        28,
+        49
+      ],
+      [
+        2115,
+        2200
+      ],
+      [
+        5050,
+        5110
+      ],
+      [
+        5248,
+        5318
+      ],
+      [
+        5698,
+        5805
+      ],
+      [
+        7075,
+        7177
+      ],
+      [
+        7285,
+        7400
+      ],
+      [
+        7500,
+        7528
+      ]
+    ],
+    "selected_text_sha256": "0dd8703b3282352e0549ba2b3ff4ac81222a76a79b51ce84be8b2b0f9d2ed226",
+    "selected_text_bytes": 37378,
+    "stream_bytes_read": 354327,
+    "prior_rg_whole_file_scan_bytes": 415962,
+    "read_mode": "rg locating names, then only listed source sections exposed; line iterator traversed prefix"
+  },
+  "process_cpu_seconds": 0.006109568000000003,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2
+}

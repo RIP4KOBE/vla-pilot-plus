@@ -1,0 +1,62 @@
+{
+  "schema": "n30-handoff-decoder-preparation-delivery-v1",
+  "frozen": true,
+  "executed": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/root-preparation-scope-v1.md",
+      "sha256": "da8415d563b1641df753db8bf22e5131efa8f62f35f92ce55a104697b3497ce8",
+      "bytes": 3406
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/preparation-error-v1.txt",
+      "sha256": "6f6c0eeda4949235c1d1ea6ced770299097ff408551491a74d6b707d9fbd1ef6",
+      "bytes": 397
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/preparation-source-reads-v1.json",
+      "sha256": "3521cd2e793d05f93af8cf8d4c694d435586b7f598500e58b90684850625ad0d",
+      "bytes": 1579
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/static-field-bindings-v1.json",
+      "sha256": "272442faff687d3e7f4ad78d536ffb53cd85735b71037c4d673f8eef171988f4",
+      "bytes": 1823
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/decode_cpu_v1.py",
+      "sha256": "4f11e72f7e15c81c5fe5094499e74ebbfed5113e05e467e2adae33f108497ed0",
+      "bytes": 36543
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/static-syntax-v1.json",
+      "sha256": "ca7539744b5894c5ec3804bd0d1a46ae07fc326494585ab095aa8a246b6d8cd0",
+      "bytes": 995
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/reader-diff-from-accepted-lineage-v1.patch",
+      "sha256": "da10c2bebc8cbf084e51a65f20948cb8886476711e360703f78d6daa723e12a1",
+      "bytes": 48692
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/decoder-source-manifest-v1.json",
+      "sha256": "46d236c7aa622377b3c45839b342d9216af75565636b0c3abdd752721fb761ad",
+      "bytes": 3880
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/command.disabled.v1.json",
+      "sha256": "c512abc51f82a49221c54071bf50ab3ea7442dfa5b384dce54d932469ee10eee",
+      "bytes": 4249
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/preparation-report-v1.md",
+      "sha256": "a7389472ab42a57d96704e00dd0877743c80412747ad300cf2cffba98735f017",
+      "bytes": 3038
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/preparation-resource-v1.json",
+      "sha256": "6325b9fcce77e7f37086790c4be0f46987b2ea0c30ab4b18cf78573ceccbe558",
+      "bytes": 4463
+    }
+  ]
+}

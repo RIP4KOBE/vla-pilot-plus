@@ -1,0 +1,3 @@
+# GPU7 plan v3: supervisor scope prelaunch failure
+
+`plan.frozen.v3.gpu7.json` passed full source/runtime validation, but the first supervisor call to `run_plan` failed before reservation or dispatch. The supervisor imported `qd_ed_n18_dev_contract` directly and opened its `_SCOPE`; the runner loaded the same file as a separate module instance and therefore saw no scope. The GPU7 supervisor status `artifacts/continuation_20260929/n18-close-then-lift-dev-v1/supervisor-status-gpu7.json` preserves this failure with zero completed cells. The correction makes the supervisor open `runner.n18_support().supervised_scope`, which is the exact instance the runner checks. A CPU test now exercises the same instance. No candidate score, task outcome or GPU budget was consumed.

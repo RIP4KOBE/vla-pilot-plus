@@ -1,0 +1,21 @@
+{
+  "schema": "n27-cpu-guard-v1",
+  "pytest_exit": 1,
+  "elapsed_seconds": 4.08516616304405,
+  "denied": [],
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "torch_threads": 2,
+  "cuda_visible": "",
+  "cuda_initialized": false,
+  "rlimit_as": [
+    8589934592,
+    8589934592
+  ],
+  "tests": [
+    "tests/test_n27_source_gates.py",
+    "tests/test_n27_integration.py::test_exact_n27_build_command_carries_codex_e2_and_update"
+  ]
+}

@@ -1,0 +1,2737 @@
+diff --git a/experiments/qd_ed_n25_continuation/controller-contract-v1.md b/experiments/qd_ed_n25_continuation/controller-contract-v1.md
+new file mode 100644
+index 0000000..a4e3f52
+--- /dev/null
++++ b/experiments/qd_ed_n25_continuation/controller-contract-v1.md
+@@ -0,0 +1,51 @@
++# Named N25 infrastructure continuation: CPU implementation contract
++
++This source implements only the frozen protocol c0c9fac3. Existing W, history, budget and GPU remain untouched by CPU delivery. No blueprint is an executable authority. Science, RDT, native arithmetic/witness, profiles, provider/Stage/E2/180s, decoder and original N25 classifier remain unchanged. Shared delta is exactly runner.metered_support/check_budget/check_retry and worker.validate_context. run_plan, build_command, run_worker and verify_receipt remain byte-identical.
++
++The new operational cohort is N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930. Import exactly18 original accepted cells as immutable metadata evidence; never dispatch or fabricate ledger events for them. New22 map original indices18..39. Only index18 retries the exact named failed task4/N23, with recovery bucket/retry_of plus n25_named_infrastructure_proof. Remaining5 baseline+16 development cells keep their science/seed/init order. Any new invalidity closes immediately, without old timeout recovery or automatic resume. Original INVALID remains immutable and all19 old costs/unknowns remain.
++
++The combined ceiling stays42 attempts/two recoveries, though observed19 old/no recovery plus22 new implies at most41 with one recovery. Original22 local GPU hours do not reset; old8201.788167113322s are subtracted. Root freezes remaining_local_gpu_hours no greater than min(22-old/3600, actual remaining unprotected cumulative hours). Every dispatch needs1840s. Private494/100 and55/199/180/40/20 caps plus32/12 protected hours are exact, with no amendment here. Cumulative accounting retains the original tensor resource proof and requires its health ledger settlement; there is no new preflight.
++
++## Metadata sealer and reliance
++
++Root runs qd_ed_n25_cont_seal.py only after reviewing this final source, while original5a W still exists. It imports only the new stdlib evidence helper and does not import old contracts or invoke their full validators. Input envelope:
++
++```
++{schema: n25-continuation-sealing-input-v1,
++ root_authorized: true,
++ references: {review, result, source, plan, controller, stage_public},
++ files: [{path: absolute_metadata_file, sha256: exact_bytes}, ...]}
++```
++
++Each reference is exactly path/sha256. The four frozen review/result/source/plan hashes are pinned by protocol; root_authorized cannot substitute for them. The allowlist is at most512 unique resolved files, each at most16MiB and all read bytes at most128MiB. Stat/size checks happen before bounded allocation; changed size/hash, symlinks, unlisted ref or payload suffix fails. Approved formats are JSON/JSONL/text; decision_evidence/images/videos directories and all tensor suffixes are refused. Original source257 are separately read as approved source bytes, never models/weights.
++
++Required manifest closure: old review/result/plan/source/controller/status/Dev-only ledger/runtime JSON;18 accepted cells' terminal/context/receipt/audit plus process/audit-start JSON; failed terminal/process/context and results.txt/episode_compute presence; original source-review/authority/backend proof and four proof refs; public Stage projection. Budget authority/release can be included for root use. Raw Stage file, tensors and runtime.files/model paths are never followed. Reader caches each inventoried metadata payload within one build.
++
++Public Stage projection schema is n25-public-stage-metadata-v1, all43 calls, root attestation and underlying source-stage ref, response_payloads_included=false. It includes no raw_response key, prompts, images or guidance semantics. The root-generated projection is trusted as a hash-bound metadata extraction; source_stage_events and reader references are recorded, not opened. All6 named failed steps, counters, timeout>=180s, cleanup/exit ordering, event/item types and ordered lifecycle association are checked. Null reasoning token counters are preserved. No API-only causal explanation is inferred.
++
++Seal schema n25-continuation-metadata-seal-v1 binds exact18 accepted metadata, all19 old terminals, old source/runtime/plan/authority/proof, recorded evidence index digests, costs and Unknowns. Thousands of receipt evidence.files entries are digested as JSON only; no tensor ref is followed or rehashed. This attests original metered audit plus root terminal review, not a fresh numerical/safety audit. The failed native gates remain UNKNOWN_MISSING, all_non_transport_gates_verified=false, causal attribution UNPROVEN. Literal event=valid/outcome_valid=false/compute_outcome=completed are preserved.
++
++Root must freeze two typed absent audit paths; a late file/symlink fails subsequent history checks. Public /proc boot/PID/start-tick/process-group/session/command checks reject live owned processes/descendants; no signalling occurs. Current proof does not infer unmeasured safety semantics from results/compute presence. Sealer does not consult actual success to choose a prefix: exact18 and0/5,0/5,0/4,1/4 are preregistered original metadata.
++
++## Root records and paths
++
++Control directory is N25/infrastructure-continuation-v1, separate from native artifact_root/attempts. Existing original paths are never overwritten. Files to create only after root review:
++
++- metadata-seal-v1.json, then root-seal-review-v1.json: exact schema n25-continuation-root-seal-review-v1, accepted=true, seal/protocol refs, original_disposition=INVALID_OR_INTERRUPTED, history_is_metadata_attestation=true, historical_unknowns equal frozen constants, gpu_authorized=false.
++- source-bridge-v1.json: bridge.build(new full source, sealed history, owning W);255 old files byte-identical, exactly two whole-file reverse patches/four functions, additional files closed. Historical proof remains labeled old5a; no new arithmetic claim.
++- final-source-runtime-review-v1.json: schema n25-continuation-source-runtime-review-v1, accepted=true, exact source/runtime/protocol/seal/root_seal_review/source_bridge/historical_backend_proof refs, no_new_preflight=true, gpu_authorized=false.
++- adoption-v1/authority.json: schema n25-continuation-authority-v1; cohort_id; exact source/runtime/protocol/seal/final_review/existing_budget_authority; caps and limits; original_local_gpu_hours22; old_gpu_seconds8201.788167113322; finite remaining_local_gpu_hours; nonempty recorded_at/authority_interpretation; validation_authorized=false/formal_authorized=false. Root privately binds n25_continuation_authority to its hash; existing n25_budget_authority/caps stay unchanged.
++- plan.frozen.v1.gpu7.json: copied original plan except reviewed source/code_files/new22 rows, new cohort metadata, original-plan derived_from and n25_cohort audit-family marker. Candidate/profile/runtime/seed/input paths remain exact. New plan freeze is immutable.
++- execution-release-v1.json: schema n25-continuation-execution-release-v1; plan/source_commit/cohort_id/authority/seal/ordered22episode_keys/limits/physical_gpu7/one_launch=true; validation/formal false.
++
++Supervisor writes execution/controller-process-v1.json with schema n25-continuation-controller-process-v1, process{pid,proc_start_ticks,boot_id}, plan/release refs and source_commit while holding supervisor ownership. This is not a release. It writes execution/supervisor-status-v1.json and finally result-v1.json plus immutable terminal-ledger-v1.json. Reservation or existing controller result/status blocks another launch. All original/continuation costs are separate and combined by unique attempt_id; unknown token calls are counted or explicitly unmeasured, never filled with zero.
++
++## Exact root activation order
++
++1. Review final CPU logs/source/route bridge and the root-generated metadata inventory. Create a NEW authorized sealing input; never flip/overwrite a previously frozen disabled draft. Under old5a: `PYTHON I/scripts/qd_ed_n25_cont_seal.py --input AUTHORIZED_INPUT --old-root W --output N25/infrastructure-continuation-v1/metadata-seal-v1.json`. Root inspects metadata-only seal and writes root-seal-review. No actual proof or history read was done by executor.
++2. Integrate exact reviewed continuation commit into idle owning W only after original source sealing. Build full source record from bridge.source_paths/worker.source_record; build source bridge; root rechecks runtime/resource/budget/proof settlement and seals final review plus finite authority/private state binding. Source paths/module ownership must resolve to W, never an adjacent clone.
++3. `PYTHON W/scripts/qd_ed_n25_cont_prepare.py --freeze --output N25/infrastructure-continuation-v1/plan.frozen.v1.gpu7.json`. Root inspects22 commands and exact current Codex managed-login settings, then writes explicit execution release.
++4. `PYTHON W/scripts/qd_ed_n25_cont_supervise.py --plan PLAN --release RELEASE --status N25/infrastructure-continuation-v1/execution/supervisor-status-v1.json`. Only GPU7; original process creation/deadline/cleanup/accounting and in-worker audit unchanged. No original controller restart.
++5. After controller death, `PYTHON W/scripts/qd_ed_n25_cont_terminal.py --plan PLAN --status STATUS` independently checks the existing immutable result against old seal/new journal/receipts/source and recomputes counts, gates, native metadata and costs, without report.analyze or tensor reads. It writes separate root-terminal-review-v1.json and never replaces result. If and only if no result exists, explicit `--repair-missing-result` invokes the fallback writer; that is not an independent successful review, so run ordinary review afterward. The independent reviewer rejects duplicate attempt identifiers/counts before comparing terminal dictionaries and checks process cleanup for every newly dispatched attempt, including an invalid last attempt. A reserved-then-aborted undispatched attempt has explicit process absence, never an inferred PID. Missing process evidence for a dispatched attempt blocks root reconstruction. Metadata discrepancy rejects root reconstruction; no automatic experiment continuation follows.
++
++Complete logical40 promotion and whole-quad futility are unchanged; missing or disagreeing status yields INVALID while preserving the journal prefix/costs. Native activity/zero-gradient counts are descriptive, not new gates. Existing N25 validation79caa4 and N26 CPU predecessor gates remain inactive: a separate reviewed downstream evidence/source adapter is mandatory for any eventual logical-cohort outcome.
+diff --git a/experiments/qd_ed_n25_continuation/original-source-v1.json b/experiments/qd_ed_n25_continuation/original-source-v1.json
+new file mode 100644
+index 0000000..1e0e79f
+--- /dev/null
++++ b/experiments/qd_ed_n25_continuation/original-source-v1.json
+@@ -0,0 +1,1034 @@
++{
++  "commit": "5a65ef15968cc68c82314e8c0773b3365ad45fa0",
++  "files": [
++    {
++      "path": "configs/backend/libero.yaml",
++      "sha256": "e1d1f41f178c7e5968e04b8337c13e8f37b691a7b3e93f9f8e9f7bb5796deb14"
++    },
++    {
++      "path": "configs/config.yaml",
++      "sha256": "5a0bce959afd4aad5e32e27dc5a278b600f8f0705069e9b36415af5f62cef183"
++    },
++    {
++      "path": "configs/perception.yaml",
++      "sha256": "3432a29b12ca634835aa81dce87923e06e188a6c283b961a18a906eb1d6d8ff8"
++    },
++    {
++      "path": "configs/policy.yaml",
++      "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6"
++    },
++    {
++      "path": "configs/qd_ed_final/baseline_profiles.json",
++      "sha256": "75ba829fc29db71ae31669cd803c24fbe8ea96fe347160539a273f9d73551690"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n1.json",
++      "sha256": "5e74d72f108df53897e790677154c5ca3691b1aeb318297168d3bffcb84bfe3c"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n11.json",
++      "sha256": "e6606c5d9deab72171fd9bc6e7407e1bab2af8cb8f7af1cb0cfcfb797f49206c"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n18.json",
++      "sha256": "86dc4da59da983b1cffac918fa8a0314ad5687ba74244614ef37518b1364fc04"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n2.json",
++      "sha256": "7ecfa31ef643f6d230570a7fb9b891444f9f3d2eff654b8e31aa10316d77211f"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n20.json",
++      "sha256": "860b0dfc49d0120a5a217ac5f66abbd20f9b8067a9c61da24c606ad9692baca2"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n21.json",
++      "sha256": "cb2af75e164e9332846d186b674aede90489fb5b1d4ee12795dc4b3e933b1e6e"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n22.json",
++      "sha256": "e2e119a364ae06f8e77790c9cf8e859da7c7981d51f2e34cde2b3f4c2676922e"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n23.json",
++      "sha256": "b6048a33d9259abd21a08ae8eca2d7fecebe16ac86b511fd7400b17caf0f2242"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n24.json",
++      "sha256": "02e45be92c34ea61577d827b269d43d766ccf3917728faf7be620e4d0f976a51"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n25.json",
++      "sha256": "fb763b140add31341d8c7b68392e574153320071b414d0bbbf41a983cf215e20"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n3.json",
++      "sha256": "73fbd63c723b0844306dd784acdb409cf45b9bc53e780c3acb81264731522a22"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n4.json",
++      "sha256": "8d421a3c6ec860dee778453225339d776911647480bc2f0394e098a00ded84b2"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n5.json",
++      "sha256": "ade1f59b877ab6dc630aa780cc6f85f807d701d690f88f01469141568dd6c94f"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n6.json",
++      "sha256": "fa76d2e8819de23796193175626308f6728d45bab3b16543470e9c1769fec40f"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n7.json",
++      "sha256": "d77b8472364cd00dc2548e9e8160672a4f16335a56736cf66d77de6ae74ccb2d"
++    },
++    {
++      "path": "configs/qd_ed_final/n2_observed_baseline_profiles.json",
++      "sha256": "dab95319fd961de44fb1c893471893660926a7bf09cdd4f817fc412de9de63fe"
++    },
++    {
++      "path": "configs/qd_ed_final/n3_observed_baseline_profiles.json",
++      "sha256": "69117707517f28dab0a9c56d388dbb95eb6b0cf938ebda71beaac7a3545c935c"
++    },
++    {
++      "path": "configs/qd_ed_final/n4_observed_baseline_profiles.json",
++      "sha256": "9ad91066bc0cf91bc8c79d9b02acbd4b83e5e5a45ae31072b0e92d2221baa54f"
++    },
++    {
++      "path": "core/__init__.py",
++      "sha256": "233696e00a1ada9a70a50c11160a96884d223df0e7b92aa7ba8bc8a61503efe6"
++    },
++    {
++      "path": "core/codex_stage.py",
++      "sha256": "45bc3512baa52500c4fb633dfc7a78ae474fb192c40745962a5d7cd5537208f9"
++    },
++    {
++      "path": "core/codex_stage_lifecycle.py",
++      "sha256": "de10576f89368b81c03b7b8d1d7c04e757a394d8b0b4974515c0b08e606d00e6"
++    },
++    {
++      "path": "core/codex_stage_policy.py",
++      "sha256": "92f78a80651e97390a296e42850aae0b70217afb1c362e9b5d0b8a07b8cbe432"
++    },
++    {
++      "path": "core/decision_evidence.py",
++      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295"
++    },
++    {
++      "path": "core/diffusion_policy_steer.py",
++      "sha256": "97f0ee3b9159461e15f6b58ea2bd95119a5514872025b4c99594ec6b71815eaa"
++    },
++    {
++      "path": "core/eds_eval_metrics.py",
++      "sha256": "3b3861870ff9645edbff1b64c2274d99889e9ee16e421976ae0b19366e6a5974"
++    },
++    {
++      "path": "core/eds_mechanism_trace.py",
++      "sha256": "312087f5c354f81a820f2acb8419c6380e96805de79f1789c5c7ff23a8fcabf3"
++    },
++    {
++      "path": "core/egl_context_drift.py",
++      "sha256": "54162566be17e1b0a0cfbc01995ee2f509e708743ddb03bf3d7d04c8613152b2"
++    },
++    {
++      "path": "core/env_adapters/__init__.py",
++      "sha256": "790830ee3d9a8a6a0c59a114fbc77fb50bc158d05e13ff9e2e634ad7f370d9c4"
++    },
++    {
++      "path": "core/env_adapters/base_adapter.py",
++      "sha256": "a5bb4f9e06f458fc38e6cc7486e6c6d268fc67bfaf6fd9f84f90514236144de8"
++    },
++    {
++      "path": "core/env_adapters/calvin_adapter.py",
++      "sha256": "396957c62660edddf9704a24cbef15d9cf5f2bbb4da39ee4b9123c4d240a0541"
++    },
++    {
++      "path": "core/env_adapters/libero_adapter.py",
++      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64"
++    },
++    {
++      "path": "core/fkd_class.py",
++      "sha256": "26ccfa9cf4837ce92baf0a5538ac3339d5c55a4f4f7b8f577366a0dd2a408412"
++    },
++    {
++      "path": "core/gemini_grounder.py",
++      "sha256": "0d1a51c8dbd077f274235ae00c1b3ab538e0f9745d85fd12417e21f57980b1f6"
++    },
++    {
++      "path": "core/keypoint_detector.py",
++      "sha256": "5fa108f01168ecb1f2433bc53f093701e0079fa6cf35abf910ec0347075d055e"
++    },
++    {
++      "path": "core/keypoint_tracker.py",
++      "sha256": "7925b62d8c6404c250ccdba6ae0df12df79dd23db1f308112b7b3f22e1a22190"
++    },
++    {
++      "path": "core/passive_physics_trace.py",
++      "sha256": "5a703e5b4f5dec786340fb8964ebfc1a18acf036a8486a7f99122223ddf06d8b"
++    },
++    {
++      "path": "core/pi05_steer.py",
++      "sha256": "ed9146d92bf09af1b1ec99774bd8042c70869ba2246c98ff04d23961ed83e962"
++    },
++    {
++      "path": "core/policy_observation_sampling.py",
++      "sha256": "c7e93e81541c34dd45e22dffc43a24d428d043a56c0dd6766bfd286e2ff07f4d"
++    },
++    {
++      "path": "core/qd_actuator_clipped_quality.py",
++      "sha256": "14f43ab89b7e59c99ada6f66a832f3a3f08d60c4fb1c92c0c8a6bb27a57ef120"
++    },
++    {
++      "path": "core/qd_actuator_clipped_rbf.py",
++      "sha256": "d305379cc6561c8b50a3d31820493be73cc7b253d490cf0dc6afe30db7bb5f33"
++    },
++    {
++      "path": "core/qd_contact_sweep.py",
++      "sha256": "fcd88b6b9dcf58b03e14f182c8d345363faf702dd146ea244ae073f997cb8602"
++    },
++    {
++      "path": "core/qd_ed.py",
++      "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89"
++    },
++    {
++      "path": "core/qd_executed_feedback.py",
++      "sha256": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab"
++    },
++    {
++      "path": "core/qd_executed_quality.py",
++      "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b"
++    },
++    {
++      "path": "core/qd_grasp_timing.py",
++      "sha256": "f38c980b22df080991e4cb86d07c1dbc933652e584e8b897dbb16e1312fd6142"
++    },
++    {
++      "path": "core/qd_gripper_parent_rescue.py",
++      "sha256": "95e58de7f33a3f365f3d7640206f9f040b821d1bcd3d44aea008dd3236a25e3f"
++    },
++    {
++      "path": "core/qd_lift_quality.py",
++      "sha256": "aa61a1b0969d9725161483d6fb255b1773aa8f68223e4e93836944a153910a82"
++    },
++    {
++      "path": "core/qd_terminal_population.py",
++      "sha256": "21ecfc9dd88ec737bc23d00cc238bd9eef1c2fbdefa5a2b9bc2803e4fccb2174"
++    },
++    {
++      "path": "core/rdt_libero_action_converter.py",
++      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
++    },
++    {
++      "path": "core/rdt_libero_obs_processor.py",
++      "sha256": "5b6f3857be13254e1d2266270f57199578dbc4066566265b147d91cc30bb2d14"
++    },
++    {
++      "path": "core/rdt_policy_steer.py",
++      "sha256": "f3077a2edb79e2240e48ba8f08709412adbbf6a75d33e8b5370214f72ca89b82"
++    },
++    {
++      "path": "core/render_phase_diagnostics.py",
++      "sha256": "5c347b7988056de384f582b0fe12e4dc32d1999577812c83205925d02339804c"
++    },
++    {
++      "path": "core/sam3_segmenter.py",
++      "sha256": "e3f3cdd5a970b738ffcf17c7fd765041195d1b9f40a1d2b3809c1459cb5dce81"
++    },
++    {
++      "path": "core/sam_refiner.py",
++      "sha256": "fbe8a642294895773a3aad1a5e4a9dd21b2af1ad0b09e6d89cecb94b171ad909"
++    },
++    {
++      "path": "core/sam_segmenter.py",
++      "sha256": "c4e243d22adf3becfaa1f94f33e9ff05c1e2962899de4e11a656d2ffb16cb8bf"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft.md",
++      "sha256": "ae8d8ea8b209edc00f2d3f869eb881626d35603ef3cc1967539594958d33c1ea"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/analyze_episode.py",
++      "sha256": "26fb0952507b41694cb7b6d56991caef5afbb5b71aa0f13f4356cb731676e0b1"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static-output/provider-target-map-v2.json",
++      "sha256": "26fe347f9f343723943927b5bed84339f59fa284252698594dcb207f8cfc0585"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static-output/review.json",
++      "sha256": "e3ab0144c64069d5ce5b6bea2ea8c208195442312e4a4893ee58a7369cc77ed6"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static_review.py",
++      "sha256": "5184b804429ceeac6b7153a68c1a5bb1e71ace0eb0a8ecb066e3b05be3cf67c0"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/native-dependency-freeze.json",
++      "sha256": "4a86b289251967186cc427eb799784e56d7c20e0819fd0953824e7ad76f65d83"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/prepare-freshboot-c0-draft.py",
++      "sha256": "1835c93379e3a149697a4b51cc0236f9bdeaa6cd662829a2ec83c47c0217d6c0"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/supervise-freshboot-c0.py",
++      "sha256": "771594e0bef8f1eb3bab28ee03df4c5f0b507fd4ff64ec1b9e193f92a0fcdfdd"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/observed-baseline-profiles.json",
++      "sha256": "41ce29c19f22d34c80358241d2443827408e1727afcc18ff416c7da3cbf7f1c9"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/observed-pairs.py",
++      "sha256": "07cf60e487e6ee0ca6a428f39bb4f62aa719817f701d6684c54bf3286ed8e5f2"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/prospective-protocol.md",
++      "sha256": "10a5eab60f63915340bee8c935fbb88ae97664dbd1175f3a32bbf8b19a11a04e"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/supervisor-support.py",
++      "sha256": "1f007fbebd1f33c583876084aefb99b02b41d8b3b602afda23bcf28ae8d8fd60"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/conditional-cpu-protocol-v1.md",
++      "sha256": "25c53eebaf37e103c688cce60b1cc123fa6d4c28cb97e8a9e12e8c15c5522d27"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/conditional-dev-controller-protocol-v1.md",
++      "sha256": "868fe8040cf5c5d9c962dd5177335f7ad78a94a17de0f60560ad489829a5b465"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/controller-contract-v1.md",
++      "sha256": "8d25b5eb8a8a42567ec71c28ab086162cfc4f1202d3814a5c0696de8e6371bae"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/cpu-implementation-contract-v1.md",
++      "sha256": "f711c999370b982ff4c10906f585bc91de69585e57524ea37395145524d5b5f5"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/independent-arithmetic-protocol-v1.md",
++      "sha256": "144f9faa8a84c0663c507b3285b91a3b227e2dffc77569c79b49f672b4408988"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/native-witness-cpu-authority-v1.json",
++      "sha256": "4e2f6ea9d37689122b5c8b87922a87ddb2d54f8e08b405e400edb52e55377b33"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/phase-a-source-manifest-v2.json",
++      "sha256": "914c6f2bfa5fc06fd3549b09da2b3ec6570a399330e4db7b56f19ce6b4d63353"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/shared-route-insertions-v1.json",
++      "sha256": "0e3bb7d6f881f441c58737b182c141c3e469c4fc78b291ba818d52d3e409f0a5"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/available-gpu-amendment.md",
++      "sha256": "0098289d2d94b9c4e7f353a540877a64cd680cbc53217773fa47878d17f755c5"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/codex-provider-amendment.md",
++      "sha256": "0cc80d2f98b3764bcc6e50cc94738fb4d0f1bf62eb5c824d415c2314f68bf26f"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu3-freshboot-c0-common-condition.md",
++      "sha256": "34467cff951ff63a130faa5137995e1aed68296bb11f446db8bbbbd2b3a7ff81"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu3-freshboot-model-first-control.md",
++      "sha256": "6c0df0b7215b6fe69314c9514aa178ca867ef0b63c12d2131edad45b076aef76"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu3-model-first-diagnostic.md",
++      "sha256": "da47161a9a2608b3b2499e2e35e6de69aefe9f8307f4389ea2722c0f975da98b"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu3-render-timing-diagnostic.md",
++      "sha256": "ad6309399a3d1bd4becb13bab188ce09e1c5c0ecae38cfbd9f917ae86dd0414c"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu5-resource-amendment.md",
++      "sha256": "2df464cc889eaa6aa5b6e8c7f401a86069d95428b40e0aad57b8f496b22413bb"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu7-final-resource-amendment.md",
++      "sha256": "b412917b5ac8c420040691a4431db1c0eb4e17d5ec658a565f4a6ef38b964e23"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/protocol.md",
++      "sha256": "e3d3c2ed50db4a845e4d0713671db225c96f124ca8719d171e5d7006f0a5e0b0"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/startup-repair-amendment.md",
++      "sha256": "7edc8d05830c75156e05f3ba687b84b2dbcf00fe3b976a3c605c457710d9ceaa"
++    },
++    {
++      "path": "experiments/iteration_002_executed_quality/accounting-clarification.md",
++      "sha256": "95449254ff20d25c404633181515d30fb7ca2114c9a174310aeff565794469f5"
++    },
++    {
++      "path": "experiments/iteration_002_executed_quality/protocol.md",
++      "sha256": "d5e560bb48cb705e13c931290adfccb3da905cf0a352e8d7bde8188dc5ca75b1"
++    },
++    {
++      "path": "experiments/iteration_003_executed_feedback/accounting-clarification.md",
++      "sha256": "133c8bd746680cb27fc0c8e0bb5f6116ffc9029045bfdd92482c88692b6419ba"
++    },
++    {
++      "path": "experiments/iteration_003_executed_feedback/protocol.md",
++      "sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931"
++    },
++    {
++      "path": "experiments/iteration_004_terminal_population/protocol.md",
++      "sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2"
++    },
++    {
++      "path": "experiments/iteration_004_terminal_population/q0-transfer-check-protocol.md",
++      "sha256": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca"
++    },
++    {
++      "path": "experiments/iteration_004_terminal_population/resource-resumption-amendment-v1.md",
++      "sha256": "a08b37836b5a9283118821bb5b6b2b2f2ccf3683bc145a6023f199484e4557dd"
++    },
++    {
++      "path": "experiments/iteration_004_terminal_population/transport180-engineering-protocol-v1.md",
++      "sha256": "a960f4075cca5962e3e9cd35956f96b49f7433f797529134896803f7b5473e2d"
++    },
++    {
++      "path": "experiments/iteration_005_grasp_timing/continuation-engineering-v1.md",
++      "sha256": "e88cd97ca07daea61a9264d92f5d4beab3ee40f00a5dba4b13fb02408032ef03"
++    },
++    {
++      "path": "experiments/iteration_005_grasp_timing/protocol.md",
++      "sha256": "14d1655c59501d356bbc6a297d47478b758b9f8c9da6e340dce9b996b1d05306"
++    },
++    {
++      "path": "experiments/iteration_006_height_aware/prelaunch-measurement-clarification-v1.md",
++      "sha256": "e50337e936c8bd9ea1e0b73f843888fed2c03e5cb5e8759dc154a9faeec36989"
++    },
++    {
++      "path": "experiments/iteration_006_height_aware/protocol.md",
++      "sha256": "211cfef47c62faec0fd3cbff57ec8af82239b952214d72dc40e8fe8f66edcea3"
++    },
++    {
++      "path": "experiments/iteration_007_direction_height/protocol.md",
++      "sha256": "c9d59545352f35d31704189cacb05782413b9ddd3ca7a3eac3f0af91fcd4b582"
++    },
++    {
++      "path": "experiments/iteration_021_stage_raw/protocol.md",
++      "sha256": "2f737fd6ab9b45a88bd6f080ff6f4a3a6a49f3089bfa3ab732e10e6672e949cc"
++    },
++    {
++      "path": "experiments/iteration_022_hold_lift/protocol-cpu.md",
++      "sha256": "30e09b3d74f2bd454c1d342ce6be85626ab3ecc5e3c416d1d609a2299495ea8d"
++    },
++    {
++      "path": "experiments/iteration_022_hold_lift/protocol.md",
++      "sha256": "650489b28f8b048b1963cfd7268dc937274a12f33132beabe93d4bc9bde0c295"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/arithmetic-repair-engineering-exception-v3.md",
++      "sha256": "bf3f28caf3967c4d3cf4cc6674bdaafd2d54abbdd22f5e9bc676853a12424727"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/backend-arithmetic-protocol-v1.md",
++      "sha256": "ada387aa1320f76239a7d4db43e8e4d9c1734ed735667113bcd6b6abcf543dfe"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/backend-arithmetic-protocol-v2.md",
++      "sha256": "9e21c6ae1b84cd2f8d85b3c3326a9e590f3775f763d900e636d147ac2d689053"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/backend-runtime-contract-v1.md",
++      "sha256": "f6baed63953b530b26fe4ba1437d0fc0002446da3f3e7bcd4c44fe3918ef7c02"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/budget-amendment-v1.md",
++      "sha256": "921d1e319d6ce7f3a9b8d79358c986b1640d31f8590d8abaf720ddea5b15cfb9"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/budget-amendment-v2.md",
++      "sha256": "6a5704152a2e783b3769648e915e458d4f08e8d75f12bde47a2b95ed1ebdc7ee"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/closed-runtime-admission-v1.md",
++      "sha256": "f48651e72283b6fdc41a518b4ee12a5e7d500850bbaf6d39b8b80d36b5e202cf"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/closed-runtime-admission-v2.md",
++      "sha256": "9a1a85556217dc571c2ab9f0d4d79eb89c439eb2658a8a2323ec07114fac0f59"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/protocol-cpu-v1.md",
++      "sha256": "e38d4c6825cca743539282818e8b49168c1910cf688720bd1901b7405ab8cf67"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/protocol-dev-conditional-v1.md",
++      "sha256": "638e43e8a7ab2b7accd13d7e772ed54e21b10ad84ac80c6decdee36a02066ed2"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/protocol-dev-v2-prospective.md",
++      "sha256": "11a311d46f62c809160ba18b7960c6eb36ad612450601b32998a3d6e21f95e0d"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/timeout-observability-addendum-v2.md",
++      "sha256": "fa0723919c67d0417b101be2a36d9832cfaaf15e4b1c4e0cdfbf61caa43e34c6"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md",
++      "sha256": "b75b60a13a2e1d0ff90433d9161f32b1bec4c056807d9f46598c10bdfe4d4071"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/uuid-repair-engineering-exception-v1.md",
++      "sha256": "d5c80006512203343d89dc24ab4de53356c045bc0f755800bf0e8337524d5f20"
++    },
++    {
++      "path": "experiments/qd_ed_n24/controller-contract-v1.md",
++      "sha256": "82d37b4a7fbcfb510f00d1fab70ccadafba510952dbe70d3e229cd4f221d410b"
++    },
++    {
++      "path": "experiments/qd_ed_n24/protocol-dev-v1.md",
++      "sha256": "77163171815bdade8d05a4010ff59aa24a4157d447d6d7fb430f3163a80c4b3b"
++    },
++    {
++      "path": "main.py",
++      "sha256": "a46be1babfde66a07729c06d4e37b51575def4e27f05970dfaa852ae4db4afd7"
++    },
++    {
++      "path": "scripts/audit_decision_evidence.py",
++      "sha256": "df9b4294e02391f12f108671680072127054471a8c2eca02fed7b167a3a9addf"
++    },
++    {
++      "path": "scripts/audit_gripper_parent_rescue.py",
++      "sha256": "546ed6c7579b70fa6e99fb1525f144fb500b57ea9e3694af517434769f09ab68"
++    },
++    {
++      "path": "scripts/qd_ed_audit_backend.py",
++      "sha256": "893d5c0194859bd74202c1afd0ba13085e9cad563566b4a79f616c79235b053d"
++    },
++    {
++      "path": "scripts/qd_ed_available_gpu_queue.py",
++      "sha256": "0732ca69ad8e8ce916926bdd839aafce51e2451b418d2d9903fe24e2335c2d23"
++    },
++    {
++      "path": "scripts/qd_ed_codex_launch.py",
++      "sha256": "91101e37e4fab893d9a8de32b3ff5d910a08fc30caa049e69e4b6a5ffd2127bf"
++    },
++    {
++      "path": "scripts/qd_ed_final_report.py",
++      "sha256": "1e5ced6f6406ed4fd77f28c621d948ff111fcc2efc084dfdd1320366f41ff918"
++    },
++    {
++      "path": "scripts/qd_ed_final_runner.py",
++      "sha256": "b3e5ccd90b4ae0eee036560809dcdb74ff68bbaecb56792d676b64bec6e2f7f5"
++    },
++    {
++      "path": "scripts/qd_ed_gpu_probe.py",
++      "sha256": "0d9497b9780e91cb5174cf201917dc6d128eaac08512180ff527faef7dfcb07e"
++    },
++    {
++      "path": "scripts/qd_ed_n11_dev_contract.py",
++      "sha256": "ea9089b138f6cf088101e1ae47262240de6bea1446ccfe8b1ecaef8e9474bf64"
++    },
++    {
++      "path": "scripts/qd_ed_n11_dev_prepare.py",
++      "sha256": "9957aada526417e767d0f6aca65a52e9432368c2fe95a3f9152c4a1d3bb7be49"
++    },
++    {
++      "path": "scripts/qd_ed_n11_dev_supervise.py",
++      "sha256": "5afb4a1b96651a7a00a943590aeccd8277a824e4ef1d3021bb412b9c2445ac1e"
++    },
++    {
++      "path": "scripts/qd_ed_n18_dev_contract.py",
++      "sha256": "636788b21f9ee87e1cb9b6a4c1f20e9b70eec43f31c0890210aecae2d73b531c"
++    },
++    {
++      "path": "scripts/qd_ed_n18_dev_prepare.py",
++      "sha256": "901c9f746a63edddacf682da98f3adbc62c4d1e627b7267de3aefaf936ed54cd"
++    },
++    {
++      "path": "scripts/qd_ed_n18_dev_supervise.py",
++      "sha256": "f2ed42a608f664db9f8005c69a58068ec4396303e4cf3d0406f1e869223bad2b"
++    },
++    {
++      "path": "scripts/qd_ed_n18_gpu7_prepare.py",
++      "sha256": "02ec70f00b59763e7f969683ce70c617c6c968ae07568aef1891972d21ad1311"
++    },
++    {
++      "path": "scripts/qd_ed_n20_dev_contract.py",
++      "sha256": "56853a51aada1329fb822b0e03d26203ed6394c0212d421a69c3faf1c92f7abb"
++    },
++    {
++      "path": "scripts/qd_ed_n20_dev_prepare.py",
++      "sha256": "6dda1ac0020785782a31a652b5cf2363882f0cac4dc045f61b2fd8ee226c9427"
++    },
++    {
++      "path": "scripts/qd_ed_n20_dev_supervise.py",
++      "sha256": "75ccf1ce820d1f79a557bb70d1aa5fea1701eafe3e9c356a9659615d10eef04a"
++    },
++    {
++      "path": "scripts/qd_ed_n21_dev_contract.py",
++      "sha256": "133a82e8b490562956a456ddfa13c1323f721be37f8162299faf006755f85eed"
++    },
++    {
++      "path": "scripts/qd_ed_n21_dev_prepare.py",
++      "sha256": "06f3daddaf83bb7090703c27d6ba0bd66f82339813982e2cbefa7fbe37e38296"
++    },
++    {
++      "path": "scripts/qd_ed_n21_dev_supervise.py",
++      "sha256": "de53e42a9cdc5c4ea0406c802fe80d39ab852b61c2b3970869238d44a89d03b9"
++    },
++    {
++      "path": "scripts/qd_ed_n22_dev_contract.py",
++      "sha256": "817a9a19a26d15838e9d98cede9ca853a667d7cb871d7891f59775526150393c"
++    },
++    {
++      "path": "scripts/qd_ed_n22_dev_prepare.py",
++      "sha256": "d77ea1e4b6272f395674935a55dfba45496ba93371ae20684f48f934bd48537e"
++    },
++    {
++      "path": "scripts/qd_ed_n22_dev_supervise.py",
++      "sha256": "5f95d5feef83f751fd78e31dc1d681504ee8af17f0c0ab6379e4050b3dc0fabd"
++    },
++    {
++      "path": "scripts/qd_ed_n23_arithmetic_repair.py",
++      "sha256": "b9010ebf9a699c7c046ff04ff3ac67b4fe5239764ae9ea745b9ed1a47f3ba9ca"
++    },
++    {
++      "path": "scripts/qd_ed_n23_backend_preflight.py",
++      "sha256": "fbdd30ac1864ea9d282ce849f45faddda4738c6a5f092351e08bd0d2d13795be"
++    },
++    {
++      "path": "scripts/qd_ed_n23_backend_prepare.py",
++      "sha256": "42b8942557f4420f248cd6a95a3836dda49b09958d8bc842025aaf628538b0b7"
++    },
++    {
++      "path": "scripts/qd_ed_n23_dev_contract.py",
++      "sha256": "0dd332174a5e2a605638e7be4791f8326203e98509bc09b2bbddb9be3c8c6930"
++    },
++    {
++      "path": "scripts/qd_ed_n23_dev_prepare.py",
++      "sha256": "61db29dae6194c699581221108164ac36266b1ae9469f8f871b9a6e47f8bd125"
++    },
++    {
++      "path": "scripts/qd_ed_n23_dev_supervise.py",
++      "sha256": "629b22ee6389511ba16993b674e0ad28a743644b440c7be273564f2acd7095eb"
++    },
++    {
++      "path": "scripts/qd_ed_n23_preflight_admit.py",
++      "sha256": "0394fc287196a0042130e0b31af09d6341d84cbcbcd66eadc919c7d167970aad"
++    },
++    {
++      "path": "scripts/qd_ed_n23_uuid_native_repair.py",
++      "sha256": "362707b2b13b666b1b73576515dd582cd5aa1e751228744d30e7651bcf520ac6"
++    },
++    {
++      "path": "scripts/qd_ed_n23_uuid_repair.py",
++      "sha256": "b48536663157da25ca996a2f4056355e2bf8a2aa185fd2e962bc80ed47192471"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_backend.py",
++      "sha256": "e292b54f83842526414f297cab8875102a11992a00d9424d356f2fa8f02cadcb"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_contract.py",
++      "sha256": "40492aec2aa88b0d0bb3595e8a47b9561bd919b76a6048d1b14278b173832a02"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_predecessor.py",
++      "sha256": "f4ecc06186e303c2fd9375df17b784821a0e03bac48f9b035fbb2a4771714956"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_preflight_admit.py",
++      "sha256": "be1f612432c71a2beb7a06554e7dad8e54c7212f103838ae4d5454dc1c0f26c7"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_prepare.py",
++      "sha256": "8563c7edb6c4186b5c9b099bef1bf7be0165750486fde5869f3281404eac88a8"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_recovery.py",
++      "sha256": "88457287d2621836324cd881d185b60bb60274d006cd01564f88dfac9f9a20fb"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_supervise.py",
++      "sha256": "d04177236bc068f038a41b57ee07be1691e8a9c290fc4ba70e7c383acd1ad67d"
++    },
++    {
++      "path": "scripts/qd_ed_n23_worker.py",
++      "sha256": "dd162c7bd0d9cf91da064fcb2652aa5ee3a0a48d4c70940dfa3ce4cdab5bc74e"
++    },
++    {
++      "path": "scripts/qd_ed_n24_bridge.py",
++      "sha256": "30f8750ef22a81b596f9881c417b620c0c8cb7ddaadbfe110731c7802fa2520e"
++    },
++    {
++      "path": "scripts/qd_ed_n24_contract.py",
++      "sha256": "3fdd1fbdb7e8c44250f4c3138a77157f86134fa0174b018f16c9318dd31dac85"
++    },
++    {
++      "path": "scripts/qd_ed_n24_native.py",
++      "sha256": "0e093f65dc6274d7ca7e5fe35bcb305a815c0b943f7f0ad2460db530a23ecb7f"
++    },
++    {
++      "path": "scripts/qd_ed_n24_prepare.py",
++      "sha256": "4a0a53432d7a8f5d0b922c22e806e22852b6468473f587d47e6717840d44b8ea"
++    },
++    {
++      "path": "scripts/qd_ed_n24_recovery.py",
++      "sha256": "fe46eb25ac80ad557ca66e9501ece3ebec5799a57218aee08976365241a33378"
++    },
++    {
++      "path": "scripts/qd_ed_n24_report.py",
++      "sha256": "4b321e29d69718bf641448cdd251493acdf4a4d255adc83e69bd01767360c58f"
++    },
++    {
++      "path": "scripts/qd_ed_n24_supervise.py",
++      "sha256": "758714905a75cf1922fe67256240482c316b073f69ce9efdc426e2e635fea0c6"
++    },
++    {
++      "path": "scripts/qd_ed_n25_backend.py",
++      "sha256": "9161dc40beba7e26a0932f64ba8036a3946727b2a03817ecbb64e0b7c079a7ea"
++    },
++    {
++      "path": "scripts/qd_ed_n25_bridge.py",
++      "sha256": "46999b04dc86621ab08e16d7fbb90c2d91f5136de09b499b3b4ea334d6efc942"
++    },
++    {
++      "path": "scripts/qd_ed_n25_contract.py",
++      "sha256": "5d991948ea897b12eab87f9d86de776dec350aa06c11e44ee2e1ae6d1c9fdd67"
++    },
++    {
++      "path": "scripts/qd_ed_n25_native.py",
++      "sha256": "ac0343de4af16d73c53b2bcff368598f5ed42bfaaf3eac3d9a2be4dc296d0b1d"
++    },
++    {
++      "path": "scripts/qd_ed_n25_preflight.py",
++      "sha256": "21aee372178ebb28242066b8788093d888ee7fbaf69468be7bfb5a5667e2c564"
++    },
++    {
++      "path": "scripts/qd_ed_n25_prepare.py",
++      "sha256": "33be58503e69d19e12ae95b390919549680c56e706d6fc80bf581faffe5abe20"
++    },
++    {
++      "path": "scripts/qd_ed_n25_recovery.py",
++      "sha256": "f6b2ac19be3a53348e83a9e098324bd72823bbdf0fe28350fb1f1203c8f50ffd"
++    },
++    {
++      "path": "scripts/qd_ed_n25_reference.py",
++      "sha256": "dd100a41021eb84b6a279d7dce8789eb65b53e04dc0a4df4df301abc1d241b3b"
++    },
++    {
++      "path": "scripts/qd_ed_n25_report.py",
++      "sha256": "eb37f2e3742d7dfe3fbaa512034b288985fa9b150e360b3eedc48a84cf7fc6a3"
++    },
++    {
++      "path": "scripts/qd_ed_n25_supervise.py",
++      "sha256": "f3fb5547a6b8c02a020de129de4ba7f34fc3b82c5886b9350050b2c14935026d"
++    },
++    {
++      "path": "scripts/qd_ed_n2_plan.py",
++      "sha256": "cc39d7846a286f38de314dfa7a7b1a9f6d08e84792e20fee9ff2b84dac454ba1"
++    },
++    {
++      "path": "scripts/qd_ed_n2_supervise.py",
++      "sha256": "bb1d7e6ea07ceb743eff3710b0d3cb3882af2ec66a6e1e8b1491f12a4459ab02"
++    },
++    {
++      "path": "scripts/qd_ed_n3_plan.py",
++      "sha256": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1"
++    },
++    {
++      "path": "scripts/qd_ed_n3_report.py",
++      "sha256": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a"
++    },
++    {
++      "path": "scripts/qd_ed_n3_supervise.py",
++      "sha256": "e71f3297adea4a05b43bfe2cedd12cf47d849d3a0c5cd55858cbc28da0de0f1f"
++    },
++    {
++      "path": "scripts/qd_ed_n4_plan.py",
++      "sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
++    },
++    {
++      "path": "scripts/qd_ed_n4_report.py",
++      "sha256": "d26769d73e43e6b10b8171f6930604bc510d15b26174ca3a767bcdf84a72c2fb"
++    },
++    {
++      "path": "scripts/qd_ed_n4_supervise.py",
++      "sha256": "b6dd9224cfaf3066ccd40dd9abe51c93fe8fafe1018329a85c3a247ba74dd877"
++    },
++    {
++      "path": "scripts/qd_ed_n4e1_plan.py",
++      "sha256": "649449da2be43661080ce39f04f37fb5fd06e12360020937aca02da6d782f1cb"
++    },
++    {
++      "path": "scripts/qd_ed_n4e1_report.py",
++      "sha256": "69899bc1869d48c186a906a60d6d2d3d65269016d72c6914d60e4c3f19cc98ac"
++    },
++    {
++      "path": "scripts/qd_ed_n4e1_supervise.py",
++      "sha256": "6db2641a51e093d9c6b07afbbfed847256be8d22d55d8a2d5d5aa30f942ad41a"
++    },
++    {
++      "path": "scripts/qd_ed_n5_plan.py",
++      "sha256": "0c2f31462d733329f05548cbc700308113d479a505511bd98ecf297d177c8a75"
++    },
++    {
++      "path": "scripts/qd_ed_n5_report.py",
++      "sha256": "862789e1c685dcfa665f4c71c82d480595610f70e5e27faca1ce510868f54df4"
++    },
++    {
++      "path": "scripts/qd_ed_n5_supervise.py",
++      "sha256": "08b0bf3b8b276320889f652ab163d6f90acfbd440f9a7b2e6992159b44e3db95"
++    },
++    {
++      "path": "scripts/qd_ed_n6_plan.py",
++      "sha256": "05d64e3f51c8a60761ca352e6867271fba5ff8d0a61afff166c5db9bb267c16c"
++    },
++    {
++      "path": "scripts/qd_ed_n6_report.py",
++      "sha256": "9308fe08a141a2031a1ba026f652b8003bb82a812b4d385ceeb4ec9fddddf89a"
++    },
++    {
++      "path": "scripts/qd_ed_n6_supervise.py",
++      "sha256": "cd6e285760a8a48a4241f3e2bc5bbbdc0a27abb199e104de6b3207bc3aebc7ba"
++    },
++    {
++      "path": "scripts/qd_ed_n7_plan.py",
++      "sha256": "a43286525551bee70ef1b8de5fc44c8754f5b893820e0895fd93b9a76af241e3"
++    },
++    {
++      "path": "scripts/qd_ed_n7_report.py",
++      "sha256": "e6a31048828d8be04eb422907f1f99ef6284e0aeea4409e1eb52bde279a02ffd"
++    },
++    {
++      "path": "scripts/qd_ed_n7_supervise.py",
++      "sha256": "f6639cdecc637594d5f8cf1a443ac0eadba9e4c57974e213a15a6cea59e0946a"
++    },
++    {
++      "path": "scripts/qd_ed_native_probe_queue.py",
++      "sha256": "79d6153175248459e647989a7faaaf2a216377e7296c9960ddb0cf3f5e4c94a5"
++    },
++    {
++      "path": "scripts/qd_ed_poe_launch.py",
++      "sha256": "86ecaf3d0d1454613ee4bec1337dca7ed81d35ce59cfda1e62d7839a58e39b82"
++    },
++    {
++      "path": "scripts/qd_ed_policy_native_probe.py",
++      "sha256": "1ddddb7f72ea2dc2d297b3aaf9e80af47944f49ccfcb9d73c097ebe97880be92"
++    },
++    {
++      "path": "scripts/qd_ed_runtime_setup.py",
++      "sha256": "ad05efd769034d3f9937aebbba10abc16039a5f1b5026e6bacd808e13d717a9c"
++    },
++    {
++      "path": "tests/n25_cpu_synthetic.py",
++      "sha256": "f31bf791f38620f77fc811b71ba5e97e2d9faffe5d83f90c54b86089e2163094"
++    },
++    {
++      "path": "tests/test_decision_evidence_audit.py",
++      "sha256": "91eecc40a4260664ab6dfe4ce3321e0022a055a5a6c792b179f8acecf68be48b"
++    },
++    {
++      "path": "tests/test_episode_phase_timing.py",
++      "sha256": "659fbc5e267ae08c5210113bc6151afb7d5f5ce050ea4749af72fea285207b53"
++    },
++    {
++      "path": "tests/test_n24_native_loop.py",
++      "sha256": "6bfb2a16a12060304c146aeb0b879afacc572e098a11256aed3fdac960aa89e8"
++    },
++    {
++      "path": "tests/test_n25_clipped_rbf.py",
++      "sha256": "7c4f6f4bbdeb31633f7fe3e5b272b55a3471ac9695082a65e79ae38272d50a10"
++    },
++    {
++      "path": "tests/test_n4_terminal_population_audit.py",
++      "sha256": "0a0e477dc06071690942ec688df436e5cab08715bb4cb5d1e3f8ee9de0489a95"
++    },
++    {
++      "path": "tests/test_qd_actuator_clipped_quality.py",
++      "sha256": "65902223ee2e57a1ef54600f51da39bb75c9d3422032f6e31992c3371411aaa6"
++    },
++    {
++      "path": "tests/test_qd_direction_height.py",
++      "sha256": "660374add7d7fbfe4019bcbc5393750711797c2cb16d0cf56f67899fc3a60d7c"
++    },
++    {
++      "path": "tests/test_qd_ed_final_runner.py",
++      "sha256": "025450ad784749bee2afb3503112b485b100fc1223407f2670bd957b20411cc9"
++    },
++    {
++      "path": "tests/test_qd_ed_n21_dev.py",
++      "sha256": "9c5e0f9c5eaac297b95b70b9db4be918dd8e174e6984a835828c5667879602ca"
++    },
++    {
++      "path": "tests/test_qd_ed_n22_dev.py",
++      "sha256": "7200011750df3827a1f8c99d5edee067da120b83bfe7042e80e0747d7a679864"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_arithmetic_repair.py",
++      "sha256": "050770156432bf27bb2b202e33725f9e1fa632665a7862e97a1b173c7e338fc5"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_backend.py",
++      "sha256": "a3ebfff43ef3c7d233e891215ba4f355d9877b564b9ca33c2687807274578dd2"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_dev.py",
++      "sha256": "eb0c1d1b3fe411c01d84f0d5a0e1fcee987235abcd46db782939bbd7030f8ed6"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_uuid_native_repair.py",
++      "sha256": "c1d34d01414f2598cdf9e818d1b7ec7adac8dcbbc066ab010144a973e3632d2a"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_uuid_repair.py",
++      "sha256": "772f5bcd7b9f19fa9f7b8d19843af6af58a9782edf89b36d557498f8ce69af8f"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_v2.py",
++      "sha256": "2082b388e8c8932d168f051ad693b7f74d879ae04aabbe00f6cf51f372c53184"
++    },
++    {
++      "path": "tests/test_qd_ed_n24_controller.py",
++      "sha256": "c1d5caca5d59769e13eca30b06c2d721deaff9e94f64f3fd3c304d467fe10bae"
++    },
++    {
++      "path": "tests/test_qd_ed_n24_recovery.py",
++      "sha256": "a94c38e5f22247bdabc099bc3c3f14b20f58a69ad17915926aae1b0913a64431"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_arithmetic.py",
++      "sha256": "f92a2cdcfd9d3411752dadc3bdd8acb67c12e954cff84cc7e7daed5ea799eb68"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_backend.py",
++      "sha256": "f3f3f1c0ebcace92c489780d0c84865a89902fa37e1eff5ce1f0f915ec821b36"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_controller.py",
++      "sha256": "12e42bc108c4313665264ca727a0aeadf50bfb0cc09de2b24444891b5e71ff9e"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_native.py",
++      "sha256": "2d814362c2a586267fa32ec074336fff737597d4714caa12acc7b438c4f5362a"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_recovery.py",
++      "sha256": "cde8d3392b56d9f168abffaa65c22200fc47947b16c3df5ef92c5422ca0ed44f"
++    },
++    {
++      "path": "tests/test_qd_ed_n5_plan.py",
++      "sha256": "7e09248ae6f5b18fe85c2262c199ee26b4eaa6d7805703e66d009bee4cf208a6"
++    },
++    {
++      "path": "tests/test_qd_ed_n7_plan.py",
++      "sha256": "2fe6952d22563e9eeb710a12d99c394c4f0caf17caf74edac083f64e662be48e"
++    },
++    {
++      "path": "tests/test_qd_grasp_timing.py",
++      "sha256": "6ad6952392bd8ee98c9e43fb848bd54237b81bcffd22840a3bd2866eac1434b0"
++    },
++    {
++      "path": "tests/test_qd_gripper_parent_rescue.py",
++      "sha256": "9d8f5c7aa0b8070e76dc89428c806b317a32a7dc73a180b1b20a0703ae7ccaf7"
++    },
++    {
++      "path": "tests/test_qd_height_aware.py",
++      "sha256": "eb044cbda0089c80273fd9aa17bf04d5df2ecebf05b9937a09a339a5b090db9a"
++    },
++    {
++      "path": "tests/test_qd_hold_lift_quality.py",
++      "sha256": "f9067be77e10210e63f82a8df05425481a45ff2511b9edea2aa4f7535612cbf1"
++    },
++    {
++      "path": "tests/test_qd_lift_quality.py",
++      "sha256": "21b2a132ead7c94f876e4c151fc1bc7c257c5576e1e567b421331f63d3c7ce0a"
++    },
++    {
++      "path": "tests/test_qd_parent_survival.py",
++      "sha256": "c883e4a7cd9ab01d39112ebfc894fdc765ee386a931a129f113a302d67b140ba"
++    },
++    {
++      "path": "tests/test_qd_terminal_population.py",
++      "sha256": "80ce2fe4a2d9ecb6aff79f158603bb22c3a1df0a92d10f3ff3a2de71673b2e0b"
++    },
++    {
++      "path": "tests/test_rdt_steer.py",
++      "sha256": "1f16056a9ada4715a2c86c64ddc59324f85f09fb9890e4f0e530e488d1ae6df4"
++    },
++    {
++      "path": "tests/test_render_phase_diagnostics.py",
++      "sha256": "fd6f50bbef56d5c5e35af2a3d3118d243d7e1f9848e244390a5df8184b187a05"
++    },
++    {
++      "path": "utils/__init__.py",
++      "sha256": "debd228bdc6164ea3f2fc49e0ef8aa891754e7748fe91ac21e8ef74b6a72a49f"
++    },
++    {
++      "path": "utils/config_utils.py",
++      "sha256": "d9f2a7665db2ee15f882be442eed791c0300607d2b62c12dfbe8651253c18af5"
++    },
++    {
++      "path": "utils/eds_eval_vis.py",
++      "sha256": "d155d2b2e6e72bd877899c1fdc6f0e57d847ea63d68b55a74a0606c90ab86676"
++    },
++    {
++      "path": "utils/eds_mechanism_pretest_vis.py",
++      "sha256": "a9ccf922bc717f955375455d56cc55f9ac49a439690461de453f2dc1b20af8fc"
++    },
++    {
++      "path": "utils/guidance_utils.py",
++      "sha256": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82"
++    },
++    {
++      "path": "utils/hydra_plugins/__init__.py",
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++    },
++    {
++      "path": "utils/hydra_plugins/task_searchpath.py",
++      "sha256": "32aa364739836f11f48299bd3e49a59a89a1baa4512f3a6f0bc962496739d218"
++    },
++    {
++      "path": "utils/keypoint_utils.py",
++      "sha256": "fb7730f5dbe6ba72584f9d7204d2578be225dc69655c7c26006a8be9a92d3c1f"
++    },
++    {
++      "path": "utils/logging_utils.py",
++      "sha256": "ad614d71030403937d8699544f9985f1909c8cc4402c43e2c9b16b39f263c2c3"
++    },
++    {
++      "path": "utils/plot_results.py",
++      "sha256": "3c8c26e719aa8742a07a134875b3dfcf0d0b2c1dedc277a8e694de0945787c90"
++    },
++    {
++      "path": "utils/vis_utils.py",
++      "sha256": "6e256ca29aabcb8ffeb852e56c732ec56885394bb8e4e8ca2fd0957e989289b8"
++    },
++    {
++      "path": "vlm_query/guidance_template.txt",
++      "sha256": "ac7a53e64f82e735b295682347cc4775da7c611715798e0d79f8a6fe34cb11c5"
++    },
++    {
++      "path": "vlm_query/guidance_template_calvin.txt",
++      "sha256": "b29b7554b27207269f572a40a4d51f7498d36e3eca4effb94349e32ebce8caee"
++    },
++    {
++      "path": "vlm_query/guidance_template_libero.txt",
++      "sha256": "0a11498ed5317170bff8e8cd3909c508ea810e4fa9f006555ef37a50f4459c54"
++    },
++    {
++      "path": "vlm_query/segmentation_planning_template.txt",
++      "sha256": "975e6905b66e749e351f2282a73e5f30eeee6735643622f74808b2379a938d30"
++    },
++    {
++      "path": "vlm_query/stage_template.txt",
++      "sha256": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b"
++    },
++    {
++      "path": "vlm_query/vlm_agent.py",
++      "sha256": "64a2f470045ab5be8840eb9758c1d8cb13cc2487d5993f2c47862052f8679494"
++    }
++  ],
++  "sha256": "8c9c62e223a2bf11e7a4815a0d06474d357a68fd1efa02725dbbcd78c7f50fe2"
++}
+diff --git a/experiments/qd_ed_n25_continuation/protocol-v1.md b/experiments/qd_ed_n25_continuation/protocol-v1.md
+new file mode 100644
+index 0000000..eb890aa
+--- /dev/null
++++ b/experiments/qd_ed_n25_continuation/protocol-v1.md
+@@ -0,0 +1,48 @@
++# N25 named infrastructure continuation protocol v1
++
++Status: root accepts bounded CPU implementation and synthetic review; actual history sealing, integration, authority adoption and GPU release remain separately recorded steps. This is an administrative continuation of the user's ongoing expressly invoked Arbor task and subsequent instruction to continue without intervention, not a new user-audited budget. No additional budget is adopted by this protocol.
++
++## Observed immutable predecessor and exact exception
++
++The original N25 cohort has closed INVALID_OR_INTERRUPTED with 18 accepted cells in original task-major order: tasks0..3 C0/Q0/N23/N25, then task4 C0/Q0. The root terminal reconstruction passed while all257 source files at 5a65ef15968cc68c82314e8c0773b3365ad45fa0 were intact. Counts are C0=0/5, Q0=0/5, N23=0/4, N25=1/4; no success-based prefix selection is permitted.
++
++The only permitted exceptional repeat is exact attempt rdt-qd-ed-final-20260921T093925Z__n25_dev_t04_n23_20260930__8b236af507d8, original scientific index18, task4/N23. Its immutable terminal literally records event=valid, outcome_valid=false, reason=TimeoutExpired, compute_outcome=completed, gpu_process_wall_seconds=1801.4751812220784. Original transport counts are43 logical,37 completed,6 failed,37 usage-complete. Six recorded codex_timeout events contain stream_error/item_error lifecycle evidence; their actual ordered identities and signatures must be sealed from existing metadata. In-worker audit receipt and independent native report are absent. Native arithmetic, unmeasured safety/semantic gates and API-only causal attribution remain UNKNOWN/UNPROVEN. This exception authorizes exactly one new attempt; it never validates, repairs or discards the old one. Do not use or weaken the old single-timeout classifier.
++
++Implement the design-v1 boundary together with the separately preserved v2 incomplete-infrastructure addendum. The root must inspect the implementation before actual metadata sealing. The sealer must verify the root terminal review, immutable result/status/ledger, original257 source closure and exact18-cell accepted prefix; source/plan/runtime/identity/start/process/receipt/audit and recorded evidence-index digests. It may consume only bounded JSON/public metadata and approved source records. Do not deserialize or rehash referenced tensor bundles, invoke the old full validator if that follows tensor paths, reopen model weights, perform GPU replay, call an API or use an environment. Historical native acceptance is explicitly the original metered audit attested by hash-bound receipts and the root review; the new seal is a metadata attestation, not another native audit. Preserve this reliance in the seal.
++
++Seal all19 old attempts and their costs, the exact failed-call signature and typed absence of the two audit files; verify old controller/worker/owned descendants are dead using boot/PID/ticks and owned-process metadata. The sealer must fail on unexpected contradictions, changed source/identity, unsettled/later reservations, missing accepted-cell metadata or a delayed audit writer. Recheck typed absence and process cleanup before actual release. Unknown historical gates must never be substituted with true. Capture existing results/compute files only as hash-bound presence evidence, not a passing scientific outcome.
++
++## Successor scientific mapping and limits
++
++Use distinct cohort N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930. Imported prefix18 consists only of original metadata references, no synthetic new events or dispatchable rows. Exactly22 possible new rows map indices18..39: one named repeat at18, recovery bucket/retry_of the exact failed attempt, then index19 N25 and tasks5..9 all original four arms. Same task/seed/init/profile/input/runtime/science/Stage/action/timeout fields; only operational key/cohort/source/plan and the named recovery lineage/bucket change. Reject dispatch of any valid historical scientific cell, repeated index, another already exposed suffix or a reordered mapping.
++
++Every NEW attempt must pass all original normal source/native/transport/cost/safety/result gates. The named repeat may validly fail the task and then continue. Any NEW invalidity immediately closes the successor INVALID with all costs; no further retries, automatic resume or reused pure-timeout allowance. A reservation consumes the single-launch opportunity.
++
++Original and successor combined: maximum42 dispatched attempts, maximum2 recovery attempts, at most1 recovery per scientific cell. Actual observed history19 with no earlier recoveries implies at most41 total for full completion. Keep original adopted local22 GPU-hour ceiling across both, subtract8201.788167113322 seconds already charged; do not reset time. Actual successor cap must be frozen at release no greater than min(22 minus original charged hours, actual remaining unprotected cumulative hours). Each dispatch requires1800+40 seconds room. Existing private caps494/100GPUh and bucket55baseline/199development/180validation/40formal/20recovery remain; validation/formal reserves32/12 cumulative hours remain. Expected remaining demand5baseline+16development+1recovery must fit actual release-time ledger; otherwise close admission, never borrow reserves. Original failed costs and six unknown-token calls remain included exactly once with partial observed token totals.
++
++Promotion remains complete40 valid, N25>=5/10 and >=all three matched controls, with substantive QD/ED and every unchanged gate. Evaluate numerical futility only at complete original quadruples. Any source/report/controller-journal disagreement is INVALID, not futility or promotion. An incomplete cohort never makes unrun cells failures.
++
++## Source boundary and preparation
++
++Create isolated implementation from exact5a under this variant; never mutate active study source/state in CPU preparation. Add small continuation contract, sealer, bridge, prepare/supervise/report/terminal-reader and synthetic fixtures as necessary. Only permitted shared-function edits: runner.metered_support, runner.check_budget, runner.check_retry, worker.validate_context, using closed versioned routes. Preserve original whole files by exact reverse patch and AST function parity. All other255 original files and all scientific/native/projector/reference/RDT/Stage/provider/config functions stay byte-identical. In particular run_plan, build_command, run_worker, verify_receipt and original N25 supervisor/classifier remain unchanged. No global monkeypatch/function cloning in the new route.
++
++Reuse the original n25_cohort audit-family marker to retain same-worker C0/Q0 CPU audit and N23/N25 GPU7 CUDA audit. An administrative source bridge must explicitly bind historical5a proof/source to successor routing; never claim the old proof was generated by the new commit. No new numerical GPU preflight is justified by pure administrative source changes. Root independently reviews full shared diff/source closure, synthetic controls, all failure logs and proof seals before integrating. If required implementation exceeds these four functions or alters math/provider/scientific semantics, stop dependent implementation and explain concretely; do not expand scope silently.
++
++Synthetic checks must cover exact named failed-signature/Unknown semantics, imported prefix and all22 mappings, accepted historical identity rejection, consumed retry and prior reservation, changed/late audit files, live/stale processes, complete source bridge and unchanged old routing, independent new receipts, every bucket/combined/local/cumulative/protected-time limit, charge-before-launch, worker deadline, any later invalidity and status/report failure with full ledger reconstruction. Tests use no real attempt/protected payloads, API/GPU/model/sim or credentials. Keep previous failed synthetic checks and issue fixes. Deliver disabled templates with explicit unresolved refs, clean isolated commit/manifests, guard logs and CPU report. All new outputs stay beneath N25; native attempts retain the original artifact root.
++
++## Activation and downstream boundary
++
++Root order: review CPU delivery -> run separately frozen metadata sealing under old5a -> validate immutable prefix/fault proof -> integrate exact reviewed administrative source -> source/runtime/resource/budget/final-review authority -> freeze exact22-row plan and independently inspect commands -> explicit one-launch release -> supervise GPU7 only. Provider remains current managed Codex CLI login, gpt-6-astra/low/E2/180s, no Poe or alternative fallback; preserve saved credentials. Only one owned GPU worker.
++
++Old original INVALID result/status/ledger are never overwritten. Successor result distinguishes imported/new evidence, every old/new attempt and combined costs, historical Unknowns, original INVALID versus logical-cohort disposition. Prebuilt N25 validation and N26 predecessor gate remain INACTIVE. Any future logical promotion/rejection requires a separate reviewed evidence/source adapter; current engineering INVALID satisfies neither. No protected-phase launcher is added here.
++
++## Frozen parent references
++
++- design-v1: `8daceadf71cbf081ed137919aeced134cf06ab8ea127d3624600267ad591a610`
++- design-v2: `156f31dc996df99b434366161c7ffd39856c4d4a2179272ccd409db7bc0bea3b`
++- result: `8005d67dc8cc04c764838d703c06dd8e14aeeae6b2312ba5bfe9b483228ac3b1`
++- terminal-review: `a0b225efd8e35c17b5c6e801c3188a63b178079b7d31274f8b189a5641c59052`
++- original-plan: `1f0c94ccd3458a3a786acb9525728a1b64e3df439e4f920731f6566dd3a95eb3`
++- source: `fafcb0d881c95d567cb14a6690145d4ad933abc84a5e0175dfbe1512efd836ee`
++
++Recorded UTC: 2026-09-30T23:01:54.120419+00:00
+diff --git a/experiments/qd_ed_n25_continuation/reverse-routes-v1.json b/experiments/qd_ed_n25_continuation/reverse-routes-v1.json
+new file mode 100644
+index 0000000..cfade51
+--- /dev/null
++++ b/experiments/qd_ed_n25_continuation/reverse-routes-v1.json
+@@ -0,0 +1,43 @@
++{
++  "base_commit": "5a65ef15968cc68c82314e8c0773b3365ad45fa0",
++  "files": [
++    {
++      "edits": [
++        {
++          "new": "    if plan.get('n25_infrastructure_continuation') is not None:\n        from scripts import qd_ed_n25_cont_contract\n        return qd_ed_n25_cont_contract\n",
++          "new_end": 654,
++          "new_start": 651,
++          "old": ""
++        },
++        {
++          "new": "    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':\n        from scripts import qd_ed_n25_cont_contract as n25c\n        n25c.require_state(state, globals())\n        bucket_caps = n25c.CAPS['buckets']\n    elif row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':\n",
++          "new_end": 1259,
++          "new_start": 1254,
++          "old": "    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':\n"
++        },
++        {
++          "new": "    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':\n        from scripts import qd_ed_n25_cont_contract as n25c\n        return n25c.check_retry(events, row, globals())\n",
++          "new_end": 1373,
++          "new_start": 1370,
++          "old": ""
++        }
++      ],
++      "new_sha256": "0887d04f5e628504c41ceed2b9503321575a18a3cad4f9cf2d1a9a301c357aab",
++      "old_sha256": "b3e5ccd90b4ae0eee036560809dcdb74ff68bbaecb56792d676b64bec6e2f7f5",
++      "path": "scripts/qd_ed_final_runner.py"
++    },
++    {
++      "edits": [
++        {
++          "new": "    if plan.get('n25_infrastructure_continuation') is not None:\n        from scripts import qd_ed_n25_cont_contract as n25c\n        return n25c.validate_worker_context(context, main_argv, root, output, plan, runtime)\n",
++          "new_end": 140,
++          "new_start": 137,
++          "old": ""
++        }
++      ],
++      "new_sha256": "6a803949c9d2dc37b333ed56bcdb67e7edeca005bdf1513ff9a9856d597e1441",
++      "old_sha256": "dd162c7bd0d9cf91da064fcb2652aa5ee3a0a48d4c70940dfa3ce4cdab5bc74e",
++      "path": "scripts/qd_ed_n23_worker.py"
++    }
++  ]
++}
+diff --git a/scripts/qd_ed_final_runner.py b/scripts/qd_ed_final_runner.py
+index ac98d2a..004e5e1 100644
+--- a/scripts/qd_ed_final_runner.py
++++ b/scripts/qd_ed_final_runner.py
+@@ -649,6 +649,9 @@ def typed_metered_plan(plan):
+ 
+ 
+ def metered_support(plan):
++    if plan.get('n25_infrastructure_continuation') is not None:
++        from scripts import qd_ed_n25_cont_contract
++        return qd_ed_n25_cont_contract
+     if is_n25_plan(plan):
+         from scripts import qd_ed_n25_contract
+         return qd_ed_n25_contract
+@@ -1249,7 +1252,11 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(),
+     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
+             'GPU policy/runtime physical device mismatch')
+     amendment = budget.get('amendment')
+-    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':
++    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':
++        from scripts import qd_ed_n25_cont_contract as n25c
++        n25c.require_state(state, globals())
++        bucket_caps = n25c.CAPS['buckets']
++    elif row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_20260930':
+         from scripts import qd_ed_n25_contract as n25
+         n25.require_state(state, globals())
+         bucket_caps = n25.budget_authority()['caps']['buckets']
+@@ -1361,6 +1368,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(),
+ 
+ 
+ def check_retry(events, row):
++    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':
++        from scripts import qd_ed_n25_cont_contract as n25c
++        return n25c.check_retry(events, row, globals())
+     if row.get('n25_recovery_eligibility') is not None:
+         from scripts import qd_ed_n25_recovery as recovery
+         return recovery.check_retry(events, row, globals())
+diff --git a/scripts/qd_ed_n23_worker.py b/scripts/qd_ed_n23_worker.py
+index 74c5177..293ec41 100644
+--- a/scripts/qd_ed_n23_worker.py
++++ b/scripts/qd_ed_n23_worker.py
+@@ -135,6 +135,9 @@ def validate_context(context, main_argv):
+     require(root == ROOT.resolve() and context['main_argv'] == list(main_argv)
+             and main_argv[0] == str(root / 'main.py') and output.name == context['attempt_id'], "worker command/root/attempt differs")
+     plan, runtime = read_ref(context['plan']), read_ref(context['runtime'])
++    if plan.get('n25_infrastructure_continuation') is not None:
++        from scripts import qd_ed_n25_cont_contract as n25c
++        return n25c.validate_worker_context(context, main_argv, root, output, plan, runtime)
+     if plan.get('n25_cohort') is not None:
+         from scripts import qd_ed_n25_contract as n25
+         return n25.validate_worker_context(context, main_argv, root, output, plan, runtime)
+diff --git a/scripts/qd_ed_n25_cont_bridge.py b/scripts/qd_ed_n25_cont_bridge.py
+new file mode 100644
+index 0000000..fb5fc40
+--- /dev/null
++++ b/scripts/qd_ed_n25_cont_bridge.py
+@@ -0,0 +1,44 @@
++"""Administrative two-file source bridge. No new arithmetic proof or data reads."""
++import ast
++import hashlib
++import subprocess
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n25_cont_evidence as e
++
++ROUTES={'scripts/qd_ed_final_runner.py':{'metered_support','check_budget','check_retry'},
++ 'scripts/qd_ed_n23_worker.py':{'validate_context'}}
++DOC='experiments/qd_ed_n25_continuation'
++MODULES={'scripts/qd_ed_n25_cont_'+n+'.py' for n in ('evidence','seal','bridge','contract','prepare','supervise','report','terminal')}
++EXTRAS=MODULES|{DOC+'/'+n for n in ('protocol-v1.md','original-source-v1.json','reverse-routes-v1.json','controller-contract-v1.md')}
++EXTRAS|={'tests/test_qd_ed_n25_cont.py','tests/n25_cont_fixtures.py'}
++
++def functions(text):return {n.name:ast.get_source_segment(text,n) for n in ast.parse(text).body if isinstance(n,ast.FunctionDef)}
++
++def source_paths(root):
++    old=w.read_ref(e.ref(Path(root)/DOC/'original-source-v1.json'))
++    return {r['path'] for r in old['files']}|EXTRAS
++
++def build(source,seal,root):
++    root=Path(root);old=w.read_ref(e.ref(root/DOC/'original-source-v1.json'))
++    w.require(old==seal['original_source'] and old['commit']==e.BASE and len(old['files'])==257,'original257 bridge differs')
++    w.require({r['path'] for r in source['files']}==source_paths(root),'complete continuation source closure')
++    reverse=w.read_ref(e.ref(root/DOC/'reverse-routes-v1.json'));deltas=[];same=[]
++    w.require(reverse['base_commit']==e.BASE and {r['path'] for r in reverse['files']}==set(ROUTES),'reverse route scope')
++    for row in old['files']:
++        p=row['path'];b=(root/p).read_bytes()
++        if p not in ROUTES:
++            w.require(hashlib.sha256(b).hexdigest()==row['sha256'],'original scientific/source bytes changed: '+p);same.append(row);continue
++        record=next(x for x in reverse['files'] if x['path']==p);lines=b.decode().splitlines(keepends=True)
++        w.require(record['new_sha256']==hashlib.sha256(b).hexdigest() and record['old_sha256']==row['sha256'],'shared route bytes differ')
++        for edit in reversed(record['edits']):
++            a,z=edit['new_start'],edit['new_end'];w.require(''.join(lines[a:z])==edit['new'],'reverse edit differs');lines[a:z]=edit['old'].splitlines(keepends=True)
++        oldb=''.join(lines).encode();w.require(hashlib.sha256(oldb).hexdigest()==row['sha256'],'whole-file reverse differs')
++        a,z=functions(oldb.decode()),functions(b.decode())
++        w.require(set(a)==set(z) and {k for k in a if a[k]!=z[k]}==ROUTES[p],'unlisted shared function changed')
++        deltas.append({'path':p,'original_sha256':row['sha256'],'new_sha256':record['new_sha256'],'functions':sorted(ROUTES[p]),'reverse_exact':True})
++    changed=set(subprocess.check_output(['git','diff','--name-only',e.BASE,source['commit']],cwd=root,text=True).splitlines())
++    w.require(changed<=EXTRAS|set(ROUTES),'unlisted source delta')
++    return {'schema':'n25-continuation-source-bridge-v1','old_source':old,'new_source':source,'same_files':same,
++        'shared_routes':deltas,'historical_backend_proof':seal['historical_backend_proof'],'new_numerical_preflight':False,
++        'interpretation':'Historical5a proof is not generated by new commit; unchanged science/native arithmetic plus reviewed administrative route bridge.'}
+diff --git a/scripts/qd_ed_n25_cont_contract.py b/scripts/qd_ed_n25_cont_contract.py
+new file mode 100644
+index 0000000..1a690bb
+--- /dev/null
++++ b/scripts/qd_ed_n25_cont_contract.py
+@@ -0,0 +1,195 @@
++"""Exactly one named incomplete-infrastructure continuation; no generalized retry."""
++import copy
++import math
++import os
++from pathlib import Path
++import threading
++from contextlib import contextmanager
++from scripts import qd_ed_n23_worker as w,qd_ed_n25_contract as old,qd_ed_n25_native as native
++from scripts import qd_ed_n25_cont_evidence as e,qd_ed_n25_cont_bridge as bridge,qd_ed_n25_cont_seal as sealer
++
++ROOT=Path(__file__).resolve().parents[1]
++COHORT=e.COHORT;ARMS=e.ARMS;RUN_DIR=old.RUN_DIR/'infrastructure-continuation-v1'
++PROTOCOL=old.RUN_DIR/'infrastructure-continuation-preparation-v1/root-implementation-protocol-v1.md'
++PROTOCOL_SHA='c0c9fac3c18a920f88539c9abcf9d66359d4843d05a630f183b15845d97c59ef'
++SEAL=RUN_DIR/'metadata-seal-v1.json';SEAL_REVIEW=RUN_DIR/'root-seal-review-v1.json'
++FINAL_REVIEW=RUN_DIR/'final-source-runtime-review-v1.json';AUTHORITY=RUN_DIR/'adoption-v1/authority.json'
++BRIDGE=RUN_DIR/'source-bridge-v1.json';PLAN=RUN_DIR/'plan.frozen.v1.gpu7.json'
++CAPS={'attempts':494,'gpu_hours':100.,'buckets':{'baseline':55,'development':199,'validation':180,'formal':40,'recovery':20},
++ 'protected_gpu_hours':{'validation':32.,'formal':12.}}
++LIMITS={'new_dispatches':22,'named_retries':1,'additional_retries':0,'combined_dispatches':42,'combined_recoveries':2,
++ 'episode_timeout_seconds':1800,'cleanup_seconds':40,'combined_local_gpu_hours':22.,'physical_gpu':7}
++WORKER_CONTRACT=old.WORKER_CONTRACT
++ref=e.ref;_SCOPE=None
++read_worker_report=old.read_worker_report
++
++def history(*,cleanup=False):
++    seal=w.read_ref(ref(SEAL));review=w.read_ref(ref(SEAL_REVIEW))
++    w.require(review=={'schema':'n25-continuation-root-seal-review-v1','accepted':True,'seal':ref(SEAL),
++        'protocol':ref(PROTOCOL),'original_disposition':'INVALID_OR_INTERRUPTED','history_is_metadata_attestation':True,
++        'historical_unknowns':e.UNKNOWN,'gpu_authorized':False},'root seal review missing/different')
++    w.require(w.sha(PROTOCOL)==PROTOCOL_SHA,'continuation protocol changed')
++    return sealer.verify(seal,check_cleanup=cleanup)
++
++def rows(seal):
++    result=[]
++    for index,oldrow in enumerate(seal['original_rows'][18:],18):
++        row=copy.deepcopy(oldrow);row.update(iteration=COHORT,episode_key=oldrow['episode_key']+'_infra1')
++        if index==18:row.update(budget_bucket='recovery',retry_of=e.FAILED,n25_named_infrastructure_proof=ref(SEAL))
++        result.append(row)
++    w.require(len(result)==22,'22 fixed successor rows required');return result
++
++def source_paths(r):return bridge.source_paths(Path(r['ROOT']))
++
++def final_review(source,runtime,root):
++    seal=history();b=bridge.build(source,seal,root)
++    w.require(w.read_ref(ref(BRIDGE))==b,'source bridge differs')
++    expected={'schema':'n25-continuation-source-runtime-review-v1','accepted':True,'source':source,'runtime':runtime,
++        'protocol':ref(PROTOCOL),'seal':ref(SEAL),'root_seal_review':ref(SEAL_REVIEW),'source_bridge':ref(BRIDGE),
++        'historical_backend_proof':seal['historical_backend_proof'],'no_new_preflight':True,'gpu_authorized':False}
++    w.require(w.read_ref(ref(FINAL_REVIEW))==expected,'root source review differs');return ref(FINAL_REVIEW)
++
++def authority(source,runtime,root,state=None):
++    record=w.read_ref(ref(AUTHORITY));seal=history();cap=record.get('remaining_local_gpu_hours')
++    keys={'schema','cohort_id','source','runtime','protocol','seal','final_review','existing_budget_authority','caps','limits',
++        'original_local_gpu_hours','old_gpu_seconds','remaining_local_gpu_hours','recorded_at','authority_interpretation','validation_authorized','formal_authorized'}
++    w.require(set(record)==keys and record['schema']=='n25-continuation-authority-v1' and record['cohort_id']==COHORT
++        and record['source']==source and record['runtime']==runtime and record['protocol']==ref(PROTOCOL)
++        and record['seal']==ref(SEAL) and record['final_review']==final_review(source,runtime,root)
++        and record['caps']==CAPS and record['limits']==LIMITS and record['original_local_gpu_hours']==22.
++        and record['old_gpu_seconds']==e.OLD_SECONDS and type(cap) in (int,float) and math.isfinite(cap)
++        and 1840/3600<=cap<=22-e.OLD_SECONDS/3600 and record['validation_authorized'] is False and record['formal_authorized'] is False
++        and all(isinstance(record[k],str) and record[k].strip() for k in ('recorded_at','authority_interpretation')),'finite continuation authority differs')
++    original_authority=w.read_ref(seal['old_authority']);budget=w.read_ref(record['existing_budget_authority'])
++    w.require(record['existing_budget_authority']==original_authority['budget_authority'] and budget['caps']==CAPS,'old adopted finite budget changed')
++    if state is not None:w.require(state.get('n25_continuation_authority')==ref(AUTHORITY),'new authority not adopted')
++    return record
++
++def require_state(state,r):
++    rec=w.read_ref(ref(AUTHORITY));authority(rec['source'],rec['runtime'],Path(r['ROOT']),state)
++    budget=state['budget'];existing=w.read_ref(rec['existing_budget_authority']);resource=state['resource_isolation']
++    w.require(state.get('n25_budget_authority')==rec['existing_budget_authority']
++        and budget['max_episode_attempts']==494 and budget['max_gpu_hours']==100.
++        and budget['reserved']==CAPS['buckets'] and budget['gpu_hour_reservations']==CAPS['protected_gpu_hours']
++        and budget['amendment']==existing['amendment'] and resource.get('status')=='ACTIVE' and resource.get('validation_status')=='PASS'
++        and resource.get('private_budget') is True and state.get('max_concurrent_gpu_workers')==1
++        and not state.get('external_resource_hold',{}).get('do_not_auto_resume',False) and r['authorized_gpu'](state)==7,'unchanged private budget/resource policy required')
++
++def local_events(events):return [x for x in events if x.get('identity',{}).get('iteration')==COHORT]
++
++def budget_check(state,events,resources,r,record,*,dispatch=False):
++    seal=history();old_events=[x for x in events if x.get('identity',{}).get('iteration')==e.OLD]
++    w.require(old_events==w.read_ref(seal['old_ledger']),'old ledger changed/later original reservation')
++    from scripts import qd_ed_n25_backend as backend
++    backend.settled_proof(w.read_ref(seal['historical_backend_proof']),resources,r)
++    local=local_events(events);gg=r['event_groups'](local);snap=r['budget_snapshot'](events,resources)
++    w.require(snap['running']==snap['gpu_healthcheck_inflight']==0 and all(g[-1]['event'] in r['TERMINAL'] for g in r['event_groups'](events).values()),'unsettled worker/ledger')
++    charged=[x for x in local if x['event']=='dispatched'];used={b:sum(x['budget_bucket']==b for x in charged) for b in CAPS['buckets']}
++    needs={'baseline':5-used['baseline'],'development':16-used['development'],'recovery':1-used['recovery']}
++    spent=sum(x.get('gpu_process_wall_seconds',0.) for x in local if x['event'] in r['TERMINAL'])
++    w.require(len(gg)<=22 and len(charged)+19<=42 and used['recovery']<=1 and all(n>=0 for n in needs.values()),'combined attempt/bucket bound')
++    reserve_h=sum(max(0.,h-snap['gpu_hours_by_bucket'][b]) for b,h in CAPS['protected_gpu_hours'].items())
++    reserve_n=sum(max(0,CAPS['buckets'][b]-snap['by_bucket'][b]) for b in ('validation','formal'))
++    cap=record['remaining_local_gpu_hours']*3600
++    w.require(spent<=cap and e.OLD_SECONDS+spent<=22*3600
++        and all(CAPS['buckets'][b]-snap['by_bucket'][b]>=n for b,n in needs.items())
++        and snap['dispatched']+sum(needs.values())+reserve_n<=494,'finite slots/local time exhausted')
++    w.require(snap['gpu_hours_consumed']+max(0.,cap-spent)/3600+reserve_h<=100.+1e-9,'local cap borrows protected cumulative hours')
++    if dispatch:w.require(spent+1840<=cap and snap['gpu_hours_consumed']+1840/3600+reserve_h<=100.+1e-9,'full1840 per-dispatch capacity missing')
++    return {'spent_seconds':spent,'remaining_slots':needs}
++
++def full_capacity(state,events,resources,r):
++    require_state(state,r);return budget_check(state,events,resources,r,w.read_ref(ref(AUTHORITY)))
++
++@contextmanager
++def supervised_scope(plan,root,episode_key):
++    global _SCOPE
++    w.require(_SCOPE is None,'nested continuation scope')
++    _SCOPE=(str(Path(root).resolve()),plan['source_commit'],episode_key,os.getpid(),threading.get_ident())
++    try:yield
++    finally:_SCOPE=None
++
++def require_scope(plan,root,r,row=None):
++    w.require(_SCOPE is not None and _SCOPE[:2]==(str(Path(root).resolve()),plan['source_commit'])
++        and _SCOPE[3:]==(os.getpid(),threading.get_ident()) and (row is None or row['episode_key']==_SCOPE[2]),'closed single-cell continuation scope required')
++
++def effective_row(plan,row,events,root,r):
++    require_scope(plan,root,r,row);w.require(row in plan['episodes'],'no replacement or recovery row');return row
++
++def check_retry(events,row,r):
++    seal=history();expected=rows(seal);w.require(row in expected,'not exact22 row')
++    index=expected.index(row)+18;oldrow=seal['original_rows'][index]
++    scientific=lambda x:{k:x[k] for k in ('split','profile','task_id','env_seed','policy_seed','init_index')}
++    prior=[g for g in r['event_groups'](events).values() if g[0]['identity']['iteration'] in {e.OLD,COHORT} and scientific(g[0]['identity'])==scientific(e.identity(oldrow))]
++    if index==18:
++        w.require(row['retry_of']==e.FAILED and row['budget_bucket']=='recovery' and row['n25_named_infrastructure_proof']==ref(SEAL)
++            and len(prior)==1 and prior[0][-1]==seal['all_old_attempts'][18]['terminal'],'only exact named first retry allowed')
++    else:w.require(not prior and not row.get('retry_of'),'scientific cell exposed/repeated')
++    if index==18:w.require(not any(x.get('retry_of')==e.FAILED for x in events),'named opportunity already consumed')
++
++
++def protected_budget(state,events,resources,row,timeout,r,*,plan):
++    w.require(row in plan['episodes'] and row['iteration']==COHORT and timeout==1800,'continuation row/deadline differs')
++    require_state(state,r);budget_check(state,events,resources,r,w.read_ref(ref(AUTHORITY)),dispatch=True)
++
++def validate_contract(plan,manifest,runtime,seeds,root,r):
++    old.imports_owned(root,r)
++    w.require(Path(__file__).resolve().is_relative_to(Path(root).resolve()),'continuation module shadowing')
++    seal=history();source=w.source_record(root,[x['path'] for x in plan['code_files']])
++    w.require(source['commit']==plan['source_commit'] and source['files']==plan['code_files'] and set(x['path'] for x in plan['code_files'])==source_paths(r),'complete committed source required')
++    w.require(plan['episodes']==rows(seal) and plan['n25_infrastructure_continuation']==metadata(source,seal['runtime'],root)
++        and plan['n25_cohort']=={'schema':'n25-continuation-audit-family-v1','worker_audit':WORKER_CONTRACT}
++        and plan['phase_authorization']=={'dev':True,'validation':False,'formal':False},'exact continuation matrix/metadata differs')
++    prior=w.read_ref(seal['original_plan']);allowed={'source_commit','code_files','episodes','n25_cohort','n25_infrastructure_continuation','derived_from','frozen'}
++    w.require(set(plan)==set(prior)|{'n25_infrastructure_continuation'}
++        and all(plan[k]==prior[k] for k in prior if k not in allowed),'original plan/runtime/science changed')
++    for a in ('N23','N25'):w.require(w.sha(plan['candidate_profiles'][a]['path'])==plan['candidate_profiles'][a]['sha256'],'profile bytes changed')
++    old.validate_runtime(runtime,root,r);require_state(r['read_state'](Path(root)/'research-state.yaml'),r)
++
++def metadata(source,runtime,root):
++    return {'schema':'n25-infrastructure-continuation-v1','cohort_id':COHORT,'protocol':ref(PROTOCOL),'seal':ref(SEAL),
++        'final_review':final_review(source,runtime,root),'authority':ref(AUTHORITY),'limits':LIMITS,
++        'historical_unknowns':e.UNKNOWN,'imports':18,'dispatchable':22}
++
++def validate_worker_context(context,argv,root,output,plan,runtime):
++    w.require(plan.get('frozen') is True and plan['n25_cohort']['worker_audit']==WORKER_CONTRACT
++        and plan['n25_infrastructure_continuation']['schema']=='n25-infrastructure-continuation-v1'
++        and plan['n25_infrastructure_continuation']['protocol']['sha256']==PROTOCOL_SHA
++        and plan['worktree']==str(root) and context['profile'] in ARMS
++        and output==Path(plan['artifact_root']).resolve()/'attempts'/context['attempt_id']
++        and context['runtime']=={'path':plan['runtime_manifest_path'],'sha256':plan['runtime_manifest_sha256']},'continuation worker context differs')
++    matches=[x for x in plan['episodes'] if x['episode_key']==context['episode_key']]
++    w.require(len(matches)==1 and matches[0]['iteration']==COHORT and matches[0]['profile']==context['profile']
++        and matches[0]['split']=='dev' and matches[0]['timeout_seconds']==1800 and context['source']['commit']==plan['source_commit']
++        and context['source']['files']==plan['code_files'],'continuation worker scientific row/source differs')
++    w.verify_source(root,context['source']);w.require(w.cuda_binding(runtime)['physical_gpu']==7,'GPU7 worker required')
++    return root,output,runtime
++
++def accepted_cell(plan,row,events,root,r):
++    own=list(r['event_groups']([x for x in local_events(events) if x['episode_key']==row['episode_key']]).values())
++    w.require(len(own)==1 and [x['event'] for x in own[0]]==['reserved','dispatched','valid'],'single settled new attempt required')
++    final=own[0][-1]
++    w.require(final['outcome_valid'] is True and final['required_cost_telemetry_complete'] is True
++        and final['identity']==r['episode_identity'](row) and final['retry_of']==row.get('retry_of')
++        and final['source_commit']==plan['source_commit'] and final['plan_sha256']==w.sha(plan['_path'])
++        and final['profile_manifest_sha256']==plan['profiles_sha256'] and final['runtime_manifest_sha256']==plan['runtime_manifest_sha256']
++        and final['runtime_inventory_sha256']==plan['runtime_inventory_sha256'] and final['init_row_sha256']==row['init_row_sha256'],'new accepted gate/identity missing')
++    out=Path(final['output_dir']);context=w.read_ref(ref(out/'n23-worker-context.json'))
++    frozen={k:v for k,v in plan.items() if k!='_path'}
++    w.require(w.read_ref(context['plan'])==frozen and w.read_ref(ref(out/'attempt-result.json'))==final
++        and final['n23_worker_receipt']==ref(out/'eds_eval/in-worker-audit-receipt.json'),'new receipt/terminal plan differs')
++    report=old.read_worker_report(out,r);native.from_output(row['profile'],out,report,final.get('guided_chunks'))
++    return final
++
++def admission(plan,runtime,row,events,resources,root,r):
++    seal=history();index=plan['episodes'].index(row)
++    allowed={x['episode_key'] for x in plan['episodes'][:index]}
++    w.require(all(x['episode_key'] in allowed for x in local_events(events)),'exact new prefix; no resume past invalid')
++    valid=[accepted_cell({**plan,'_path':_plan_path(plan)},x,events,root,r) for x in plan['episodes'][:index]]
++    n=18+index;wins=seal['counts']['N25']['success']+sum(x['success'] is True and x['identity']['profile']=='N25' for x in valid)
++    w.require(wins+10-n//4>=5,'complete original quadruple futility already reached')
++    return {'n25_continuation_id':COHORT,'n25_original_logical_index':18+index,'n25_original_cohort':e.OLD,
++        'n25_continuation_protocol_sha256':PROTOCOL_SHA,'n25_prefix_seal':ref(SEAL),'n25_historical_unknowns':e.UNKNOWN}
++
++def _plan_path(plan):
++    w.require(w.read_ref(ref(PLAN))==plan,'plan must be exact frozen continuation');return str(PLAN)
+diff --git a/scripts/qd_ed_n25_cont_evidence.py b/scripts/qd_ed_n25_cont_evidence.py
+new file mode 100644
+index 0000000..06544cc
+--- /dev/null
++++ b/scripts/qd_ed_n25_cont_evidence.py
+@@ -0,0 +1,198 @@
++"""Metadata-only historical attestation. Never follows evidence tensor references."""
++import hashlib
++import json
++import math
++from pathlib import Path
++
++BASE='5a65ef15968cc68c82314e8c0773b3365ad45fa0'
++OLD='N25_ACTUATOR_CLIPPED_RBF_DEV_20260930'
++COHORT='N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930'
++FAILED='rdt-qd-ed-final-20260921T093925Z__n25_dev_t04_n23_20260930__8b236af507d8'
++OLD_SECONDS=8201.788167113322
++FAILED_SECONDS=1801.4751812220784
++EXPECTED_COUNTS={'C0':{'audited':5,'success':0},'Q0':{'audited':5,'success':0},'N23':{'audited':4,'success':0},'N25':{'audited':4,'success':1}}
++FROZEN={'review':'a0b225efd8e35c17b5c6e801c3188a63b178079b7d31274f8b189a5641c59052',
++ 'result':'8005d67dc8cc04c764838d703c06dd8e14aeeae6b2312ba5bfe9b483228ac3b1',
++ 'plan':'1f0c94ccd3458a3a786acb9525728a1b64e3df439e4f920731f6566dd3a95eb3',
++ 'source':'fafcb0d881c95d567cb14a6690145d4ad933abc84a5e0175dfbe1512efd836ee'}
++ARMS=('C0','Q0','N23','N25')
++UNKNOWN={'native_audit_status':'UNKNOWN_MISSING','all_non_transport_gates_verified':False,
++ 'api_only_causal_attribution':'UNPROVEN','accept_original_as_scientific_result':False,
++ 'retroactive_native_repair_authorized':False,'unknown_token_calls':6}
++
++def require(ok,msg):
++    if not ok:raise ValueError(msg)
++
++def canonical(x):return hashlib.sha256(json.dumps(x,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
++def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++def ref(path):return {'path':str(Path(path).resolve()),'sha256':sha(path)}
++def same_ref(a,b):return a['sha256']==b['sha256'] and Path(a['path']).resolve()==Path(b['path']).resolve()
++def identity(row):return {k:row[k] for k in ('split','iteration','profile','task_id','env_seed','policy_seed','init_index')}
++
++class Reader:
++    """One explicitly inventoried metadata universe, bounded total bytes, no payload follow."""
++    def __init__(self,records):
++        require(isinstance(records,list) and 0<len(records)<=512,'metadata inventory bound')
++        self.records={str(Path(r['path']).resolve()):r for r in records};self.cache={};self.bytes=0
++        require(len(self.records)==len(records),'duplicate metadata path')
++        for p,r in self.records.items():
++            require(set(r)=={'path','sha256'} and Path(p).suffix in {'.json','.jsonl','.txt'},'metadata file type')
++            require(not any(x in Path(p).parts for x in ('decision_evidence','images','videos')),'payload directory forbidden')
++    def read_bytes(self,reference):
++        p=Path(reference['path']);key=str(p.resolve())
++        require(set(reference)=={'path','sha256'} and p.is_absolute() and key in self.records
++            and same_ref(reference,self.records[key]),'uninventoried metadata reference')
++        if key not in self.cache:
++            require(p.is_file() and not p.is_symlink(),'metadata missing/symlink')
++            size=p.stat().st_size;require(0<=size<=16*1024*1024 and self.bytes+size<=128*1024*1024,'metadata byte bound before read')
++            with p.open('rb') as stream:b=stream.read(size+1)
++            require(len(b)==size,'metadata changed while reading');self.bytes+=len(b)
++            require(hashlib.sha256(b).hexdigest()==reference['sha256'],'metadata hash changed');self.cache[key]=b
++        return self.cache[key]
++    def json(self,r):return json.loads(self.read_bytes(r))
++    def lines(self,r):return [json.loads(s) for s in self.read_bytes(r).splitlines() if s.strip()]
++
++def absence(path):
++    p=Path(path);require(not p.exists() and not p.is_symlink(),'delayed audit writer or linked absence')
++    return {'path':str(p.resolve()),'present':False,'sha256':None}
++
++def verify_absences(rows):
++    require(len(rows)==2 and {Path(r['path']).name for r in rows}=={'in-worker-audit-receipt.json','decision-evidence-audit.json'},'two named absent audits required')
++    for row in rows:require(row==absence(row['path']),'absence record changed')
++
++def process_cleanup(processes,*,proc=Path('/proc')):
++    """Public boot/stat/cmdline only; no signalling or child creation."""
++    boot=(proc/'sys/kernel/random/boot_id').read_text().strip();checked=[];owned=set()
++    for p in processes:
++        require(set(p)=={'pid','proc_start_ticks','boot_id'} and type(p['pid']) is int and p['pid']>1
++            and isinstance(p['proc_start_ticks'],str) and p['proc_start_ticks'].isdigit(),'process identity malformed')
++        owned.add(p['pid']);stat=proc/str(p['pid'])/'stat'
++        if p['boot_id']==boot and stat.exists():
++            fields=stat.read_text().rsplit(')',1)[1].split()
++            require(fields[19]!=p['proc_start_ticks'],'original owned process still present (including zombie)')
++        checked.append(p)
++    # Original workers use start_new_session=True. Detect surviving process groups
++    # and explicit original attempt/supervisor command identities, including reparented children.
++    for entry in proc.iterdir():
++        if not entry.name.isdigit():continue
++        try:
++            fields=(entry/'stat').read_text().rsplit(')',1)[1].split()
++            cmd=(entry/'cmdline').read_bytes().replace(b'\0',b' ').decode(errors='replace')
++        except (FileNotFoundError,ProcessLookupError):continue
++        require(not (any(p['boot_id']==boot for p in processes) and (int(fields[2]) in owned or int(fields[3]) in owned)), 'owned process group/session remains')
++        require(FAILED not in cmd and 'qd_ed_n25_supervise.py' not in cmd,'original owned command remains')
++    return {'boot_id':boot,'checked_processes':checked,'no_owned_processes':True}
++
++def groups(events):
++    d={}
++    for e in events:d.setdefault(e['attempt_id'],[]).append(e)
++    return d
++
++def failed_signature(final,stage):
++    require(final['attempt_id']==FAILED and final.get('event')=='valid' and final.get('outcome_valid') is False
++        and final.get('reason')=='TimeoutExpired' and final.get('compute_outcome')=='completed'
++        and final.get('gpu_process_wall_seconds')==FAILED_SECONDS and final.get('retry_of') is None,'named terminal signature differs')
++    for k,v in {'provider_logical_call_attempts':43,'provider_completed_turns':37,'provider_failed_calls':6,'provider_usage_complete_calls':37}.items():
++        require(type(final.get(k)) is int and final[k]==v,'named provider counter differs: '+k)
++    require(stage['schema']=='n25-public-stage-metadata-v1' and stage['attempt_id']==FAILED
++        and stage.get('response_payloads_included') is False,'public Stage projection differs')
++    att=stage['attestation'];require(att['root_terminal_review']['sha256']==FROZEN['review'] and att['source_stage_events']==stage['source_stage_events']
++        and att['public_fields_only'] is True and att['all_logical_calls_included'] is True,'root projection attestation differs')
++    calls=stage['calls'];require(len(calls)==43,'public logical call count differs')
++    positions=[x['event_position'] for x in calls];require(all(type(n) is int and n>=0 for n in positions) and positions==sorted(set(positions)), 'public event positions differ')
++    fails=[x for x in calls if x['query_ok'] is not True]
++    require([x['global_step'] for x in fails]==[96,120,128,136,168,176],'six named failed steps differ')
++    for x in calls:
++        require(not any(k in x for k in ('raw_response','prompt','image','images','response')),'public projection contains excluded content')
++        tr=x['transport'];require(tr['backend']=='codex_cli' and tr['auth_mode']=='chatgpt' and tr['model']=='gpt-6-astra'
++            and tr['reasoning_effort']=='low' and tr['timeout_seconds']==180.,'provider semantics changed')
++        require(x['codex_logical_call_attempts']==1,'logical call multiplicity')
++        if x['query_ok'] is True:
++            require(x['codex_completed_turns']==x['codex_usage_complete_calls']==1 and x['codex_failed_calls']==0,'successful usage incomplete')
++        else:
++            life=tr['lifecycle'];events=life['events'];kinds=[e['kind'] for e in events]
++            require(x['query_status']=='error' and x['error']=='codex_timeout' and x['codex_completed_turns']==0
++                and x['codex_usage_complete_calls']==0 and x['codex_failed_calls']==1,'failed call changed')
++            require(life['schema']=='codex-stage-lifecycle-v1' and life['observation_complete'] is True
++                and life['observer_error_category'] is None and life['timeout_observed_at'] is not None
++                and life['first_completed_observed_at'] is None and life['first_complete_usage_observed_at'] is None
++                and life['complete_usage_observed'] is False,'timeout lifecycle incomplete/different')
++            timeline=[life[k] for k in ('request_started_at','spawn_started_at','spawn_returned_at','communicate_started_at','timeout_observed_at','cleanup_started_at','cleanup_returned_at','process_exit_observed_at','observer_finished_at')]
++            require(all(type(v) in (int,float) and math.isfinite(v) for v in timeline) and timeline==sorted(timeline)
++                and life['timeout_observed_at']-life['communicate_started_at']>=180.
++                and type(x.get('codex_call_latency_s')) in (int,float) and math.isfinite(x['codex_call_latency_s']) and x['codex_call_latency_s']>=180.,'timeout interval/cleanup ordering differs')
++            require(tr['event_types']==kinds and tr['item_types']==[v['item_kind'] for v in events if 'item_kind' in v]
++                and all(type(v.get('observed_at')) in (int,float) and math.isfinite(v['observed_at']) for v in events)
++                and [v['observed_at'] for v in events]==sorted(v['observed_at'] for v in events)
++                and all(timeline[0]<=v['observed_at']<=timeline[-1] for v in events),'transport/lifecycle association differs')
++            require(kinds[:2]==['thread.started','turn.started'] and all(e['kind'] in {'thread.started','turn.started','error','item.completed'} for e in events)
++                and {e.get('error_category') for e in events[2:]}=={'stream_error','item_error'}
++                and all(e.get('item_kind')=='error' for e in events if e['kind']=='item.completed'),'unexpected lifecycle fault')
++    return {'failed_calls':fails,'failed_calls_sha256':canonical(fails),'public_projection_source':stage['source_stage_events'],**UNKNOWN}
++
++def terminal_binding(final,row,plan,plan_ref,commit=BASE):
++    require(final['identity']==identity(row) and final['episode_key']==row['episode_key']
++        and final['plan_sha256']==plan_ref['sha256'] and final['source_commit']==commit
++        and final['runtime_manifest_sha256']==plan['runtime_manifest_sha256']
++        and final['profile_manifest_sha256']==plan['profiles_sha256']
++        and final['runtime_inventory_sha256']==plan['runtime_inventory_sha256']
++        and final['init_row_sha256']==row['init_row_sha256'] and final['physical_gpu']==7,'historical terminal binding differs')
++
++def accepted_metadata(cell,final,row,plan,plan_ref,source,runtime,reader,*,historical=True):
++    require(final.get('event')=='valid' and final.get('outcome_valid') is True
++        and final.get('required_cost_telemetry_complete') is True and final.get('retry_of')==row.get('retry_of'),'import must be fully accepted primary')
++    terminal_binding(final,row,plan,plan_ref,BASE if historical else source['commit'])
++    require(cell['attempt_id']==final['attempt_id'] and cell['episode_key']==row['episode_key']
++        and cell['task_id']==row['task_id'] and cell['profile']==row['profile'] and cell['success'] is final['success'],'accepted prefix association')
++    require(reader.json(cell['attempt_result'])==final,'accepted terminal record differs')
++    context=reader.json(cell['worker_context']);receipt=reader.json(cell['worker_receipt']);audit=reader.json(cell['audit'])
++    require(context['source']==source and context['plan']==plan_ref and context['runtime']==runtime
++        and context['attempt_id']==cell['attempt_id'] and context['episode_key']==cell['episode_key']
++        and context['profile']==cell['profile'] and context['output_dir']==final['output_dir'],'historical context identity')
++    require(receipt['accepted'] is True and audit['accepted'] is True and audit.get('evidence_complete') is True
++        and receipt['main_exit_code']==0 and receipt['process_unchanged'] is True
++        and receipt['context']==cell['worker_context'] and receipt['audit_report']==cell['audit']
++        and receipt['source']==source and receipt['plan']==plan_ref and receipt['runtime']==runtime
++        and receipt['attempt_id']==cell['attempt_id'] and receipt['profile']==cell['profile']
++        and receipt['episode_key']==cell['episode_key'] and final['n23_worker_receipt']==cell['worker_receipt']
++        and receipt['main_argv_sha256']==canonical(context['main_argv']),'historical receipt metadata binding')
++    process=reader.json(ref_from_inventory(reader,Path(final['output_dir'])/'process.json'))
++    proc={k:process[k] for k in ('pid','proc_start_ticks','boot_id')}
++    require(process['attempt_id']==cell['attempt_id'] and receipt['process']==proc,'historical PID binding')
++    start=reader.json(ref_from_inventory(reader,Path(final['output_dir'])/'eds_eval/in-worker-audit-start.json'))
++    require(start=={'schema':'n23-worker-start-v1','process':proc,'context':cell['worker_context']},'historical audit start')
++    evidence=receipt['evidence'];require(evidence['sha256']==canonical(evidence['files']),'recorded evidence digest changed')
++    require(all(set(q)=={'path','sha256'} and not Path(q['path']).is_absolute() and '..' not in Path(q['path']).parts for q in evidence['files']), 'unsafe recorded evidence index')
++    kind='cuda' if row['profile'] in {'N23','N25'} else 'cpu'
++    require(receipt['audit_backend']['kind']==kind and audit['n23_arithmetic_backend']==receipt['audit_backend']
++        and receipt['worker_cuda']['physical_gpu']==7 and receipt['worker_cuda']['physical_uuid']=='GPU-48473162-9548-1a19-04aa-ea86c5349187','historical audit backend')
++    require(0<=receipt['audit_seconds']<=receipt['worker_wall_seconds'] and receipt['worker_wall_seconds']<=final['gpu_process_wall_seconds'],'historical audit wall association')
++    return {'cell':cell,'process':proc,'native':receipt['n25_native_counts'],'auxiliary':receipt['n25_auxiliary'],
++        'evidence_index':evidence,'reliance':'Original metered audit + frozen root terminal review; no tensor reread or native re-audit.'}
++
++def ref_from_inventory(reader,path):
++    key=str(Path(path).resolve());require(key in reader.records,'missing required metadata inventory: '+key);return reader.records[key]
++
++
++def measured_native_metadata(final,receipt,audit):
++    """Public result/receipt gates only. No numerical replay and no tensor reads."""
++    counts=receipt['n25_native_counts'];arm=final['identity']['profile'];g=counts['guided_decisions']
++    require(type(g) is int and g>=0,'guided count missing')
++    require(not audit.get('errors') and audit.get('evidence_complete') is True,'native report completeness')
++    if arm in ('N23','N25'):
++        require(counts['parent_rounds_verified']==10*g and counts['score_batches_verified']==11*g and counts['candidate_scores_verified']==176*g,'fixed QD/ED canonical counts')
++    gate=audit.get('n25_actuator_clipped_rbf_audit')
++    if arm=='N25':
++        require(gate is not None and gate['schema']=='n25-native-rbf-audit-v1' and gate['accepted'] is True and gate['guided_decisions']==g,'N25 cannot downgrade missing native markers')
++        for k in ('all_call_summaries_verified','witness_calls_verified','zero_gradient_calls','clipped_components'):
++            require(type(gate[k]) is int and gate[k]>=0 and gate[k]==counts[k],'N25 scalar native gate differs')
++        require(gate['all_call_summaries_verified']==final['rbf_gradient_calls']
++            and gate['zero_gradient_calls']<=gate['all_call_summaries_verified'] and gate['clipped_components']<=384*gate['all_call_summaries_verified']
++            and gate['witness_calls_verified']<=11 and gate['witness_numeric_bytes']<=225280
++            and len(gate['witness_checks'])==gate['witness_calls_verified'] and all(q['accepted'] is True for q in gate['witness_checks']), 'bounded native witness gate differs')
++    else:require(not gate,'control has unexpected N25 gate')
++    transport=final['stage_transport']
++    require((transport['backend'],transport['auth_mode'],transport['model'],transport['reasoning_effort'],transport['timeout_seconds'])
++        ==('codex_cli','chatgpt','gpt-6-astra','low',180.) and final['guidance_api_request_attempts']==final['grounding_api_request_attempts']==0,
++        'Codex-only frozen transport differs')
++    return counts,receipt['n25_auxiliary']
+diff --git a/scripts/qd_ed_n25_cont_prepare.py b/scripts/qd_ed_n25_cont_prepare.py
+new file mode 100644
+index 0000000..7327a0e
+--- /dev/null
++++ b/scripts/qd_ed_n25_cont_prepare.py
+@@ -0,0 +1,37 @@
++#!/usr/bin/env python3
++"""Pure successor draft; --freeze requires complete root-owned review/adoption."""
++import argparse
++import copy
++from pathlib import Path
++import sys
++ROOT=Path(__file__).resolve().parents[1]
++if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
++from scripts import qd_ed_final_runner as r,qd_ed_n23_worker as w,qd_ed_n25_cont_contract as c
++
++
++def build_plan(prior,seal,source,*,meta=None):
++    plan=copy.deepcopy(prior)
++    plan.update(frozen=False,source_commit=source['commit'],code_files=source['files'],episodes=c.rows(seal),
++        derived_from=seal['original_plan'],n25_cohort={'schema':'n25-continuation-audit-family-v1','worker_audit':c.WORKER_CONTRACT},
++        n25_infrastructure_continuation=meta or {'schema':'n25-infrastructure-continuation-v1','executable':False,
++            'protocol_sha256':c.PROTOCOL_SHA,'seal':None,'authority':None,'final_review':None})
++    return plan
++
++
++def freeze(path,root=ROOT):
++    w.require(Path(path).resolve()==c.PLAN.resolve(),'exact successor plan path required')
++    w.require(not Path(path).exists() and not Path(path).is_symlink(),'immutable successor plan already exists')
++    with r.locked(Path(root)/'data/qd-ed-runner.lock',nonblocking=True):
++        seal=c.history(cleanup=True);source=w.source_record(root,c.source_paths(vars(r)))
++        c.final_review(source,seal['runtime'],root);c.authority(source,seal['runtime'],root)
++        with r.locked(Path(root)/'data/qd-ed-state.lock'):
++            events=r.read_events(Path(root)/'data/attempt-ledger.jsonl')
++            w.require(not c.local_events(events),'any reservation consumes successor launch')
++            c.full_capacity(r.read_state(Path(root)/'research-state.yaml'),events,r.read_events(Path(root)/'data/gpu-healthcheck-ledger.jsonl'),vars(r))
++        plan=build_plan(w.read_ref(seal['original_plan']),seal,source,meta=c.metadata(source,seal['runtime'],root));plan['frozen']=True
++        w.atomic_json(path,plan);r.validate_plan(path,root=root);return plan
++
++
++def main():
++    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--freeze',action='store_true',required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args();freeze(a.output)
++if __name__=='__main__':main()
+diff --git a/scripts/qd_ed_n25_cont_report.py b/scripts/qd_ed_n25_cont_report.py
+new file mode 100644
+index 0000000..715446f
+--- /dev/null
++++ b/scripts/qd_ed_n25_cont_report.py
+@@ -0,0 +1,86 @@
++"""Independent logical40 aggregation, immutable original INVALID and all costs retained."""
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w,qd_ed_n25_report as old_report,qd_ed_n25_native as native
++from scripts import qd_ed_n25_cont_contract as c,qd_ed_n25_cont_evidence as e
++
++
++def analyze(plan,seal,events,acceptor):
++    local=c.local_events(events);gg=e.groups(local);rows=plan['episodes'];keys=[x['episode_key'] for x in rows]
++    w.require(len(rows)==22 and rows==c.rows(seal),'fixed22 reporting map differs')
++    attempts=[]
++    for aid,g in gg.items():
++        w.require(g[0]['event']=='reserved' and g[-1]['event'] in {'valid','aborted'}
++            and sum(x['event']=='dispatched' for x in g)<=1 and all(x['episode_key']==g[0]['episode_key'] for x in g),'new unsettled/malformed journal')
++        w.require(g[0]['episode_key'] in keys,'unknown successor cell')
++        row=rows[keys.index(g[0]['episode_key'])]
++        attempts.append({'attempt_id':aid,'episode_key':row['episode_key'],'profile':row['profile'],'terminal':g[-1]})
++    accepted=[{**q['cell'],'logical_index':q['logical_index'],'origin':'imported_original'} for q in seal['accepted_prefix']]
++    native_counts={a:dict(seal['native'][a]) for a in c.ARMS};aux={a:dict(seal['auxiliary'][a]) for a in c.ARMS};failure=None
++    for n,row in enumerate(rows,18):
++        own=[g for g in gg.values() if g[0]['episode_key']==row['episode_key']]
++        if not own:break
++        try:
++            cell,counts,cost=acceptor(row,local)
++            w.require(len(own)==1 and cell['attempt_id']==own[0][-1]['attempt_id'],'new accepted lineage differs')
++        except (ValueError,RuntimeError,OSError,KeyError,AssertionError) as exc:
++            failure={'episode_key':row['episode_key'],'logical_index':n,'type':type(exc).__name__,'reason':str(exc)};break
++        accepted.append({**cell,'logical_index':n,'origin':'new_successor'})
++        for dest,data in ((native_counts,counts),(aux,cost)):
++            for k,v in data.items():dest[row['profile']][k]=dest[row['profile']].get(k,0)+v
++    added=len(accepted)-18;allowed=set(keys[:added])|({keys[added]} if added<22 else set())
++    w.require(all(x['episode_key'] in allowed for x in local),'journal continued past invalid/missing cell')
++    counts={a:{'audited':sum(x['profile']==a for x in accepted),'success':sum(x['profile']==a and x['success'] is True for x in accepted)} for a in c.ARMS}
++    wins=counts['N25']['success'];substantive=native_counts['N25'].get('guided_decisions',0)>0 and native_counts['N25'].get('parent_rounds_verified',0)>0
++    promoted=len(accepted)==40 and wins>=5 and wins>=max(counts[a]['success'] for a in c.ARMS[:-1]) and substantive
++    futile=len(accepted)%4==0 and wins+10-len(accepted)//4<5
++    decision='ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION' if promoted else 'REJECT' if len(accepted)==40 else 'REJECT_NUMERIC_FUTILITY' if futile and failure is None else 'INVALID_OR_INTERRUPTED'
++    combined=seal['all_old_attempts']+attempts
++    w.require(len({x['attempt_id'] for x in combined})==len(combined),'cost attempt duplicated')
++    return {'schema':'n25-infrastructure-continuation-result-v1','cohort_id':c.COHORT,'source_commit':plan['source_commit'],
++        'planned':40,'imported_cells':18,'new_accepted_cells':added,'audited_cells':len(accepted),'counts':counts,'accepted_cells':accepted,
++        'original_disposition':'INVALID_OR_INTERRUPTED','original_result':seal['original_result'],'prefix_seal':c.ref(c.SEAL),
++        'historical_unknowns':e.UNKNOWN,'new_attempts':attempts,'attempts':combined,
++        'new_dispatched':sum(x['event']=='dispatched' for x in local),'dispatched':19+sum(x['event']=='dispatched' for x in local),
++        'native':native_counts,'auxiliary':aux,'failure':failure,'decision':decision,'dev_gate_promoted':promoted,
++        'old_costs':old_report.summary([],seal['all_old_attempts']),'new_costs':old_report.summary([],attempts),
++        **old_report.summary(accepted,combined),'validation_authorized':False,'formal_authorized':False,'goal_status':'TARGET_NOT_MET',
++        'downstream_adapter_required':True}
++
++
++def write_terminal(plan_path,plan,status_path,root,r):
++    w.require(Path(status_path).resolve()==(c.RUN_DIR/'execution/supervisor-status-v1.json').resolve(),'controller status exact split-root path')
++    seal=c.history();events=r['read_events'](Path(root)/'data/attempt-ledger.jsonl');local=c.local_events(events)
++    try:status=w.read_ref(c.ref(status_path));status_ref=c.ref(status_path)
++    except (OSError,ValueError,KeyError) as exc:status={'status':'unavailable','type':type(exc).__name__};status_ref={'path':str(status_path),'sha256':None}
++    def accept(row,ev):
++        final=c.accepted_cell({**plan,'_path':str(plan_path)},row,ev,root,r);out=Path(final['output_dir'])
++        report=c.old.read_worker_report(out,r);counts,aux=native.from_output(row['profile'],out,report,final.get('guided_chunks'))
++        return {'episode_key':row['episode_key'],'task_id':row['task_id'],'profile':row['profile'],'attempt_id':final['attempt_id'],
++            'success':final['success'],'audit':c.ref(out/'eds_eval/decision-evidence-audit.json'),
++            'worker_context':c.ref(out/'n23-worker-context.json'),'worker_receipt':c.ref(out/'eds_eval/in-worker-audit-receipt.json'),
++            'attempt_result':c.ref(out/'attempt-result.json')},counts,aux
++    try:result=analyze(plan,seal,events,accept)
++    except (ValueError,RuntimeError,OSError,KeyError,AssertionError) as exc:
++        # Malformed/unsettled metadata cannot be silently converted into accepted cells.
++        attempts=[]
++        for g in e.groups(local).values():
++            attempts.append({'attempt_id':g[0]['attempt_id'],'episode_key':g[0]['episode_key'],
++                'profile':g[0]['identity']['profile'],'terminal':g[-1]})
++        combined=seal['all_old_attempts']+attempts
++        result={'schema':'n25-infrastructure-continuation-result-v1','cohort_id':c.COHORT,'decision':'INVALID_OR_INTERRUPTED',
++            'dev_gate_promoted':False,'original_disposition':'INVALID_OR_INTERRUPTED','original_result':seal['original_result'],
++            'accepted_cells':[dict(q['cell'],origin='imported_original',logical_index=q['logical_index']) for q in seal['accepted_prefix']],
++            'audited_cells':18,'journal_reconstruction_error':{'type':type(exc).__name__,'reason':str(exc)},'attempts':combined,
++            'unsettled_or_malformed_new_journal':local,'historical_unknowns':e.UNKNOWN,**old_report.summary([],combined)}
++    prefix=[x['episode_key'] for x in result['accepted_cells'] if x['origin']=='new_successor']
++    phase=status.get('status');consistent=status.get('completed_keys')==prefix and status.get('dev_gate_promoted')==result['dev_gate_promoted']
++    consistent=consistent and ((phase=='rejected_numeric_futility' and result['decision']=='REJECT_NUMERIC_FUTILITY')
++        or (phase=='completed_all_forty_audited' and result['audited_cells']==40)
++        or (phase in {'failed','interrupted'} and result['decision']=='INVALID_OR_INTERRUPTED'))
++    result['controller_evidence']={'consistent':consistent,'completed_keys':status.get('completed_keys'),'journal_accepted_keys':prefix,'status_phase':phase}
++    if not consistent:
++        result['journal_reconstructed_disposition']=result['decision'];result['decision']='INVALID_OR_INTERRUPTED';result['dev_gate_promoted']=False
++    snapshot=c.RUN_DIR/'execution/terminal-ledger-v1.json';w.atomic_json(snapshot,local)
++    result.update(plan=c.ref(plan_path),source_bridge=c.ref(c.BRIDGE),terminal_status={**status_ref,'content':status},ledger_snapshot=c.ref(snapshot),
++        reader=c.ref(__file__),validation_authorized=False,formal_authorized=False)
++    w.atomic_json(c.RUN_DIR/'result-v1.json',result);return result
+diff --git a/scripts/qd_ed_n25_cont_seal.py b/scripts/qd_ed_n25_cont_seal.py
+new file mode 100644
+index 0000000..4bb3a1e
+--- /dev/null
++++ b/scripts/qd_ed_n25_cont_seal.py
+@@ -0,0 +1,116 @@
++#!/usr/bin/env python3
++"""Root-only future metadata seal; CPU preparation never invokes main on real inputs."""
++import argparse
++import json
++import subprocess
++from pathlib import Path
++import sys
++ROOT=Path(__file__).resolve().parents[1]
++if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
++from scripts import qd_ed_n25_cont_evidence as e
++
++
++def build(input_record,old_root,*,cleanup=e.process_cleanup):
++    e.require(input_record['schema']=='n25-continuation-sealing-input-v1' and input_record['root_authorized'] is True,
++        'explicit root metadata input review required')
++    r=e.Reader(input_record['files']);refs=input_record['references']
++    for k,expected in e.FROZEN.items():e.require(refs[k]['sha256']==expected,'frozen parent reference differs: '+k)
++    review=r.json(refs['review']);result=r.json(refs['result']);plan=r.json(refs['plan']);source=r.json(refs['source'])
++    e.require(review['schema']=='n25-root-terminal-review-v1' and review['decision']=='ACCEPT_TERMINAL_RECONSTRUCTION'
++        and review['cohort_disposition']=='INVALID_OR_INTERRUPTED' and review['source_files_verified']==257
++        and review['accepted_cells']==18 and review['counts']==e.EXPECTED_COUNTS
++        and review['all_attempts']==19 and review['all_attempt_gpu_process_seconds']==e.OLD_SECONDS,'root terminal attestation differs')
++    for k in ('result','plan','source'):e.require(e.same_ref(review[k],refs[k]),'root reference binding differs')
++    e.require(source['commit']==e.BASE and len(source['files'])==257 and source['sha256']==e.canonical(source['files']), 'old source manifest closure')
++    old_root=Path(old_root).resolve()
++    e.require(subprocess.check_output(['git','rev-parse','HEAD'],cwd=old_root,text=True).strip()==e.BASE,'sealing requires intact old HEAD')
++    for q in source['files']:
++        p=old_root/q['path'];e.require(not p.is_symlink() and p.resolve().is_relative_to(old_root) and e.sha(p)==q['sha256'],'old source byte drift')
++    e.require(plan['source_commit']==e.BASE and plan['code_files']==source['files'] and Path(plan['worktree']).resolve()==old_root,'original plan/source root differs')
++    rows=plan['episodes'];e.require(len(rows)==40 and [(x['task_id'],x['profile']) for x in rows]==[(t,a) for t in range(10) for a in e.ARMS]
++        and all(x['iteration']==e.OLD and x['split']==x['seed_block']=='dev' and x['timeout_seconds']==1800 for x in rows),'old matrix changed')
++    runtime={'path':plan['runtime_manifest_path'],'sha256':plan['runtime_manifest_sha256']}
++    runtime_data=r.json(runtime)  # JSON only: never follows runtime.files/weights.
++    e.require(Path(runtime_data['worktree']).resolve()==old_root and runtime_data['gpu_mapping']['physical_gpu']==7
++        and runtime_data['gpu_mapping']['uuid']=='GPU-48473162-9548-1a19-04aa-ea86c5349187','old runtime identity')
++    e.require(result['schema']=='n25-dev-cohort-result-v1' and result['decision']=='INVALID_OR_INTERRUPTED'
++        and result['cohort_id']==e.OLD and result['source_commit']==e.BASE and result['audited_cells']==18
++        and result['planned']==40 and result['dispatched']==19 and result['counts']==e.EXPECTED_COUNTS
++        and result['dev_gate_promoted'] is False and result['controller_evidence']['consistent'] is True,'old INVALID result differs')
++    e.require(e.same_ref(result['plan'],refs['plan']) and e.same_ref(result['ledger_snapshot'],review['ledger']),'old result ledger/plan differs')
++    sr={k:result['terminal_status'][k] for k in ('path','sha256')};status=r.json(sr)
++    e.require(status==result['terminal_status']['content'] and status['status']=='failed'
++        and status['completed_keys']==[x['episode_key'] for x in rows[:18]],'old status differs')
++    ledger=r.json(result['ledger_snapshot']);gg=e.groups(ledger)
++    e.require(len(gg)==19 and list(gg)==[x['attempt_id'] for x in result['attempts']], 'old attempt order differs')
++    all_attempts=[]
++    for n,(aid,g) in enumerate(gg.items()):
++        e.require([q['event'] for q in g]==['reserved','dispatched','valid'] and all(q.get('retry_of') is None for q in g),'old attempt chronology/recovery differs')
++        final=g[-1];e.terminal_binding(final,rows[n],plan,refs['plan'])
++        e.require(all(q['identity']==final['identity'] and q['attempt_id']==aid for q in g),'old event identity differs')
++        item={'attempt_id':aid,'episode_key':rows[n]['episode_key'],'profile':rows[n]['profile'],'terminal':final}
++        e.require(item==result['attempts'][n],'old result attempt differs from ledger');all_attempts.append(item)
++    e.require(sum(v['terminal']['gpu_process_wall_seconds'] for v in all_attempts)==e.OLD_SECONDS,'old all-attempt wall differs')
++    accepted=[];processes=[];native={a:{} for a in e.ARMS};aux={a:{} for a in e.ARMS}
++    for n,cell in enumerate(result['accepted_cells']):
++        rec=e.accepted_metadata(cell,all_attempts[n]['terminal'],rows[n],plan,refs['plan'],source,runtime,r)
++        accepted.append({'logical_index':n,**rec});processes.append(rec['process'])
++        for dest,key in ((native,'native'),(aux,'auxiliary')):
++            for k,v in rec[key].items():dest[rows[n]['profile']][k]=dest[rows[n]['profile']].get(k,0)+v
++    e.require(len(accepted)==18 and native==result['native'] and aux==result['auxiliary'],'old native totals/root attestation mismatch')
++    failed=all_attempts[-1]['terminal'];e.require(failed['attempt_id']==e.FAILED,'wrong exceptional attempt')
++    out=Path(failed['output_dir']);e.require(out.name==e.FAILED,'failed output identity')
++    failed_terminal=r.json(e.ref_from_inventory(r,out/'attempt-result.json'));e.require(failed_terminal==failed,'failed terminal file differs')
++    process=r.json(e.ref_from_inventory(r,out/'process.json'));e.require(process['attempt_id']==e.FAILED,'failed process binding')
++    processes.append({k:process[k] for k in ('pid','proc_start_ticks','boot_id')})
++    context=r.json(e.ref_from_inventory(r,out/'n23-worker-context.json'))
++    e.require(context['source']==source and context['plan']==refs['plan'] and context['runtime']==runtime
++        and context['attempt_id']==e.FAILED and context['profile']=='N23','failed context/source binding')
++    absent=[e.absence(out/'eds_eval'/n) for n in ('in-worker-audit-receipt.json','decision-evidence-audit.json')]
++    present=[e.ref_from_inventory(r,out/n) for n in ('results.txt','eds_eval/episode_compute.jsonl')]
++    for q in present:r.read_bytes(q)  # presence and immutable hash, never acceptance.
++    signature=e.failed_signature(failed,r.json(refs['stage_public']))
++    controller=r.json(refs['controller']);e.require(controller['schema']=='n25-root-controller-process-v1'
++        and e.same_ref(controller['plan'],refs['plan']),'original supervisor identity')
++    processes.append({'pid':controller['controller_pid'],'proc_start_ticks':controller['controller_start_ticks'],'boot_id':controller['boot_id']})
++    final_review=r.json(plan['n25_cohort']['final_review']);authority=r.json(plan['n25_cohort']['authority'])
++    e.require(final_review['source']==source and final_review['runtime']==runtime and final_review['disposition']=='accepted'
++        and authority['source']==source and authority['runtime']==runtime and authority['local_gpu_hours']==22.,'old reviewed source/authority differs')
++    proof=r.json(final_review['backend_proof'])
++    e.require(proof['schema']=='n25-metered-tensor-proof-v1' and proof['accepted'] is True and proof['source']==source
++        and proof['runtime']==runtime,'historical backend source proof differs')
++    # Hash proof closure only. It is historical root-reviewed evidence, not a new run.
++    for k in ('plan','report','process','terminal'):r.json(proof[k])
++    cleanup_record=cleanup(processes)
++    return {'schema':'n25-continuation-metadata-seal-v1','original_disposition':'INVALID_OR_INTERRUPTED',
++        'original_source':source,'original_plan':refs['plan'],'runtime':runtime,'root_terminal_review':refs['review'],
++        'original_result':refs['result'],'old_ledger':result['ledger_snapshot'],'old_status':sr,'old_authority':plan['n25_cohort']['authority'],
++        'historical_backend_proof':final_review['backend_proof'],'metadata_files':list(r.records.values()),
++        'all_old_attempts':all_attempts,'original_rows':rows,'accepted_prefix':accepted,'native':native,'auxiliary':aux,
++        'counts':e.EXPECTED_COUNTS,'old_gpu_seconds':e.OLD_SECONDS,'old_attempts':19,'old_recoveries':0,
++        'failed_attempt':e.FAILED,'failed_signature':signature,'failed_audits_absent':absent,'failed_present_only':present,
++        'processes':processes,'cleanup':cleanup_record,'reader':e.ref(__file__),
++        'metadata_reader':e.ref(Path(__file__).with_name('qd_ed_n25_cont_evidence.py')),
++        'reliance':'Root terminal review + original metered receipts/evidence-index digests; no tensor files opened or native gates recomputed.',
++        'historical_unknowns':e.UNKNOWN,'metadata_bytes':r.bytes,'validation_authorized':False,'formal_authorized':False}
++
++
++def verify(seal,*,check_cleanup=False,cleanup=e.process_cleanup):
++    e.require(seal['schema']=='n25-continuation-metadata-seal-v1' and seal['historical_unknowns']==e.UNKNOWN
++        and seal['original_disposition']=='INVALID_OR_INTERRUPTED' and seal['failed_attempt']==e.FAILED
++        and seal['old_attempts']==19 and seal['old_recoveries']==0 and seal['old_gpu_seconds']==e.OLD_SECONDS
++        and seal['counts']==e.EXPECTED_COUNTS and [x['logical_index'] for x in seal['accepted_prefix']]==list(range(18)), 'seal limits/Unknown changed')
++    r=e.Reader(seal['metadata_files'])
++    for q in seal['metadata_files']:r.read_bytes(q)
++    e.verify_absences(seal['failed_audits_absent'])
++    if check_cleanup:cleanup(seal['processes'])
++    return seal
++
++
++def main():
++    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--input',type=Path,required=True);p.add_argument('--old-root',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
++    data=json.loads(a.input.read_text());seal=build(data,a.old_root);seal['sealing_input']=e.ref(a.input)
++    e.require(not a.output.exists(),'seal is immutable');a.output.parent.mkdir(parents=True,exist_ok=True)
++    with a.output.open('x') as f:json.dump(seal,f,indent=2,allow_nan=False);f.write('\n')
++    print(json.dumps({'path':str(a.output.resolve()),'sha256':e.sha(a.output),'metadata_only':True,'gpu_authorized':False}))
++if __name__=='__main__':main()
+diff --git a/scripts/qd_ed_n25_cont_supervise.py b/scripts/qd_ed_n25_cont_supervise.py
+new file mode 100644
+index 0000000..13f2d4f
+--- /dev/null
++++ b/scripts/qd_ed_n25_cont_supervise.py
+@@ -0,0 +1,82 @@
++#!/usr/bin/env python3
++"""One successor launch, one named repeat; any new invalidity closes immediately."""
++import argparse
++from pathlib import Path
++import signal
++import sys
++ROOT=Path(__file__).resolve().parents[1]
++if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
++from scripts import qd_ed_final_runner as r,qd_ed_n23_worker as w,qd_ed_n25_supervise as old_supervisor
++from scripts import qd_ed_n25_cont_contract as c,qd_ed_n25_cont_report as report
++
++
++def one_attempt(path,plan,row):
++    seen={x['attempt_id'] for x in r.read_events(ROOT/'data/attempt-ledger.jsonl')}
++    with c.supervised_scope(plan,ROOT,row['episode_key']):
++        try:
++            values=r.run_plan(path,split='dev',iteration=c.COHORT,episode_keys=[row['episode_key']],root=ROOT)
++            w.require(len(values)==1,'single successor worker result required');return values[0]
++        except r.GateError:
++            finals=[x for x in r.read_events(ROOT/'data/attempt-ledger.jsonl') if x['attempt_id'] not in seen
++                and x['event'] in r.TERMINAL and x.get('identity',{}).get('iteration')==c.COHORT and x['episode_key']==row['episode_key']]
++            if len(finals)!=1:raise
++            return finals[0]
++
++
++def release_check(path,plan_path,plan):
++    w.require(Path(path).resolve()==(c.RUN_DIR/'execution-release-v1.json').resolve(),'successor release path')
++    expected={'schema':'n25-continuation-execution-release-v1','plan':c.ref(plan_path),'source_commit':plan['source_commit'],
++        'cohort_id':c.COHORT,'authority':c.ref(c.AUTHORITY),'seal':c.ref(c.SEAL),'episode_keys':[x['episode_key'] for x in plan['episodes']],
++        'limits':c.LIMITS,'physical_gpu':7,'one_launch':True,'validation_authorized':False,'formal_authorized':False}
++    w.require(w.read_ref(c.ref(path))==expected,'exact external successor release required')
++
++
++def execute(path,plan,status_path):
++    w.require(Path(status_path).resolve()==(c.RUN_DIR/'execution/supervisor-status-v1.json').resolve(),'split-root status differs')
++    Path(status_path).parent.mkdir(parents=True,exist_ok=True)
++    seal=c.history();completed=[];attempts=[];outcomes=[];wins={a:seal['counts'][a]['success'] for a in c.ARMS};native_totals={a:dict(seal['native'][a]) for a in c.ARMS}
++    def write(phase,**kw):
++        r.durable_json(status_path,{'schema':'n25-continuation-supervisor-status-v1','status':phase,'cohort_id':c.COHORT,
++            'plan':c.ref(path),'source_commit':plan['source_commit'],'prefix_seal':c.ref(c.SEAL),'completed_keys':list(completed),
++            'attempts':attempts,'outcomes':outcomes,'counts_success':wins,'dev_gate_promoted':False,'protected_authorized':False,**kw})
++    try:
++        write('started')
++        for row in plan['episodes']:
++            old_supervisor.device_check();final=one_attempt(path,plan,row)
++            attempts.append(final);write('attempt_journaled')
++            w.require(final.get('outcome_valid') is True,'any new invalidity closes; no further recovery')
++            events=r.read_events(ROOT/'data/attempt-ledger.jsonl');accepted=c.accepted_cell({**plan,'_path':str(path)},row,events,ROOT,vars(r))
++            w.require(accepted==final,'journal differs from result')
++            counts,_=c.native.from_output(row['profile'],final['output_dir'],c.old.read_worker_report(final['output_dir'],vars(r)),final.get('guided_chunks'))
++            for k,v in counts.items():native_totals[row['profile']][k]=native_totals[row['profile']].get(k,0)+v
++            outcomes.append({'episode_key':row['episode_key'],'attempt_id':final['attempt_id'],'success':final['success']})
++            wins[row['profile']]+=int(final['success'] is True);completed.append(row['episode_key']);write('cell_audited')
++            n=18+len(completed)
++            if n%4==0 and wins['N25']+10-n//4<5:write('rejected_numeric_futility');return
++        promote=wins['N25']>=5 and wins['N25']>=max(wins[a] for a in c.ARMS[:-1]) and native_totals['N25'].get('guided_decisions',0)>0 and native_totals['N25'].get('parent_rounds_verified',0)>0
++        write('completed_all_forty_audited',dev_gate_promoted=promote)
++    except BaseException as exc:
++        try:write('interrupted' if isinstance(exc,(KeyboardInterrupt,SystemExit)) else 'failed',failure_class=type(exc).__name__,failure=str(exc))
++        finally:raise
++    finally:report.write_terminal(path,plan,status_path,ROOT,vars(r))
++
++
++def launch(path,release,status):
++    plan,manifest,runtime=r.validate_plan(path,root=ROOT);release_check(release,path,plan)
++    w.require(Path(status).resolve()==(c.RUN_DIR/'execution/supervisor-status-v1.json').resolve(),'exact status location')
++    with r.locked(c.RUN_DIR/'execution/supervisor.lock',nonblocking=True):
++        w.require(not Path(status).exists() and not (c.RUN_DIR/'result-v1.json').exists(),'single launch, never resume')
++        with r.locked(ROOT/'data/qd-ed-runner.lock',nonblocking=True):
++            c.history(cleanup=True);events=r.read_events(ROOT/'data/attempt-ledger.jsonl')
++            w.require(not c.local_events(events),'reservation already consumed opportunity')
++            c.full_capacity(r.read_state(ROOT/'research-state.yaml'),events,r.read_events(ROOT/'data/gpu-healthcheck-ledger.jsonl'),vars(r))
++        w.atomic_json(c.RUN_DIR/'execution/controller-process-v1.json',{'schema':'n25-continuation-controller-process-v1',
++            'process':w.process_identity(),'plan':c.ref(path),'release':c.ref(release),'source_commit':plan['source_commit']})
++        execute(path,plan,status)
++
++
++def main():
++    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--plan',type=Path,required=True);p.add_argument('--release',type=Path,required=True);p.add_argument('--status',type=Path,required=True);a=p.parse_args();launch(a.plan,a.release,a.status)
++if __name__=='__main__':
++    signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(KeyboardInterrupt()))
++    main()
+diff --git a/scripts/qd_ed_n25_cont_terminal.py b/scripts/qd_ed_n25_cont_terminal.py
+new file mode 100644
+index 0000000..806c807
+--- /dev/null
++++ b/scripts/qd_ed_n25_cont_terminal.py
+@@ -0,0 +1,134 @@
++#!/usr/bin/env python3
++"""Independent metadata review of existing immutable successor result; optional repair writer."""
++import argparse
++import math
++from pathlib import Path
++import sys
++ROOT=Path(__file__).resolve().parents[1]
++if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
++from scripts import qd_ed_final_runner as r,qd_ed_n23_worker as w,qd_ed_n25_cont_contract as c,qd_ed_n25_cont_report as report
++from scripts import qd_ed_n25_cont_evidence as e
++
++
++def review_existing(result,plan,seal,current,reader,source,*,cleanup=e.process_cleanup):
++    """Does not call report.analyze or a native auditor; independently derives gates/costs."""
++    e.require(result['schema']=='n25-infrastructure-continuation-result-v1' and result['cohort_id']==c.COHORT
++        and result['original_disposition']=='INVALID_OR_INTERRUPTED' and result['original_result']==seal['original_result']
++        and result['historical_unknowns']==e.UNKNOWN,'result history/Unknown altered')
++    e.require(plan['source_commit']==source['commit'] and plan['code_files']==source['files'] and plan['episodes']==c.rows(seal),'new plan/source closure')
++    e.require(reader.json(result['plan'])==plan and reader.json(result['ledger_snapshot'])==current,'current journal/snapshot differs')
++    gg=e.groups(current);finals=[];processes=[];process_absences=[]
++    for aid,g in gg.items():
++        e.require(g[0]['event']=='reserved' and g[-1]['event'] in {'valid','aborted'} and sum(x['event']=='dispatched' for x in g)<=1,'unsettled new group')
++        final=g[-1];finals.append(final)
++        e.require(all(x['attempt_id']==aid and x['episode_key']==final['episode_key'] for x in g),'new attempt group identity differs')
++        row=next((x for x in plan['episodes'] if x['episode_key']==final['episode_key']),None)
++        e.require(row is not None,'unknown dispatched cell');e.terminal_binding(final,row,plan,result['plan'],source['commit'])
++        path=Path(final['output_dir'])/'process.json'
++        if any(x['event']=='dispatched' for x in g):
++            process=reader.json(e.ref_from_inventory(reader,path))
++            e.require(process['attempt_id']==aid,'dispatched process attempt differs')
++            proc={k:process[k] for k in ('pid','proc_start_ticks','boot_id')}
++            e.require(type(proc['pid']) is int and proc['pid']>1 and isinstance(proc['proc_start_ticks'],str)
++                and proc['proc_start_ticks'].isdigit() and isinstance(proc['boot_id'],str) and bool(proc['boot_id']),'dispatched process identity absent/malformed')
++            processes.append(proc)
++        else:
++            e.require(final['event']=='aborted' and final.get('outcome_valid') is not True,'undispatched result cannot be accepted')
++            process_absences.append({'attempt_id':aid,**e.absence(path)})
++    expected_attempts=[q['terminal'] for q in seal['all_old_attempts']]+finals
++    ids=[x['attempt_id'] for x in result['attempts']]
++    e.require(len(ids)==len(expected_attempts) and len(set(ids))==len(ids)
++        and len({x['attempt_id'] for x in expected_attempts})==len(expected_attempts),'unique exactly-once attempt count required')
++    e.require(all(x['terminal']['attempt_id']==x['attempt_id'] and x['episode_key']==x['terminal']['episode_key']
++        and x['profile']==x['terminal']['identity']['profile'] for x in result['attempts']),'attempt cost identity differs')
++    e.require({x['attempt_id']:x['terminal'] for x in result['attempts']}=={x['attempt_id']:x for x in [q['terminal'] for q in seal['all_old_attempts']]+finals},'all old/new terminal costs must be retained')
++    imported=[{**x['cell'],'logical_index':x['logical_index'],'origin':'imported_original'} for x in seal['accepted_prefix']]
++    e.require(result['accepted_cells'][:18]==imported,'imported prefix changed')
++    new=result['accepted_cells'][18:];keys=[x['episode_key'] for x in plan['episodes']]
++    e.require([x['episode_key'] for x in new]==keys[:len(new)] and len(new)<=22,'new accepted prefix differs')
++    wins={a:seal['counts'][a]['success'] for a in c.ARMS};denom={a:seal['counts'][a]['audited'] for a in c.ARMS}
++    native={a:dict(seal['native'][a]) for a in c.ARMS};aux={a:dict(seal['auxiliary'][a]) for a in c.ARMS}
++    for offset,cell in enumerate(new):
++        row=plan['episodes'][offset];own=[x for x in finals if x['episode_key']==row['episode_key']]
++        e.require(len(own)==1 and cell['logical_index']==18+offset and cell['origin']=='new_successor','new accepted mapping')
++        final=own[0];rec=e.accepted_metadata(cell,final,row,plan,result['plan'],source,seal['runtime'],reader,historical=False)
++        receipt=reader.json(cell['worker_receipt']);audit=reader.json(cell['audit']);counts,cost=e.measured_native_metadata(final,receipt,audit)
++        wins[row['profile']]+=int(final['success'] is True);denom[row['profile']]+=1
++        for dest,data in ((native,counts),(aux,cost)):
++            for k,v in data.items():dest[row['profile']][k]=dest[row['profile']].get(k,0)+v
++    # Every later attempt must be the one next unaccepted cell, never a skipped suffix.
++    allowed=set(keys[:len(new)])|({keys[len(new)]} if len(new)<22 else set())
++    e.require(all(f['episode_key'] in allowed for f in finals),'journal contains skipped/later cell')
++    unexpected_valid=[f for f in finals if f['episode_key'] not in keys[:len(new)] and f.get('outcome_valid') is True]
++    e.require(not unexpected_valid,'valid journal outcome omitted from immutable result')
++    expected_counts={a:{'audited':denom[a],'success':wins[a]} for a in c.ARMS}
++    e.require(result['counts']==expected_counts and result['native']==native and result['auxiliary']==aux
++        and result['audited_cells']==18+len(new),'independent result counts/native differ')
++    n=18+len(new);promoted=n==40 and wins['N25']>=5 and wins['N25']>=max(wins[a] for a in c.ARMS[:-1]) and native['N25'].get('guided_decisions',0)>0 and native['N25'].get('parent_rounds_verified',0)>0
++    invalid=any(f.get('outcome_valid') is not True for f in finals)
++    expected='ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION' if promoted else 'REJECT' if n==40 else 'REJECT_NUMERIC_FUTILITY' if n%4==0 and wins['N25']+10-n//4<5 and not invalid else 'INVALID_OR_INTERRUPTED'
++    statusref={k:result['terminal_status'][k] for k in ('path','sha256')}
++    status=reader.json(statusref) if statusref['sha256'] is not None else result['terminal_status']['content']
++    e.require(status==result['terminal_status']['content'],'status bytes/content mismatch')
++    phase=status.get('status');prefix=[x['episode_key'] for x in new]
++    consistent=status.get('completed_keys')==prefix and status.get('dev_gate_promoted')==promoted
++    consistent=consistent and ((phase=='rejected_numeric_futility' and expected=='REJECT_NUMERIC_FUTILITY') or
++        (phase=='completed_all_forty_audited' and n==40) or (phase in {'failed','interrupted'} and expected=='INVALID_OR_INTERRUPTED'))
++    e.require(result['controller_evidence']=={'consistent':consistent,'completed_keys':status.get('completed_keys'),'journal_accepted_keys':prefix,'status_phase':phase},'controller consistency claim differs')
++    if not consistent:
++        e.require(result['journal_reconstructed_disposition']==expected,'unrecorded controller discrepancy');expected='INVALID_OR_INTERRUPTED';promoted=False
++    e.require(result['decision']==expected and result['dev_gate_promoted'] is promoted and result['validation_authorized'] is False
++        and result['formal_authorized'] is False,'independent disposition differs')
++    # Recompute each cost with the same chronological sum domain; no imputed fields.
++    costs={a:{k:{'observed_total':0,'observed_attempts':0,'missing_attempts':[]} for k in report.old_report.COST_FIELDS} for a in c.ARMS}
++    unknown=[];unmeasured=[]
++    for item in result['attempts']:
++        f=item['terminal'];logical=f.get('provider_logical_call_attempts');usage=f.get('provider_usage_complete_calls')
++        if type(logical) is int and type(usage) is int and 0<=usage<=logical:unknown.append(logical-usage)
++        else:unmeasured.append(f['attempt_id'])
++        for k,slot in costs[item['profile']].items():
++            v=f.get(k)
++            if type(v) in (int,float) and math.isfinite(v) and v>=0:slot['observed_total']+=v;slot['observed_attempts']+=1
++            else:slot['missing_attempts'].append(f['attempt_id'])
++    e.require(result['all_attempt_costs']==costs and result['known_unknown_token_calls']==sum(unknown)
++        and result['unknown_token_calls']==(None if unmeasured else sum(unknown)) and result['unmeasured_token_call_attempts']==unmeasured
++        and result['all_attempt_token_usage_complete'] is False,'partial cost/usage differs')
++    e.require(result['dispatched']==19+sum(x['event']=='dispatched' for x in current),'combined dispatch denominator differs')
++    cleanup_result=cleanup(processes)
++    return {'schema':'n25-continuation-root-terminal-review-v1','decision':'ACCEPT_TERMINAL_RECONSTRUCTION',
++        'cohort_disposition':expected,'accepted_cells':n,'counts':expected_counts,'all_attempts':len(result['attempts']),
++        'historical_unknowns':e.UNKNOWN,'metadata_only':True,'tensor_reads':0,'next_gpu_execution_authorized':False,
++        'downstream_adapter_required':True,'cleanup':cleanup_result,'undispatched_process_absences':process_absences,'reader':e.ref(__file__)}
++
++
++def metadata_inventory(result,current):
++    refs=[result['plan'],result['ledger_snapshot']]
++    if result['terminal_status']['sha256'] is not None:refs.append({k:result['terminal_status'][k] for k in ('path','sha256')})
++    for group in e.groups(current).values():
++        if any(x['event']=='dispatched' for x in group):refs.append(e.ref(Path(group[-1]['output_dir'])/'process.json'))
++    for cell in result['accepted_cells'][18:]:
++        refs.extend(cell[k] for k in ('audit','worker_context','worker_receipt','attempt_result'))
++        out=Path(cell['attempt_result']['path']).parent
++        refs.extend(e.ref(out/n) for n in ('process.json','eds_eval/in-worker-audit-start.json'))
++    return list({str(Path(q['path']).resolve()):q for q in refs}.values())
++
++
++def main():
++    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--plan',type=Path,required=True);p.add_argument('--status',type=Path,required=True)
++    p.add_argument('--repair-missing-result',action='store_true');a=p.parse_args()
++    with r.locked(c.RUN_DIR/'execution/supervisor.lock',nonblocking=True):
++        with r.locked(ROOT/'data/qd-ed-runner.lock',nonblocking=True):
++            plan,_,_=r.validate_plan(a.plan,root=ROOT);controller=w.read_ref(c.ref(c.RUN_DIR/'execution/controller-process-v1.json'))
++            e.require(controller['schema']=='n25-continuation-controller-process-v1' and controller['plan']==c.ref(a.plan)
++                and controller['source_commit']==plan['source_commit'] and controller['release']==c.ref(c.RUN_DIR/'execution-release-v1.json'),'controller record differs')
++            from scripts.qd_ed_n25_cont_supervise import release_check
++            release_check(controller['release']['path'],a.plan,plan)
++            e.process_cleanup([controller['process']]);resultpath=c.RUN_DIR/'result-v1.json'
++            if a.repair_missing_result:
++                w.require(not resultpath.exists(),'terminal result already immutable');report.write_terminal(a.plan,plan,a.status,ROOT,vars(r));return
++            result=w.read_ref(c.ref(resultpath));seal=c.history();source=w.source_record(ROOT,c.source_paths(vars(r)))
++            current=c.local_events(r.read_events(ROOT/'data/attempt-ledger.jsonl'))
++            review=review_existing(result,plan,seal,current,e.Reader(metadata_inventory(result,current)),source)
++            review.update(result=c.ref(resultpath),plan=c.ref(a.plan),source=source,seal=c.ref(c.SEAL),ledger=result['ledger_snapshot'],controller=c.ref(c.RUN_DIR/'execution/controller-process-v1.json'))
++            w.atomic_json(c.RUN_DIR/'root-terminal-review-v1.json',review)
++if __name__=='__main__':main()
+diff --git a/tests/n25_cont_fixtures.py b/tests/n25_cont_fixtures.py
+new file mode 100644
+index 0000000..56d4c06
+--- /dev/null
++++ b/tests/n25_cont_fixtures.py
+@@ -0,0 +1,151 @@
++"""Only synthetic JSON/source/process fixtures; never opens real research artifacts."""
++import copy
++import json
++from pathlib import Path
++from scripts import qd_ed_n25_cont_evidence as e,qd_ed_n25_cont_contract as c
++
++
++def put(p,o):
++    p=Path(p);p.parent.mkdir(parents=True,exist_ok=True)
++    p.write_text(json.dumps(o,sort_keys=True,indent=2)+'\n');return e.ref(p)
++
++def plan_rows():
++    return [dict(split='dev',seed_block='dev',iteration=e.OLD,profile=a,task_id=t,env_seed=100+t,policy_seed=200+t,init_index=0,
++        init_row_sha256='row'+str(t),init_file_sha256='init'+str(t),bddl_sha256='bddl'+str(t),timeout_seconds=1800,
++        budget_bucket='baseline' if a=='C0' else 'development',episode_key=f'n25_dev_t{t:02d}_{a.lower()}_20260930') for t in range(10) for a in e.ARMS]
++
++def public_calls():
++    failsteps=[96,120,128,136,168,176];out=[]
++    for i in range(43):
++        fail=i<6;events=[{'kind':'thread.started'},{'kind':'turn.started'},{'kind':'error','error_category':'stream_error'},
++            {'kind':'item.completed','item_kind':'error','error_category':'item_error'}]
++        for position,event in enumerate(events):event['observed_at']=2.+position
++        life={'request_started_at':0.,'spawn_started_at':.1,'spawn_returned_at':.2,'communicate_started_at':1.,
++            'cleanup_started_at':181.1,'cleanup_returned_at':181.2,'process_exit_observed_at':181.3,'observer_finished_at':181.4,'schema':'codex-stage-lifecycle-v1','observation_complete':True,'observer_error_category':None,
++            'timeout_observed_at':181.,'first_completed_observed_at':None,'first_complete_usage_observed_at':None,
++            'complete_usage_observed':False,'events':events}
++        out.append({'event_position':i,'global_step':failsteps[i] if fail else 200+i*8,'chunk_id':i,'episode_id':0,
++            'query_ok':not fail,'query_status':'error' if fail else 'ok','error':'codex_timeout' if fail else None,
++            'codex_logical_call_attempts':1,'codex_completed_turns':int(not fail),'codex_failed_calls':int(fail),
++            'codex_usage_complete_calls':int(not fail),'codex_reasoning_output_tokens':None,'codex_call_latency_s':181.4,
++            'transport':{'backend':'codex_cli','auth_mode':'chatgpt','model':'gpt-6-astra','reasoning_effort':'low','timeout_seconds':180.,'event_types':[v['kind'] for v in events],'item_types':['error'],'lifecycle':life}})
++    return out
++
++def fixture(tmp,monkeypatch):
++    root=tmp/'old_source';root.mkdir();files=[]
++    for n in range(257):
++        p=root/f'source_{n}.py';p.write_text(f'number={n}\n');files.append({'path':p.name,'sha256':e.sha(p)})
++    source={'commit':e.BASE,'files':files,'sha256':e.canonical(files)};src=put(tmp/'source.json',source)
++    runtime={'worktree':str(root),'gpu_mapping':{'physical_gpu':7,'uuid':'GPU-48473162-9548-1a19-04aa-ea86c5349187'}};rt=put(tmp/'runtime.json',runtime)
++    dummy=put(tmp/'proof-extra.json',{'completed':True})
++    proof=put(tmp/'proof.json',{'schema':'n25-metered-tensor-proof-v1','accepted':True,'source':source,'runtime':rt,**{k:dummy for k in ('plan','report','process','terminal')}})
++    budget=put(tmp/'budget.json',{'caps':c.CAPS,'amendment':'synthetic'})
++    auth=put(tmp/'old-authority.json',{'source':source,'runtime':rt,'local_gpu_hours':22.,'budget_authority':budget})
++    freview=put(tmp/'old-final-review.json',{'source':source,'runtime':rt,'disposition':'accepted','backend_proof':proof})
++    rows=plan_rows();plan={'source_commit':e.BASE,'code_files':files,'worktree':str(root),'frozen':True,'episodes':rows,
++        'runtime_manifest_path':rt['path'],'runtime_manifest_sha256':rt['sha256'],'profiles_sha256':'profiles','runtime_inventory_sha256':'inventory',
++        'n25_cohort':{'final_review':freview,'authority':auth},'derived_from':dummy,'artifact_root':str(tmp/'attempts'),
++        'phase_authorization':{'dev':True,'validation':False,'formal':False}}
++    planref=put(tmp/'plan.json',plan);attempts=[];accepted=[];ledger=[];natives={a:{} for a in e.ARMS};aux={a:{} for a in e.ARMS}
++    walls=[0.]*17+[e.OLD_SECONDS-e.FAILED_SECONDS,e.FAILED_SECONDS]
++    assert sum(walls)==e.OLD_SECONDS
++    for n,row in enumerate(rows[:19]):
++        aid=e.FAILED if n==18 else 'synthetic-'+str(n);out=tmp/'attempts'/aid;out.mkdir(parents=True)
++        pid=900000+n;process={'pid':pid,'proc_start_ticks':str(100+n),'boot_id':'old-boot','attempt_id':aid};proc={k:process[k] for k in ('pid','proc_start_ticks','boot_id')}
++        put(out/'process.json',process)
++        context={'source':source,'plan':planref,'runtime':rt,'attempt_id':aid,'episode_key':row['episode_key'],'profile':row['profile'],
++            'output_dir':str(out),'main_argv':[str(root/'main.py')],'worktree':str(root),'schema':'n23-metered-worker-context-v1'}
++        cr=put(out/'n23-worker-context.json',context)
++        put(out/'eds_eval/in-worker-audit-start.json',{'schema':'n23-worker-start-v1','process':proc,'context':cr})
++        native={'guided_decisions':1,'parent_rounds_verified':10};backend={'kind':'cuda' if row['profile'] in {'N23','N25'} else 'cpu'}
++        if n<18:
++            ar=put(out/'eds_eval/decision-evidence-audit.json',{'accepted':True,'evidence_complete':True,'n23_arithmetic_backend':backend})
++            evidence=[{'path':f'd{j}.pt','sha256':'a'*64} for j in range(2100)]
++            receipt={'accepted':True,'main_exit_code':0,'process_unchanged':True,'context':cr,'audit_report':ar,'source':source,'plan':planref,'runtime':rt,
++                'attempt_id':aid,'profile':row['profile'],'episode_key':row['episode_key'],'main_argv_sha256':e.canonical(context['main_argv']),
++                'process':proc,'evidence':{'files':evidence,'sha256':e.canonical(evidence)},'audit_backend':backend,
++                'worker_cuda':{'physical_gpu':7,'physical_uuid':'GPU-48473162-9548-1a19-04aa-ea86c5349187'},'audit_seconds':0.,'worker_wall_seconds':0.,
++                'n25_native_counts':native,'n25_auxiliary':{}}
++            rr=put(out/'eds_eval/in-worker-audit-receipt.json',receipt)
++            for k,v in native.items():natives[row['profile']][k]=natives[row['profile']].get(k,0)+v
++        final={'attempt_id':aid,'episode_key':row['episode_key'],'identity':e.identity(row),'event':'valid','outcome_valid':n<18,
++            'source_commit':e.BASE,'plan_sha256':planref['sha256'],'runtime_manifest_sha256':rt['sha256'],'profile_manifest_sha256':'profiles',
++            'runtime_inventory_sha256':'inventory','init_row_sha256':row['init_row_sha256'],'physical_gpu':7,'output_dir':str(out),'budget_bucket':row['budget_bucket'],
++            'retry_of':None,'gpu_process_wall_seconds':walls[n],'success':n==15,'required_cost_telemetry_complete':n<18,
++            'provider_logical_call_attempts':43 if n==18 else 1,'provider_completed_turns':37 if n==18 else 1,
++            'provider_failed_calls':6 if n==18 else 0,'provider_usage_complete_calls':37 if n==18 else 1,'provider_token_usage_complete':n<18}
++        if n==18:final.update(reason='TimeoutExpired',compute_outcome='completed')
++        else:final['n23_worker_receipt']=rr
++        tr=put(out/'attempt-result.json',final)
++        if n<18:accepted.append({'attempt_id':aid,'episode_key':row['episode_key'],'task_id':row['task_id'],'profile':row['profile'],'success':final['success'],
++            'audit':ar,'worker_context':cr,'worker_receipt':rr,'attempt_result':tr})
++        attempts.append({'attempt_id':aid,'episode_key':row['episode_key'],'profile':row['profile'],'terminal':final})
++        ledger.extend([{**final,'event':'reserved'},{**final,'event':'dispatched'},final])
++    out=Path(attempts[-1]['terminal']['output_dir']);(out/'results.txt').write_text('present, not accepted')
++    put(out/'eds_eval/episode_compute.jsonl',{'compute_outcome':'completed'})
++    lr=put(tmp/'ledger.json',ledger);status={'status':'failed','completed_keys':[q['episode_key'] for q in rows[:18]]};sr=put(tmp/'status.json',status)
++    result={'schema':'n25-dev-cohort-result-v1','decision':'INVALID_OR_INTERRUPTED','cohort_id':e.OLD,'source_commit':e.BASE,'audited_cells':18,
++        'planned':40,'dispatched':19,'counts':e.EXPECTED_COUNTS,'dev_gate_promoted':False,'controller_evidence':{'consistent':True},'plan':planref,
++        'ledger_snapshot':lr,'terminal_status':{**sr,'content':status},'accepted_cells':accepted,'attempts':attempts,'native':natives,'auxiliary':aux}
++    res=put(tmp/'result.json',result)
++    review={'schema':'n25-root-terminal-review-v1','decision':'ACCEPT_TERMINAL_RECONSTRUCTION','cohort_disposition':'INVALID_OR_INTERRUPTED',
++        'source_files_verified':257,'accepted_cells':18,'counts':e.EXPECTED_COUNTS,'all_attempts':19,'all_attempt_gpu_process_seconds':e.OLD_SECONDS,
++        'result':res,'plan':planref,'source':src,'ledger':lr}
++    rev=put(tmp/'review.json',review)
++    ctl=put(tmp/'controller.json',{'schema':'n25-root-controller-process-v1','plan':planref,'controller_pid':999999,'controller_start_ticks':'88','boot_id':'old-boot'})
++    public={'schema':'n25-public-stage-metadata-v1','attempt_id':e.FAILED,'response_payloads_included':False,
++        'source_stage_events':{'path':str(tmp/'NEVER_READ.jsonl'),'sha256':'f'*64},'calls':public_calls()}
++    public['attestation']={'root_terminal_review':rev,'source_stage_events':public['source_stage_events'],'public_fields_only':True,'all_logical_calls_included':True,'reader':dummy}
++    st=put(tmp/'public-stage.json',public)
++    refs={'review':rev,'result':res,'source':src,'plan':planref,'controller':ctl,'stage_public':st}
++    monkeypatch.setattr(e,'FROZEN',{k:refs[k]['sha256'] for k in ('review','result','source','plan')})
++    files=[e.ref(p) for p in tmp.rglob('*') if p.is_file() and p.suffix in {'.json','.jsonl','.txt'}]
++    data={'schema':'n25-continuation-sealing-input-v1','root_authorized':True,'files':files,'references':refs}
++    return data,root,plan
++
++
++def fake_cleanup(ps):return {'boot_id':'new','checked_processes':ps,'no_owned_processes':True}
++
++
++def new_events(plan,n=22,*,fail=None,wins=5):
++    events=[]
++    for i,row in enumerate(plan['episodes'][:n]):
++        final={'attempt_id':'new-'+str(i),'episode_key':row['episode_key'],'identity':e.identity(row),'retry_of':row.get('retry_of'),
++            'budget_bucket':row['budget_bucket'],'event':'valid','outcome_valid':i!=fail,'required_cost_telemetry_complete':i!=fail,
++            'success':row['profile']=='N25' and row['task_id']<4+wins,'gpu_process_wall_seconds':100.,
++            'provider_logical_call_attempts':1,'provider_usage_complete_calls':1,'provider_token_usage_complete':True}
++        events.extend([{**final,'event':'reserved'},{**final,'event':'dispatched'},final])
++    return events
++
++
++def materialize_new(tmp,plan,seal,events):
++    pref=put(tmp/'new-plan.json',plan);source={'commit':plan['source_commit'],'files':plan['code_files'],'sha256':e.canonical(plan['code_files'])}
++    cells={};groups=e.groups(events)
++    for i,(aid,group) in enumerate(groups.items()):
++        row=plan['episodes'][i];out=tmp/'new-native'/aid;out.mkdir(parents=True);final=group[-1]
++        final.update(source_commit=source['commit'],plan_sha256=pref['sha256'],runtime_manifest_sha256=plan['runtime_manifest_sha256'],
++            profile_manifest_sha256=plan['profiles_sha256'],runtime_inventory_sha256=plan['runtime_inventory_sha256'],init_row_sha256=row['init_row_sha256'],
++            physical_gpu=7,output_dir=str(out),rbf_gradient_calls=154,guidance_api_request_attempts=0,grounding_api_request_attempts=0,
++            stage_transport={'backend':'codex_cli','auth_mode':'chatgpt','model':'gpt-6-astra','reasoning_effort':'low','timeout_seconds':180.})
++        for q in group[:-1]:q.update(final)
++        group[0]['event']='reserved';group[1]['event']='dispatched'
++        proc={'pid':800000+i,'proc_start_ticks':'1','boot_id':'test'};put(out/'process.json',{**proc,'attempt_id':aid})
++        ctx={'source':source,'plan':pref,'runtime':seal['runtime'],'attempt_id':aid,'episode_key':row['episode_key'],'profile':row['profile'],
++            'output_dir':str(out),'main_argv':[str(tmp/'main.py')]};cr=put(out/'n23-worker-context.json',ctx)
++        put(out/'eds_eval/in-worker-audit-start.json',{'schema':'n23-worker-start-v1','process':proc,'context':cr})
++        backend={'kind':'cuda' if row['profile'] in {'N23','N25'} else 'cpu'};counts={'guided_decisions':1,'parent_rounds_verified':10 if row['profile'] in {'N23','N25'} else 0}
++        if row['profile'] in {'N23','N25'}:counts.update(score_batches_verified=11,candidate_scores_verified=176)
++        audit={'accepted':True,'evidence_complete':True,'errors':[],'n23_arithmetic_backend':backend}
++        if row['profile']=='N25':
++            counts.update(all_call_summaries_verified=154,witness_calls_verified=0,zero_gradient_calls=0,clipped_components=10)
++            audit['n25_actuator_clipped_rbf_audit']={'schema':'n25-native-rbf-audit-v1','accepted':True,**counts,'witness_numeric_bytes':0,'witness_checks':[]}
++        ar=put(out/'eds_eval/decision-evidence-audit.json',audit)
++        receipt={'accepted':True,'main_exit_code':0,'process_unchanged':True,'context':cr,'audit_report':ar,'source':source,'plan':pref,'runtime':seal['runtime'],
++            'attempt_id':aid,'profile':row['profile'],'episode_key':row['episode_key'],'main_argv_sha256':e.canonical(ctx['main_argv']),'process':proc,
++            'evidence':{'files':[],'sha256':e.canonical([])},'audit_backend':backend,'worker_cuda':{'physical_gpu':7,'physical_uuid':'GPU-48473162-9548-1a19-04aa-ea86c5349187'},
++            'audit_seconds':0.,'worker_wall_seconds':0.,'n25_native_counts':counts,'n25_auxiliary':{}}
++        rr=put(out/'eds_eval/in-worker-audit-receipt.json',receipt);final['n23_worker_receipt']=rr
++        tr=put(out/'attempt-result.json',final)
++        cells[row['episode_key']]=({'episode_key':row['episode_key'],'task_id':row['task_id'],'profile':row['profile'],'attempt_id':aid,'success':final['success'],
++            'audit':ar,'worker_context':cr,'worker_receipt':rr,'attempt_result':tr},counts,{})
++    return pref,source,cells
+diff --git a/tests/test_qd_ed_n25_cont.py b/tests/test_qd_ed_n25_cont.py
+new file mode 100644
+index 0000000..3abd74b
+--- /dev/null
++++ b/tests/test_qd_ed_n25_cont.py
+@@ -0,0 +1,383 @@
++import copy
++import json
++from pathlib import Path
++import types
++import pytest
++from scripts import qd_ed_n25_cont_evidence as e,qd_ed_n25_cont_seal as sealmod,qd_ed_n25_cont_contract as c
++from scripts import qd_ed_n25_cont_bridge as bridge,qd_ed_n25_cont_prepare as prepare,qd_ed_n25_cont_report as report,qd_ed_n25_cont_supervise as sup
++from scripts import qd_ed_final_runner as r,qd_ed_n23_worker as w,qd_ed_n25_contract as old
++from n25_cont_fixtures import fixture,put,fake_cleanup,new_events
++
++@pytest.fixture
++def hist(tmp_path,monkeypatch):
++    data,root,prior=fixture(tmp_path,monkeypatch)
++    monkeypatch.setattr(sealmod.subprocess,'check_output',lambda *a,**k:e.BASE+'\n')
++    seal=sealmod.build(data,root,cleanup=fake_cleanup)
++    monkeypatch.setattr(c,'SEAL',tmp_path/'seal.json');put(c.SEAL,seal)
++    monkeypatch.setattr(c,'history',lambda **k:seal)
++    return seal,prior,data,root
++
++
++def test_complete_metadata_seal_no_tensor_or_stage_follow(hist):
++    seal,_,_,_=hist
++    assert len(seal['accepted_prefix'])==18 and len(seal['all_old_attempts'])==19
++    assert seal['historical_unknowns']==e.UNKNOWN and seal['old_gpu_seconds']==e.OLD_SECONDS
++    assert len(seal['accepted_prefix'][0]['evidence_index']['files'])==2100
++    assert not any(Path(q['path']).suffix=='.pt' for q in seal['metadata_files'])
++    assert not any('NEVER_READ' in q['path'] for q in seal['metadata_files'])
++    assert sealmod.verify(seal,cleanup=fake_cleanup,check_cleanup=True)==seal
++
++@pytest.mark.parametrize('fault',['attempt','event','outcome','reason','compute','wall','logical','complete','failed','usage','step','lifecycle','extra_error','success_usage','positions','projection_semantics','attestation','raw_response'])
++def test_named_signature_fails_closed(hist,fault):
++    seal,_,data,_=hist;final=copy.deepcopy(seal['all_old_attempts'][-1]['terminal']);public=json.loads(Path(data['references']['stage_public']['path']).read_text())
++    edits={'attempt':('attempt_id','other'),'event':('event','aborted'),'outcome':('outcome_valid',True),'reason':('reason','Other'),
++        'compute':('compute_outcome','aborted'),'wall':('gpu_process_wall_seconds',1800.),'logical':('provider_logical_call_attempts',44),
++        'complete':('provider_completed_turns',38),'failed':('provider_failed_calls',7),'usage':('provider_usage_complete_calls',43)}
++    if fault in edits:k,v=edits[fault];final[k]=v
++    elif fault=='step':public['calls'][0]['global_step']=95
++    elif fault=='lifecycle':public['calls'][0]['transport']['lifecycle']['first_completed_observed_at']=3.
++    elif fault=='extra_error':public['calls'][0]['transport']['lifecycle']['events'].append({'kind':'x','error_category':'other'})
++    elif fault=='success_usage':public['calls'][10]['codex_usage_complete_calls']=0
++    elif fault=='positions':public['calls'][1]['event_position']=0
++    elif fault=='projection_semantics':public['response_payloads_included']=True
++    elif fault=='attestation':public['attestation']['all_logical_calls_included']=False
++    else:public['calls'][0]['raw_response']=None
++    with pytest.raises(ValueError):e.failed_signature(final,public)
++
++@pytest.mark.parametrize('fault',['file_drift','late_audit','unknown_true','old_cost','missing_prefix','tensor_allow','unlisted_ref','byte_bound'])
++def test_seal_inventory_and_unknown_negative(hist,fault,monkeypatch):
++    seal,_,_,_=hist;seal=copy.deepcopy(seal)
++    if fault=='file_drift':Path(seal['metadata_files'][0]['path']).write_text('{}')
++    elif fault=='late_audit':Path(seal['failed_audits_absent'][0]['path']).write_text('{}')
++    elif fault=='unknown_true':seal['historical_unknowns']['all_non_transport_gates_verified']=True
++    elif fault=='old_cost':seal['old_gpu_seconds']=0
++    elif fault=='missing_prefix':seal['accepted_prefix'].pop()
++    elif fault=='tensor_allow':seal['metadata_files'].append({'path':'/tmp/unknown.pt','sha256':'x'})
++    elif fault=='unlisted_ref':
++        with pytest.raises(ValueError):e.Reader(seal['metadata_files']).json({'path':'/tmp/NEVER.json','sha256':'x'})
++        return
++    else:
++        reader=e.Reader(seal['metadata_files']);reader.bytes=128*1024*1024
++        with pytest.raises(ValueError):reader.read_bytes(seal['metadata_files'][0])
++        return
++    with pytest.raises(ValueError):sealmod.verify(seal)
++
++@pytest.mark.parametrize('fault',['none','live','reused_pid','old_boot','orphan_session','owned_command'])
++def test_public_process_identity_cleanup(tmp_path,fault):
++    proc=tmp_path/'proc';(proc/'sys/kernel/random').mkdir(parents=True);(proc/'sys/kernel/random/boot_id').write_text('boot')
++    def add(pid,ticks,session=0,cmd='other'):
++        path=proc/str(pid);path.mkdir();fields=['S','1','0',str(session)]+['0']*15+[str(ticks)]
++        (path/'stat').write_text(str(pid)+' (python) '+' '.join(fields));(path/'cmdline').write_text(cmd)
++    p={'pid':999,'proc_start_ticks':'123','boot_id':'boot'}
++    if fault=='live':add(999,123)
++    elif fault=='reused_pid':add(999,456)
++    elif fault=='old_boot':p['boot_id']='old';add(999,123)
++    elif fault=='orphan_session':add(998,456,999)
++    elif fault=='owned_command':add(998,456,cmd='python '+e.FAILED)
++    if fault in {'live','orphan_session','owned_command'}:
++        with pytest.raises(ValueError):e.process_cleanup([p],proc=proc)
++    else:assert e.process_cleanup([p],proc=proc)['no_owned_processes']
++
++
++def make_plan(hist):
++    seal,prior,_,_=hist
++    return prepare.build_plan(prior,seal,{'commit':'new','files':prior['code_files']})
++
++
++def test_exact22_mapping_and_disabled_draft(hist):
++    seal,prior,_,_=hist;plan=make_plan(hist)
++    assert plan['frozen'] is False and plan['n25_infrastructure_continuation']['executable'] is False
++    assert len(plan['episodes'])==22 and plan['episodes'][0]['retry_of']==e.FAILED
++    assert [r['budget_bucket'] for r in plan['episodes']].count('baseline')==5
++    assert [r['budget_bucket'] for r in plan['episodes']].count('development')==16
++    assert [r['budget_bucket'] for r in plan['episodes']].count('recovery')==1
++    for n,row in enumerate(plan['episodes'],18):
++        assert all(row[k]==v for k,v in prior['episodes'][n].items() if k not in {'iteration','episode_key','budget_bucket'})
++    assert not any(x['episode_key'] in {r['episode_key'] for r in prior['episodes'][:18]} for x in plan['episodes'])
++
++@pytest.mark.parametrize('index,fault',[(0,'none'),(1,'none'),(0,'already_retried'),(0,'valid_prior'),(0,'other_attempt'),(1,'prior_suffix'),(0,'row_changed')])
++def test_exact_cross_cohort_repeat_and_valid_import_rejection(hist,index,fault):
++    seal,_,_,_=hist;plan=make_plan(hist);row=copy.deepcopy(plan['episodes'][index]);events=w.read_ref(seal['old_ledger'])
++    if index==1:events+=new_events(plan,1)
++    if fault=='already_retried':events+=new_events(plan,1)
++    elif fault=='valid_prior':events[-1]['outcome_valid']=True
++    elif fault=='other_attempt':row['retry_of']='other'
++    elif fault=='prior_suffix':events+=new_events(plan,2)[3:]
++    elif fault=='row_changed':row['policy_seed']+=1
++    if fault=='none':c.check_retry(events,row,vars(r))
++    else:
++        with pytest.raises(ValueError):c.check_retry(events,row,vars(r))
++
++@pytest.mark.parametrize('n,fail,wins,decision',[(22,None,5,'ELIGIBLE_FOR_SEPARATELY_FROZEN_VALIDATION'),(22,None,0,'REJECT'),(10,None,0,'REJECT_NUMERIC_FUTILITY'),(9,None,0,'INVALID_OR_INTERRUPTED'),(1,0,0,'INVALID_OR_INTERRUPTED'),(5,4,2,'INVALID_OR_INTERRUPTED')])
++def test_logical_denominator_all_costs_and_unknowns(hist,n,fail,wins,decision):
++    seal,_,_,_=hist;plan=make_plan(hist);events=new_events(plan,n,fail=fail,wins=wins)
++    def accept(row,ev):
++        g=[v for v in ev if v['episode_key']==row['episode_key']];final=g[-1]
++        e.require(final['outcome_valid'],'invalid')
++        return {'episode_key':row['episode_key'],'task_id':row['task_id'],'profile':row['profile'],'attempt_id':final['attempt_id'],'success':final['success']},{'guided_decisions':1,'parent_rounds_verified':10},{}
++    result=report.analyze(plan,seal,events,accept)
++    assert result['decision']==decision and result['dispatched']==19+n and len(result['attempts'])==19+n
++    assert result['unknown_token_calls']==6 and result['all_attempt_token_usage_complete'] is False
++    assert result['old_costs']['all_attempt_costs']['N23']['gpu_process_wall_seconds']['observed_total']>=e.FAILED_SECONDS
++    assert result['audited_cells']==18+(fail if fail is not None else n)
++    assert result['original_disposition']=='INVALID_OR_INTERRUPTED'
++
++@pytest.mark.parametrize('fault',['none','baseline','development','recovery','attempts','local','cumulative','protected','inflight','old_drift'])
++def test_all_capacity_gates(hist,monkeypatch,fault):
++    seal,_,_,_=hist;events=w.read_ref(seal['old_ledger']);record={'remaining_local_gpu_hours':5.}
++    snap={'running':0,'gpu_healthcheck_inflight':0,'gpu_hours_consumed':42.7,'gpu_hours_by_bucket':{'validation':10.,'formal':0.},
++        'by_bucket':{'baseline':50,'development':183,'validation':60,'formal':0,'recovery':11},'dispatched':304}
++    from scripts import qd_ed_n25_backend as backend
++    monkeypatch.setattr(backend,'settled_proof',lambda *a:None)
++    if fault in {'baseline','development','recovery'}:snap['by_bucket'][fault]=c.CAPS['buckets'][fault]
++    elif fault=='attempts':snap['dispatched']=400
++    elif fault=='local':record['remaining_local_gpu_hours']=.1
++    elif fault=='cumulative':snap['gpu_hours_consumed']=80.
++    elif fault=='protected':snap['gpu_hours_by_bucket']['validation']=0.;snap['gpu_hours_consumed']=60.
++    elif fault=='inflight':snap['running']=1
++    elif fault=='old_drift':events[-1]['outcome_valid']=True
++    ns={**vars(r),'budget_snapshot':lambda *a:snap}
++    if fault=='none':assert c.budget_check({},events,[],ns,record,dispatch=True)['remaining_slots']=={'baseline':5,'development':16,'recovery':1}
++    else:
++        with pytest.raises(ValueError):c.budget_check({},events,[],ns,record,dispatch=True)
++
++
++def test_four_function_reverse_and_old_routing(monkeypatch):
++    root=r.ROOT;index=json.loads((root/bridge.DOC/'reverse-routes-v1.json').read_text())
++    for x in index['files']:
++        lines=(root/x['path']).read_text().splitlines(keepends=True);new=''.join(lines)
++        for y in reversed(x['edits']):lines[y['new_start']:y['new_end']]=y['old'].splitlines(keepends=True)
++        restored=''.join(lines);assert e.hashlib.sha256(restored.encode()).hexdigest()==x['old_sha256']
++        a,b=bridge.functions(restored),bridge.functions(new);assert set(a)==set(b)
++        assert {k for k in a if a[k]!=b[k]}==bridge.ROUTES[x['path']]
++    assert r.metered_support({'n25_cohort':{}}) is old
++    assert r.metered_support({'n25_cohort':{},'n25_infrastructure_continuation':{}}) is c
++    assert r.is_n25_plan({'n25_cohort':{},'n25_infrastructure_continuation':{}})
++
++@pytest.mark.parametrize('fault',['none','profile','split','timeout','source','artifact','mode','gpu'])
++def test_new_context_routes_without_old_history_replay(hist,monkeypatch,fault):
++    seal,_,_,root=hist;plan=make_plan(hist);plan.update(frozen=True,n25_infrastructure_continuation={'schema':'n25-infrastructure-continuation-v1','protocol':{'sha256':c.PROTOCOL_SHA}})
++    row=plan['episodes'][0];out=Path(plan['artifact_root']).resolve()/'attempts'/'new';context={'episode_key':row['episode_key'],'profile':row['profile'],
++        'runtime':seal['runtime'],'source':{'commit':plan['source_commit'],'files':plan['code_files']},'attempt_id':'new'}
++    runtime={'gpu_mapping':{'physical_gpu':7,'uuid':'fixed'}};monkeypatch.setattr(w,'verify_source',lambda *a:None)
++    if fault=='profile':context['profile']='N26'
++    elif fault=='split':row['split']='formal'
++    elif fault=='timeout':row['timeout_seconds']=1900
++    elif fault=='source':context['source']['commit']='bad'
++    elif fault=='artifact':out=root/'escape'
++    elif fault=='mode':plan['n25_cohort']['worker_audit']={}
++    elif fault=='gpu':runtime['gpu_mapping']['physical_gpu']=3
++    if fault=='none':assert c.validate_worker_context(context,[],root,out,plan,runtime)==(root,out,runtime)
++    else:
++        with pytest.raises(ValueError):c.validate_worker_context(context,[],root,out,plan,runtime)
++
++@pytest.mark.parametrize('fail_index',[0,1,4])
++def test_supervisor_never_recovers_new_invalid(hist,tmp_path,monkeypatch,fail_index):
++    seal,_,_,_=hist;plan=make_plan(hist);out=tmp_path/'controller';monkeypatch.setattr(c,'RUN_DIR',out);status=out/'execution/supervisor-status-v1.json'
++    path=tmp_path/'new-plan.json';put(path,plan);called=[];events=[]
++    monkeypatch.setattr(sup.old_supervisor,'device_check',lambda:None)
++    def one(path,plan,row):
++        i=plan['episodes'].index(row);called.append(i);ev=new_events(plan,i+1,fail=fail_index);events[:]=ev;return ev[-1]
++    monkeypatch.setattr(sup,'one_attempt',one);monkeypatch.setattr(r,'read_events',lambda p:events)
++    monkeypatch.setattr(c,'accepted_cell',lambda p,row,ev,*a:[x for x in ev if x['episode_key']==row['episode_key']][-1])
++    monkeypatch.setattr(old,'read_worker_report',lambda *a:{})
++    monkeypatch.setattr(c.native,'from_output',lambda *a:({'guided_decisions':1,'parent_rounds_verified':10},{}))
++    final=[];monkeypatch.setattr(report,'write_terminal',lambda *a:final.append(list(events)))
++    original=one
++    def with_output(*a):v=original(*a);v['output_dir']=str(tmp_path/'out');return v
++    monkeypatch.setattr(sup,'one_attempt',with_output)
++    with pytest.raises(ValueError):sup.execute(path,plan,status)
++    assert called==list(range(fail_index+1)) and len(final)==1
++    assert json.loads(status.read_text())['status']=='failed'
++
++@pytest.mark.parametrize('fault',['interval','latency','order','event_types','item_types','event_time'])
++def test_failed_lifecycle_observable_timing(hist,fault):
++    seal,_,data,_=hist;public=json.loads(Path(data['references']['stage_public']['path']).read_text());x=public['calls'][0];life=x['transport']['lifecycle']
++    if fault=='interval':life['timeout_observed_at']=179.
++    elif fault=='latency':x['codex_call_latency_s']=179.
++    elif fault=='order':life['cleanup_started_at']=190.
++    elif fault=='event_types':x['transport']['event_types']=[]
++    elif fault=='item_types':x['transport']['item_types']=[]
++    else:life['events'][0]['observed_at']=-1.
++    with pytest.raises(ValueError):e.failed_signature(seal['all_old_attempts'][-1]['terminal'],public)
++
++
++def test_reader_rejects_oversize_before_allocating(tmp_path,monkeypatch):
++    p=tmp_path/'big.json';p.write_text('{}');reader=e.Reader([e.ref(p)]);real=Path.stat
++    def stat(q,*a,**k):
++        if q==p:return types.SimpleNamespace(st_size=17*1024*1024,st_mode=0o100644)
++        return real(q,*a,**k)
++    monkeypatch.setattr(Path,'stat',stat)
++    with pytest.raises(ValueError,match='before read'):reader.read_bytes(reader.records[str(p)])
++
++
++def test_freeze_existing_plan_fail_early(tmp_path,monkeypatch):
++    p=tmp_path/'plan.json';put(p,{'immutable':True});monkeypatch.setattr(c,'PLAN',p)
++    with pytest.raises(ValueError,match='already exists'):prepare.freeze(p,root=tmp_path)
++    assert json.loads(p.read_text())=={'immutable':True}
++
++@pytest.mark.parametrize('fault',['none','timeout','popen','native'])
++def test_original_run_plan_charges_and_cleans_under_new_route(hist,tmp_path,monkeypatch,fault):
++    import contextlib,subprocess
++    seal,_,_,_=hist;plan=make_plan(hist);plan['run_name']='synthetic';plan['n25_infrastructure_continuation']={'schema':'n25-infrastructure-continuation-v1'}
++    plan['worktree']=str(tmp_path);path=tmp_path/'frozen.json';put(path,plan);row=plan['episodes'][0]
++    runtime={'gpu_mapping':{'uuid':'fixed','egl_device_index':4},'environment':{},'frozen_stage_provider':{}}
++    seen=[];terminals=[];deadline=[];clean=[]
++    monkeypatch.setattr(r,'locked',lambda *a,**k:contextlib.nullcontext())
++    monkeypatch.setattr(r,'validate_plan',lambda *a,**k:(plan,{'profiles':{row['profile']: {}}},runtime))
++    monkeypatch.setattr(r,'read_events',lambda p:[]);monkeypatch.setattr(r,'read_state',lambda p:{})
++    monkeypatch.setattr(r,'runtime_gpu',lambda *a:7);monkeypatch.setattr(r,'check_budget',lambda *a,**k:1800)
++    monkeypatch.setattr(c,'check_retry',lambda *a:None);monkeypatch.setattr(c,'protected_budget',lambda *a,**k:None)
++    monkeypatch.setattr(c,'admission',lambda *a:{'n25_continuation_id':c.COHORT})
++    monkeypatch.setattr(r,'gpu_admission',lambda **k:{'physical_gpu':7});monkeypatch.setattr(r,'verify_provider',lambda *a,**k:None)
++    monkeypatch.setattr(r,'child_environment',lambda *a:{})
++    def command(p,m,rt,row,aid):return ['python',str(tmp_path/'main.py')],tmp_path/'output'/aid
++    monkeypatch.setattr(r,'build_command',command);monkeypatch.setattr(w,'build_context',lambda *a:{'synthetic':True})
++    def append(root,event):seen.append(event['event']);terminals.append(event)
++    monkeypatch.setattr(r,'append_event',append)
++    def popen(*a,**k):
++        assert seen==['reserved','dispatched']
++        if fault=='popen':raise OSError('synthetic launch failure')
++        return types.SimpleNamespace(pid=999999999)
++    monkeypatch.setattr(r.subprocess,'Popen',popen)
++    original_read=Path.read_text
++    def public_process_read(path,*a,**k):
++        if str(path)=='/proc/999999999/stat':raise FileNotFoundError('synthetic process has no host PID')
++        return original_read(path,*a,**k)
++    monkeypatch.setattr(Path,'read_text',public_process_read)
++    def wait(proc,seconds,**k):
++        deadline.append(seconds)
++        if fault=='timeout':raise subprocess.TimeoutExpired('synthetic',seconds)
++        return 0
++    monkeypatch.setattr(r,'wait_exclusively',wait);monkeypatch.setattr(r,'terminate_owned',lambda p:clean.append(p))
++    def audit(out,ns):
++        if fault=='native':raise ValueError('synthetic native fault')
++        put(Path(out)/'eds_eval/in-worker-audit-receipt.json',{'accepted':True});return {'evidence_complete':True}
++    monkeypatch.setattr(c,'read_worker_report',audit)
++    monkeypatch.setattr(r,'validate_result',lambda *a:{'outcome_valid':True,'success':False})
++    monkeypatch.setattr(r,'failed_outcome',lambda *a,**k:('aborted',{'outcome_valid':False,'failure_class':fault}))
++    with c.supervised_scope(plan,tmp_path,row['episode_key']):
++        if fault=='none':assert len(r.run_plan(path,split='dev',iteration=c.COHORT,episode_keys=[row['episode_key']],root=tmp_path))==1
++        else:
++            with pytest.raises(r.GateError):r.run_plan(path,split='dev',iteration=c.COHORT,episode_keys=[row['episode_key']],root=tmp_path)
++    assert len(clean)==1 and seen[:2]==['reserved','dispatched'] and seen[-1] in r.TERMINAL
++    assert terminals[-1]['gpu_process_wall_seconds']>=0 and terminals[-1]['n25_episode_dispatched'] is True
++    if fault!='popen':assert deadline==[1800]
++
++@pytest.mark.parametrize('fault',['missing_status','lagging_status','failed_after_valid','normal_invalid'])
++def test_report_preserves_valid_journal_prefix_and_cost_after_status_failure(hist,tmp_path,monkeypatch,fault):
++    seal,_,_,_=hist;plan=make_plan(hist);planpath=tmp_path/'plan-report.json';put(planpath,plan)
++    run=tmp_path/'variant-control';monkeypatch.setattr(c,'RUN_DIR',run);status=run/'execution/supervisor-status-v1.json'
++    ev=new_events(plan,1,fail=0 if fault=='normal_invalid' else None);out=tmp_path/'native'
++    for name in ('attempt-result.json','n23-worker-context.json','eds_eval/decision-evidence-audit.json','eds_eval/in-worker-audit-receipt.json'):put(out/name,{'synthetic':True})
++    for q in ev:q['output_dir']=str(out)
++    def accepted(p,row,events,*a):
++        final=events[-1];e.require(final['outcome_valid'],'invalid');return final
++    monkeypatch.setattr(c,'accepted_cell',accepted);monkeypatch.setattr(old,'read_worker_report',lambda *a:{})
++    monkeypatch.setattr(c.native,'from_output',lambda *a:({'guided_decisions':1,'parent_rounds_verified':10},{}))
++    if fault!='missing_status':put(status,{'status':'failed','completed_keys':[] if fault!='failed_after_valid' else [plan['episodes'][0]['episode_key']],'dev_gate_promoted':False})
++    monkeypatch.setattr(c,'BRIDGE',tmp_path/'bridge.json');put(c.BRIDGE,{'synthetic':True})
++    value=report.write_terminal(planpath,plan,status,tmp_path,{**vars(r),'read_events':lambda p:ev})
++    assert value['decision']=='INVALID_OR_INTERRUPTED' and value['audited_cells']==(18 if fault=='normal_invalid' else 19)
++    assert len(value['attempts'])==20 and value['dispatched']==20
++    assert value['controller_evidence']['journal_accepted_keys']==([] if fault=='normal_invalid' else [plan['episodes'][0]['episode_key']])
++    assert (run/'result-v1.json').exists() and (run/'execution/terminal-ledger-v1.json').exists()
++
++@pytest.mark.parametrize('case',['promotion','reject','futility','invalid','status_disagreement','wrong_cost','wrong_disposition','drop_old','drop_marker','receipt_source','wrong_provider','duplicate_attempt','invalid_cleanup','invalid_missing_process','undispatched_aborted'])
++def test_independent_existing_terminal_review(hist,tmp_path,monkeypatch,case):
++    from n25_cont_fixtures import materialize_new
++    from scripts import qd_ed_n25_cont_terminal as terminal
++    seal,_,_,_=hist;plan=make_plan(hist);n=22 if case in {'promotion','reject','wrong_disposition'} else 10 if case=='futility' else 2
++    fail=1 if case in {'invalid','invalid_cleanup','invalid_missing_process','undispatched_aborted'} else None;events=new_events(plan,n,fail=fail,wins=0 if case in {'reject','futility'} else 5)
++    pref,source,cells=materialize_new(tmp_path,plan,seal,events)
++    if case=='undispatched_aborted':
++        events.pop(-2);events[-1]['event']='aborted';events[-1]['gpu_process_wall_seconds']=0.
++        (Path(events[-1]['output_dir'])/'process.json').unlink()
++    def accept(row,ev):
++        final=next(g[-1] for g in e.groups(ev).values() if g[0]['episode_key']==row['episode_key']);e.require(final['outcome_valid'],'invalid')
++        return cells[row['episode_key']]
++    result=report.analyze(plan,seal,events,accept);snapshot=put(tmp_path/'new-ledger.json',events)
++    phase='completed_all_forty_audited' if n==22 else 'rejected_numeric_futility' if case=='futility' else 'failed'
++    prefix=[x['episode_key'] for x in result['accepted_cells'][18:]]
++    status={'status':phase,'completed_keys':prefix,'dev_gate_promoted':result['dev_gate_promoted']}
++    consistent=True
++    if case=='status_disagreement':status['completed_keys']=[];consistent=False;result['journal_reconstructed_disposition']=result['decision'];result['decision']='INVALID_OR_INTERRUPTED';result['dev_gate_promoted']=False
++    sr=put(tmp_path/'new-status.json',status);result.update(plan=pref,ledger_snapshot=snapshot,terminal_status={**sr,'content':status},
++        controller_evidence={'consistent':consistent,'completed_keys':status['completed_keys'],'journal_accepted_keys':prefix,'status_phase':phase})
++    if case=='wrong_cost':result['all_attempt_costs']['N23']['gpu_process_wall_seconds']['observed_total']+=1
++    elif case=='wrong_disposition':result['decision']='REJECT'
++    elif case=='drop_old':result['attempts'].pop(18)
++    elif case=='drop_marker':
++        q=cells[plan['episodes'][1]['episode_key']][0]['audit'];v=json.loads(Path(q['path']).read_text());v.pop('n25_actuator_clipped_rbf_audit');Path(q['path']).write_text(json.dumps(v))
++    elif case=='receipt_source':
++        q=cells[plan['episodes'][0]['episode_key']][0]['worker_receipt'];v=json.loads(Path(q['path']).read_text());v['source']['commit']='bad';Path(q['path']).write_text(json.dumps(v))
++    elif case=='wrong_provider':
++        # Mutate public receipt-bound terminal, retaining original reference: hash rejection.
++        q=cells[plan['episodes'][0]['episode_key']][0]['attempt_result'];v=json.loads(Path(q['path']).read_text());v['stage_transport']['backend']='poe';Path(q['path']).write_text(json.dumps(v))
++    if case=='duplicate_attempt':result['attempts'].append(copy.deepcopy(result['attempts'][-1]))
++    if case=='invalid_missing_process':
++        (Path(events[-1]['output_dir'])/'process.json').unlink()
++        with pytest.raises(FileNotFoundError):terminal.metadata_inventory(result,events)
++        return
++    reader=e.Reader(terminal.metadata_inventory(result,events))
++    if case in {'wrong_cost','wrong_disposition','drop_old','drop_marker','receipt_source','wrong_provider','duplicate_attempt'}:
++        with pytest.raises(ValueError):terminal.review_existing(result,plan,seal,events,reader,source,cleanup=fake_cleanup)
++    else:
++        seen=[]
++        def cleanup(ps):
++            seen.extend(ps);return fake_cleanup(ps)
++        if case=='invalid_cleanup':
++            def alive(ps):
++                assert {q['pid'] for q in ps}=={800000,800001}
++                raise ValueError('last invalid worker still alive')
++            with pytest.raises(ValueError,match='last invalid worker still alive'):
++                terminal.review_existing(result,plan,seal,events,reader,source,cleanup=alive)
++        value=terminal.review_existing(result,plan,seal,events,reader,source,cleanup=cleanup)
++        assert len(seen)==n-(case=='undispatched_aborted')
++        if case=='undispatched_aborted':
++            assert value['undispatched_process_absences']==[{'attempt_id':events[-1]['attempt_id'],**e.absence(Path(events[-1]['output_dir'])/'process.json')}]
++        assert value['cohort_disposition']==result['decision'] and value['tensor_reads']==0
++
++@pytest.mark.parametrize('fault',['none','science','route','unlisted','manifest'])
++def test_full_source_bridge_255_unchanged_and_exact_routes(tmp_path,monkeypatch,fault):
++    import shutil
++    root=r.ROOT;paths=bridge.source_paths(root);copyroot=tmp_path/'new-source'
++    for p in paths:
++        target=copyroot/p;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((root/p).read_bytes())
++    original=w.read_ref(e.ref(root/bridge.DOC/'original-source-v1.json'))
++    seal={'original_source':original,'historical_backend_proof':{'path':'/synthetic/old-proof.json','sha256':'old'}}
++    source={'commit':'new','files':[{'path':p,'sha256':e.sha(copyroot/p)} for p in sorted(paths)]}
++    source['sha256']=e.canonical(source['files'])
++    changes=bridge.EXTRAS|set(bridge.ROUTES)
++    if fault=='science':(copyroot/'core/rdt_policy_steer.py').write_text('altered')
++    elif fault=='route':(copyroot/'scripts/qd_ed_n23_worker.py').write_text('altered')
++    elif fault=='unlisted':changes=changes|{'other.py'}
++    elif fault=='manifest':source['files'].pop()
++    monkeypatch.setattr(bridge.subprocess,'check_output',lambda *a,**k:'\n'.join(sorted(changes)))
++    if fault=='none':
++        value=bridge.build(source,seal,copyroot);assert len(value['same_files'])==255 and value['new_numerical_preflight'] is False
++    else:
++        with pytest.raises(ValueError):bridge.build(source,seal,copyroot)
++
++@pytest.mark.parametrize('fault',['no_authority','bad_state_ref','raised_attempts','raised_hours','protected_reduced','gpu','hold','parallel'])
++def test_adopted_finite_state_failclosed(hist,monkeypatch,fault):
++    seal,_,_,_=hist
++    rec={'existing_budget_authority':{'path':'/synthetic/budget.json','sha256':'x'},'source':{},'runtime':{}}
++    state={'n25_continuation_authority':{'path':'/synthetic/authority.json','sha256':'a'},'n25_budget_authority':rec['existing_budget_authority'],
++        'budget':{'max_episode_attempts':494,'max_gpu_hours':100.,'reserved':copy.deepcopy(c.CAPS['buckets']),
++            'gpu_hour_reservations':copy.deepcopy(c.CAPS['protected_gpu_hours']),'amendment':'exact'},
++        'resource_isolation':{'status':'ACTIVE','validation_status':'PASS','private_budget':True},'max_concurrent_gpu_workers':1}
++    def read(q):
++        if fault=='no_authority':raise FileNotFoundError('authority absent')
++        return {'amendment':'exact'} if q==rec['existing_budget_authority'] else rec
++    monkeypatch.setattr(w,'read_ref',read);monkeypatch.setattr(c,'ref',lambda p:state['n25_continuation_authority'])
++    def authority(*a):
++        if fault=='bad_state_ref':raise ValueError('not adopted')
++    monkeypatch.setattr(c,'authority',authority)
++    if fault=='raised_attempts':state['budget']['max_episode_attempts']=495
++    elif fault=='raised_hours':state['budget']['max_gpu_hours']=101.
++    elif fault=='protected_reduced':state['budget']['gpu_hour_reservations']['formal']=0
++    elif fault=='hold':state['external_resource_hold']={'do_not_auto_resume':True}
++    elif fault=='parallel':state['max_concurrent_gpu_workers']=2
++    ns={**vars(r),'authorized_gpu':lambda s:3 if fault=='gpu' else 7}
++    with pytest.raises((ValueError,FileNotFoundError)):c.require_state(state,ns)

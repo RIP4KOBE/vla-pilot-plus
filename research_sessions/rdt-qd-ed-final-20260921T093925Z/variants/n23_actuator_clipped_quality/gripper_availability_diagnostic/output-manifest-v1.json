@@ -1,0 +1,40 @@
+{
+  "schema": "n23-gripper-availability-output-manifest-v1",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/gripper_availability_diagnostic/batches-v1.csv",
+      "sha256": "b94db32e42fbb0475650e8940d0d5c45aeef8982fa505ce308e7838f5336b1fe",
+      "bytes": 9145
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/gripper_availability_diagnostic/conclusion-v1.md",
+      "sha256": "e9a1d1ef78d91674ae39ac2836d713507b51d99b35c1e9755abdeb276c566b45",
+      "bytes": 9710
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/gripper_availability_diagnostic/decisions-v1.csv",
+      "sha256": "f238aa498bd400e0c9a439d23f25a53a6b133f6d3c73cdffdca396561258c17f",
+      "bytes": 2159
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/gripper_availability_diagnostic/read-scope-v1.json",
+      "sha256": "5b569b01eb84cd5b51139cfd9ce175f94f695306cb977b5a3875ebc17fc8c34b",
+      "bytes": 10076
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/gripper_availability_diagnostic/screen-result-v1.json",
+      "sha256": "d8ba9b2865479646edfede42e447497dd7b162a4847e3fe5447aa98905c5477c",
+      "bytes": 2615080
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/gripper_availability_diagnostic/screen-v1.log",
+      "sha256": "c709276d7fa4e9a484ccb2337e3c42b5409ea157fd26ee9fd20e4f6028a5a20d",
+      "bytes": 1447
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/gripper_availability_diagnostic/screen_cpu_v1.py",
+      "sha256": "49aeea5e25790c31d550256fbff363a0f5670f2ed96d355dcd55883ccccacdf0",
+      "bytes": 19067
+    }
+  ]
+}

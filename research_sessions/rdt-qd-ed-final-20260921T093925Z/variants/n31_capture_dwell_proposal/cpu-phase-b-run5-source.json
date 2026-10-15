@@ -1,0 +1,21 @@
+{
+  "schema": "n31-final-test-source-v1",
+  "sources": {
+    "core/qd_capture_dwell_proposal.py": "e0b274e418aa9adc3cf7955ca162d830e66ffe9db79c65428573757e95fee843",
+    "core/qd_capture_dwell.py": "1ad6e2ef087d1ad53867b3afd74c27012dc60d6b0fb8200ed7ae3d916e3f0ed3",
+    "core/rdt_policy_steer.py": "d418b1c548e2c178a3a9f95722eccc88ebf6f54b1a3f831677fdca1fc37238d2",
+    "main.py": "32ff2c8368c15d3777ebba497d356d835a6cca6aa59dca5b4a2ac8142b3dfd72",
+    "configs/config.yaml": "40512b5e218dab4433ba23257fc251dfea930d7bad1441b99731b94265a8a404",
+    "configs/qd_ed_final/candidate_n31.json": "7360954167a4edad7bdf4b03a48bf7c01b070342063592045fafe099e86d2b12",
+    "configs/qd_ed_final/n4_observed_baseline_profiles.json": "9ad91066bc0cf91bc8c79d9b02acbd4b83e5e5a45ae31072b0e92d2221baa54f",
+    "tests/test_n31_capture_dwell_integration.py": "b02c565a39897e3eb7464aea83f82aebd4e1094a43d6da89c2d6a19b961e9b26",
+    "tests/n31_original_methods.json": "51d5f0e66c549a6c5b8438b46ada4526427b389b8267eb6bd58babc56cfe7ca5",
+    "tests/test_rdt_steer.py": "1f16056a9ada4715a2c86c64ddc59324f85f09fb9890e4f0e530e488d1ae6df4",
+    "tests/test_n30_executed_progress.py": "f750e30d67eb674ec4f4d91d259692117cf8a4638ca3031b9104d0104d8511ed",
+    "tests/test_n30_initial_observation_repair.py": "3a20181ff534dc410698ba7e1f7dce87b8aa764c9c834bee57b9e6a83f27c6ff"
+  },
+  "guard": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_phase_b_guard_v2.py",
+    "sha256": "ec82aa55ba5a1c9fe377c4ea67ab90d4ecace0cc637db55827f41bfefd3fa4ce"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "autonomy-driver-cpu-resource-ledger-v2",
+  "cpu_limit_seconds": 120,
+  "test_total_cpu_seconds": 1.0772854889999999,
+  "test_total_wall_seconds": 1.682977434946224,
+  "runs": [
+    {
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v1.json",
+        "sha256": "1310424bd5a5d96ad2911f8e542ba011f05dd06e39e69a2b84359d39daf109ed"
+      },
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-tests-v1.log",
+        "sha256": "d5a35096a7b22a8302b99ac69630d24e42ef56725011dfc180eb79a3e7f88f8e"
+      }
+    },
+    {
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v2.json",
+        "sha256": "57e0b4c4cb7c7882349c08ef7026463164d9c7a4cba4c6ab2c1a9ebeb1c5d111"
+      },
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-tests-v2.log",
+        "sha256": "5d52a6d35c67cb0a2ef073bfb43a2e224a11dd4b45c6899805cfa045b8702b8a"
+      }
+    },
+    {
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v3.json",
+        "sha256": "97db904bcece8cdb6c81bb781c0be3e8bffb578088eeac8ba870b2281614fcbd"
+      },
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-tests-v3.log",
+        "sha256": "2557804d3a54ff0c5edd936c2932b4683c3637ecc8716ef1f3f907eaa4dbf2f1"
+      }
+    }
+  ],
+  "final_driver": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_v1.py",
+    "sha256": "8b3552676e8e2296fa48ff79dc6361b21225bf82e673e98312ac289a64cce627"
+  },
+  "original_test_driver_bytes": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_pre_root_v1.py",
+    "sha256": "068db4dee2132936f06d6ba92a7d5c60a5f813167520da491a2e0514935c431a"
+  },
+  "run2": "16 pass/guard-clean before exact actual authorization-schema + CLI-hash binding.",
+  "run3": "6 targeted cases/guard-clean on final driver after schema/hash change, including new wrong-CLI/approval negative. Other functions AST-identical to run2.",
+  "run1": "13 assertion passes but guard failure from relative dir_fd cleanup; original source/log retained, not clean coverage.",
+  "driver_launches": 0,
+  "official_cli_model_calls": 0,
+  "gpu_api_model_env_sim_calls": 0,
+  "official_cli_help_called": true
+}

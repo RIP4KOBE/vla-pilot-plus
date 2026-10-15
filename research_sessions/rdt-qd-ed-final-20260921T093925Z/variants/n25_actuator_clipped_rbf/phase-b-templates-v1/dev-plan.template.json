@@ -1,0 +1,38 @@
+{
+  "schema": "n25-disabled-preparation-template-v1",
+  "executable": false,
+  "authorization": false,
+  "target_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/plan.frozen.v1.gpu7.json",
+  "missing_prerequisites": [
+    "actual original frozen Dev identity metadata derivation by prepare.build_plan",
+    "all root gates plus actual same-source CUDA proof"
+  ],
+  "payload": {
+    "frozen": false,
+    "source_commit": null,
+    "code_files": null,
+    "runtime_manifest_path": null,
+    "runtime_manifest_sha256": null,
+    "episodes": null,
+    "phase_authorization": {
+      "dev": false,
+      "validation": false,
+      "formal": false
+    },
+    "n25_cohort": {
+      "cohort_id": "N25_ACTUATOR_CLIPPED_RBF_DEV_20260930",
+      "limits": {
+        "primary_cells": 40,
+        "episode_dispatches": 42,
+        "recoveries": 2,
+        "recoveries_per_cell": 1,
+        "maximum_local_gpu_hours": 22.0,
+        "episode_timeout_seconds": 1800,
+        "cleanup_seconds": 40,
+        "physical_gpu": 7
+      },
+      "authority": null,
+      "final_review": null
+    }
+  }
+}

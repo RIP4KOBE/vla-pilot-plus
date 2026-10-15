@@ -1,0 +1,54 @@
+{
+  "schema": "n28-linkage-availability-resource-v1",
+  "cpu_limit_seconds": 30,
+  "threads": 2,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "calls": [
+    {
+      "phase": "release_scope_initial_read",
+      "measured_cpu_seconds": 0.0
+    },
+    {
+      "phase": "closure_schema_inspection",
+      "measured_cpu_seconds": 0.0032962259999999993
+    },
+    {
+      "phase": "four_cell_metadata_identity_and_schema",
+      "measured_cpu_seconds": 0.079429417
+    },
+    {
+      "phase": "emitter_schema_and_reference_discovery",
+      "measured_cpu_seconds": 0.04089264599999999
+    },
+    {
+      "phase": "first_index_row_only",
+      "measured_cpu_seconds": 0.050803847
+    },
+    {
+      "phase": "first_metrics_identity_and_static_child_order",
+      "measured_cpu_seconds": 0.042012536
+    },
+    {
+      "phase": "metadata_linkage_reconciliation_and_minimisation",
+      "measured_cpu_seconds": 0.054854795
+    },
+    {
+      "phase": "final_report_and_provenance",
+      "measured_cpu_seconds": 0.0020417330000000004
+    }
+  ],
+  "unmeasured_startup_allowance_seconds": 1.0,
+  "torch_imported": false,
+  "tensor_content_reads": 0,
+  "gpu_api_model_simulator_calls": 0,
+  "numpy_imported": false,
+  "cumulative_measured_cpu_seconds": 0.2733312,
+  "accounted_cpu_seconds_with_startup_allowance": 1.2733311999999999,
+  "measurement_limit": "Measured stdlib parsing blocks plus 1s disclosed process startup/teardown allowance; not false exact whole-session CPU accounting.",
+  "json_original_input_bytes": 9549627,
+  "sidecars_read": 4,
+  "outcome": "COMPLETE_METADATA_AVAILABILITY_WITH_DISCLOSED_FIELD_OUTPUT_DEVIATION"
+}

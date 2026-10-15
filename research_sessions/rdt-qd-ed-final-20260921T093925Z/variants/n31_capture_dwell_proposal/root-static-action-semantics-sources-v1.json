@@ -1,0 +1,30 @@
+{
+  "scope": "static source only; no runtime/physics/numeric replay",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/root-static-action-semantics-v1.md",
+      "sha256": "8e72730ac4ef0340f025467d690637380e9eaecaeaf45f6723192afd36f3d180",
+      "bytes": 2103
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/osc.py",
+      "sha256": "cfa62a0e719bc53ef0c701efa66f7b3e2272d4fca2150ec73c05bb145eba85cb",
+      "bytes": 20265
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/control_utils.py",
+      "sha256": "1d0f1a063894b1e8289339e223665e14e8aec492c31e9e00f42edea8dc735f43",
+      "bytes": 10243
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/grippers/panda_gripper.py",
+      "sha256": "a3760a8fc4599fa6f79914304b82466f3c1bda1a945943ca693bb57f00dc59eb",
+      "bytes": 1817
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160
+    }
+  ]
+}

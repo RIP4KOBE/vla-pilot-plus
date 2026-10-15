@@ -1,0 +1,102 @@
+{
+  "schema": "n26-scalar-summary-cpu-delivery-v1",
+  "actual_inputs_read": false,
+  "execution_authorized": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/cpu-cli-v1.log",
+      "sha256": "b41a3fd6ae41b9e8680f3817046dd4dd626f8b407f307004de5dcdee8d214be1",
+      "bytes": 113
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/cpu-final-v1.log",
+      "sha256": "8c48c23e147db9241d7cc9c41c4f7edbb53396b9d16d7723440dc6cf6b39d960",
+      "bytes": 99
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/cpu-initial-v1.log",
+      "sha256": "8614f561b5b062e84b9ebb52331a95210a1fe986c63fbd83e69bbaa67660e4f2",
+      "bytes": 3411
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/cpu-report-v1.md",
+      "sha256": "32dc1e44a28555f1c6b80cdeffb7b02010008afd918ea3f24ec613f47d731159",
+      "bytes": 3126
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/cpu_guard_v1.py",
+      "sha256": "a772518e84161a026e2f0b9fc89ca4114e66397b5980a3ad77ae8805eac30c4c",
+      "bytes": 2814
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/guard-cli-v1-pytest.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/guard-cli-v1.json",
+      "sha256": "9d46856d1982af4ba956473f0c308aad0f8e93c357629fc5dde986b2e7f79371",
+      "bytes": 714
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/guard-final-v1-pytest.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/guard-final-v1.json",
+      "sha256": "9d46856d1982af4ba956473f0c308aad0f8e93c357629fc5dde986b2e7f79371",
+      "bytes": 714
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/guard-initial-v1-pytest.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/guard-initial-v1.json",
+      "sha256": "f80ee240e75bc890342e564e1579e3b101d1cde8a0f3f2d6a3413f6c1df03cc1",
+      "bytes": 1270
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/input-contract-v1.md",
+      "sha256": "53d58cd2feb7aeca99751d5a806980a290c064fdd7ec48998bb919744e95e7a2",
+      "bytes": 5982
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/input-disabled-v1.json",
+      "sha256": "3c732135e649a3e566020839e0dc0834afe433b7319e60e88960fafeb9ca60d4",
+      "bytes": 925
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/root-cpu-summary-protocol-v1.md",
+      "sha256": "fc4f01c8948d21e1696ed13aefbdb0885fbea67491a6ecde3a0d64684824d5f5",
+      "bytes": 5033
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/scalar_summary_v1.py",
+      "sha256": "bcf00fb8c1f7ad4242af4dc195dc9ec067c4694f0c3e508a30cd7b160a3fa110",
+      "bytes": 16323
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/source-manifest-v1.json",
+      "sha256": "1b44fb3229b9625c79b527436beb846f3dd2d1a6e4d2a26601861fc6514cab4e",
+      "bytes": 1147
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/static-read-scope-v1.json",
+      "sha256": "0ad2a3f6b1b33b9b53d1da4499f25f7d0cff55427e540bc4f9ef0fc784864371",
+      "bytes": 3938
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/synthetic_summary_v1.py",
+      "sha256": "b4913ddcad1a1f6350793b9fb7cfd0eae5bad391999a7b855ccaa003385322cc",
+      "bytes": 7070
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/measurement-summary-preparation-v1/test_scalar_summary_v1.py",
+      "sha256": "1134c7c3f91df0b0bcf74689781239fc419934c02fe21450e6b7c16b462293a0",
+      "bytes": 9971
+    }
+  ]
+}

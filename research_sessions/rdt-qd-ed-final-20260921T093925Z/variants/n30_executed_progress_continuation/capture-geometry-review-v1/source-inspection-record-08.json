@@ -1,0 +1,20 @@
+{
+  "read_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/env_wrapper.py",
+      "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0",
+      "bytes": 8781,
+      "windows": [
+        [
+          152,
+          169
+        ]
+      ]
+    }
+  ],
+  "cpu_seconds": 0.0,
+  "affinity": [
+    0,
+    1
+  ]
+}

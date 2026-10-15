@@ -1,0 +1,502 @@
+{
+  "schema": "n30-capture-source-inputs-v1",
+  "source_commit_requested": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/handoff-visual-check-v1/root-visual-observations-v1.md",
+      "sha256": "bdc0226aacc78a6c8336a94c8fd01b71b406196c5d340fbd0c397cd8daeb3d23",
+      "bytes": 2458,
+      "inspections": [
+        {}
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/handoff-visual-check-v1/root-terminal-review-v1.json",
+      "sha256": "d57be83f24292da5074401bcd241fdf899bd4993487fac36d636d558a3c65641",
+      "bytes": 2517,
+      "inspections": [
+        {}
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160,
+      "inspections": [
+        {
+          "windows": [
+            [
+              1,
+              85
+            ],
+            [
+              180,
+              340
+            ],
+            [
+              740,
+              810
+            ],
+            [
+              1635,
+              1710
+            ]
+          ]
+        },
+        {
+          "line_filter": "LIBERO.*PATH|OffScreen|env_args|robots|gripper|make_env|LiberoEnv|load_controller"
+        },
+        {
+          "windows": [
+            [
+              700,
+              729
+            ],
+            [
+              1143,
+              1172
+            ]
+          ]
+        },
+        {
+          "windows": [
+            [
+              81,
+              117
+            ],
+            [
+              1020,
+              1080
+            ],
+            [
+              1710,
+              1750
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962,
+      "inspections": [
+        {
+          "windows": [
+            [
+              7800,
+              7880
+            ]
+          ]
+        },
+        {
+          "line_filter": "observation quaternion wiring"
+        },
+        {
+          "windows": [
+            [
+              1568,
+              1603
+            ],
+            [
+              4910,
+              4944
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/robots/single_arm.py",
+      "sha256": "d233b1b785e8f88ffb5df1357666b02a397ae930ce98181b079e0496ab35fc57",
+      "bytes": 19104,
+      "inspections": [
+        {
+          "line_filter": "eef_pos|eef_quat|gripper_qpos|_eef|grip_site|convert_quat|body_xquat|site_xpos"
+        },
+        {
+          "windows": [
+            [
+              80,
+              126
+            ],
+            [
+              150,
+              219
+            ],
+            [
+              292,
+              330
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/robots/manipulators/panda_robot.py",
+      "sha256": "cedaeef03d4c01b6a76a56838f9cf8f68b34f85bac823cb2c76543492553c736",
+      "bytes": 1504,
+      "inspections": [
+        {
+          "line_filter": "default_gripper|eef_name|gripper|bottom_offset"
+        },
+        {
+          "windows": [
+            [
+              15,
+              47
+            ],
+            [
+              90,
+              130
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/grippers/panda_gripper.py",
+      "sha256": "a3760a8fc4599fa6f79914304b82466f3c1bda1a945943ca693bb57f00dc59eb",
+      "bytes": 1817,
+      "inspections": [
+        {
+          "line_filter": "."
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/assets/grippers/panda_gripper.xml",
+      "sha256": "d9d68123909d6910488310d0fae4e358ed4ac831c6d0957f3e30893a5412baac",
+      "bytes": 4600,
+      "inspections": [
+        {
+          "line_filter": "."
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n12_grasp_affordance/outer-loop-screen-v1.md",
+      "sha256": "17de1f3b84c1be4572abfb8e7e7a9451836fc3e430206458ad4ad08ce29977cc",
+      "bytes": 3622,
+      "inspections": [
+        {
+          "full_text": true
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n15_stalled_contact/screen-conclusion.md",
+      "sha256": "0a2db951c311360d94e61274e92e3ba984d74d6f974bd94f7bb06a506945eb5d",
+      "bytes": 1089,
+      "inspections": [
+        {
+          "full_text": true
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n16_gripper_quality/screen-conclusion.md",
+      "sha256": "42b055e3a9d520386b29e49abd76af007e637ac09565ae7b3f004c198bdf0205",
+      "bytes": 1305,
+      "inspections": [
+        {
+          "full_text": true
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n22_hold_conditioned_lift/idea-declaration-v1.md",
+      "sha256": "cc22391a16bb2f0bdd9f4ad3dd71322894601e353cda9e5daf88bccbd736404d",
+      "bytes": 1582,
+      "inspections": [
+        {
+          "full_text": true
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n22_hold_conditioned_lift/offline-screen-conclusion-v1.md",
+      "sha256": "0dd03be93436d25b4ab9ec80214d8f6ae9cd102c0b428cce96b0db6c9476f367",
+      "bytes": 1471,
+      "inspections": [
+        {
+          "full_text": true
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/env_wrapper.py",
+      "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0",
+      "bytes": 8781,
+      "inspections": [
+        {
+          "windows": [
+            [
+              1,
+              100
+            ]
+          ]
+        },
+        {
+          "windows": [
+            [
+              152,
+              169
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/grippers/gripper_model.py",
+      "sha256": "0543b5a9e1d8b41e21880d8445c5d8fbf8535a4ac6fd55c5e70a3b1f323c3735",
+      "bytes": 5476,
+      "inspections": [
+        {
+          "line_filter": "quaternion/frame attachment"
+        },
+        {
+          "windows": [
+            [
+              17,
+              38
+            ],
+            [
+              100,
+              126
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/robots/manipulators/manipulator_model.py",
+      "sha256": "ac21ce0b004a1ee93cb8b728c00b9c18c38ecabb2dedca370de80602ad26f059",
+      "bytes": 6579,
+      "inspections": [
+        {
+          "line_filter": "quaternion/frame attachment"
+        },
+        {
+          "windows": [
+            [
+              43,
+              81
+            ],
+            [
+              100,
+              118
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/transform_utils.py",
+      "sha256": "1c2317895733449883b56af0decefb3529649b3a7779dc2ef3ed00816bb25bb0",
+      "bytes": 27506,
+      "inspections": [
+        {
+          "line_filter": "quaternion/frame attachment"
+        },
+        {
+          "windows": [
+            [
+              50,
+              77
+            ],
+            [
+              461,
+              502
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/__init__.py",
+      "sha256": "b99601b6b44de6d0078baa66054113881492826bbfbe8cd41e2d39d5bf6f0875",
+      "bytes": 267,
+      "inspections": [
+        {
+          "windows": [
+            [
+              1,
+              100
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/robots/__init__.py",
+      "sha256": "92d2667dcd9fce0d0ba744bcc317bfc07104136e90f066df04d09cbad5bd489e",
+      "bytes": 307,
+      "inspections": [
+        {
+          "windows": [
+            [
+              1,
+              120
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/bddl_base_domain.py",
+      "sha256": "055836670ac5fcac7e033fc86404718fd53854996e5776b1ff68b646f7bbcc9d",
+      "bytes": 32639,
+      "inspections": [
+        {
+          "line_filter": "robot/gripper model selection only"
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/assets/robots/panda/robot.xml",
+      "sha256": "51e3a4a6d54bcaf77e9d36a27372b871728590eedf53d4fd0e195525950eb988",
+      "bytes": 21425,
+      "inspections": [
+        {
+          "line_filter": "hand/eef attachment"
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_grasp_timing.py",
+      "sha256": "f38c980b22df080991e4cb86d07c1dbc933652e584e8b897dbb16e1312fd6142",
+      "bytes": 3847,
+      "inspections": [
+        {
+          "line_filter": "eligible|projected|gripper|threshold|distance|target"
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/robots/mounted_panda.py",
+      "sha256": "c89ab36decca6d9fa242021971513960c3ce31aa42735009c73258f397be126c",
+      "bytes": 1658,
+      "inspections": [
+        {
+          "windows": [
+            [
+              1,
+              110
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/robots/on_the_ground_panda.py",
+      "sha256": "7d580aeee632e164f327cf6b1951861bec40cf814cdbe92bcfc469a93e1f9fa8",
+      "bytes": 1726,
+      "inspections": [
+        {
+          "windows": [
+            [
+              1,
+              110
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/base.py",
+      "sha256": "a5d7bc8c7f317735b76347c0038d3c0888e592da0ee059d0f937eb9f1b272b34",
+      "bytes": 24667,
+      "inspections": [
+        {
+          "windows": [
+            [
+              53,
+              113
+            ],
+            [
+              328,
+              395
+            ],
+            [
+              500,
+              530
+            ]
+          ]
+        },
+        {
+          "line_filter": "def joints|self._joints|\"joints\""
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_ed.py",
+      "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89",
+      "bytes": 46573,
+      "inspections": [
+        {
+          "line_filter": "descriptor function locations"
+        },
+        {
+          "windows": [
+            [
+              89,
+              110
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/result-v1.json",
+      "sha256": "fd63df833c0839efd87ddea5d3ffcb75eebfe493730aef018f809d9937324f46",
+      "bytes": 111308,
+      "inspections": [
+        {
+          "schema_only_inspection": true
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/mjcf_utils.py",
+      "sha256": "3c96c9722288b48b55a41fa0c400576e352d2f8f40eb1c6cbc126c070d79d348",
+      "bytes": 32489,
+      "inspections": [
+        {
+          "line_filter": "def sort_elements|elements_dict|child in root|element_filter\\("
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/osc.py",
+      "sha256": "cfa62a0e719bc53ef0c701efa66f7b3e2272d4fca2150ec73c05bb145eba85cb",
+      "bytes": 20265,
+      "inspections": [
+        {
+          "line_filter": "delta_ori|set_goal_orientation|scaled_delta|delta\\[3|def set_goal"
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/control_utils.py",
+      "sha256": "1d0f1a063894b1e8289339e223665e14e8aec492c31e9e00f42edea8dc735f43",
+      "bytes": 10243,
+      "inspections": [
+        {
+          "line_filter": "def set_goal_orientation|rotation_mat_error|quat2mat|rotation_mat_error|goal_orientation"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/root-scope-v1.md",
+    "sha256": "2075ec00aac9637cba598c4cf4e31ff41e9f7c0ce1e0ad8c3e7d95e7ea887e54",
+    "bytes": 4741
+  },
+  "installed_source_not_historical_loaded_byte_attestation": true,
+  "numeric_input_reads": {
+    "schema_inspection": 1,
+    "calculation": 1
+  },
+  "deviation": "Initial filename locator used recursive rg --files under variants; yielded filenames including implementation/synthetic fixture paths. No contents of those files were opened. Discontinued; later narrative lookup was top-level only. No protected document or payload content was read."
+}

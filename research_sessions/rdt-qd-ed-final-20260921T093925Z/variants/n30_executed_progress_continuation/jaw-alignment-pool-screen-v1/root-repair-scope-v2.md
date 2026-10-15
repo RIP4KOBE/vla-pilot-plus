@@ -1,0 +1,16 @@
+# N30 fixed handoff pool: manual engineering repair v2
+
+This is the same exposed-Dev CPU diagnostic, not a new experiment or hypothesis. All v1 files remain immutable.
+
+The first invocation stopped before analyze() due to its missing prior argument. task0 bundle50 and bundle51 were loaded once each (12,091,427 encoded bytes); task1 was not read. All numerical findings remain Unknown. Six denied dependency probes and the original resource charges remain disclosed.
+
+ROOT independently found a second static error: N30 is Q0-derived and uses archive_global_best. core/rdt_policy_steer.py around 7154 obtains sorted occupied archive elites via elite_tensors(); terminal_population/grasp_selection is conditional on terminal_mode and does not apply. Therefore the scientific population is every actual row of the recorded final_selection.population, with 1<=N<=16, not an assumed 16-row final canonical batch. Each row must bind to its original canonical occurrence/scoring projection/quality through archive identity and recorded native equality. Repeated equal-content occurrences require source-consistent identity, or agreement of all relevant projection/quality values with explicit ambiguity, not arbitrary favorable choice. No provider rescoring.
+
+Only static source and existing metadata preparation is presently authorized. Write repaired reader and a contract/manifest/declaration under repair-v2. Fix the prior argument, remove terminal-mode assumptions, trace target from bound current Stage/recognized target context, and reuse the successful earlier archive lineage reader where appropriate. No production science edits. ROOT will inspect before releasing one invocation.
+
+After release: only the same four manifest-listed native files, the same task0/task1 decision e0:d3:s16 and prior step15 hand state, with all-row geometry and ranks as previously frozen. Original recorded first8 projected positions; fixed observed rotation/qpos; native gripper decode; binary64 arithmetic, exact ties, strict pair reversals; no learned weights, new metrics, image decode, new tasks, future payloads, GT contact/object state, simulator/model/API/GPU calls. Bind selected decoded8 commands to the accepted H JSON. All other co-resident events can be traversed for provenance identity only; extra candidate outcomes/scores may not be reported/analyzed as an expanded scientific sample.
+
+One manual recovery may reread task0's two containers and first-read task1's two. Combined encoded reads then 36,274,537 bytes, below the existing 64 MiB cap. Cumulative zip/storage caps remain 128 MiB. Recovery child CPU <=118 seconds, wall <=178 seconds, so with failed-run CPU1.838564 and wall1.775106 the calculation remains within original cumulative120/180 limits; threads2, affinity[0,1], 16GiB address space, CUDA hidden. Source preparation is separately metered/disclosed. No automatic retry or relaxed identity gates. Guard denials remain errors/probes, not a clean isolation claim. No GPU budget change.
+
+This corrects the intended final-selection population prospectively, before any numeric analysis has occurred. It does not relax N30's closed Dev gate or establish success. The overall Goal remains NOT_MET.
+

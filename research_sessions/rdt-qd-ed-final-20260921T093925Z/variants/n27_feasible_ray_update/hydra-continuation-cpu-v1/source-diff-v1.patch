@@ -1,0 +1,2598 @@
+diff --git a/configs/config.yaml b/configs/config.yaml
+index 8f3ca28..8b5a08d 100644
+--- a/configs/config.yaml
++++ b/configs/config.yaml
+@@ -80,6 +80,7 @@ main:
+     save_initial_cache: false
+     save_ed_cache: false
+     diversity_input_source: noisy_sample
++    diversity_update_mode: legacy_additive
+     initial_sampling_mode: iid
+     initial_diversity_descriptor_mode: absolute_eef
+     initial_diversity_scale: 1.0
+diff --git a/docs/experiments/n27_hydra_continuation/controller-contract-v1.md b/docs/experiments/n27_hydra_continuation/controller-contract-v1.md
+new file mode 100644
+index 0000000..95e8fdb
+--- /dev/null
++++ b/docs/experiments/n27_hydra_continuation/controller-contract-v1.md
+@@ -0,0 +1,46 @@
++# N27 named Hydra continuation — CPU implementation contract
++
++This source prepares one new administrative continuation. It does not authorize a GPU launch, adopt a budget, or turn original N27 INVALID into a scientific result. The original source is 095cfeecd6af55477d2529441c307ab712e8a8da. Its 345-file record is tracked alongside this document. Only configs/config.yaml and the four explicitly listed runner/worker routing functions differ; whole-file reversal is in reverse-source-v1.json. All policy, native/reference, profiles, provider, runtime and worker run_worker/verify_receipt bytes remain original. There is no new numerical preflight.
++
++## Paths and immutability
++
++All new control artifacts live at N27/hydra-continuation-v1 (RUN_DIR), independently of the original attempt artifact volume. New attempt outputs remain under frozen plan.artifact_root/attempts. The supervisor creates RUN_DIR/execution before its lock. It refuses any previous status/result/controller record or reservation; it never resumes. CLI scripts automatically put scripts/ on sys.path and explicitly add the owning worktree root. Root must run from the adopted owning worktree, not the isolated implementation checkout.
++
++The three changed existing files are configs/config.yaml; scripts/qd_ed_final_runner.py (metered_support, check_budget, check_retry); scripts/qd_ed_n23_worker.py (validate_context only). New plans keep n27_cohort with the exact old WORKER_CONTRACT so unchanged same-process run_worker and verify_receipt retain N27 profile-bound checks, including zero-guided episodes. The additional n27_hydra_continuation marker takes priority only in the administrative routing. Mixed or incomplete plans fail the new exact contract. Old N27 plans retain the old branch.
++
++## Root-made history seal (not generated or read by CPU executor)
++
++Write history-seal-v1.json with schema n27-hydra-history-seal-v1. Field names below are exact. Refs are absolute resolved path + SHA256; full source records are {commit,files:[{path,sha256}],sha256}, sorted by path with canonical JSON file-list digest. The runtime is its unchanged old ref, not a new manifest. See qd_ed_n27_cont_history.verify for executable pure constraints.
++
++- original_disposition: INVALID_OR_INTERRUPTED; original_source: exact old345 record.
++- original_plan: old frozen ref (SHA8632a2f...); original_plan_content: its exact JSON object; original_plan_content_sha256: worker.canonical_sha(object), distinct from the file-byte SHA.
++- root_terminal_review: SHA01dc887d...; startup_classification: SHA276985ca...; original_result: unchanged INVALID result ref.
++- original_source_review, original_authority, historical_backend_proof, budget_authority: original control refs. Budget authority is the existing N26 522/100 finite authority, not an old N27 limit record.
++- runtime: {path: oldplan.runtime_manifest_path,sha256: oldplan.runtime_manifest_sha256}.
++- old_events: all original N27 events, exact ordered 4 × reserved/dispatched/valid, including the original invalid's literal fields; no full private ledger. all_old_attempts: four {attempt_id,episode_key,profile,terminal} wrappers with terminal exactly equal to each last event. Do not change its task_failure label or impute missing usage.
++- accepted_prefix: exact3 entries {logical_index:0..2,cell,native,auxiliary}. cell has episode_key,task_id,profile,attempt_id,success and audit/worker_context/worker_receipt/attempt_result refs, copied from accepted old metadata. All success=false. native/auxiliary are original profile-bound counts. Old commit remains attached to imported cells in the new report.
++- old_resource_events: exact original N27 tensor resource reserved/dispatched/completed subset. Preserve kind/resource_id/cost and all other original fields. old_gpu_seconds equals all4 terminal GPU-process seconds plus proof terminal seconds, without rounding (root-known1401.9772811948787).
++- historical_unknowns: [original_invalid_required_cost_telemetry,original_invalid_provider_usage,original_invalid_native_outcome]. These are still Unknown, never accepted task evidence.
++- cleanup_complete and no_active_owned_worker: true only after root independently checks all known processes/groups and private idle locks.
++
++Root verifies the original same-process receipts/native reports/proof and original closure, then writes root-seal-review-v1.json with the exact object required by contract.history: schema n27-hydra-root-seal-review-v1, accepted=true, seal/protocol/root_terminal_review/startup_classification refs, original_disposition, old_source, historical_backend_proof, native_receipts_attested_not_replayed=true, cleanup_complete=true, gpu_authorized=false. This is an explicit root attestation trust boundary. The new controller follows nine bounded control JSONs (each ≤16MiB) and does not follow their nested tensor/Stage/attempt refs. It does not replay old controller or numerical checks. Current caller-supplied full ledger is filtered and must equal both sealed historical subsets at every capacity/admission check; unrelated cohort appends are allowed.
++
++## Bridge, finite adoption and release
++
++1. Root reviews/commits source and keeps original source intact through historical sealing. Integrate only the reviewed new commit in the idle owning W. Source record comes from w.source_record(W,c.source_paths(vars(r))); do not use the isolated checkout path as future owning root.
++2. Under private locks verify old history, current GPU7 UUID/EGL/owner idle and runtime/provider/source bytes. Build bridge with c.bridge.build(source,c.history(),W); write immutable source-bridge-v1.json. The bridge ties old proof ref to unchanged numerical bytes; it is not a newly generated GPU proof.
++3. Write final-source-runtime-review-v1.json exactly as c.final_review expects: schema n27-hydra-source-runtime-review-v1, accepted=true, source/runtime/protocol/seal/root_seal_review/source_bridge/historical_backend_proof, no_new_preflight=true,gpu_authorized=false.
++4. Write adoption-v1/authority.json exactly as c.authority expects: schema n27-hydra-authority-v1,cohort_id,source,runtime,protocol,seal,final_review,budget_authority,caps,limits,old_gpu_seconds,recorded_at,authority_interpretation,validation_authorized=false,formal_authorized=false. Adopt only state.n27_hydra_continuation_authority={path,sha256}; preserve budget values and original authority records. Do not modify old event buckets/labels. No new GPU proof slot.
++5. From W run `/home/hynx/miniconda3/envs/vla-pilot/bin/python scripts/qd_ed_n27_cont_prepare.py --freeze --output <RUN_DIR>/plan.frozen.v1.gpu7.json`. This requires source/review/adoption and complete remaining full-row capacity before an immutable write. It preserves the old profiles/runtime/seed inputs and all13 original suffix rows except cohort/key and the sole first recovery marker. Root separately verifies actual13 commands/provider/resources before release. No automatic rollback/re-freeze of a failed frozen plan.
++6. Write execution-release-v1.json exactly as supervise.release_check expects: schema n27-hydra-execution-release-v1,plan,source_commit,cohort_id,authority,seal,episode_keys (all13 fixed order),limits,one_launch=true,physical_gpu=7,validation_authorized=false,formal_authorized=false.
++7. Launch once: `/home/hynx/miniconda3/envs/vla-pilot/bin/python scripts/qd_ed_n27_cont_supervise.py --plan <RUN_DIR>/plan.frozen.v1.gpu7.json --release <RUN_DIR>/execution-release-v1.json --status <RUN_DIR>/execution/supervisor-status-v1.json`. Original runner owns reservation, locks, process launch, 1800s timeout+40s cleanup, same-process audit, charging and terminal append. This preparation does not run those commands.
++
++Exact unchanged caps:522 attempts/100 GPUh; baseline62,development220,validation180,formal40,recovery20; unspent protected allocations32h/12h retained. First new row is only the named original ...__1af7d45d9a10 replacement, charged recovery; other12 are baseline3/development9. No extra typed timeout recovery. Before launch and every row require all still-unrun rows ×1840s to fit remaining combined9.25h and cumulative unprotected allowance, plus all remaining slots. old4+new13=17 episode dispatches maximum,16 logical cells. Missing original telemetry stays missing; all measured elapsed costs remain.
++
++## Terminal semantics
++
++New result-v1.json has schema n27-hydra-continuation-result-v1, original_disposition always INVALID_OR_INTERRUPTED, continuation_disposition COMPLETE_THIRTEEN_VALID only after all13 new valid cells, otherwise INVALID_OR_INTERRUPTED. `decision` is the combined logical16 screen. Full promotion requires N27≥2/4,≥every control,strictly>N26, and substantive QD/ED. It grants only separately frozen full Dev consideration. Complete failure is REJECT_SCREEN; any incomplete/invalid/status-journal mismatch is INVALID_OR_INTERRUPTED. No ten-task futility rule. Zero gradients/zero-guided episodes are not individual efficacy vetoes, but all profile-bound audit gates remain required.
++
++Report aggregates all17 possible episode attempts, preserving unknown usage via null/missing lists and partial observed token totals. The proof is retained in the seal/source bridge and charged in combined local admission; all_attempt_costs describes episodes, not resource proofs. An exception after a valid terminal append preserves that valid journal prefix and costs while marking controller mismatch INVALID. Any newly invalid episode stops; no catch-and-retry. Root independently reviews terminal metadata and cleanup after closure; this implementation adds no generic terminal reader or downstream release.
++
++All external delivered templates have executable=false/unresolved refs and are not acceptable real authority/release schemas. No validation/formal/protected input or new algorithm is authorized by these artifacts.
+diff --git a/docs/experiments/n27_hydra_continuation/original-source-v1.json b/docs/experiments/n27_hydra_continuation/original-source-v1.json
+new file mode 100644
+index 0000000..47b4069
+--- /dev/null
++++ b/docs/experiments/n27_hydra_continuation/original-source-v1.json
+@@ -0,0 +1,1386 @@
++{
++  "commit": "095cfeecd6af55477d2529441c307ab712e8a8da",
++  "files": [
++    {
++      "path": "configs/backend/libero.yaml",
++      "sha256": "e1d1f41f178c7e5968e04b8337c13e8f37b691a7b3e93f9f8e9f7bb5796deb14"
++    },
++    {
++      "path": "configs/config.yaml",
++      "sha256": "0fafab23cb97a4171d27e47d9b016eea84a909302ed02892922f040ca41c52b7"
++    },
++    {
++      "path": "configs/perception.yaml",
++      "sha256": "3432a29b12ca634835aa81dce87923e06e188a6c283b961a18a906eb1d6d8ff8"
++    },
++    {
++      "path": "configs/policy.yaml",
++      "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6"
++    },
++    {
++      "path": "configs/qd_ed_final/baseline_profiles.json",
++      "sha256": "75ba829fc29db71ae31669cd803c24fbe8ea96fe347160539a273f9d73551690"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n1.json",
++      "sha256": "5e74d72f108df53897e790677154c5ca3691b1aeb318297168d3bffcb84bfe3c"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n11.json",
++      "sha256": "e6606c5d9deab72171fd9bc6e7407e1bab2af8cb8f7af1cb0cfcfb797f49206c"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n18.json",
++      "sha256": "86dc4da59da983b1cffac918fa8a0314ad5687ba74244614ef37518b1364fc04"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n2.json",
++      "sha256": "7ecfa31ef643f6d230570a7fb9b891444f9f3d2eff654b8e31aa10316d77211f"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n20.json",
++      "sha256": "860b0dfc49d0120a5a217ac5f66abbd20f9b8067a9c61da24c606ad9692baca2"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n21.json",
++      "sha256": "cb2af75e164e9332846d186b674aede90489fb5b1d4ee12795dc4b3e933b1e6e"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n22.json",
++      "sha256": "e2e119a364ae06f8e77790c9cf8e859da7c7981d51f2e34cde2b3f4c2676922e"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n23.json",
++      "sha256": "b6048a33d9259abd21a08ae8eca2d7fecebe16ac86b511fd7400b17caf0f2242"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n24.json",
++      "sha256": "02e45be92c34ea61577d827b269d43d766ccf3917728faf7be620e4d0f976a51"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n25.json",
++      "sha256": "fb763b140add31341d8c7b68392e574153320071b414d0bbbf41a983cf215e20"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n26.json",
++      "sha256": "b712892636fa15bc2d3d90e13e41ca7303aa85ea08d1555177a4c2a56353aa21"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n27.json",
++      "sha256": "c066eac51a60390cab4eb2ba7f719701c2b8997a461ccf470105091f16333318"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n3.json",
++      "sha256": "73fbd63c723b0844306dd784acdb409cf45b9bc53e780c3acb81264731522a22"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n4.json",
++      "sha256": "8d421a3c6ec860dee778453225339d776911647480bc2f0394e098a00ded84b2"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n5.json",
++      "sha256": "ade1f59b877ab6dc630aa780cc6f85f807d701d690f88f01469141568dd6c94f"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n6.json",
++      "sha256": "fa76d2e8819de23796193175626308f6728d45bab3b16543470e9c1769fec40f"
++    },
++    {
++      "path": "configs/qd_ed_final/candidate_n7.json",
++      "sha256": "d77b8472364cd00dc2548e9e8160672a4f16335a56736cf66d77de6ae74ccb2d"
++    },
++    {
++      "path": "configs/qd_ed_final/n2_observed_baseline_profiles.json",
++      "sha256": "dab95319fd961de44fb1c893471893660926a7bf09cdd4f817fc412de9de63fe"
++    },
++    {
++      "path": "configs/qd_ed_final/n3_observed_baseline_profiles.json",
++      "sha256": "69117707517f28dab0a9c56d388dbb95eb6b0cf938ebda71beaac7a3545c935c"
++    },
++    {
++      "path": "configs/qd_ed_final/n4_observed_baseline_profiles.json",
++      "sha256": "9ad91066bc0cf91bc8c79d9b02acbd4b83e5e5a45ae31072b0e92d2221baa54f"
++    },
++    {
++      "path": "core/__init__.py",
++      "sha256": "233696e00a1ada9a70a50c11160a96884d223df0e7b92aa7ba8bc8a61503efe6"
++    },
++    {
++      "path": "core/codex_stage.py",
++      "sha256": "45bc3512baa52500c4fb633dfc7a78ae474fb192c40745962a5d7cd5537208f9"
++    },
++    {
++      "path": "core/codex_stage_lifecycle.py",
++      "sha256": "de10576f89368b81c03b7b8d1d7c04e757a394d8b0b4974515c0b08e606d00e6"
++    },
++    {
++      "path": "core/codex_stage_policy.py",
++      "sha256": "92f78a80651e97390a296e42850aae0b70217afb1c362e9b5d0b8a07b8cbe432"
++    },
++    {
++      "path": "core/decision_evidence.py",
++      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295"
++    },
++    {
++      "path": "core/diffusion_policy_steer.py",
++      "sha256": "97f0ee3b9159461e15f6b58ea2bd95119a5514872025b4c99594ec6b71815eaa"
++    },
++    {
++      "path": "core/eds_eval_metrics.py",
++      "sha256": "3b3861870ff9645edbff1b64c2274d99889e9ee16e421976ae0b19366e6a5974"
++    },
++    {
++      "path": "core/eds_mechanism_trace.py",
++      "sha256": "312087f5c354f81a820f2acb8419c6380e96805de79f1789c5c7ff23a8fcabf3"
++    },
++    {
++      "path": "core/egl_context_drift.py",
++      "sha256": "54162566be17e1b0a0cfbc01995ee2f509e708743ddb03bf3d7d04c8613152b2"
++    },
++    {
++      "path": "core/env_adapters/__init__.py",
++      "sha256": "790830ee3d9a8a6a0c59a114fbc77fb50bc158d05e13ff9e2e634ad7f370d9c4"
++    },
++    {
++      "path": "core/env_adapters/base_adapter.py",
++      "sha256": "a5bb4f9e06f458fc38e6cc7486e6c6d268fc67bfaf6fd9f84f90514236144de8"
++    },
++    {
++      "path": "core/env_adapters/calvin_adapter.py",
++      "sha256": "396957c62660edddf9704a24cbef15d9cf5f2bbb4da39ee4b9123c4d240a0541"
++    },
++    {
++      "path": "core/env_adapters/libero_adapter.py",
++      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64"
++    },
++    {
++      "path": "core/fkd_class.py",
++      "sha256": "26ccfa9cf4837ce92baf0a5538ac3339d5c55a4f4f7b8f577366a0dd2a408412"
++    },
++    {
++      "path": "core/gemini_grounder.py",
++      "sha256": "0d1a51c8dbd077f274235ae00c1b3ab538e0f9745d85fd12417e21f57980b1f6"
++    },
++    {
++      "path": "core/keypoint_detector.py",
++      "sha256": "5fa108f01168ecb1f2433bc53f093701e0079fa6cf35abf910ec0347075d055e"
++    },
++    {
++      "path": "core/keypoint_tracker.py",
++      "sha256": "7925b62d8c6404c250ccdba6ae0df12df79dd23db1f308112b7b3f22e1a22190"
++    },
++    {
++      "path": "core/passive_physics_trace.py",
++      "sha256": "5a703e5b4f5dec786340fb8964ebfc1a18acf036a8486a7f99122223ddf06d8b"
++    },
++    {
++      "path": "core/pi05_steer.py",
++      "sha256": "ed9146d92bf09af1b1ec99774bd8042c70869ba2246c98ff04d23961ed83e962"
++    },
++    {
++      "path": "core/policy_observation_sampling.py",
++      "sha256": "c7e93e81541c34dd45e22dffc43a24d428d043a56c0dd6766bfd286e2ff07f4d"
++    },
++    {
++      "path": "core/qd_actuator_clipped_quality.py",
++      "sha256": "14f43ab89b7e59c99ada6f66a832f3a3f08d60c4fb1c92c0c8a6bb27a57ef120"
++    },
++    {
++      "path": "core/qd_actuator_clipped_rbf.py",
++      "sha256": "d0a516046f9d9efc8694916a9ff845c8b67868d8d7d2d01381894bcc05b89408"
++    },
++    {
++      "path": "core/qd_clean_output_rbf.py",
++      "sha256": "f107f50e45c233e291e5f5799633b0f3005fe54dc0649506dec41a4c02bb789c"
++    },
++    {
++      "path": "core/qd_contact_sweep.py",
++      "sha256": "fcd88b6b9dcf58b03e14f182c8d345363faf702dd146ea244ae073f997cb8602"
++    },
++    {
++      "path": "core/qd_ed.py",
++      "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89"
++    },
++    {
++      "path": "core/qd_executed_feedback.py",
++      "sha256": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab"
++    },
++    {
++      "path": "core/qd_executed_quality.py",
++      "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b"
++    },
++    {
++      "path": "core/qd_feasible_ray_rbf.py",
++      "sha256": "f2494d1a2c55f4899d848d5f7e8af03cc8518cd53749c8875a117c1ff15a3207"
++    },
++    {
++      "path": "core/qd_feasible_ray_update.py",
++      "sha256": "146163977866af87d2c643b0446be9ebac12f83cf9337d534b736874c623203e"
++    },
++    {
++      "path": "core/qd_grasp_timing.py",
++      "sha256": "f38c980b22df080991e4cb86d07c1dbc933652e584e8b897dbb16e1312fd6142"
++    },
++    {
++      "path": "core/qd_gripper_parent_rescue.py",
++      "sha256": "95e58de7f33a3f365f3d7640206f9f040b821d1bcd3d44aea008dd3236a25e3f"
++    },
++    {
++      "path": "core/qd_lift_quality.py",
++      "sha256": "aa61a1b0969d9725161483d6fb255b1773aa8f68223e4e93836944a153910a82"
++    },
++    {
++      "path": "core/qd_terminal_population.py",
++      "sha256": "21ecfc9dd88ec737bc23d00cc238bd9eef1c2fbdefa5a2b9bc2803e4fccb2174"
++    },
++    {
++      "path": "core/rdt_libero_action_converter.py",
++      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
++    },
++    {
++      "path": "core/rdt_libero_obs_processor.py",
++      "sha256": "5b6f3857be13254e1d2266270f57199578dbc4066566265b147d91cc30bb2d14"
++    },
++    {
++      "path": "core/rdt_policy_steer.py",
++      "sha256": "768fd9d1072f1f2abc0e3a1f87f764facd69b99e102399c041b73167b6ef00fe"
++    },
++    {
++      "path": "core/render_phase_diagnostics.py",
++      "sha256": "5c347b7988056de384f582b0fe12e4dc32d1999577812c83205925d02339804c"
++    },
++    {
++      "path": "core/sam3_segmenter.py",
++      "sha256": "e3f3cdd5a970b738ffcf17c7fd765041195d1b9f40a1d2b3809c1459cb5dce81"
++    },
++    {
++      "path": "core/sam_refiner.py",
++      "sha256": "fbe8a642294895773a3aad1a5e4a9dd21b2af1ad0b09e6d89cecb94b171ad909"
++    },
++    {
++      "path": "core/sam_segmenter.py",
++      "sha256": "c4e243d22adf3becfaa1f94f33e9ff05c1e2962899de4e11a656d2ffb16cb8bf"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft.md",
++      "sha256": "ae8d8ea8b209edc00f2d3f869eb881626d35603ef3cc1967539594958d33c1ea"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/analyze_episode.py",
++      "sha256": "26fb0952507b41694cb7b6d56991caef5afbb5b71aa0f13f4356cb731676e0b1"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static-output/provider-target-map-v2.json",
++      "sha256": "26fe347f9f343723943927b5bed84339f59fa284252698594dcb207f8cfc0585"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static-output/review.json",
++      "sha256": "e3ab0144c64069d5ce5b6bea2ea8c208195442312e4a4893ee58a7369cc77ed6"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/provider-target-review/static_review.py",
++      "sha256": "5184b804429ceeac6b7153a68c1a5bb1e71ace0eb0a8ecb066e3b05be3cf67c0"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/native-dependency-freeze.json",
++      "sha256": "4a86b289251967186cc427eb799784e56d7c20e0819fd0953824e7ad76f65d83"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/prepare-freshboot-c0-draft.py",
++      "sha256": "1835c93379e3a149697a4b51cc0236f9bdeaa6cd662829a2ec83c47c0217d6c0"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/supervise-freshboot-c0.py",
++      "sha256": "771594e0bef8f1eb3bab28ee03df4c5f0b507fd4ff64ec1b9e193f92a0fcdfdd"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/observed-baseline-profiles.json",
++      "sha256": "41ce29c19f22d34c80358241d2443827408e1727afcc18ff416c7da3cbf7f1c9"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/observed-pairs.py",
++      "sha256": "07cf60e487e6ee0ca6a428f39bb4f62aa719817f701d6684c54bf3286ed8e5f2"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/prospective-protocol.md",
++      "sha256": "10a5eab60f63915340bee8c935fbb88ae97664dbd1175f3a32bbf8b19a11a04e"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/supervisor-support.py",
++      "sha256": "1f007fbebd1f33c583876084aefb99b02b41d8b3b602afda23bcf28ae8d8fd60"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/conditional-cpu-protocol-v1.md",
++      "sha256": "25c53eebaf37e103c688cce60b1cc123fa6d4c28cb97e8a9e12e8c15c5522d27"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/conditional-dev-controller-protocol-v1.md",
++      "sha256": "868fe8040cf5c5d9c962dd5177335f7ad78a94a17de0f60560ad489829a5b465"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/controller-contract-v1.md",
++      "sha256": "8d25b5eb8a8a42567ec71c28ab086162cfc4f1202d3814a5c0696de8e6371bae"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/cpu-implementation-contract-v1.md",
++      "sha256": "f711c999370b982ff4c10906f585bc91de69585e57524ea37395145524d5b5f5"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/independent-arithmetic-protocol-v1.md",
++      "sha256": "144f9faa8a84c0663c507b3285b91a3b227e2dffc77569c79b49f672b4408988"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/native-witness-cpu-authority-v1.json",
++      "sha256": "4e2f6ea9d37689122b5c8b87922a87ddb2d54f8e08b405e400edb52e55377b33"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/phase-a-source-manifest-v2.json",
++      "sha256": "914c6f2bfa5fc06fd3549b09da2b3ec6570a399330e4db7b56f19ce6b4d63353"
++    },
++    {
++      "path": "docs/03_evidence/qd_ed_final/n25/shared-route-insertions-v1.json",
++      "sha256": "0e3bb7d6f881f441c58737b182c141c3e469c4fc78b291ba818d52d3e409f0a5"
++    },
++    {
++      "path": "docs/n27-feasible-ray-cpu-note.md",
++      "sha256": "c6d5b3a2673085e75836295cd6d5325fb3f695906b86b32325991b4908f64f2e"
++    },
++    {
++      "path": "docs/n27-phase-b-controller-contract.md",
++      "sha256": "2c4ac99183f0c7871883b7c2b101d237853f295abec8875b0d3067d8b829dd71"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/available-gpu-amendment.md",
++      "sha256": "0098289d2d94b9c4e7f353a540877a64cd680cbc53217773fa47878d17f755c5"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/codex-provider-amendment.md",
++      "sha256": "0cc80d2f98b3764bcc6e50cc94738fb4d0f1bf62eb5c824d415c2314f68bf26f"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu3-freshboot-c0-common-condition.md",
++      "sha256": "34467cff951ff63a130faa5137995e1aed68296bb11f446db8bbbbd2b3a7ff81"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu3-freshboot-model-first-control.md",
++      "sha256": "6c0df0b7215b6fe69314c9514aa178ca867ef0b63c12d2131edad45b076aef76"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu3-model-first-diagnostic.md",
++      "sha256": "da47161a9a2608b3b2499e2e35e6de69aefe9f8307f4389ea2722c0f975da98b"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu3-render-timing-diagnostic.md",
++      "sha256": "ad6309399a3d1bd4becb13bab188ce09e1c5c0ecae38cfbd9f917ae86dd0414c"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu5-resource-amendment.md",
++      "sha256": "2df464cc889eaa6aa5b6e8c7f401a86069d95428b40e0aad57b8f496b22413bb"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/gpu7-final-resource-amendment.md",
++      "sha256": "b412917b5ac8c420040691a4431db1c0eb4e17d5ec658a565f4a6ef38b964e23"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/protocol.md",
++      "sha256": "e3d3c2ed50db4a845e4d0713671db225c96f124ca8719d171e5d7006f0a5e0b0"
++    },
++    {
++      "path": "experiments/iteration_001_execution_intent/startup-repair-amendment.md",
++      "sha256": "7edc8d05830c75156e05f3ba687b84b2dbcf00fe3b976a3c605c457710d9ceaa"
++    },
++    {
++      "path": "experiments/iteration_002_executed_quality/accounting-clarification.md",
++      "sha256": "95449254ff20d25c404633181515d30fb7ca2114c9a174310aeff565794469f5"
++    },
++    {
++      "path": "experiments/iteration_002_executed_quality/protocol.md",
++      "sha256": "d5e560bb48cb705e13c931290adfccb3da905cf0a352e8d7bde8188dc5ca75b1"
++    },
++    {
++      "path": "experiments/iteration_003_executed_feedback/accounting-clarification.md",
++      "sha256": "133c8bd746680cb27fc0c8e0bb5f6116ffc9029045bfdd92482c88692b6419ba"
++    },
++    {
++      "path": "experiments/iteration_003_executed_feedback/protocol.md",
++      "sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931"
++    },
++    {
++      "path": "experiments/iteration_004_terminal_population/protocol.md",
++      "sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2"
++    },
++    {
++      "path": "experiments/iteration_004_terminal_population/q0-transfer-check-protocol.md",
++      "sha256": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca"
++    },
++    {
++      "path": "experiments/iteration_004_terminal_population/resource-resumption-amendment-v1.md",
++      "sha256": "a08b37836b5a9283118821bb5b6b2b2f2ccf3683bc145a6023f199484e4557dd"
++    },
++    {
++      "path": "experiments/iteration_004_terminal_population/transport180-engineering-protocol-v1.md",
++      "sha256": "a960f4075cca5962e3e9cd35956f96b49f7433f797529134896803f7b5473e2d"
++    },
++    {
++      "path": "experiments/iteration_005_grasp_timing/continuation-engineering-v1.md",
++      "sha256": "e88cd97ca07daea61a9264d92f5d4beab3ee40f00a5dba4b13fb02408032ef03"
++    },
++    {
++      "path": "experiments/iteration_005_grasp_timing/protocol.md",
++      "sha256": "14d1655c59501d356bbc6a297d47478b758b9f8c9da6e340dce9b996b1d05306"
++    },
++    {
++      "path": "experiments/iteration_006_height_aware/prelaunch-measurement-clarification-v1.md",
++      "sha256": "e50337e936c8bd9ea1e0b73f843888fed2c03e5cb5e8759dc154a9faeec36989"
++    },
++    {
++      "path": "experiments/iteration_006_height_aware/protocol.md",
++      "sha256": "211cfef47c62faec0fd3cbff57ec8af82239b952214d72dc40e8fe8f66edcea3"
++    },
++    {
++      "path": "experiments/iteration_007_direction_height/protocol.md",
++      "sha256": "c9d59545352f35d31704189cacb05782413b9ddd3ca7a3eac3f0af91fcd4b582"
++    },
++    {
++      "path": "experiments/iteration_021_stage_raw/protocol.md",
++      "sha256": "2f737fd6ab9b45a88bd6f080ff6f4a3a6a49f3089bfa3ab732e10e6672e949cc"
++    },
++    {
++      "path": "experiments/iteration_022_hold_lift/protocol-cpu.md",
++      "sha256": "30e09b3d74f2bd454c1d342ce6be85626ab3ecc5e3c416d1d609a2299495ea8d"
++    },
++    {
++      "path": "experiments/iteration_022_hold_lift/protocol.md",
++      "sha256": "650489b28f8b048b1963cfd7268dc937274a12f33132beabe93d4bc9bde0c295"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/arithmetic-repair-engineering-exception-v3.md",
++      "sha256": "bf3f28caf3967c4d3cf4cc6674bdaafd2d54abbdd22f5e9bc676853a12424727"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/backend-arithmetic-protocol-v1.md",
++      "sha256": "ada387aa1320f76239a7d4db43e8e4d9c1734ed735667113bcd6b6abcf543dfe"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/backend-arithmetic-protocol-v2.md",
++      "sha256": "9e21c6ae1b84cd2f8d85b3c3326a9e590f3775f763d900e636d147ac2d689053"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/backend-runtime-contract-v1.md",
++      "sha256": "f6baed63953b530b26fe4ba1437d0fc0002446da3f3e7bcd4c44fe3918ef7c02"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/budget-amendment-v1.md",
++      "sha256": "921d1e319d6ce7f3a9b8d79358c986b1640d31f8590d8abaf720ddea5b15cfb9"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/budget-amendment-v2.md",
++      "sha256": "6a5704152a2e783b3769648e915e458d4f08e8d75f12bde47a2b95ed1ebdc7ee"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/closed-runtime-admission-v1.md",
++      "sha256": "f48651e72283b6fdc41a518b4ee12a5e7d500850bbaf6d39b8b80d36b5e202cf"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/closed-runtime-admission-v2.md",
++      "sha256": "9a1a85556217dc571c2ab9f0d4d79eb89c439eb2658a8a2323ec07114fac0f59"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/protocol-cpu-v1.md",
++      "sha256": "e38d4c6825cca743539282818e8b49168c1910cf688720bd1901b7405ab8cf67"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/protocol-dev-conditional-v1.md",
++      "sha256": "638e43e8a7ab2b7accd13d7e772ed54e21b10ad84ac80c6decdee36a02066ed2"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/protocol-dev-v2-prospective.md",
++      "sha256": "11a311d46f62c809160ba18b7960c6eb36ad612450601b32998a3d6e21f95e0d"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/timeout-observability-addendum-v2.md",
++      "sha256": "fa0723919c67d0417b101be2a36d9832cfaaf15e4b1c4e0cdfbf61caa43e34c6"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md",
++      "sha256": "b75b60a13a2e1d0ff90433d9161f32b1bec4c056807d9f46598c10bdfe4d4071"
++    },
++    {
++      "path": "experiments/iteration_023_actuator_clipped_quality/uuid-repair-engineering-exception-v1.md",
++      "sha256": "d5c80006512203343d89dc24ab4de53356c045bc0f755800bf0e8337524d5f20"
++    },
++    {
++      "path": "experiments/qd_ed_n24/controller-contract-v1.md",
++      "sha256": "82d37b4a7fbcfb510f00d1fab70ccadafba510952dbe70d3e229cd4f221d410b"
++    },
++    {
++      "path": "experiments/qd_ed_n24/protocol-dev-v1.md",
++      "sha256": "77163171815bdade8d05a4010ff59aa24a4157d447d6d7fb430f3163a80c4b3b"
++    },
++    {
++      "path": "experiments/qd_ed_n25_continuation/controller-contract-v1.md",
++      "sha256": "ab2d986a0afc50fe119e8092ffcc92b2f5307d3a78e26d1fa348efcb3ed772bb"
++    },
++    {
++      "path": "experiments/qd_ed_n25_continuation/original-source-v1.json",
++      "sha256": "fafcb0d881c95d567cb14a6690145d4ad933abc84a5e0175dfbe1512efd836ee"
++    },
++    {
++      "path": "experiments/qd_ed_n25_continuation/protocol-v1.md",
++      "sha256": "c0c9fac3c18a920f88539c9abcf9d66359d4843d05a630f183b15845d97c59ef"
++    },
++    {
++      "path": "experiments/qd_ed_n25_continuation/reverse-routes-v1.json",
++      "sha256": "411b0e9f45704f24c50952abc727d43c470dfb2846b1ddc2b7333fbd6751b29a"
++    },
++    {
++      "path": "experiments/qd_ed_n25_continuation_downstream/evidence-contract-v1.md",
++      "sha256": "57e5038d880e5b27ed2f53c90c791dc0fdf0d107aecf55797fed613b826eabab"
++    },
++    {
++      "path": "experiments/qd_ed_n25_continuation_downstream/protocol-v1.md",
++      "sha256": "0e4ce396125c07a6105a6f90cb2a52835d331ac91ce31e31746f633b1f500213"
++    },
++    {
++      "path": "experiments/qd_ed_n26/admission-clarification-v1.md",
++      "sha256": "1ebd4242dc9462f13136f3517e46230aca255fe8400bde215976d991bf3e2365"
++    },
++    {
++      "path": "experiments/qd_ed_n26/base-function-hashes-v1.json",
++      "sha256": "85c6df4fb9da31629ef14876772c0e8d036b04bccfcc1c811f9f55fb0ac4a9af"
++    },
++    {
++      "path": "experiments/qd_ed_n26/conditional-cpu-protocol-v1.md",
++      "sha256": "37395fce88347d5315e14e6c8c2f40225ff469a118eb5003d3eb801e83562df3"
++    },
++    {
++      "path": "experiments/qd_ed_n26/conditional-dev-controller-protocol-v1.md",
++      "sha256": "7c64679c35ffc3c9a53d8309ceea7668de872f03fc5e2d2ed16bae2c43058b55"
++    },
++    {
++      "path": "experiments/qd_ed_n26/controller-contract-v1.md",
++      "sha256": "3d0bad0858133b7cc6ba303cb849799811a0ad9ee1bcb83cbf7e1e9d04539e69"
++    },
++    {
++      "path": "experiments/qd_ed_n26/implementation-contract-v1.md",
++      "sha256": "9844eadc7c87f76e151745a521bf5d61e272f07f9723a5e7a05e3b073705a24a"
++    },
++    {
++      "path": "experiments/qd_ed_n26/independent-arithmetic-protocol-v1.md",
++      "sha256": "9118bdb63fb0af76b2a1c9abc3ea0ca5e79445dc29ea1cab3161dde83e9069c9"
++    },
++    {
++      "path": "experiments/qd_ed_n26/n25-control-source-manifest-v1.json",
++      "sha256": "fafcb0d881c95d567cb14a6690145d4ad933abc84a5e0175dfbe1512efd836ee"
++    },
++    {
++      "path": "experiments/qd_ed_n26/phase-a-source-manifest-v1.json",
++      "sha256": "5e7085f4fd62c9e07af1890ab00d99f2a8bf75965b4130d944e61236926c3300"
++    },
++    {
++      "path": "experiments/qd_ed_n26/shared-route-insertions-v1.json",
++      "sha256": "a4f8c8b80501dd4fadd3a85bcae18eb36932de1c00deb5f91c497dcfdf897267"
++    },
++    {
++      "path": "experiments/qd_ed_n26_logical/accepted-n26-source-v1.json",
++      "sha256": "8cae3e7bb0104cb978237b5d4323909e13ffc8a03036958717c5378960ca9bdf"
++    },
++    {
++      "path": "experiments/qd_ed_n26_logical/admission-addendum-v1.md",
++      "sha256": "b4ec59fac43df3531b7edf47bd40166fb69189e5adae8ea13f06212332cfbcf6"
++    },
++    {
++      "path": "experiments/qd_ed_n26_logical/common-source-v1.json",
++      "sha256": "868852c63d17a4359fd641f7c47ac16c627961f2c9715106eef1bba207d50ec7"
++    },
++    {
++      "path": "experiments/qd_ed_n26_logical/controller-contract-v1.md",
++      "sha256": "532c4ecabe366f83f47cbcfa07b89850e9487e5e804d5b119f87be9d406986f1"
++    },
++    {
++      "path": "experiments/qd_ed_n26_logical/protocol-v1.md",
++      "sha256": "87ff4abf54ebeed75a9551db309bb82472d752f0b9f13b818f1509b6de183dc6"
++    },
++    {
++      "path": "experiments/qd_ed_n26_logical/provenance-reverse-v1.json",
++      "sha256": "1001514edbd6a619b7cf2acac3d9a119a14962b607d8cc5d187971ecdf9a3661"
++    },
++    {
++      "path": "experiments/qd_ed_n26_logical/shared-reverse-v1.json",
++      "sha256": "fe75df7140af23864754d74a917773fb633e94f7ca3a571816310543b83806a9"
++    },
++    {
++      "path": "experiments/qd_ed_n27/accepted-n26-source-v1.json",
++      "sha256": "3ae3f24be7600f9f912454172fbe92667feb8e1920301f41b53a679b57f011f3"
++    },
++    {
++      "path": "experiments/qd_ed_n27/accepted-predecessor-refs-v1.json",
++      "sha256": "5fa057691976a7033115ab1e6e3050a162a1c3958deee9cfc6691fda9066755c"
++    },
++    {
++      "path": "experiments/qd_ed_n27/hypothesis-and-scope-v1.md",
++      "sha256": "a49314e4349c2e4ee273374703fe16e0d734871ff244009b31041e484817f9bd"
++    },
++    {
++      "path": "experiments/qd_ed_n27/independent-arithmetic-protocol-v1.md",
++      "sha256": "60c897302d95278b46817fd2b553e037df414f5b6ea6fc7cfd9ce31c68fbe7df"
++    },
++    {
++      "path": "experiments/qd_ed_n27/phase-a-bytes-v1.json",
++      "sha256": "0f0170208441414c243556ba689e2d952340596240beffa4b5b84d3211ea738c"
++    },
++    {
++      "path": "experiments/qd_ed_n27/phase-b-integration-protocol-v1.md",
++      "sha256": "165d4efd83a7bf86a5bc1c42c0bea31272b69a86501ee22598bd2a1c6c9fa280"
++    },
++    {
++      "path": "experiments/qd_ed_n27/reverse-source-v1.json",
++      "sha256": "111560b9a48410fa250e2ecf1b3f12d0300ac1376e0ec82d6dacc2d1c92ce753"
++    },
++    {
++      "path": "main.py",
++      "sha256": "a46be1babfde66a07729c06d4e37b51575def4e27f05970dfaa852ae4db4afd7"
++    },
++    {
++      "path": "scripts/audit_decision_evidence.py",
++      "sha256": "df9b4294e02391f12f108671680072127054471a8c2eca02fed7b167a3a9addf"
++    },
++    {
++      "path": "scripts/audit_gripper_parent_rescue.py",
++      "sha256": "546ed6c7579b70fa6e99fb1525f144fb500b57ea9e3694af517434769f09ab68"
++    },
++    {
++      "path": "scripts/qd_ed_audit_backend.py",
++      "sha256": "893d5c0194859bd74202c1afd0ba13085e9cad563566b4a79f616c79235b053d"
++    },
++    {
++      "path": "scripts/qd_ed_available_gpu_queue.py",
++      "sha256": "0732ca69ad8e8ce916926bdd839aafce51e2451b418d2d9903fe24e2335c2d23"
++    },
++    {
++      "path": "scripts/qd_ed_codex_launch.py",
++      "sha256": "91101e37e4fab893d9a8de32b3ff5d910a08fc30caa049e69e4b6a5ffd2127bf"
++    },
++    {
++      "path": "scripts/qd_ed_final_report.py",
++      "sha256": "1e5ced6f6406ed4fd77f28c621d948ff111fcc2efc084dfdd1320366f41ff918"
++    },
++    {
++      "path": "scripts/qd_ed_final_runner.py",
++      "sha256": "792b44e5011b5f8c83d41b49e892eaffc7714ad62b7dd0323cc5f3e1d7aca6df"
++    },
++    {
++      "path": "scripts/qd_ed_gpu_probe.py",
++      "sha256": "0d9497b9780e91cb5174cf201917dc6d128eaac08512180ff527faef7dfcb07e"
++    },
++    {
++      "path": "scripts/qd_ed_n11_dev_contract.py",
++      "sha256": "ea9089b138f6cf088101e1ae47262240de6bea1446ccfe8b1ecaef8e9474bf64"
++    },
++    {
++      "path": "scripts/qd_ed_n11_dev_prepare.py",
++      "sha256": "9957aada526417e767d0f6aca65a52e9432368c2fe95a3f9152c4a1d3bb7be49"
++    },
++    {
++      "path": "scripts/qd_ed_n11_dev_supervise.py",
++      "sha256": "5afb4a1b96651a7a00a943590aeccd8277a824e4ef1d3021bb412b9c2445ac1e"
++    },
++    {
++      "path": "scripts/qd_ed_n18_dev_contract.py",
++      "sha256": "636788b21f9ee87e1cb9b6a4c1f20e9b70eec43f31c0890210aecae2d73b531c"
++    },
++    {
++      "path": "scripts/qd_ed_n18_dev_prepare.py",
++      "sha256": "901c9f746a63edddacf682da98f3adbc62c4d1e627b7267de3aefaf936ed54cd"
++    },
++    {
++      "path": "scripts/qd_ed_n18_dev_supervise.py",
++      "sha256": "f2ed42a608f664db9f8005c69a58068ec4396303e4cf3d0406f1e869223bad2b"
++    },
++    {
++      "path": "scripts/qd_ed_n18_gpu7_prepare.py",
++      "sha256": "02ec70f00b59763e7f969683ce70c617c6c968ae07568aef1891972d21ad1311"
++    },
++    {
++      "path": "scripts/qd_ed_n20_dev_contract.py",
++      "sha256": "56853a51aada1329fb822b0e03d26203ed6394c0212d421a69c3faf1c92f7abb"
++    },
++    {
++      "path": "scripts/qd_ed_n20_dev_prepare.py",
++      "sha256": "6dda1ac0020785782a31a652b5cf2363882f0cac4dc045f61b2fd8ee226c9427"
++    },
++    {
++      "path": "scripts/qd_ed_n20_dev_supervise.py",
++      "sha256": "75ccf1ce820d1f79a557bb70d1aa5fea1701eafe3e9c356a9659615d10eef04a"
++    },
++    {
++      "path": "scripts/qd_ed_n21_dev_contract.py",
++      "sha256": "133a82e8b490562956a456ddfa13c1323f721be37f8162299faf006755f85eed"
++    },
++    {
++      "path": "scripts/qd_ed_n21_dev_prepare.py",
++      "sha256": "06f3daddaf83bb7090703c27d6ba0bd66f82339813982e2cbefa7fbe37e38296"
++    },
++    {
++      "path": "scripts/qd_ed_n21_dev_supervise.py",
++      "sha256": "de53e42a9cdc5c4ea0406c802fe80d39ab852b61c2b3970869238d44a89d03b9"
++    },
++    {
++      "path": "scripts/qd_ed_n22_dev_contract.py",
++      "sha256": "817a9a19a26d15838e9d98cede9ca853a667d7cb871d7891f59775526150393c"
++    },
++    {
++      "path": "scripts/qd_ed_n22_dev_prepare.py",
++      "sha256": "d77ea1e4b6272f395674935a55dfba45496ba93371ae20684f48f934bd48537e"
++    },
++    {
++      "path": "scripts/qd_ed_n22_dev_supervise.py",
++      "sha256": "5f95d5feef83f751fd78e31dc1d681504ee8af17f0c0ab6379e4050b3dc0fabd"
++    },
++    {
++      "path": "scripts/qd_ed_n23_arithmetic_repair.py",
++      "sha256": "b9010ebf9a699c7c046ff04ff3ac67b4fe5239764ae9ea745b9ed1a47f3ba9ca"
++    },
++    {
++      "path": "scripts/qd_ed_n23_backend_preflight.py",
++      "sha256": "fbdd30ac1864ea9d282ce849f45faddda4738c6a5f092351e08bd0d2d13795be"
++    },
++    {
++      "path": "scripts/qd_ed_n23_backend_prepare.py",
++      "sha256": "42b8942557f4420f248cd6a95a3836dda49b09958d8bc842025aaf628538b0b7"
++    },
++    {
++      "path": "scripts/qd_ed_n23_dev_contract.py",
++      "sha256": "0dd332174a5e2a605638e7be4791f8326203e98509bc09b2bbddb9be3c8c6930"
++    },
++    {
++      "path": "scripts/qd_ed_n23_dev_prepare.py",
++      "sha256": "61db29dae6194c699581221108164ac36266b1ae9469f8f871b9a6e47f8bd125"
++    },
++    {
++      "path": "scripts/qd_ed_n23_dev_supervise.py",
++      "sha256": "629b22ee6389511ba16993b674e0ad28a743644b440c7be273564f2acd7095eb"
++    },
++    {
++      "path": "scripts/qd_ed_n23_preflight_admit.py",
++      "sha256": "0394fc287196a0042130e0b31af09d6341d84cbcbcd66eadc919c7d167970aad"
++    },
++    {
++      "path": "scripts/qd_ed_n23_uuid_native_repair.py",
++      "sha256": "362707b2b13b666b1b73576515dd582cd5aa1e751228744d30e7651bcf520ac6"
++    },
++    {
++      "path": "scripts/qd_ed_n23_uuid_repair.py",
++      "sha256": "b48536663157da25ca996a2f4056355e2bf8a2aa185fd2e962bc80ed47192471"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_backend.py",
++      "sha256": "e292b54f83842526414f297cab8875102a11992a00d9424d356f2fa8f02cadcb"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_contract.py",
++      "sha256": "40492aec2aa88b0d0bb3595e8a47b9561bd919b76a6048d1b14278b173832a02"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_predecessor.py",
++      "sha256": "f4ecc06186e303c2fd9375df17b784821a0e03bac48f9b035fbb2a4771714956"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_preflight_admit.py",
++      "sha256": "be1f612432c71a2beb7a06554e7dad8e54c7212f103838ae4d5454dc1c0f26c7"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_prepare.py",
++      "sha256": "8563c7edb6c4186b5c9b099bef1bf7be0165750486fde5869f3281404eac88a8"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_recovery.py",
++      "sha256": "88457287d2621836324cd881d185b60bb60274d006cd01564f88dfac9f9a20fb"
++    },
++    {
++      "path": "scripts/qd_ed_n23_v2_supervise.py",
++      "sha256": "d04177236bc068f038a41b57ee07be1691e8a9c290fc4ba70e7c383acd1ad67d"
++    },
++    {
++      "path": "scripts/qd_ed_n23_worker.py",
++      "sha256": "14a050b15a49d98bfffbfdb2032335415c8bfbed9720027702e96d31a47ba7fc"
++    },
++    {
++      "path": "scripts/qd_ed_n24_bridge.py",
++      "sha256": "30f8750ef22a81b596f9881c417b620c0c8cb7ddaadbfe110731c7802fa2520e"
++    },
++    {
++      "path": "scripts/qd_ed_n24_contract.py",
++      "sha256": "3fdd1fbdb7e8c44250f4c3138a77157f86134fa0174b018f16c9318dd31dac85"
++    },
++    {
++      "path": "scripts/qd_ed_n24_native.py",
++      "sha256": "0e093f65dc6274d7ca7e5fe35bcb305a815c0b943f7f0ad2460db530a23ecb7f"
++    },
++    {
++      "path": "scripts/qd_ed_n24_prepare.py",
++      "sha256": "4a0a53432d7a8f5d0b922c22e806e22852b6468473f587d47e6717840d44b8ea"
++    },
++    {
++      "path": "scripts/qd_ed_n24_recovery.py",
++      "sha256": "fe46eb25ac80ad557ca66e9501ece3ebec5799a57218aee08976365241a33378"
++    },
++    {
++      "path": "scripts/qd_ed_n24_report.py",
++      "sha256": "4b321e29d69718bf641448cdd251493acdf4a4d255adc83e69bd01767360c58f"
++    },
++    {
++      "path": "scripts/qd_ed_n24_supervise.py",
++      "sha256": "758714905a75cf1922fe67256240482c316b073f69ce9efdc426e2e635fea0c6"
++    },
++    {
++      "path": "scripts/qd_ed_n25_backend.py",
++      "sha256": "9161dc40beba7e26a0932f64ba8036a3946727b2a03817ecbb64e0b7c079a7ea"
++    },
++    {
++      "path": "scripts/qd_ed_n25_bridge.py",
++      "sha256": "46999b04dc86621ab08e16d7fbb90c2d91f5136de09b499b3b4ea334d6efc942"
++    },
++    {
++      "path": "scripts/qd_ed_n25_cont_bridge.py",
++      "sha256": "2a7a535ba0838dd10ff4dd2f3beab725ebeeea2936be918104ae8fbe241c0546"
++    },
++    {
++      "path": "scripts/qd_ed_n25_cont_contract.py",
++      "sha256": "51cbe762bc38da98237aad3154ca7641e4b53805729b09958309a96cde9dc6de"
++    },
++    {
++      "path": "scripts/qd_ed_n25_cont_downstream.py",
++      "sha256": "60a27a867c4a0ed4921d7a86cdbd333a5439d2b0eb497eb503743adbf9427832"
++    },
++    {
++      "path": "scripts/qd_ed_n25_cont_evidence.py",
++      "sha256": "9bf4b8ce97e0f36ced03343f475a2f61913e1da2dfcf8ce3249615b08680b657"
++    },
++    {
++      "path": "scripts/qd_ed_n25_cont_prepare.py",
++      "sha256": "1346e124b94a4e34c3e886d143015872961c7ac84c0bec59057d1c2d763a3197"
++    },
++    {
++      "path": "scripts/qd_ed_n25_cont_report.py",
++      "sha256": "e7653fee42afa39742b1ad74f47ada4ac3d39fa73a9877ae78a16192694ea55e"
++    },
++    {
++      "path": "scripts/qd_ed_n25_cont_seal.py",
++      "sha256": "ad9d56fe38aacecb50b9e36e55d9d8c71fd1a0f0a0b503418b3cfa32dd866154"
++    },
++    {
++      "path": "scripts/qd_ed_n25_cont_supervise.py",
++      "sha256": "b8cebea5e017b1479e5bde1c06f26f6f8df47821bb76636c9d390e4c66d4dce9"
++    },
++    {
++      "path": "scripts/qd_ed_n25_cont_terminal.py",
++      "sha256": "3f58a9e7e97453f65c5a184bb0b8597a4a5d1a365a63f69875a3e75981e04e41"
++    },
++    {
++      "path": "scripts/qd_ed_n25_contract.py",
++      "sha256": "5d991948ea897b12eab87f9d86de776dec350aa06c11e44ee2e1ae6d1c9fdd67"
++    },
++    {
++      "path": "scripts/qd_ed_n25_native.py",
++      "sha256": "ac0343de4af16d73c53b2bcff368598f5ed42bfaaf3eac3d9a2be4dc296d0b1d"
++    },
++    {
++      "path": "scripts/qd_ed_n25_preflight.py",
++      "sha256": "21aee372178ebb28242066b8788093d888ee7fbaf69468be7bfb5a5667e2c564"
++    },
++    {
++      "path": "scripts/qd_ed_n25_prepare.py",
++      "sha256": "33be58503e69d19e12ae95b390919549680c56e706d6fc80bf581faffe5abe20"
++    },
++    {
++      "path": "scripts/qd_ed_n25_recovery.py",
++      "sha256": "f6b2ac19be3a53348e83a9e098324bd72823bbdf0fe28350fb1f1203c8f50ffd"
++    },
++    {
++      "path": "scripts/qd_ed_n25_reference.py",
++      "sha256": "dd100a41021eb84b6a279d7dce8789eb65b53e04dc0a4df4df301abc1d241b3b"
++    },
++    {
++      "path": "scripts/qd_ed_n25_report.py",
++      "sha256": "eb37f2e3742d7dfe3fbaa512034b288985fa9b150e360b3eedc48a84cf7fc6a3"
++    },
++    {
++      "path": "scripts/qd_ed_n25_supervise.py",
++      "sha256": "f3fb5547a6b8c02a020de129de4ba7f34fc3b82c5886b9350050b2c14935026d"
++    },
++    {
++      "path": "scripts/qd_ed_n26_backend.py",
++      "sha256": "53970bca912aa8d413fae17ca9e9df243e6f8538344d7448f5efab387b1e4062"
++    },
++    {
++      "path": "scripts/qd_ed_n26_bridge.py",
++      "sha256": "1a9354faecf3a182f27187666beaf22e8e560727a2d4e3666bce50be55283fc7"
++    },
++    {
++      "path": "scripts/qd_ed_n26_contract.py",
++      "sha256": "e7a58c965f635062ba72a81acf2e84c26bcae735ca6b580862adae426d4d299f"
++    },
++    {
++      "path": "scripts/qd_ed_n26_logical.py",
++      "sha256": "d5fde7a827c29a4e60789947701f4abb079e80399e45de69b6f1f1f877f6c7fe"
++    },
++    {
++      "path": "scripts/qd_ed_n26_native.py",
++      "sha256": "7454ba0be79e9568252f2d55e2ec3a96da7e81d3030b71b42a8eca8104eabf62"
++    },
++    {
++      "path": "scripts/qd_ed_n26_preflight.py",
++      "sha256": "b0afeb217f7a25ea06f82d3915808d4a1cd8fd7520fe1deb7baa058ba48461af"
++    },
++    {
++      "path": "scripts/qd_ed_n26_prepare.py",
++      "sha256": "21e0dcdcde7f813b8afd5a35a10a490c29f7c41ea788132f8457145e1ba09b11"
++    },
++    {
++      "path": "scripts/qd_ed_n26_recovery.py",
++      "sha256": "ef00fdbccd520d073638f50eacbfca8863f83c42fda8b9096c06db9fbc92a1fc"
++    },
++    {
++      "path": "scripts/qd_ed_n26_reference.py",
++      "sha256": "84269ba38075ffd423638282700026657fb2525dadd5761f824b515ebceb84ee"
++    },
++    {
++      "path": "scripts/qd_ed_n26_report.py",
++      "sha256": "d0d37c3fcb751c674316c255834648eddf11cacb98e3cddb7c0f17576e600ec5"
++    },
++    {
++      "path": "scripts/qd_ed_n26_supervise.py",
++      "sha256": "57dfae9e54d0087d233f8554dd432bef12f6cf076728f28ee97f7e38c3cf7772"
++    },
++    {
++      "path": "scripts/qd_ed_n27_backend.py",
++      "sha256": "a79f2188c98af91559120720626f9be066632bac916891f9cd956e3f63cdcf4a"
++    },
++    {
++      "path": "scripts/qd_ed_n27_bridge.py",
++      "sha256": "fde7b883cea9af0ec5033cd97d5813dcadac9f1d7d3d8a6fcc36baf90f06ad9f"
++    },
++    {
++      "path": "scripts/qd_ed_n27_contract.py",
++      "sha256": "badfdb4225cc0a2d4ccc94a29d4e2deb4add0a4a85e2d78e8157b17261d84bc6"
++    },
++    {
++      "path": "scripts/qd_ed_n27_native.py",
++      "sha256": "76cf758a5e14786a6a168968d5099ae5fc5822fbd15eca3f47c582e6e2c536d2"
++    },
++    {
++      "path": "scripts/qd_ed_n27_preflight.py",
++      "sha256": "0ef5cecfaa13de0a5b3ddc543fc70c8ed33a56a2f0ef98abe33809a26c729526"
++    },
++    {
++      "path": "scripts/qd_ed_n27_prepare.py",
++      "sha256": "fc672cfced254208991a7009d11003432510f9594e01ec31b6107a6d5bca035c"
++    },
++    {
++      "path": "scripts/qd_ed_n27_recovery.py",
++      "sha256": "56ae0d5b8dfc29a577115c2b3366a986ca61ce49aa04182dba20a3b801688284"
++    },
++    {
++      "path": "scripts/qd_ed_n27_reference.py",
++      "sha256": "b6f265f961b4592177cac016f5773f3a1484e0b84544b6a7bca6205e5bb45d63"
++    },
++    {
++      "path": "scripts/qd_ed_n27_report.py",
++      "sha256": "10a219ca45103ffca9efa173ca8fee07d8b519e386404d1597850e4fc1964f5d"
++    },
++    {
++      "path": "scripts/qd_ed_n27_supervise.py",
++      "sha256": "373f9e1e3d04e9417b3f2060dbfd28a9b9d06247e38189ef2448d7f1b51342cb"
++    },
++    {
++      "path": "scripts/qd_ed_n2_plan.py",
++      "sha256": "cc39d7846a286f38de314dfa7a7b1a9f6d08e84792e20fee9ff2b84dac454ba1"
++    },
++    {
++      "path": "scripts/qd_ed_n2_supervise.py",
++      "sha256": "bb1d7e6ea07ceb743eff3710b0d3cb3882af2ec66a6e1e8b1491f12a4459ab02"
++    },
++    {
++      "path": "scripts/qd_ed_n3_plan.py",
++      "sha256": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1"
++    },
++    {
++      "path": "scripts/qd_ed_n3_report.py",
++      "sha256": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a"
++    },
++    {
++      "path": "scripts/qd_ed_n3_supervise.py",
++      "sha256": "e71f3297adea4a05b43bfe2cedd12cf47d849d3a0c5cd55858cbc28da0de0f1f"
++    },
++    {
++      "path": "scripts/qd_ed_n4_plan.py",
++      "sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
++    },
++    {
++      "path": "scripts/qd_ed_n4_report.py",
++      "sha256": "d26769d73e43e6b10b8171f6930604bc510d15b26174ca3a767bcdf84a72c2fb"
++    },
++    {
++      "path": "scripts/qd_ed_n4_supervise.py",
++      "sha256": "b6dd9224cfaf3066ccd40dd9abe51c93fe8fafe1018329a85c3a247ba74dd877"
++    },
++    {
++      "path": "scripts/qd_ed_n4e1_plan.py",
++      "sha256": "649449da2be43661080ce39f04f37fb5fd06e12360020937aca02da6d782f1cb"
++    },
++    {
++      "path": "scripts/qd_ed_n4e1_report.py",
++      "sha256": "69899bc1869d48c186a906a60d6d2d3d65269016d72c6914d60e4c3f19cc98ac"
++    },
++    {
++      "path": "scripts/qd_ed_n4e1_supervise.py",
++      "sha256": "6db2641a51e093d9c6b07afbbfed847256be8d22d55d8a2d5d5aa30f942ad41a"
++    },
++    {
++      "path": "scripts/qd_ed_n5_plan.py",
++      "sha256": "0c2f31462d733329f05548cbc700308113d479a505511bd98ecf297d177c8a75"
++    },
++    {
++      "path": "scripts/qd_ed_n5_report.py",
++      "sha256": "862789e1c685dcfa665f4c71c82d480595610f70e5e27faca1ce510868f54df4"
++    },
++    {
++      "path": "scripts/qd_ed_n5_supervise.py",
++      "sha256": "08b0bf3b8b276320889f652ab163d6f90acfbd440f9a7b2e6992159b44e3db95"
++    },
++    {
++      "path": "scripts/qd_ed_n6_plan.py",
++      "sha256": "05d64e3f51c8a60761ca352e6867271fba5ff8d0a61afff166c5db9bb267c16c"
++    },
++    {
++      "path": "scripts/qd_ed_n6_report.py",
++      "sha256": "9308fe08a141a2031a1ba026f652b8003bb82a812b4d385ceeb4ec9fddddf89a"
++    },
++    {
++      "path": "scripts/qd_ed_n6_supervise.py",
++      "sha256": "cd6e285760a8a48a4241f3e2bc5bbbdc0a27abb199e104de6b3207bc3aebc7ba"
++    },
++    {
++      "path": "scripts/qd_ed_n7_plan.py",
++      "sha256": "a43286525551bee70ef1b8de5fc44c8754f5b893820e0895fd93b9a76af241e3"
++    },
++    {
++      "path": "scripts/qd_ed_n7_report.py",
++      "sha256": "e6a31048828d8be04eb422907f1f99ef6284e0aeea4409e1eb52bde279a02ffd"
++    },
++    {
++      "path": "scripts/qd_ed_n7_supervise.py",
++      "sha256": "f6639cdecc637594d5f8cf1a443ac0eadba9e4c57974e213a15a6cea59e0946a"
++    },
++    {
++      "path": "scripts/qd_ed_native_probe_queue.py",
++      "sha256": "79d6153175248459e647989a7faaaf2a216377e7296c9960ddb0cf3f5e4c94a5"
++    },
++    {
++      "path": "scripts/qd_ed_poe_launch.py",
++      "sha256": "86ecaf3d0d1454613ee4bec1337dca7ed81d35ce59cfda1e62d7839a58e39b82"
++    },
++    {
++      "path": "scripts/qd_ed_policy_native_probe.py",
++      "sha256": "1ddddb7f72ea2dc2d297b3aaf9e80af47944f49ccfcb9d73c097ebe97880be92"
++    },
++    {
++      "path": "scripts/qd_ed_runtime_setup.py",
++      "sha256": "ad05efd769034d3f9937aebbba10abc16039a5f1b5026e6bacd808e13d717a9c"
++    },
++    {
++      "path": "tests/n25_cont_fixtures.py",
++      "sha256": "590b96f8f791a3641f26a3d707daac03fc479dca72fe3b5b7f270834a04faa1e"
++    },
++    {
++      "path": "tests/n25_cpu_synthetic.py",
++      "sha256": "f31bf791f38620f77fc811b71ba5e97e2d9faffe5d83f90c54b86089e2163094"
++    },
++    {
++      "path": "tests/n25_downstream_fixtures.py",
++      "sha256": "470074a3d6fa6ff094b31584fa532bd08b77806652a044fddf9f50f4e2b8fdb2"
++    },
++    {
++      "path": "tests/n26_cpu_synthetic.py",
++      "sha256": "a464fbec1272f9240039437ab17ef7590d191b32861a8d4574282f9139b040ef"
++    },
++    {
++      "path": "tests/n26_logical_fixtures.py",
++      "sha256": "1728f5b834c6fac3d444c22ca0f01faebde4f02bcae7d861ab9e93e0ab488f13"
++    },
++    {
++      "path": "tests/n27_cpu_synthetic.py",
++      "sha256": "d2a0b06182bf5f4847d1b117e6256735f6ea5f98accc7e47dfdb169926525e6d"
++    },
++    {
++      "path": "tests/test_decision_evidence_audit.py",
++      "sha256": "91eecc40a4260664ab6dfe4ce3321e0022a055a5a6c792b179f8acecf68be48b"
++    },
++    {
++      "path": "tests/test_episode_phase_timing.py",
++      "sha256": "659fbc5e267ae08c5210113bc6151afb7d5f5ce050ea4749af72fea285207b53"
++    },
++    {
++      "path": "tests/test_n24_native_loop.py",
++      "sha256": "6bfb2a16a12060304c146aeb0b879afacc572e098a11256aed3fdac960aa89e8"
++    },
++    {
++      "path": "tests/test_n25_clipped_rbf.py",
++      "sha256": "7c4f6f4bbdeb31633f7fe3e5b272b55a3471ac9695082a65e79ae38272d50a10"
++    },
++    {
++      "path": "tests/test_n26_clean_output_rbf.py",
++      "sha256": "bec98407514a03aee872fa321f7f45243413e07d2ba62b4dfbc421566811238d"
++    },
++    {
++      "path": "tests/test_n27_backend.py",
++      "sha256": "8b5c3ecf500139e12ecafe313aa456072fa9d3bb49fee3229e5b824507cfa08e"
++    },
++    {
++      "path": "tests/test_n27_controller.py",
++      "sha256": "3a05cf319bac50c36caa07825c5d603dbb6c24f6da33d6f52c082e9da14eaae6"
++    },
++    {
++      "path": "tests/test_n27_feasible_ray_update.py",
++      "sha256": "f15a54c25a502ad9c6aa966e02b438abcc2ef02979d219fdf506952e3de86c31"
++    },
++    {
++      "path": "tests/test_n27_integration.py",
++      "sha256": "6be2e7b47b85fbaf31b8dba98f4a88c5c41e6aaa31effe86715958c4a368d77d"
++    },
++    {
++      "path": "tests/test_n27_native.py",
++      "sha256": "72c6cf83c19f354205faf2d61bb250bddca7cfab8285950e66990cc110a311ef"
++    },
++    {
++      "path": "tests/test_n27_recovery.py",
++      "sha256": "c7a1997c08f2c6187e4ed7e151e3963e57e565286ef850fd7ce0922366f8cb4c"
++    },
++    {
++      "path": "tests/test_n27_source_gates.py",
++      "sha256": "334b0971498d38f8d860900aa6b29522dc89a30125e30610728c7a9bff7a9ae6"
++    },
++    {
++      "path": "tests/test_n4_terminal_population_audit.py",
++      "sha256": "0a0e477dc06071690942ec688df436e5cab08715bb4cb5d1e3f8ee9de0489a95"
++    },
++    {
++      "path": "tests/test_qd_actuator_clipped_quality.py",
++      "sha256": "65902223ee2e57a1ef54600f51da39bb75c9d3422032f6e31992c3371411aaa6"
++    },
++    {
++      "path": "tests/test_qd_direction_height.py",
++      "sha256": "660374add7d7fbfe4019bcbc5393750711797c2cb16d0cf56f67899fc3a60d7c"
++    },
++    {
++      "path": "tests/test_qd_ed_final_runner.py",
++      "sha256": "025450ad784749bee2afb3503112b485b100fc1223407f2670bd957b20411cc9"
++    },
++    {
++      "path": "tests/test_qd_ed_n21_dev.py",
++      "sha256": "9c5e0f9c5eaac297b95b70b9db4be918dd8e174e6984a835828c5667879602ca"
++    },
++    {
++      "path": "tests/test_qd_ed_n22_dev.py",
++      "sha256": "7200011750df3827a1f8c99d5edee067da120b83bfe7042e80e0747d7a679864"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_arithmetic_repair.py",
++      "sha256": "050770156432bf27bb2b202e33725f9e1fa632665a7862e97a1b173c7e338fc5"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_backend.py",
++      "sha256": "a3ebfff43ef3c7d233e891215ba4f355d9877b564b9ca33c2687807274578dd2"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_dev.py",
++      "sha256": "eb0c1d1b3fe411c01d84f0d5a0e1fcee987235abcd46db782939bbd7030f8ed6"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_uuid_native_repair.py",
++      "sha256": "c1d34d01414f2598cdf9e818d1b7ec7adac8dcbbc066ab010144a973e3632d2a"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_uuid_repair.py",
++      "sha256": "772f5bcd7b9f19fa9f7b8d19843af6af58a9782edf89b36d557498f8ce69af8f"
++    },
++    {
++      "path": "tests/test_qd_ed_n23_v2.py",
++      "sha256": "2082b388e8c8932d168f051ad693b7f74d879ae04aabbe00f6cf51f372c53184"
++    },
++    {
++      "path": "tests/test_qd_ed_n24_controller.py",
++      "sha256": "c1d5caca5d59769e13eca30b06c2d721deaff9e94f64f3fd3c304d467fe10bae"
++    },
++    {
++      "path": "tests/test_qd_ed_n24_recovery.py",
++      "sha256": "a94c38e5f22247bdabc099bc3c3f14b20f58a69ad17915926aae1b0913a64431"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_arithmetic.py",
++      "sha256": "f92a2cdcfd9d3411752dadc3bdd8acb67c12e954cff84cc7e7daed5ea799eb68"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_backend.py",
++      "sha256": "f3f3f1c0ebcace92c489780d0c84865a89902fa37e1eff5ce1f0f915ec821b36"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_cont.py",
++      "sha256": "8be51bc69063910afb7c1e42688099ed5593b7c0fe69b1cf9760a80176368b0a"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_cont_downstream.py",
++      "sha256": "1c2d689493fe2cbf8bda527ce25412c5b802f97ebf8d3a28b81fee5bbed45b48"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_controller.py",
++      "sha256": "12e42bc108c4313665264ca727a0aeadf50bfb0cc09de2b24444891b5e71ff9e"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_native.py",
++      "sha256": "2d814362c2a586267fa32ec074336fff737597d4714caa12acc7b438c4f5362a"
++    },
++    {
++      "path": "tests/test_qd_ed_n25_recovery.py",
++      "sha256": "cde8d3392b56d9f168abffaa65c22200fc47947b16c3df5ef92c5422ca0ed44f"
++    },
++    {
++      "path": "tests/test_qd_ed_n26_arithmetic.py",
++      "sha256": "a322bfb5c274282c3d91499505f6f3537952d42239fe6efd71b9788fb6675e14"
++    },
++    {
++      "path": "tests/test_qd_ed_n26_backend.py",
++      "sha256": "6abb3b4015c924772457d5cd4928d7a71956eca5a37473b135c7b05255cf011e"
++    },
++    {
++      "path": "tests/test_qd_ed_n26_controller.py",
++      "sha256": "17bbc00b4835c14f892eaf2b374a57db457d5621a3d6473422b98e336369ece0"
++    },
++    {
++      "path": "tests/test_qd_ed_n26_logical.py",
++      "sha256": "0ca695f0ef2ac4fab0e0c4662072b084cbf13c21582fbdc8bb0bc58b07024d4d"
++    },
++    {
++      "path": "tests/test_qd_ed_n26_native.py",
++      "sha256": "74d683f2f97bc5e99ee5dc18948230c837742b947f9647a29bbdf1966aaa87f1"
++    },
++    {
++      "path": "tests/test_qd_ed_n26_recovery.py",
++      "sha256": "a1f3a9577bb42636a03e2b27ba1b18e8554c69c7b8482604400f349e94bcdc7c"
++    },
++    {
++      "path": "tests/test_qd_ed_n5_plan.py",
++      "sha256": "7e09248ae6f5b18fe85c2262c199ee26b4eaa6d7805703e66d009bee4cf208a6"
++    },
++    {
++      "path": "tests/test_qd_ed_n7_plan.py",
++      "sha256": "2fe6952d22563e9eeb710a12d99c394c4f0caf17caf74edac083f64e662be48e"
++    },
++    {
++      "path": "tests/test_qd_grasp_timing.py",
++      "sha256": "6ad6952392bd8ee98c9e43fb848bd54237b81bcffd22840a3bd2866eac1434b0"
++    },
++    {
++      "path": "tests/test_qd_gripper_parent_rescue.py",
++      "sha256": "9d8f5c7aa0b8070e76dc89428c806b317a32a7dc73a180b1b20a0703ae7ccaf7"
++    },
++    {
++      "path": "tests/test_qd_height_aware.py",
++      "sha256": "eb044cbda0089c80273fd9aa17bf04d5df2ecebf05b9937a09a339a5b090db9a"
++    },
++    {
++      "path": "tests/test_qd_hold_lift_quality.py",
++      "sha256": "f9067be77e10210e63f82a8df05425481a45ff2511b9edea2aa4f7535612cbf1"
++    },
++    {
++      "path": "tests/test_qd_lift_quality.py",
++      "sha256": "21b2a132ead7c94f876e4c151fc1bc7c257c5576e1e567b421331f63d3c7ce0a"
++    },
++    {
++      "path": "tests/test_qd_parent_survival.py",
++      "sha256": "c883e4a7cd9ab01d39112ebfc894fdc765ee386a931a129f113a302d67b140ba"
++    },
++    {
++      "path": "tests/test_qd_terminal_population.py",
++      "sha256": "80ce2fe4a2d9ecb6aff79f158603bb22c3a1df0a92d10f3ff3a2de71673b2e0b"
++    },
++    {
++      "path": "tests/test_rdt_steer.py",
++      "sha256": "1f16056a9ada4715a2c86c64ddc59324f85f09fb9890e4f0e530e488d1ae6df4"
++    },
++    {
++      "path": "tests/test_render_phase_diagnostics.py",
++      "sha256": "fd6f50bbef56d5c5e35af2a3d3118d243d7e1f9848e244390a5df8184b187a05"
++    },
++    {
++      "path": "utils/__init__.py",
++      "sha256": "debd228bdc6164ea3f2fc49e0ef8aa891754e7748fe91ac21e8ef74b6a72a49f"
++    },
++    {
++      "path": "utils/config_utils.py",
++      "sha256": "d9f2a7665db2ee15f882be442eed791c0300607d2b62c12dfbe8651253c18af5"
++    },
++    {
++      "path": "utils/eds_eval_vis.py",
++      "sha256": "d155d2b2e6e72bd877899c1fdc6f0e57d847ea63d68b55a74a0606c90ab86676"
++    },
++    {
++      "path": "utils/eds_mechanism_pretest_vis.py",
++      "sha256": "a9ccf922bc717f955375455d56cc55f9ac49a439690461de453f2dc1b20af8fc"
++    },
++    {
++      "path": "utils/guidance_utils.py",
++      "sha256": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82"
++    },
++    {
++      "path": "utils/hydra_plugins/__init__.py",
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++    },
++    {
++      "path": "utils/hydra_plugins/task_searchpath.py",
++      "sha256": "32aa364739836f11f48299bd3e49a59a89a1baa4512f3a6f0bc962496739d218"
++    },
++    {
++      "path": "utils/keypoint_utils.py",
++      "sha256": "fb7730f5dbe6ba72584f9d7204d2578be225dc69655c7c26006a8be9a92d3c1f"
++    },
++    {
++      "path": "utils/logging_utils.py",
++      "sha256": "ad614d71030403937d8699544f9985f1909c8cc4402c43e2c9b16b39f263c2c3"
++    },
++    {
++      "path": "utils/plot_results.py",
++      "sha256": "3c8c26e719aa8742a07a134875b3dfcf0d0b2c1dedc277a8e694de0945787c90"
++    },
++    {
++      "path": "utils/vis_utils.py",
++      "sha256": "6e256ca29aabcb8ffeb852e56c732ec56885394bb8e4e8ca2fd0957e989289b8"
++    },
++    {
++      "path": "vlm_query/guidance_template.txt",
++      "sha256": "ac7a53e64f82e735b295682347cc4775da7c611715798e0d79f8a6fe34cb11c5"
++    },
++    {
++      "path": "vlm_query/guidance_template_calvin.txt",
++      "sha256": "b29b7554b27207269f572a40a4d51f7498d36e3eca4effb94349e32ebce8caee"
++    },
++    {
++      "path": "vlm_query/guidance_template_libero.txt",
++      "sha256": "0a11498ed5317170bff8e8cd3909c508ea810e4fa9f006555ef37a50f4459c54"
++    },
++    {
++      "path": "vlm_query/segmentation_planning_template.txt",
++      "sha256": "975e6905b66e749e351f2282a73e5f30eeee6735643622f74808b2379a938d30"
++    },
++    {
++      "path": "vlm_query/stage_template.txt",
++      "sha256": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b"
++    },
++    {
++      "path": "vlm_query/vlm_agent.py",
++      "sha256": "64a2f470045ab5be8840eb9758c1d8cb13cc2487d5993f2c47862052f8679494"
++    }
++  ],
++  "sha256": "6939ccc33c83186eb0a68922ea36d8893c5cdc74ef72a87d483093022281b851"
++}
+diff --git a/docs/experiments/n27_hydra_continuation/protocol-v1.md b/docs/experiments/n27_hydra_continuation/protocol-v1.md
+new file mode 100644
+index 0000000..59f416d
+--- /dev/null
++++ b/docs/experiments/n27_hydra_continuation/protocol-v1.md
+@@ -0,0 +1,29 @@
++# N27 exact infrastructure continuation — prospective root design
++
++This is a root design under the continuing explicitly authorized Arbor task, not an execution release. The original N27 cohort, source095cfee, plan, four attempt records, result and independent terminal review remain immutable. Its disposition stays INVALID_OR_INTERRUPTED. The original candidate has no valid outcome; this fault does not reject its scientific hypothesis.
++
++## Evidence and repair scope
++
++Root terminal review `../root-terminal-review-v1.json`, SHA256 `01dc887dc20d6050a498b15c575b881a3ad8471041c466818cad1ecb4aa8eaac`, accepted three valid task0 controls and one invalid N27 startup. All six known controller/proof/worker process identities are dead. The failed named attempt is `rdt-qd-ed-final-20260921T093925Z__n27_screen_t00_n27_20261001__1af7d45d9a10`. Its339-byte runner log identifies Hydra's unregistered `main.eds_config.diversity_update_mode`; worker receipt main_exit_code1, audit_seconds0, no audit report. Charged wall time7.231457023997791s stays in development. Missing cost telemetry remains unknown. No Stage timeout eligibility is claimed.
++
++The sole proposed scientific configuration repair is to register `diversity_update_mode: legacy_additive` in configs/config.yaml. Exact spelling is inherited from the existing policy/helper default. N27 retains its already frozen feasible_ray_v1 override. Require real Hydra composition of the original and repaired four-arm complete generated commands, unchanged argv, controls identical after deleting only this explicitly legacy default, and N27 inherited settings unchanged except the intended mode. Do not use broad `+` overrides. No policy/helper/native arithmetic/scorer/model/Stage/provider/runtime/action code changes.
++
++## Finite continuation
++
++Use a new named non-resumable continuation under this N27 folder, a new source commit and frozen plan; never restart or modify the original controller. Import exactly the first three valid cells via their closed metadata and source-equivalence bridge. Dispatch exactly the remaining13 rows of the original16-cell task-major matrix: N27 task0, then C0/Q0/N26/N27 tasks1,2,3. Only the first new row may name the original invalid attempt as retry_of and use the recovery bucket. Subsequent12 rows are previously unexecuted cells, three baseline and nine development. No additional recovery, task-failure retry, alternate seed, skipped cell or automatic restart. Any new invalid attempt closes the continuation INVALID; preserve all measured costs and unknown usage.
++
++Combined maxima17 episode dispatches (original4+new13), one named infrastructure replacement,16 first-valid logical cells. Original36-case numerical proof is inherited through byte-equivalent numerical code plus the explicit config/administrative source bridge; do not repeat the proof or model preflight. Same physical GPU7, one worker,1800s per episode plus40s cleanup. Total original-plus-continuation-plus-proof GPU-process time <=9.25h, with complete remaining full-row capacity checked before launch and every dispatch. Preserve private owner locks and full historical accounting.
++
++No budget increase or reassignment: cumulative522 attempts/100GPUh; baseline62/development220/validation180/formal40/recovery20; protected GPU-hour allocations validation32/formal12, preserving unspent amounts. At closure342 attempts/46.86186153036005GPUh; baseline59/development211/validation60/formal0/recovery12. Thus the exact13 new rows consume baseline3/development9/recovery1 within existing caps. Do not rewrite or reclassify the failed development attempt. Existing522 authority is prior root finite adoption under continuing delegation, not a newly asserted separate user audit.
++
++## Scientific interpretation
++
++The new continuation's result is separately reported. The combined logical screen requires all16 valid first results, N27>=2/4, N27>=each C0/Q0/N26 and strictly>N26, and substantive QD/ED evidence. Passing permits only separately frozen full-Dev preparation; failing is REJECT_SCREEN. Incomplete data is INVALID_OR_INTERRUPTED. No10-task futility shortcut, target-achieved claim, validation/formal authorization, extra simulation branch or protected data access.
++
++## Implementation boundary and acceptance
++
++Prepare a minimal isolated source checkout beneath N27 from095cfee only after root accepts the Hydra diagnostic. Allow the one config line and explicit continuation routing insertions in scripts/qd_ed_final_runner.py and scripts/qd_ed_n23_worker.py; add named continuation modules/tests/docs. Existing N27 and historical numerical/contract/proof/controller files remain unchanged. The exact named startup recovery is distinct from existing Codex-timeout recovery and cannot generalize to another attempt.
++
++Require complete old345-file comparison, exact reversible shared routing edits, original config bytes recoverable by deleting the single default, no old benchmark-code changes, complete new source manifest and clean commit. Bind exact original plan/source/result/root-review/closure projection/proof refs without recursive old proof replay or raw tensors/Stage reads. Old three cells remain historical same-process evidence under the bridge, not newly recomputed evidence.
++
++CPU validation should focus on real Hydra composition, exact13 rows, unknown-cost preservation, named recovery uniqueness, old valid result inheritance, source and account binding, control routing, all16 logical screening boundaries, finite budget/cleanup and no restart. Reuse previously accepted science tests and36-case proof; do not repeat unchanged numerical suites. CPU2/CUDAhidden, no model/API/GPU/simulation work; cumulative focused tests <=120s. Root must independently review source, test evidence, historical seal, remaining budget and cleanup before source adoption and any separately written executable release. All delivered plan/authority/release templates remain disabled until then.
+diff --git a/docs/experiments/n27_hydra_continuation/reverse-source-v1.json b/docs/experiments/n27_hydra_continuation/reverse-source-v1.json
+new file mode 100644
+index 0000000..6664318
+--- /dev/null
++++ b/docs/experiments/n27_hydra_continuation/reverse-source-v1.json
+@@ -0,0 +1,53 @@
++{
++  "base_commit": "095cfeecd6af55477d2529441c307ab712e8a8da",
++  "files": {
++    "configs/config.yaml": {
++      "old_sha256": "0fafab23cb97a4171d27e47d9b016eea84a909302ed02892922f040ca41c52b7",
++      "new_sha256": "654508563250e59ac56695ed3853157992ac946401179c593d74f10082282ee0",
++      "edits": [
++        {
++          "new_start": 82,
++          "new_end": 83,
++          "old": "",
++          "new": "    diversity_update_mode: legacy_additive\n"
++        }
++      ]
++    },
++    "scripts/qd_ed_final_runner.py": {
++      "old_sha256": "792b44e5011b5f8c83d41b49e892eaffc7714ad62b7dd0323cc5f3e1d7aca6df",
++      "new_sha256": "58599c3700ba8883530d4f4599346fca9acfd5edf7a3f74bd15d2f32ceda43af",
++      "edits": [
++        {
++          "new_start": 665,
++          "new_end": 668,
++          "old": "",
++          "new": "    if plan.get(\"n27_hydra_continuation\") is not None:\n        from scripts import qd_ed_n27_cont_contract\n        return qd_ed_n27_cont_contract\n"
++        },
++        {
++          "new_start": 1277,
++          "new_end": 1282,
++          "old": "    if row.get('iteration') == 'N27_FEASIBLE_RAY_SCREEN_20261001':\n",
++          "new": "    if row.get('iteration') == 'N27_HYDRA_CONTINUATION_V1_20261001':\n        from scripts import qd_ed_n27_cont_contract as n27c\n        n27c.require_state(state, globals())\n        bucket_caps = n27c.CAPS['buckets']\n    elif row.get('iteration') == 'N27_FEASIBLE_RAY_SCREEN_20261001':\n"
++        },
++        {
++          "new_start": 1405,
++          "new_end": 1408,
++          "old": "",
++          "new": "    if row.get(\"iteration\") == \"N27_HYDRA_CONTINUATION_V1_20261001\":\n        from scripts import qd_ed_n27_cont_contract as n27c\n        return n27c.check_retry(events, row, globals())\n"
++        }
++      ]
++    },
++    "scripts/qd_ed_n23_worker.py": {
++      "old_sha256": "14a050b15a49d98bfffbfdb2032335415c8bfbed9720027702e96d31a47ba7fc",
++      "new_sha256": "67fb073f20d618414936dd2e1bbfb6aae00f7156f87ffb645875997b6d03aaa6",
++      "edits": [
++        {
++          "new_start": 137,
++          "new_end": 140,
++          "old": "",
++          "new": "    if plan.get(\"n27_hydra_continuation\") is not None:\n        from scripts import qd_ed_n27_cont_contract as n27c\n        return n27c.validate_worker_context(context, main_argv, root, output, plan, runtime)\n"
++        }
++      ]
++    }
++  }
++}
+diff --git a/scripts/qd_ed_final_runner.py b/scripts/qd_ed_final_runner.py
+index 5922892..62bd68b 100644
+--- a/scripts/qd_ed_final_runner.py
++++ b/scripts/qd_ed_final_runner.py
+@@ -663,6 +663,9 @@ def typed_metered_plan(plan):
+ 
+ 
+ def metered_support(plan):
++    if plan.get("n27_hydra_continuation") is not None:
++        from scripts import qd_ed_n27_cont_contract
++        return qd_ed_n27_cont_contract
+     if is_n27_plan(plan):
+         from scripts import qd_ed_n27_contract
+         return qd_ed_n27_contract
+@@ -1272,7 +1275,11 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(),
+     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
+             'GPU policy/runtime physical device mismatch')
+     amendment = budget.get('amendment')
+-    if row.get('iteration') == 'N27_FEASIBLE_RAY_SCREEN_20261001':
++    if row.get('iteration') == 'N27_HYDRA_CONTINUATION_V1_20261001':
++        from scripts import qd_ed_n27_cont_contract as n27c
++        n27c.require_state(state, globals())
++        bucket_caps = n27c.CAPS['buckets']
++    elif row.get('iteration') == 'N27_FEASIBLE_RAY_SCREEN_20261001':
+         from scripts import qd_ed_n27_contract as n27
+         n27.require_state(state, globals())
+         bucket_caps = n27.BASE_CAPS['buckets']
+@@ -1396,6 +1403,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(),
+ 
+ 
+ def check_retry(events, row):
++    if row.get("iteration") == "N27_HYDRA_CONTINUATION_V1_20261001":
++        from scripts import qd_ed_n27_cont_contract as n27c
++        return n27c.check_retry(events, row, globals())
+     if row.get('n27_recovery_eligibility') is not None:
+         from scripts import qd_ed_n27_recovery as recovery
+         return recovery.check_retry(events, row, globals())
+diff --git a/scripts/qd_ed_n23_worker.py b/scripts/qd_ed_n23_worker.py
+index fe24cba..23772b6 100644
+--- a/scripts/qd_ed_n23_worker.py
++++ b/scripts/qd_ed_n23_worker.py
+@@ -135,6 +135,9 @@ def validate_context(context, main_argv):
+     require(root == ROOT.resolve() and context['main_argv'] == list(main_argv)
+             and main_argv[0] == str(root / 'main.py') and output.name == context['attempt_id'], "worker command/root/attempt differs")
+     plan, runtime = read_ref(context['plan']), read_ref(context['runtime'])
++    if plan.get("n27_hydra_continuation") is not None:
++        from scripts import qd_ed_n27_cont_contract as n27c
++        return n27c.validate_worker_context(context, main_argv, root, output, plan, runtime)
+     if plan.get('n27_cohort') is not None or 'N27' in plan.get('candidate_profiles', {}):
+         from scripts import qd_ed_n27_contract as n27
+         return n27.validate_worker_context(context, main_argv, root, output, plan, runtime)
+diff --git a/scripts/qd_ed_n27_cont_bridge.py b/scripts/qd_ed_n27_cont_bridge.py
+new file mode 100644
+index 0000000..4cba2a6
+--- /dev/null
++++ b/scripts/qd_ed_n27_cont_bridge.py
+@@ -0,0 +1,45 @@
++"""Exact three-file administrative/config reversal, old numerical proof inherited."""
++import ast
++import hashlib
++import json
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n27_cont_history as h
++DOC='docs/experiments/n27_hydra_continuation'
++ROUTES={'scripts/qd_ed_final_runner.py':{'metered_support','check_budget','check_retry'},'scripts/qd_ed_n23_worker.py':{'validate_context'}}
++CHANGED=set(ROUTES)|{'configs/config.yaml'}
++
++def functions(text):return {n.name:ast.get_source_segment(text,n) for n in ast.parse(text).body if isinstance(n,ast.FunctionDef)}
++def source_paths(root):
++    root=Path(root);old=json.loads((root/DOC/'original-source-v1.json').read_text())
++    paths={x['path'] for x in old['files']}
++    for pattern in ('scripts/qd_ed_n27_cont_*.py','tests/test_n27_cont*.py','tests/n27_cont_*.py',DOC+'/*'):
++        paths.update(str(p.relative_to(root)) for p in root.glob(pattern) if p.is_file())
++    return paths
++
++def reverse_source(root,source):
++    root=Path(root);old=json.loads((root/DOC/'original-source-v1.json').read_text());patch=json.loads((root/DOC/'reverse-source-v1.json').read_text())
++    w.require(old['commit']==h.BASE and len(old['files'])==345 and patch['base_commit']==h.BASE and set(patch['files'])==CHANGED,'source bridge base/scope')
++    index={x['path']:x['sha256'] for x in source['files']}
++    w.require(len(index)==len(source['files']) and set(index)==source_paths(root),'source closure')
++    for row in old['files']:
++        path=row['path'];data=(root/path).read_bytes();w.require(hashlib.sha256(data).hexdigest()==index[path],'current source bytes')
++        if path in CHANGED:
++            p=patch['files'][path];w.require(p['new_sha256']==index[path] and p['old_sha256']==row['sha256'],'route hashes')
++            lines=data.decode().splitlines(keepends=True)
++            for edit in reversed(p['edits']):
++                a,z=edit['new_start'],edit['new_end'];w.require(''.join(lines[a:z])==edit['new'],'reverse hunk');lines[a:z]=edit['old'].splitlines(keepends=True)
++            restored=''.join(lines).encode()
++            if path in ROUTES:
++                a,z=functions(restored.decode()),functions(data.decode());w.require(set(a)==set(z) and {k for k in a if a[k]!=z[k]}==ROUTES[path],'function allowlist')
++            else:w.require(data.replace(b'    diversity_update_mode: legacy_additive\n',b'',1)==restored and data.count(b'    diversity_update_mode: legacy_additive\n')==1,'sole disabled config default')
++            data=restored
++        w.require(hashlib.sha256(data).hexdigest()==row['sha256'],'old scientific byte drift: '+path)
++    return old
++
++def build(source,seal,root):
++    w.verify_source(root,source);old=reverse_source(root,source);w.require(old==seal['original_source'],'sealed old source differs')
++    return {'schema':'n27-hydra-source-bridge-v1','old_source':old,'new_source':source,'changed_existing':sorted(CHANGED),
++        'unchanged_original_files':342,'reverse_exact':True,'historical_backend_proof':seal['historical_backend_proof'],
++        'new_numerical_preflight':False,'runtime':seal['runtime'],
++        'interpretation':'Old 36-case proof belongs to source095; unchanged numerical bytes and exact administrative/config bridge, not a new proof.'}
+diff --git a/scripts/qd_ed_n27_cont_contract.py b/scripts/qd_ed_n27_cont_contract.py
+new file mode 100644
+index 0000000..38bc71d
+--- /dev/null
++++ b/scripts/qd_ed_n27_cont_contract.py
+@@ -0,0 +1,189 @@
++"""One named startup replacement, twelve untouched rows; no generic retry."""
++import copy
++import os
++import threading
++from contextlib import contextmanager
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w,qd_ed_n27_contract as old,qd_ed_n27_native as native
++from scripts import qd_ed_n27_cont_history as h,qd_ed_n27_cont_bridge as bridge
++ROOT=Path(__file__).resolve().parents[1]
++COHORT=h.COHORT;ARMS=h.ARMS;CAPS=old.BASE_CAPS;WORKER_CONTRACT=old.WORKER_CONTRACT
++RUN_DIR=old.RUN_DIR/'hydra-continuation-v1'
++PROTOCOL=old.RUN_DIR/'hydra-config-repair-preparation-v1/root-continuation-design-v1.md'
++PROTOCOL_SHA='d4316e941ed67c246823bfc7143fadf8d50e4cc86cce57b5ac55bac413a71fc0'
++SEAL=RUN_DIR/'history-seal-v1.json';SEAL_REVIEW=RUN_DIR/'root-seal-review-v1.json'
++BRIDGE=RUN_DIR/'source-bridge-v1.json';FINAL_REVIEW=RUN_DIR/'final-source-runtime-review-v1.json'
++AUTHORITY=RUN_DIR/'adoption-v1/authority.json';PLAN=RUN_DIR/'plan.frozen.v1.gpu7.json'
++LIMITS={'new_dispatches':13,'combined_dispatches':17,'named_retries':1,'additional_retries':0,
++ 'episode_timeout_seconds':1800,'cleanup_seconds':40,'combined_local_gpu_hours':9.25,'physical_gpu':7}
++ref=h.ref;read_worker_report=old.read_worker_report;_SCOPE=None
++
++def history():
++    seal=h.verify(h.read(ref(SEAL)));review=h.read(ref(SEAL_REVIEW))
++    w.require(w.sha(PROTOCOL)==PROTOCOL_SHA and (ROOT/bridge.DOC/'protocol-v1.md').read_bytes()==PROTOCOL.read_bytes(),'continuation protocol changed')
++    w.require(review=={'schema':'n27-hydra-root-seal-review-v1','accepted':True,'seal':ref(SEAL),'protocol':ref(PROTOCOL),
++        'root_terminal_review':seal['root_terminal_review'],'startup_classification':seal['startup_classification'],
++        'original_disposition':'INVALID_OR_INTERRUPTED','old_source':seal['original_source'],
++        'historical_backend_proof':seal['historical_backend_proof'],'native_receipts_attested_not_replayed':True,
++        'cleanup_complete':True,'gpu_authorized':False},'exact independent root seal review required')
++    # Only bounded control JSON refs are followed. Never follow nested attempt/tensor/Stage refs.
++    prior=h.read(seal['original_plan']);w.require(prior==seal['original_plan_content'],'sealed plan bytes/content mismatch')
++    h.read(seal['root_terminal_review']);h.read(seal['startup_classification'])
++    h.read(seal['original_result']);h.read(seal['historical_backend_proof']);h.read(seal['original_source_review']);h.read(seal['original_authority'])
++    return seal
++
++def rows(seal):
++    result=[]
++    for index,original in enumerate(seal['original_plan_content']['episodes'][3:],3):
++        row=copy.deepcopy(original);row.update(iteration=COHORT,episode_key=original['episode_key']+'_hydra1')
++        if index==3:row.update(budget_bucket='recovery',retry_of=h.FAILED,n27_named_hydra_proof=ref(SEAL))
++        result.append(row)
++    w.require(len(result)==13,'exact thirteen remaining rows');return result
++
++def source_paths(r):return bridge.source_paths(r['ROOT'])
++
++def final_review(source,runtime,root):
++    seal=history();expected=bridge.build(source,seal,root)
++    w.require(runtime==seal['runtime'] and h.read(ref(BRIDGE))==expected,'reviewed source/runtime bridge missing')
++    review={'schema':'n27-hydra-source-runtime-review-v1','accepted':True,'source':source,'runtime':runtime,'protocol':ref(PROTOCOL),
++        'seal':ref(SEAL),'root_seal_review':ref(SEAL_REVIEW),'source_bridge':ref(BRIDGE),
++        'historical_backend_proof':seal['historical_backend_proof'],'no_new_preflight':True,'gpu_authorized':False}
++    w.require(h.read(ref(FINAL_REVIEW))==review,'exact final root source review missing');return ref(FINAL_REVIEW)
++
++def authority(source,runtime,root,state=None):
++    seal=history();record=h.read(ref(AUTHORITY));budget=h.read(seal['budget_authority'])
++    expected={'schema':'n27-hydra-authority-v1','cohort_id':COHORT,'source':source,'runtime':runtime,'protocol':ref(PROTOCOL),
++        'seal':ref(SEAL),'final_review':final_review(source,runtime,root),'budget_authority':seal['budget_authority'],
++        'caps':CAPS,'limits':LIMITS,'old_gpu_seconds':seal['old_gpu_seconds'],
++        'validation_authorized':False,'formal_authorized':False}
++    w.require(set(record)==set(expected)|{'recorded_at','authority_interpretation'} and all(record[k]==v for k,v in expected.items())
++        and all(isinstance(record[k],str) and record[k].strip() for k in ('recorded_at','authority_interpretation'))
++        and budget['caps']==CAPS,'finite unchanged authority differs')
++    if state is not None:w.require(state.get('n27_hydra_continuation_authority')==ref(AUTHORITY),'new authority not adopted')
++    return record
++
++def require_state(state,r):
++    record=h.read(ref(AUTHORITY));authority(record['source'],record['runtime'],Path(r['ROOT']),state)
++    budget=state['budget'];adopted=h.read(record['budget_authority']);resource=state.get('resource_isolation',{})
++    w.require(state.get('n26_budget_authority')==record['budget_authority'] and budget['max_episode_attempts']==522
++        and budget['max_gpu_hours']==100. and budget['reserved']==CAPS['buckets'] and budget['gpu_hour_reservations']==CAPS['protected_gpu_hours']
++        and budget['amendment']==adopted['amendment'] and resource.get('status')=='ACTIVE' and resource.get('validation_status')=='PASS'
++        and resource.get('private_budget') is True and state.get('max_concurrent_gpu_workers')==1
++        and not state.get('external_resource_hold',{}).get('do_not_auto_resume',False) and r['authorized_gpu'](state)==7,'unchanged private finite budget/resource')
++
++def local_events(events):return [x for x in events if x.get('identity',{}).get('iteration')==COHORT]
++
++def budget_check(state,events,resources,r,*,dispatch=False):
++    seal=history();h.current_subset(seal,events,resources);snap=r['budget_snapshot'](events,resources)
++    local=local_events(events);gg=r['event_groups'](local);charged=[x for x in local if x['event']=='dispatched']
++    w.require(snap['running']==snap['gpu_healthcheck_inflight']==0 and all(g[-1]['event'] in r['TERMINAL'] for g in r['event_groups'](events).values()),'unsettled owner/ledger')
++    w.require(state['budget']['dispatched']==snap['dispatched'] and abs(state['budget']['gpu_hours_consumed']-snap['gpu_hours_consumed'])<1e-8,'state/ledger costs differ')
++    remaining={b:n-sum(x['budget_bucket']==b for x in charged) for b,n in {'baseline':3,'development':9,'recovery':1}.items()}
++    vals=[g[-1].get('gpu_process_wall_seconds') for g in gg.values()]
++    w.require(len(gg)<=13 and len(charged)+4<=17 and all(v>=0 for v in remaining.values()) and all(h.finite(v) for v in vals),'finite count/cost missing')
++    spent=seal['old_gpu_seconds']+sum(vals);remaining_seconds=sum(remaining.values())*1840
++    reserved_h=sum(max(0.,n-snap['gpu_hours_by_bucket'][b]) for b,n in CAPS['protected_gpu_hours'].items())
++    reserved_n=sum(max(0,CAPS['buckets'][b]-snap['by_bucket'][b]) for b in ('validation','formal'))
++    w.require(spent+remaining_seconds<=9.25*3600 and all(CAPS['buckets'][b]-snap['by_bucket'][b]>=n for b,n in remaining.items())
++        and snap['dispatched']+sum(remaining.values())+reserved_n<=522
++        and snap['gpu_hours_consumed']+remaining_seconds/3600+reserved_h<=100.+1e-9,'full remaining rows/protected capacity missing')
++    if dispatch:w.require(sum(remaining.values())>0 and spent+1840<=9.25*3600,'next full-row capacity missing')
++    return {'combined_spent_seconds':spent,'remaining':remaining}
++
++def full_capacity(state,events,resources,r):
++    require_state(state,r);return budget_check(state,events,resources,r)
++
++@contextmanager
++def supervised_scope(plan,root,episode_key):
++    global _SCOPE
++    w.require(_SCOPE is None,'nested continuation scope')
++    _SCOPE=(str(Path(root).resolve()),plan['source_commit'],episode_key,os.getpid(),threading.get_ident())
++    try:yield
++    finally:_SCOPE=None
++
++def require_scope(plan,root,r,row=None):
++    w.require(_SCOPE is not None and _SCOPE[:2]==(str(Path(root).resolve()),plan['source_commit'])
++        and _SCOPE[3:]==(os.getpid(),threading.get_ident()) and (row is None or _SCOPE[2]==row['episode_key']),'closed single-cell scope required')
++
++def effective_row(plan,row,events,root,r):
++    require_scope(plan,root,r,row);w.require(row in plan['episodes'],'no substituted/recovery row');return row
++
++def check_retry(events,row,r):
++    seal=history();expected=rows(seal);w.require(row in expected,'not exact fixed continuation row')
++    index=expected.index(row)+3;original=seal['original_plan_content']['episodes'][index]
++    keys=('split','profile','task_id','env_seed','policy_seed','init_index')
++    prior=[g for g in r['event_groups'](events).values() if g[0]['identity'].get('iteration') in {h.OLD,COHORT} and all(g[0]['identity'].get(k)==original[k] for k in keys)]
++    w.require(not any(x.get('n27_recovery_eligibility') or x.get('n26_recovery_eligibility') for x in (row,)),'mixed recovery marker')
++    if index==3:
++        w.require(len(prior)==1 and prior[0][-1]==seal['all_old_attempts'][3]['terminal'] and row['retry_of']==h.FAILED
++            and row['budget_bucket']=='recovery' and row['n27_named_hydra_proof']==ref(SEAL)
++            and not any(x.get('retry_of')==h.FAILED for x in events),'named startup replacement consumed/different')
++    else:w.require(not prior and not row.get('retry_of'),'valid/exposed cell cannot repeat')
++
++def protected_budget(state,events,resources,row,timeout,r,*,plan):
++    w.require(row in plan['episodes'] and row['iteration']==COHORT and timeout==1800,'row/deadline differs')
++    require_state(state,r);budget_check(state,events,resources,r,dispatch=True)
++
++def metadata(source,runtime,root):
++    return {'schema':'n27-hydra-continuation-v1','cohort_id':COHORT,'protocol':ref(PROTOCOL),'seal':ref(SEAL),
++        'final_review':final_review(source,runtime,root),'authority':ref(AUTHORITY),'limits':LIMITS,'imported_cells':3,'dispatchable':13}
++
++def validate_contract(plan,manifest,runtime,seeds,root,r):
++    old.imports_owned(root,r)
++    for module in (h,bridge):w.require(Path(module.__file__).resolve().is_relative_to(Path(root).resolve()),'continuation module shadow')
++    w.require(Path(__file__).resolve().is_relative_to(Path(root).resolve()),'continuation contract shadow')
++    seal=history();source=w.source_record(root,[x['path'] for x in plan['code_files']])
++    w.require(source['commit']==plan['source_commit'] and source['files']==plan['code_files'] and source_paths(r)=={x['path'] for x in plan['code_files']},'committed source closure')
++    prior=seal['original_plan_content'];allowed={'source_commit','code_files','episodes','n27_cohort','n27_hydra_continuation','derived_from','frozen'}
++    w.require(set(plan)==set(prior)|{'n27_hydra_continuation'} and all(plan[k]==prior[k] for k in prior if k not in allowed)
++        and plan['derived_from']==seal['original_plan'] and plan['episodes']==rows(seal)
++        and plan['n27_cohort']=={'schema':'n27-hydra-audit-family-v1','worker_audit':WORKER_CONTRACT}
++        and plan['n27_hydra_continuation']==metadata(source,seal['runtime'],root),'exact source-equivalent continuation plan')
++    w.require(set(manifest['profiles'])==set(ARMS) and manifest['profiles']['N27']['resolved_eds_config']=={
++        **manifest['profiles']['N26']['resolved_eds_config'],'diversity_update_mode':'feasible_ray_v1'},'science/profile equivalence')
++    w.require(runtime==h.read(seal['runtime']) and Path(runtime['worktree']).resolve()==Path(root).resolve()
++        and runtime.get('schema')=='qd-ed-runtime-setup-v1' and r['runtime_gpu'](runtime)==7
++        and runtime['gpu_mapping']['uuid']==old.GPU7_UUID and runtime['gpu_mapping']['egl_device_index']==4
++        and runtime.get('cuda_egl_verified') is True and runtime.get('cuda_egl_probe',{}).get('resource_id')==old.GPU7_PROOF
++        and runtime.get('stage_recovered_error_condition')==r['E2_STAGE_CONDITION']
++        and runtime.get('stage_engineering_condition')==r['n4e1_support']().engineering_condition()
++        and runtime['frozen_stage_provider'].get('allow_recovered_error_events') is True,'frozen runtime/GPU/Stage differs')
++    r['verify_files'](runtime['files'],allowed_roots=(Path(root),Path(runtime['worktree']),runtime['artifact_root']))
++    require_state(r['read_state'](Path(root)/'research-state.yaml'),r)
++
++def validate_worker_context(context,argv,root,output,plan,runtime):
++    meta=plan.get('n27_hydra_continuation',{})
++    w.require(plan.get('frozen') is True and plan.get('n27_cohort')=={'schema':'n27-hydra-audit-family-v1','worker_audit':WORKER_CONTRACT}
++        and meta.get('schema')=='n27-hydra-continuation-v1' and meta.get('cohort_id')==COHORT and meta.get('protocol',{}).get('sha256')==PROTOCOL_SHA
++        and set(plan.get('candidate_profiles',{}))=={'N26','N27'} and not any(k.startswith(('n23_','n24_','n25_','n26_')) for k in plan)
++        and plan['worktree']==str(root) and context['profile'] in ARMS
++        and output==Path(plan['artifact_root']).resolve()/'attempts'/context['attempt_id']
++        and context['runtime']=={'path':plan['runtime_manifest_path'],'sha256':plan['runtime_manifest_sha256']},'continuation worker plan/runtime')
++    matches=[x for x in plan['episodes'] if x['episode_key']==context['episode_key']]
++    w.require(len(matches)==1 and matches[0]['iteration']==COHORT and matches[0]['profile']==context['profile']
++        and matches[0]['split']=='dev' and matches[0]['timeout_seconds']==1800 and context['source']['commit']==plan['source_commit']
++        and context['source']['files']==plan['code_files'],'worker row/source differs')
++    w.verify_source(root,context['source']);w.require(w.cuda_binding(runtime)['physical_gpu']==7,'GPU7 only')
++    return root,output,runtime
++
++def accepted_cell(plan,row,events,root,r):
++    own=list(r['event_groups']([x for x in local_events(events) if x['episode_key']==row['episode_key']]).values())
++    w.require(len(own)==1 and [x['event'] for x in own[0]]==['reserved','dispatched','valid'],'single valid new attempt required')
++    final=own[0][-1];out=Path(final['output_dir']);context=h.read(ref(out/'n23-worker-context.json'))
++    w.require(final.get('outcome_valid') is True and final.get('required_cost_telemetry_complete') is True and type(final.get('success')) is bool
++        and final['identity']==r['episode_identity'](row) and final.get('retry_of')==row.get('retry_of') and final['budget_bucket']==row['budget_bucket']
++        and final['source_commit']==plan['source_commit'] and final['plan_sha256']==w.sha(PLAN)
++        and final['profile_manifest_sha256']==plan['profiles_sha256'] and final['runtime_manifest_sha256']==plan['runtime_manifest_sha256']
++        and final['runtime_inventory_sha256']==plan['runtime_inventory_sha256'] and final['init_row_sha256']==row['init_row_sha256']
++        and context['plan']==ref(PLAN) and h.read(context['plan'])==plan and h.read(ref(out/'attempt-result.json'))==final
++        and final.get('n23_worker_receipt')==ref(out/'eds_eval/in-worker-audit-receipt.json'),'new terminal/plan/receipt binding')
++    report=read_worker_report(out,r);w.require(type(final.get('guided_chunks')) is int,'guided count unknown')
++    # Profile-bound gate remains required even with zero guided work; no marker downgrade.
++    native.from_output(row['profile'],out,report,final['guided_chunks']);return final
++
++def admission(plan,runtime,row,events,resources,root,r):
++    index=plan['episodes'].index(row);local=local_events(events);allowed={x['episode_key'] for x in plan['episodes'][:index]}
++    w.require(all(x['episode_key'] in allowed for x in local),'exact untouched suffix/no resume past invalid')
++    for previous in plan['episodes'][:index]:accepted_cell(plan,previous,events,root,r)
++    return {'n27_hydra_continuation_id':COHORT,'n27_original_logical_index':3+index,'n27_prefix_seal':ref(SEAL),
++        **({'n27_named_hydra_proof':ref(SEAL)} if index==0 else {})}
+diff --git a/scripts/qd_ed_n27_cont_history.py b/scripts/qd_ed_n27_cont_history.py
+new file mode 100644
+index 0000000..a331d96
+--- /dev/null
++++ b/scripts/qd_ed_n27_cont_history.py
+@@ -0,0 +1,95 @@
++"""Bounded root-attested old metadata; never replay old controllers/raw evidence."""
++import hashlib
++import json
++import math
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w
++BASE='095cfeecd6af55477d2529441c307ab712e8a8da'
++OLD='N27_FEASIBLE_RAY_SCREEN_20261001'
++COHORT='N27_HYDRA_CONTINUATION_V1_20261001'
++FAILED='rdt-qd-ed-final-20260921T093925Z__n27_screen_t00_n27_20261001__1af7d45d9a10'
++PLAN_SHA='8632a2f39f0cde0c198f358c1b1700907707d3e0474a75df6b9296cf18f7441f'
++REVIEW_SHA='01dc887dc20d6050a498b15c575b881a3ad8471041c466818cad1ecb4aa8eaac'
++CLASSIFICATION_SHA='276985ca84b8031060d329485097e2fb33ffaee5ea379abbedd9c05e97523ad1'
++ARMS=('C0','Q0','N26','N27')
++UNKNOWN=['original_invalid_required_cost_telemetry','original_invalid_provider_usage','original_invalid_native_outcome']
++MAX_FILE=16*1024*1024
++def ref(path):
++    p=Path(path).resolve()
++    w.require(p.is_file() and p.stat().st_size<=MAX_FILE,'metadata reference size/path')
++    with p.open('rb') as stream:data=stream.read(MAX_FILE+1)
++    w.require(len(data)<=MAX_FILE,'metadata reference grew beyond cap')
++    return {'path':str(p),'sha256':hashlib.sha256(data).hexdigest()}
++
++def read(reference):
++    w.require(set(reference)=={'path','sha256'},'metadata ref schema')
++    p=Path(reference['path'])
++    w.require(p.is_absolute() and not p.is_symlink() and p.is_file() and p.stat().st_size<=MAX_FILE,'metadata path/size')
++    with p.open('rb') as f:data=f.read(MAX_FILE+1)
++    w.require(len(data)<=MAX_FILE and hashlib.sha256(data).hexdigest()==reference['sha256'],'metadata hash/size')
++    return json.loads(data)
++
++def finite(v):return type(v) in (int,float) and math.isfinite(v) and v>=0
++
++def groups(events):
++    result={}
++    for event in events:result.setdefault(event['attempt_id'],[]).append(event)
++    return result
++
++def verify(seal):
++    """Pure schema/identity checks. Root seal review attests receipt/raw/proof integrity."""
++    w.require(seal.get('schema')=='n27-hydra-history-seal-v1' and seal.get('original_disposition')=='INVALID_OR_INTERRUPTED'
++        and seal.get('original_source',{}).get('commit')==BASE and len(seal['original_source']['files'])==345
++        and seal.get('original_plan',{}).get('sha256')==PLAN_SHA and seal.get('root_terminal_review',{}).get('sha256')==REVIEW_SHA
++        and seal.get('startup_classification',{}).get('sha256')==CLASSIFICATION_SHA
++        and seal.get('historical_unknowns')==UNKNOWN,'named historical seal differs')
++    source=seal['original_source'];w.require(source['sha256']==w.canonical_sha(source['files'])
++        and len({x['path'] for x in source['files']})==345,'old source digest')
++    plan=seal['original_plan_content'];rows=plan['episodes']
++    w.require(w.canonical_sha(plan)==seal['original_plan_content_sha256'] and plan['source_commit']==BASE
++        and plan['code_files']==source['files'] and plan['frozen'] is True
++        and len(rows)==16 and [(x['task_id'],x['profile']) for x in rows]==[(t,a) for t in range(4) for a in ARMS]
++        and len({x['episode_key'] for x in rows})==16,'original screen/source matrix')
++    for row in rows:w.require(row['iteration']==OLD and row['split']==row['seed_block']=='dev' and row['timeout_seconds']==1800
++        and row['budget_bucket']==('baseline' if row['profile']=='C0' else 'development') and not row.get('retry_of'),'old row changed')
++    w.require(seal['runtime']=={'path':plan['runtime_manifest_path'],'sha256':plan['runtime_manifest_sha256']},'runtime lineage')
++    ev=seal['old_events'];gg=list(groups(ev).values())
++    w.require(len(gg)==4 and len(ev)==12 and [g[0]['episode_key'] for g in gg]==[x['episode_key'] for x in rows[:4]],'old exact four attempts')
++    for i,g in enumerate(gg):
++        final=g[-1];row=rows[i]
++        w.require([x['event'] for x in g]==['reserved','dispatched','valid'] and final['outcome_valid'] is (i<3)
++            and final['source_commit']==BASE and final['plan_sha256']==PLAN_SHA and final['identity']['iteration']==OLD
++            and all(x['attempt_id']==final['attempt_id'] and x['episode_key']==row['episode_key'] and x.get('retry_of') is None for x in g)
++            and all(final['identity'][k]==row[k] for k in ('split','profile','task_id','env_seed','policy_seed','init_index'))
++            and finite(final.get('gpu_process_wall_seconds')),'old attempt identity/terminal/cost')
++        if i<3:w.require(final.get('required_cost_telemetry_complete') is True and final.get('success') is False,'three valid failed controls')
++    w.require(gg[3][-1]['attempt_id']==FAILED and gg[3][-1]['gpu_process_wall_seconds']==7.231457023997791
++        and gg[3][-1].get('required_cost_telemetry_complete') is not True,'named pre-main invalid retained')
++    prefix=seal['accepted_prefix'];w.require(len(prefix)==3,'exact historical accepted prefix')
++    for i,item in enumerate(prefix):
++        cell=item['cell'];final=gg[i][-1]
++        w.require(item['logical_index']==i and cell['episode_key']==rows[i]['episode_key'] and cell['task_id']==0
++            and cell['profile']==ARMS[i] and cell['attempt_id']==final['attempt_id'] and cell['success'] is False
++            and all(set(cell[k])=={'path','sha256'} for k in ('audit','worker_context','worker_receipt','attempt_result'))
++            and isinstance(item['native'],dict) and isinstance(item['auxiliary'],dict),'historical cell binding')
++    attempts=seal['all_old_attempts'];w.require(len(attempts)==4 and all(x['terminal']==g[-1] and x['attempt_id']==g[-1]['attempt_id']
++        and x['episode_key']==g[-1]['episode_key'] and x['profile']==rows[i]['profile'] for i,(x,g) in enumerate(zip(attempts,gg))),'all original costs unchanged')
++    health=seal['old_resource_events'];hg={}
++    for event in health:hg.setdefault(event['resource_id'],[]).append(event)
++    hg=list(hg.values())
++    w.require(len(hg)==1 and [x['event'] for x in hg[0]]==['reserved','dispatched','completed'] and hg[0][-1].get('kind')=='n27_tensor_arithmetic_v1'
++        and finite(hg[0][-1].get('gpu_process_wall_seconds')),'one settled historical proof resource')
++    seconds=sum(g[-1]['gpu_process_wall_seconds'] for g in gg)+hg[0][-1]['gpu_process_wall_seconds']
++    w.require(seal['old_gpu_seconds']==seconds and seconds<9.25*3600 and seal.get('cleanup_complete') is True
++        and seal.get('no_active_owned_worker') is True,'old full costs/cleanup seal')
++    for k in ('original_result','historical_backend_proof','original_source_review','original_authority','budget_authority'):
++        w.require(set(seal[k])=={'path','sha256'},'historical ref missing: '+k)
++    return seal
++
++def current_subset(seal,events,resources):
++    verify(seal)
++    old=[x for x in events if x.get('identity',{}).get('iteration')==OLD]
++    ids={x['resource_id'] for x in seal['old_resource_events']}
++    resource=[x for x in resources if x.get('kind')=='n27_tensor_arithmetic_v1' or x.get('resource_id') in ids]
++    w.require(old==seal['old_events'] and resource==seal['old_resource_events'],'historical subset drift/later old reservation')
++    # Unrelated legitimate append-only ledger events are deliberately irrelevant here.
+diff --git a/scripts/qd_ed_n27_cont_prepare.py b/scripts/qd_ed_n27_cont_prepare.py
+new file mode 100644
+index 0000000..8a37c41
+--- /dev/null
++++ b/scripts/qd_ed_n27_cont_prepare.py
+@@ -0,0 +1,32 @@
++#!/usr/bin/env python3
++"""Non-executable pure draft; root seal/review/adoption precede one immutable freeze."""
++import argparse
++import copy
++import sys
++from pathlib import Path
++ROOT=Path(__file__).resolve().parents[1]
++if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
++from scripts import qd_ed_final_runner as r,qd_ed_n23_worker as w,qd_ed_n27_cont_contract as c
++
++def build_plan(seal,source,*,meta=None):
++    plan=copy.deepcopy(seal['original_plan_content'])
++    plan.update(frozen=False,source_commit=source['commit'],code_files=source['files'],episodes=c.rows(seal),
++        derived_from=seal['original_plan'],n27_cohort={'schema':'n27-hydra-audit-family-v1','worker_audit':c.WORKER_CONTRACT},
++        n27_hydra_continuation=meta or {'schema':'n27-hydra-continuation-v1','executable':False,'authority':None,'seal':None,'final_review':None})
++    return plan
++
++def freeze(path,root=ROOT):
++    w.require(Path(path).resolve()==c.PLAN.resolve() and not Path(path).exists() and not Path(path).is_symlink(),'one immutable exact plan freeze')
++    with r.locked(Path(root)/'data/qd-ed-runner.lock',nonblocking=True):
++        seal=c.history();source=w.source_record(root,c.source_paths(vars(r)))
++        c.final_review(source,seal['runtime'],root);c.authority(source,seal['runtime'],root)
++        with r.locked(Path(root)/'data/qd-ed-state.lock'):
++            events=r.read_events(Path(root)/'data/attempt-ledger.jsonl');w.require(not c.local_events(events),'any reservation consumes continuation')
++            c.full_capacity(r.read_state(Path(root)/'research-state.yaml'),events,r.read_events(Path(root)/'data/gpu-healthcheck-ledger.jsonl'),vars(r))
++        plan=build_plan(seal,source,meta=c.metadata(source,seal['runtime'],root));plan['frozen']=True
++        w.atomic_json(path,plan);r.validate_plan(path,root=root);return plan
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--freeze',action='store_true',required=True);parser.add_argument('--output',type=Path,required=True)
++    args=parser.parse_args();freeze(args.output)
++if __name__=='__main__':main()
+diff --git a/scripts/qd_ed_n27_cont_report.py b/scripts/qd_ed_n27_cont_report.py
+new file mode 100644
+index 0000000..c4fa6bf
+--- /dev/null
++++ b/scripts/qd_ed_n27_cont_report.py
+@@ -0,0 +1,83 @@
++"""Separate successor outcome and logical sixteen; historical INVALID never changes."""
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w,qd_ed_n27_report as old
++from scripts import qd_ed_n27_cont_contract as c,qd_ed_n27_cont_history as h
++
++def analyze(plan,seal,events,acceptor):
++    local=c.local_events(events);gg=list(h.groups(local).values());rows=plan['episodes'];keys=[x['episode_key'] for x in rows]
++    w.require(rows==c.rows(seal),'exact fixed reporting matrix')
++    attempts=[]
++    for i,g in enumerate(gg):
++        w.require(i<len(rows) and g[0]['episode_key']==keys[i] and [x['event'] for x in g] in (
++            ['reserved','dispatched','valid'],['reserved','dispatched','aborted'],['reserved','aborted'])
++            and all(x['episode_key']==keys[i] and x['attempt_id']==g[0]['attempt_id'] for x in g),'ordered settled new attempt groups')
++        w.require(g[-1]['identity']['iteration']==c.COHORT,'new cohort identity')
++        attempts.append({'attempt_id':g[0]['attempt_id'],'episode_key':keys[i],'profile':rows[i]['profile'],'terminal':g[-1]})
++    # Reject interleaved/reordered groups, not just dictionary ordering.
++    w.require(local==[event for group in gg for event in group],'interleaved attempt history')
++    accepted=[{**q['cell'],'logical_index':q['logical_index'],'origin':'imported_original','source_commit':h.BASE} for q in seal['accepted_prefix']]
++    native={a:{} for a in c.ARMS};aux={a:{} for a in c.ARMS}
++    for item in seal['accepted_prefix']:
++        arm=item['cell']['profile'];native[arm]=dict(item['native']);aux[arm]=dict(item['auxiliary'])
++    failure=None
++    for i,row in enumerate(rows):
++        if i>=len(gg):break
++        try:
++            cell,counts,cost=acceptor(row,local)
++            w.require(cell['attempt_id']==gg[i][-1]['attempt_id'] and cell['episode_key']==row['episode_key']
++                and cell['profile']==row['profile'] and cell['task_id']==row['task_id'] and type(cell['success']) is bool,'new cell identity')
++        except (ValueError,RuntimeError,OSError,KeyError,AssertionError) as exc:
++            failure={'episode_key':row['episode_key'],'failure_class':type(exc).__name__,'reason':str(exc)};break
++        accepted.append({**cell,'logical_index':i+3,'origin':'new_continuation','source_commit':plan['source_commit']})
++        for dest,data in ((native,counts),(aux,cost)):
++            for k,v in data.items():dest[row['profile']][k]=dest[row['profile']].get(k,0)+v
++    added=len(accepted)-3;w.require(len(gg)<=added+(1 if added<13 else 0),'continued after invalid/missing result')
++    counts={a:{'audited':sum(x['profile']==a for x in accepted),'success':sum(x['profile']==a and x['success'] for x in accepted)} for a in c.ARMS}
++    wins=counts['N27']['success'];complete=len(accepted)==16
++    promoted=complete and wins>=2 and wins>=max(counts[a]['success'] for a in c.ARMS[:-1]) and wins>counts['N26']['success']
++    promoted=promoted and native['N27'].get('guided_decisions',0)>0 and native['N27'].get('parent_rounds_verified',0)>0
++    decision='ELIGIBLE_FOR_SEPARATELY_FROZEN_FULL_DEV' if promoted else 'REJECT_SCREEN' if complete else 'INVALID_OR_INTERRUPTED'
++    combined=seal['all_old_attempts']+attempts;w.require(len({x['attempt_id'] for x in combined})==len(combined),'attempt charged twice')
++    return {'schema':'n27-hydra-continuation-result-v1','cohort_id':c.COHORT,'source_commit':plan['source_commit'],
++        'original_disposition':'INVALID_OR_INTERRUPTED','original_result':seal['original_result'],'prefix_seal':c.ref(c.SEAL),
++        'planned':16,'imported_cells':3,'new_planned':13,'new_accepted_cells':added,'audited_cells':len(accepted),
++        'continuation_disposition':'COMPLETE_THIRTEEN_VALID' if complete else 'INVALID_OR_INTERRUPTED','decision':decision,
++        'dev_gate_promoted':promoted,'counts':counts,'accepted_cells':accepted,'native':native,'auxiliary':aux,'failure':failure,
++        'new_attempts':attempts,'attempts':combined,'new_dispatched':sum(x['event']=='dispatched' for x in local),
++        'dispatched':4+sum(x['event']=='dispatched' for x in local),'historical_unknowns':h.UNKNOWN,
++        'old_costs':old.summary([],seal['all_old_attempts']),'new_costs':old.summary([],attempts),**old.summary(accepted,combined),
++        'validation_authorized':False,'formal_authorized':False,'goal_status':'TARGET_NOT_MET','new_numerical_preflight':False}
++
++def write_terminal(path,plan,status_path,root,r):
++    w.require(Path(status_path).resolve()==(c.RUN_DIR/'execution/supervisor-status-v1.json').resolve(),'status split-root path')
++    seal=c.history();local=c.local_events(r['read_events'](Path(root)/'data/attempt-ledger.jsonl'))
++    try:status=h.read(c.ref(status_path));status_ref=c.ref(status_path)
++    except (OSError,ValueError,KeyError):status={'status':'unavailable'};status_ref={'path':str(status_path),'sha256':None}
++    def accept(row,events):
++        final=c.accepted_cell(plan,row,events,root,r);out=Path(final['output_dir']);report=c.read_worker_report(out,r)
++        counts,aux=c.native.from_output(row['profile'],out,report,final.get('guided_chunks'))
++        return {'episode_key':row['episode_key'],'task_id':row['task_id'],'profile':row['profile'],'attempt_id':final['attempt_id'],'success':final['success'],
++            'audit':c.ref(out/'eds_eval/decision-evidence-audit.json'),'worker_context':c.ref(out/'n23-worker-context.json'),
++            'worker_receipt':c.ref(out/'eds_eval/in-worker-audit-receipt.json'),'attempt_result':c.ref(out/'attempt-result.json')},counts,aux
++    try:result=analyze(plan,seal,local,accept)
++    except (ValueError,RuntimeError,OSError,KeyError,AssertionError) as exc:
++        attempts=[{'attempt_id':g[0]['attempt_id'],'episode_key':g[0]['episode_key'],'profile':g[0]['identity']['profile'],'terminal':g[-1]} for g in h.groups(local).values()]
++        all_attempts=seal['all_old_attempts']+attempts
++        result={'schema':'n27-hydra-continuation-result-v1','cohort_id':c.COHORT,'source_commit':plan['source_commit'],
++            'decision':'INVALID_OR_INTERRUPTED','dev_gate_promoted':False,'continuation_disposition':'INVALID_OR_INTERRUPTED',
++            'original_disposition':'INVALID_OR_INTERRUPTED','original_result':seal['original_result'],'audited_cells':3,
++            'accepted_cells':[{**q['cell'],'origin':'imported_original','source_commit':h.BASE,'logical_index':q['logical_index']} for q in seal['accepted_prefix']],
++            'journal_reconstruction_error':{'type':type(exc).__name__,'reason':str(exc)},'unsettled_or_malformed_new_journal':local,
++            'attempts':all_attempts,'new_attempts':attempts,'historical_unknowns':h.UNKNOWN,**old.summary([],all_attempts)}
++    prefix=[x['episode_key'] for x in result['accepted_cells'] if x['origin']=='new_continuation'];phase=status.get('status')
++    consistent=status.get('completed_keys')==prefix and status.get('dev_gate_promoted')==result['dev_gate_promoted']
++    consistent=consistent and ((phase=='completed_all_sixteen_audited' and result['audited_cells']==16)
++        or (phase in {'failed','interrupted'} and result['decision']=='INVALID_OR_INTERRUPTED'))
++    result['controller_evidence']={'consistent':consistent,'completed_keys':status.get('completed_keys'),'journal_accepted_keys':prefix,'status_phase':phase}
++    if not consistent:
++        result['journal_reconstructed_disposition']=result['decision'];result['decision']='INVALID_OR_INTERRUPTED'
++        result['dev_gate_promoted']=False;result['continuation_disposition']='INVALID_OR_INTERRUPTED'
++    ledger=c.RUN_DIR/'execution/terminal-ledger-v1.json';w.atomic_json(ledger,local)
++    result.update(plan=c.ref(path),source_bridge=c.ref(c.BRIDGE),terminal_status={**status_ref,'content':status},ledger_snapshot=c.ref(ledger),
++        reader=c.ref(__file__),validation_authorized=False,formal_authorized=False)
++    w.atomic_json(c.RUN_DIR/'result-v1.json',result);return result
+diff --git a/scripts/qd_ed_n27_cont_supervise.py b/scripts/qd_ed_n27_cont_supervise.py
+new file mode 100644
+index 0000000..38c87ec
+--- /dev/null
++++ b/scripts/qd_ed_n27_cont_supervise.py
+@@ -0,0 +1,78 @@
++#!/usr/bin/env python3
++"""Exactly one finite continuation; any newly invalid outcome stops without retry."""
++import argparse
++from pathlib import Path
++import signal
++import sys
++ROOT=Path(__file__).resolve().parents[1]
++if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
++from scripts import qd_ed_final_runner as r,qd_ed_n23_worker as w,qd_ed_n27_supervise as old
++from scripts import qd_ed_n27_cont_contract as c,qd_ed_n27_cont_report as report
++
++def one_attempt(path,plan,row):
++    seen={x['attempt_id'] for x in r.read_events(ROOT/'data/attempt-ledger.jsonl')}
++    with c.supervised_scope(plan,ROOT,row['episode_key']):
++        try:
++            result=r.run_plan(path,split='dev',iteration=c.COHORT,episode_keys=[row['episode_key']],root=ROOT)
++            w.require(len(result)==1,'one worker result required');return result[0]
++        except r.GateError:
++            finals=[x for x in r.read_events(ROOT/'data/attempt-ledger.jsonl') if x['attempt_id'] not in seen
++                and x['event'] in r.TERMINAL and x.get('identity',{}).get('iteration')==c.COHORT and x['episode_key']==row['episode_key']]
++            if len(finals)!=1:raise
++            return finals[0]
++
++def release_check(path,plan_path,plan):
++    w.require(Path(path).resolve()==(c.RUN_DIR/'execution-release-v1.json').resolve(),'exact release path')
++    expected={'schema':'n27-hydra-execution-release-v1','plan':c.ref(plan_path),'source_commit':plan['source_commit'],'cohort_id':c.COHORT,
++        'authority':c.ref(c.AUTHORITY),'seal':c.ref(c.SEAL),'episode_keys':[x['episode_key'] for x in plan['episodes']],
++        'limits':c.LIMITS,'one_launch':True,'physical_gpu':7,'validation_authorized':False,'formal_authorized':False}
++    w.require(c.h.read(c.ref(path))==expected,'root executable release missing/different')
++
++def execute(path,plan,status_path):
++    w.require(Path(status_path).resolve()==(c.RUN_DIR/'execution/supervisor-status-v1.json').resolve(),'exact controller output root')
++    Path(status_path).parent.mkdir(parents=True,exist_ok=True)
++    completed=[];attempts=[];outcomes=[];wins={a:0 for a in c.ARMS};native={a:{} for a in c.ARMS}
++    def write(phase,**extra):
++        r.durable_json(status_path,{'schema':'n27-hydra-supervisor-status-v1','status':phase,'cohort_id':c.COHORT,
++            'plan':c.ref(path),'source_commit':plan['source_commit'],'prefix_seal':c.ref(c.SEAL),'completed_keys':list(completed),
++            'attempts':list(attempts),'outcomes':list(outcomes),'successes':dict(wins),'dev_gate_promoted':False,'protected_authorized':False,**extra})
++    try:
++        write('started')
++        for row in plan['episodes']:
++            old.device_check();final=one_attempt(path,plan,row)
++            attempts.append({'attempt_id':final['attempt_id'],'episode_key':row['episode_key'],'profile':row['profile'],'terminal':final});write('attempt_journaled')
++            w.require(final.get('outcome_valid') is True,'new invalidity closes continuation; no retry permitted')
++            accepted=c.accepted_cell(plan,row,r.read_events(ROOT/'data/attempt-ledger.jsonl'),ROOT,vars(r));w.require(accepted==final,'journal/result differs')
++            counts,_=c.native.from_output(row['profile'],final['output_dir'],c.read_worker_report(final['output_dir'],vars(r)),final.get('guided_chunks'))
++            for k,v in counts.items():native[row['profile']][k]=native[row['profile']].get(k,0)+v
++            outcomes.append({'episode_key':row['episode_key'],'attempt_id':final['attempt_id'],'success':final['success']})
++            wins[row['profile']]+=int(final['success']);completed.append(row['episode_key']);write('cell_audited')
++        promoted=wins['N27']>=2 and wins['N27']>=max(wins[a] for a in c.ARMS[:-1]) and wins['N27']>wins['N26']
++        promoted=promoted and native['N27'].get('guided_decisions',0)>0 and native['N27'].get('parent_rounds_verified',0)>0
++        write('completed_all_sixteen_audited',dev_gate_promoted=promoted)
++    except BaseException as exc:
++        try:write('interrupted' if isinstance(exc,(KeyboardInterrupt,SystemExit)) else 'failed',failure_class=type(exc).__name__,failure=str(exc))
++        finally:raise
++    finally:report.write_terminal(path,plan,status_path,ROOT,vars(r))
++
++def launch(path,release,status):
++    plan,_,_=r.validate_plan(path,root=ROOT);release_check(release,path,plan)
++    w.require(Path(status).resolve()==(c.RUN_DIR/'execution/supervisor-status-v1.json').resolve(),'exact status path')
++    (c.RUN_DIR/'execution').mkdir(parents=True,exist_ok=True)
++    with r.locked(c.RUN_DIR/'execution/supervisor.lock',nonblocking=True):
++        w.require(not Path(status).exists() and not (c.RUN_DIR/'result-v1.json').exists()
++            and not (c.RUN_DIR/'execution/controller-process-v1.json').exists(),'no controller restart')
++        with r.locked(ROOT/'data/qd-ed-runner.lock',nonblocking=True):
++            events=r.read_events(ROOT/'data/attempt-ledger.jsonl');w.require(not c.local_events(events),'prior reservation consumes launch')
++            c.full_capacity(r.read_state(ROOT/'research-state.yaml'),events,r.read_events(ROOT/'data/gpu-healthcheck-ledger.jsonl'),vars(r))
++        w.atomic_json(c.RUN_DIR/'execution/controller-process-v1.json',{'schema':'n27-hydra-controller-process-v1','process':w.process_identity(),
++            'plan':c.ref(path),'release':c.ref(release),'source_commit':plan['source_commit']})
++        execute(path,plan,status)
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    for key in ('plan','release','status'):parser.add_argument('--'+key,type=Path,required=True)
++    a=parser.parse_args();launch(a.plan,a.release,a.status)
++if __name__=='__main__':
++    signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(KeyboardInterrupt()))
++    main()
+diff --git a/tests/n27_cont_fixtures.py b/tests/n27_cont_fixtures.py
+new file mode 100644
+index 0000000..5e046f1
+--- /dev/null
++++ b/tests/n27_cont_fixtures.py
+@@ -0,0 +1,58 @@
++"""Synthetic runner-schema metadata, never actual attempt data."""
++import copy
++import json
++from pathlib import Path
++from scripts import qd_ed_final_runner as r,qd_ed_n23_worker as w
++from scripts import qd_ed_n27_cont_history as h,qd_ed_n27_cont_contract as c
++
++def write(path,value):
++    path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(value,indent=2)+'\n');return c.ref(path)
++
++def rows():
++    return [dict(episode_key=f'n27_screen_t{t:02d}_{a.lower()}_20261001',iteration=h.OLD,split='dev',seed_block='dev',profile=a,task_id=t,
++        env_seed=100+t,policy_seed=200+t,init_index=0,init_row_sha256='a'*64,init_file_sha256='b'*64,bddl_sha256='c'*64,
++        budget_bucket='baseline' if a=='C0' else 'development',timeout_seconds=1800) for t in range(4) for a in c.ARMS]
++
++def group(row,aid,*,valid=True,success=False,source=h.BASE,plan_sha=h.PLAN_SHA,wall=10.):
++    base={'attempt_id':aid,'identity':r.episode_identity(row),'episode_key':row['episode_key'],'retry_of':row.get('retry_of'),
++        'budget_bucket':row['budget_bucket'],'source_commit':source,'plan_sha256':plan_sha,'output_dir':'SYNTHETIC',
++        'profile_manifest_sha256':'p'*64,'runtime_manifest_sha256':'r'*64,'runtime_inventory_sha256':'i'*64,'init_row_sha256':row['init_row_sha256']}
++    return [{**base,'event':ev,'time_unix':i,**({'outcome_valid':valid,'success':success,'gpu_process_wall_seconds':wall,
++        'required_cost_telemetry_complete':valid,'guided_chunks':1,'provider_logical_call_attempts':2,'provider_usage_complete_calls':2,
++        'provider_token_usage_complete':valid} if ev=='valid' else {})} for i,ev in enumerate(('reserved','dispatched','valid'))]
++
++def seal(tmp):
++    oldsource=json.loads((Path(c.ROOT)/'docs/experiments/n27_hydra_continuation/original-source-v1.json').read_text())
++    rr=rows();plan={'source_commit':h.BASE,'code_files':oldsource['files'],'episodes':rr,'frozen':True,
++        'profiles_sha256':'p'*64,'runtime_manifest_path':str(tmp/'runtime.json'),'runtime_manifest_sha256':'r'*64,
++        'runtime_inventory_sha256':'i'*64,'worktree':str(tmp),'artifact_root':str(tmp/'artifact'),
++        'candidate_profiles':{'N26':{},'N27':{}},'n27_cohort':{},'phase_authorization':{'dev':True,'validation':False,'formal':False},
++        'derived_from':{}}
++    events=[]
++    for i,row in enumerate(rr[:4]):
++        g=group(row,h.FAILED if i==3 else 'old'+str(i),valid=i<3,wall=7.231457023997791 if i==3 else 10.)
++        if i==3:
++            for k in ('guided_chunks','provider_logical_call_attempts','provider_usage_complete_calls','provider_token_usage_complete'):g[-1].pop(k)
++        events+=g
++    prefix=[]
++    for i,row in enumerate(rr[:3]):
++        refs={k:{'path':str(tmp/'old'/str(i)/k),'sha256':k[0]*64} for k in ('audit','worker_context','worker_receipt','attempt_result')}
++        prefix.append({'logical_index':i,'cell':{'episode_key':row['episode_key'],'task_id':0,'profile':row['profile'],
++            'attempt_id':'old'+str(i),'success':False,**refs},'native':{'guided_decisions':1,'parent_rounds_verified':10},'auxiliary':{}})
++    fake=lambda k:{'path':str(tmp/k),'sha256':'d'*64}
++    s={'schema':'n27-hydra-history-seal-v1','original_disposition':'INVALID_OR_INTERRUPTED','original_source':oldsource,
++        'original_plan':{**fake('old-plan'),'sha256':h.PLAN_SHA},'original_plan_content':plan,'original_plan_content_sha256':w.canonical_sha(plan),
++        'root_terminal_review':{**fake('old-review'),'sha256':h.REVIEW_SHA},'startup_classification':{**fake('classification'),'sha256':h.CLASSIFICATION_SHA},
++        'runtime':{'path':plan['runtime_manifest_path'],'sha256':plan['runtime_manifest_sha256']},'old_events':events,
++        'old_resource_events':[{'resource_id':'oldproof','kind':'n27_tensor_arithmetic_v1','event':ev,**({'gpu_process_wall_seconds':16.} if ev=='completed' else {})} for ev in ('reserved','dispatched','completed')],
++        'accepted_prefix':prefix,'all_old_attempts':[{'attempt_id':g[-1]['attempt_id'],'episode_key':g[-1]['episode_key'],
++            'profile':g[-1]['identity']['profile'],'terminal':g[-1]} for g in h.groups(events).values()],
++        'historical_unknowns':h.UNKNOWN,'old_gpu_seconds':53.23145702399779,'cleanup_complete':True,'no_active_owned_worker':True,
++        **{k:fake(k) for k in ('original_result','historical_backend_proof','original_source_review','original_authority','budget_authority')}}
++    s['old_gpu_seconds']=sum(x['terminal']['gpu_process_wall_seconds'] for x in s['all_old_attempts'])+16.
++    return s
++
++def snapshot():
++    return {'running':0,'gpu_healthcheck_inflight':0,'dispatched':342,'gpu_hours_consumed':46.86186153036005,
++        'by_bucket':{'baseline':59,'development':211,'validation':60,'formal':0,'recovery':12},
++        'gpu_hours_by_bucket':{'baseline':5.,'development':20.,'validation':10.,'formal':0.,'recovery':1.}}
+diff --git a/tests/test_n27_cont_binding.py b/tests/test_n27_cont_binding.py
+new file mode 100644
+index 0000000..ae93d52
+--- /dev/null
++++ b/tests/test_n27_cont_binding.py
+@@ -0,0 +1,77 @@
++import copy
++from pathlib import Path
++import pytest
++from scripts import qd_ed_final_runner as r,qd_ed_n23_worker as w
++from scripts import qd_ed_n27_cont_contract as c,qd_ed_n27_cont_history as h
++from scripts import qd_ed_n27_cont_prepare as prep
++from n27_cont_fixtures import group,write
++from test_n27_continuation import fixture
++
++@pytest.mark.parametrize('fault',[None,'plan','context','receipt','identity','budget','cost','audit','zero_gate'])
++def test_actual_terminal_schema_and_native_acceptor(fixture,tmp_path,monkeypatch,fault):
++    p=prep.build_plan(fixture,{'commit':'new','files':[]});write(c.PLAN,p);row=p['episodes'][0]
++    events=group(row,'new',source='new',plan_sha=w.sha(c.PLAN));f=events[-1];out=tmp_path/'attempt';f['output_dir']=str(out)
++    receipt=write(out/'eds_eval/in-worker-audit-receipt.json',{});f['n23_worker_receipt']=receipt
++    context={'plan':c.ref(c.PLAN)};write(out/'n23-worker-context.json',context)
++    write(out/'attempt-result.json',f)
++    calls=[]
++    monkeypatch.setattr(c,'read_worker_report',lambda *a:calls.append('receipt') or {})
++    def native(*args):
++        calls.append(('native',args[0],args[-1]))
++        if fault in {'audit','zero_gate'}:raise ValueError('profile-bound audit missing')
++        return {},{}
++    monkeypatch.setattr(c.native,'from_output',native)
++    if fault=='plan':f['plan_sha256']='bad'
++    elif fault=='context':write(out/'n23-worker-context.json',{'plan':{'path':str(c.PLAN),'sha256':'bad'}})
++    elif fault=='receipt':f['n23_worker_receipt']={'path':receipt['path'],'sha256':'bad'}
++    elif fault=='identity':f['identity']['policy_seed']+=1
++    elif fault=='budget':f['budget_bucket']='development'
++    elif fault=='cost':f['required_cost_telemetry_complete']=False
++    elif fault=='zero_gate':f['guided_chunks']=0;write(out/'attempt-result.json',f)
++    if fault is None:assert c.accepted_cell(p,row,events,tmp_path,vars(r))==f and calls==['receipt',('native','N27',1)]
++    else:
++        with pytest.raises(ValueError):c.accepted_cell(p,row,events,tmp_path,vars(r))
++    if fault=='zero_gate':assert calls==['receipt',('native','N27',0)]
++
++@pytest.mark.parametrize('fault',[None,'missing_adoption','caps','protected','resource','hold','gpu'])
++def test_state_admission_exact_caps(fixture,tmp_path,monkeypatch,fault):
++    budget={'caps':c.CAPS,'amendment':{'synthetic':True}};write(tmp_path/'budget.json',budget);fixture['budget_authority']=c.ref(tmp_path/'budget.json')
++    record={'source':{},'runtime':{},'budget_authority':fixture['budget_authority']};write(c.AUTHORITY,record)
++    # Source/review authority is tested separately; this test checks actual state constraints.
++    def auth(source,runtime,root,state):
++        w.require(state.get('n27_hydra_continuation_authority')==c.ref(c.AUTHORITY),'adoption required');return record
++    monkeypatch.setattr(c,'authority',auth)
++    state={'n27_hydra_continuation_authority':c.ref(c.AUTHORITY),'n26_budget_authority':fixture['budget_authority'],
++        'budget':{'max_episode_attempts':522,'max_gpu_hours':100.,'reserved':copy.deepcopy(c.CAPS['buckets']),
++            'gpu_hour_reservations':copy.deepcopy(c.CAPS['protected_gpu_hours']),'amendment':budget['amendment']},
++        'resource_isolation':{'status':'ACTIVE','validation_status':'PASS','private_budget':True},'max_concurrent_gpu_workers':1,'gpu_pool':[7]}
++    if fault=='missing_adoption':state.pop('n27_hydra_continuation_authority')
++    elif fault=='caps':state['budget']['reserved']['development']+=1
++    elif fault=='protected':state['budget']['gpu_hour_reservations']['validation']-=1
++    elif fault=='resource':state['resource_isolation']['private_budget']=False
++    elif fault=='hold':state['external_resource_hold']={'do_not_auto_resume':True}
++    elif fault=='gpu':state['gpu_pool']=[3]
++    if fault is None:c.require_state(state,vars(r))
++    else:
++        with pytest.raises((ValueError,r.GateError)):c.require_state(state,vars(r))
++
++@pytest.mark.parametrize('fault',[None,'caps','source','protocol','limits','missing','extra'])
++def test_authority_exact_schema(fixture,tmp_path,monkeypatch,fault):
++    runtime=fixture['runtime'];source={'commit':'new','files':[]};review={'path':str(tmp_path/'review'),'sha256':'x'*64}
++    monkeypatch.setattr(c,'final_review',lambda *a:review)
++    budget={'caps':c.CAPS};write(tmp_path/'budget',budget);fixture['budget_authority']=c.ref(tmp_path/'budget')
++    monkeypatch.setattr(c,'PROTOCOL',tmp_path/'protocol');(tmp_path/'protocol').write_text('synthetic')
++    data={'schema':'n27-hydra-authority-v1','cohort_id':c.COHORT,'source':source,'runtime':runtime,'protocol':c.ref(c.PROTOCOL),
++        'seal':c.ref(c.SEAL),'final_review':review,'budget_authority':fixture['budget_authority'],'caps':copy.deepcopy(c.CAPS),
++        'limits':copy.deepcopy(c.LIMITS),'old_gpu_seconds':fixture['old_gpu_seconds'],'validation_authorized':False,'formal_authorized':False,
++        'recorded_at':'synthetic','authority_interpretation':'synthetic only'}
++    if fault=='caps':data['caps']['attempts']+=1
++    elif fault=='source':data['source']={'commit':'wrong'}
++    elif fault=='protocol':data['protocol']['sha256']='bad'
++    elif fault=='limits':data['limits']['additional_retries']=1
++    elif fault=='missing':data.pop('final_review')
++    elif fault=='extra':data['executable']=False
++    write(c.AUTHORITY,data)
++    if fault is None:assert c.authority(source,runtime,tmp_path)==data
++    else:
++        with pytest.raises(ValueError):c.authority(source,runtime,tmp_path)
+diff --git a/tests/test_n27_cont_execution.py b/tests/test_n27_cont_execution.py
+new file mode 100644
+index 0000000..cad04ad
+--- /dev/null
++++ b/tests/test_n27_cont_execution.py
+@@ -0,0 +1,123 @@
++import copy
++import json
++from pathlib import Path
++from contextlib import contextmanager
++import pytest
++from scripts import qd_ed_final_runner as r,qd_ed_n23_worker as w
++from scripts import qd_ed_n27_cont_contract as c,qd_ed_n27_cont_history as h,qd_ed_n27_cont_prepare as prep
++from scripts import qd_ed_n27_cont_report as report,qd_ed_n27_cont_supervise as sup,qd_ed_n27_cont_bridge as bridge
++from n27_cont_fixtures import seal,write,group
++from test_n27_continuation import fixture
++
++@pytest.mark.parametrize('mode',['complete','reject','first_invalid','mid_invalid','abort','post_valid_error','status_write_error','missing_receipt'])
++def test_supervisor_preserves_all_costs_and_no_retry(fixture,tmp_path,monkeypatch,mode):
++    p=prep.build_plan(fixture,{'commit':'new','files':[]});write(c.PLAN,p)
++    monkeypatch.setattr(sup,'ROOT',tmp_path);monkeypatch.setattr(sup.old,'device_check',lambda:None)
++    events=[];calls=[];path=c.RUN_DIR/'execution/supervisor-status-v1.json'
++    monkeypatch.setattr(r,'read_events',lambda _:copy.deepcopy(events))
++    def run_plan(plan_path,*,split,iteration,episode_keys,root):
++        assert split=='dev' and iteration==c.COHORT and root==tmp_path and len(episode_keys)==1
++        row=next(x for x in p['episodes'] if x['episode_key']==episode_keys[0]);c.require_scope(p,root,vars(r),row)
++        i=len(calls);calls.append(row);invalid=(mode=='first_invalid' and i==0) or (mode in {'mid_invalid','abort','missing_receipt'} and i==3)
++        g=group(row,'new'+str(i),source='new',valid=not invalid,success=row['profile']=='N27' and row['task_id']<2 and mode!='reject')
++        final=g[-1];out=tmp_path/'separate_attempt_volume'/final['attempt_id'];final['output_dir']=str(out)
++        if mode=='abort' and invalid:g=g[:1]+[{**g[-1],'event':'aborted','outcome_valid':False}]
++        events.extend(g);final=g[-1]
++        for filename in ('attempt-result.json','n23-worker-context.json','eds_eval/decision-evidence-audit.json','eds_eval/in-worker-audit-receipt.json'):write(out/filename,final if filename=='attempt-result.json' else {})
++        if invalid:raise r.GateError('original runner charged invalid')
++        if mode=='post_valid_error' and i==3:raise RuntimeError('post-processing exception after valid journal')
++        return [final]
++    monkeypatch.setattr(r,'run_plan',run_plan)
++    def accept(plan,row,ev,root,env):
++        final=next(x for x in ev if x['episode_key']==row['episode_key'] and x['event'] in r.TERMINAL)
++        w.require(final['outcome_valid'],'invalid/missing receipt');return final
++    monkeypatch.setattr(c,'accepted_cell',accept);monkeypatch.setattr(c,'read_worker_report',lambda *a:{})
++    monkeypatch.setattr(c.native,'from_output',lambda *a:({'guided_decisions':1,'parent_rounds_verified':10},{}))
++    if mode=='status_write_error':
++        original=r.durable_json;raised=False
++        def durable(path,data):
++            nonlocal raised
++            if not raised and len(data['completed_keys'])==4:
++                raised=True;raise OSError('status durable failure')
++            return original(path,data)
++        monkeypatch.setattr(r,'durable_json',durable)
++    if mode in {'complete','reject'}:sup.execute(c.PLAN,p,path)
++    else:
++        with pytest.raises((ValueError,r.GateError,RuntimeError,OSError)):sup.execute(c.PLAN,p,path)
++    result=json.loads((c.RUN_DIR/'result-v1.json').read_text())
++    if mode=='complete':assert result['decision']=='ELIGIBLE_FOR_SEPARATELY_FROZEN_FULL_DEV' and result['audited_cells']==16
++    elif mode=='reject':assert result['decision']=='REJECT_SCREEN' and len(calls)==13
++    else:assert result['decision']=='INVALID_OR_INTERRUPTED' and not result['dev_gate_promoted'] and len(calls)<=4
++    assert len(result['attempts'])==4+len(calls) and result['original_disposition']=='INVALID_OR_INTERRUPTED'
++    assert result['unmeasured_token_call_attempts']==[h.FAILED]
++    assert result['all_attempt_costs']['N27']['gpu_process_wall_seconds']['observed_total']>=7.231457023997791
++    if mode=='post_valid_error':assert result['audited_cells']==7 and result['controller_evidence']['consistent'] is False
++    assert all(x['source_commit']==h.BASE for x in result['accepted_cells'][:3])
++
++
++def test_terminal_status_missing_keeps_valid_journal(fixture,tmp_path,monkeypatch):
++    p=prep.build_plan(fixture,{'commit':'new','files':[]});write(c.PLAN,p)
++    events=group(p['episodes'][0],'new',source='new');out=tmp_path/'attempt';events[-1]['output_dir']=str(out)
++    for name in ('attempt-result.json','n23-worker-context.json','eds_eval/decision-evidence-audit.json','eds_eval/in-worker-audit-receipt.json'):write(out/name,{})
++    monkeypatch.setattr(c,'accepted_cell',lambda *a:events[-1]);monkeypatch.setattr(c,'read_worker_report',lambda *a:{})
++    monkeypatch.setattr(c.native,'from_output',lambda *a:({'guided_decisions':1,'parent_rounds_verified':10},{}))
++    result=report.write_terminal(c.PLAN,p,c.RUN_DIR/'execution/supervisor-status-v1.json',tmp_path,{**vars(r),'read_events':lambda _:events})
++    assert result['audited_cells']==4 and len(result['attempts'])==5 and result['decision']=='INVALID_OR_INTERRUPTED'
++    assert result['terminal_status']['sha256'] is None
++
++
++def test_launch_precreates_directory_no_retry_or_second_launch(fixture,tmp_path,monkeypatch):
++    p=prep.build_plan(fixture,{'commit':'new','files':[]});write(c.PLAN,p)
++    monkeypatch.setattr(sup,'ROOT',tmp_path);monkeypatch.setattr(r,'validate_plan',lambda *a,**kw:(p,{},{}))
++    monkeypatch.setattr(sup,'release_check',lambda *a:None);monkeypatch.setattr(r,'read_events',lambda _:[]);monkeypatch.setattr(r,'read_state',lambda _: {})
++    monkeypatch.setattr(c,'full_capacity',lambda *a:None);monkeypatch.setattr(w,'process_identity',lambda:{'pid':123,'proc_start_ticks':'456','boot_id':'synthetic'})
++    @contextmanager
++    def locked(path,**kw):
++        if Path(path).name=='supervisor.lock':assert Path(path).parent.is_dir()
++        yield
++    monkeypatch.setattr(r,'locked',locked);calls=[];monkeypatch.setattr(sup,'execute',lambda *a:calls.append(a))
++    write(tmp_path/'release',{})
++    status=c.RUN_DIR/'execution/supervisor-status-v1.json';sup.launch(c.PLAN,tmp_path/'release',status);assert len(calls)==1
++    with pytest.raises(ValueError):sup.launch(c.PLAN,tmp_path/'release',status)
++    assert len(calls)==1
++
++@pytest.mark.parametrize('fault',['wrongpath','source','keys','limits','disabled'])
++def test_release_failclosed(fixture,tmp_path,fault):
++    p=prep.build_plan(fixture,{'commit':'new','files':[]});write(c.PLAN,p)
++    release=c.RUN_DIR/'execution-release-v1.json'
++    data={'schema':'n27-hydra-execution-release-v1','plan':c.ref(c.PLAN),'source_commit':'new','cohort_id':c.COHORT,
++        'authority':c.ref(c.AUTHORITY),'seal':c.ref(c.SEAL),'episode_keys':[x['episode_key'] for x in p['episodes']],
++        'limits':c.LIMITS,'one_launch':True,'physical_gpu':7,'validation_authorized':False,'formal_authorized':False}
++    write(release,data);sup.release_check(release,c.PLAN,p)
++    if fault=='source':data['source_commit']='wrong'
++    elif fault=='keys':data['episode_keys'].reverse()
++    elif fault=='limits':data['limits']={**c.LIMITS,'new_dispatches':14}
++    elif fault=='disabled':data['executable']=False
++    write(release,data)
++    with pytest.raises(ValueError):sup.release_check(tmp_path/'wrong' if fault=='wrongpath' else release,c.PLAN,p)
++
++
++
++def test_source_reverse_exact_and_science_unchanged():
++    root=Path(c.ROOT);files=[{'path':p,'sha256':w.sha(root/p)} for p in sorted(bridge.source_paths(root))]
++    source={'commit':'synthetic','files':files,'sha256':w.canonical_sha(files)}
++    old=bridge.reverse_source(root,source);assert old['commit']==h.BASE and len(old['files'])==345
++    current=(root/'scripts/qd_ed_n23_worker.py').read_text();patch=json.loads((root/bridge.DOC/'reverse-source-v1.json').read_text())['files']['scripts/qd_ed_n23_worker.py']
++    lines=current.splitlines(keepends=True)
++    for edit in reversed(patch['edits']):lines[edit['new_start']:edit['new_end']]=edit['old'].splitlines(keepends=True)
++    previous=''.join(lines);a,z=bridge.functions(previous),bridge.functions(current)
++    assert a['run_worker']==z['run_worker'] and a['verify_receipt']==z['verify_receipt']
++    assert 'n27_cohort' in z['run_worker'] and 'n27_cohort' in z['verify_receipt']
++
++
++def test_reverse_rejects_source_hash_drift():
++    root=Path(c.ROOT);files=[{'path':p,'sha256':w.sha(root/p)} for p in sorted(bridge.source_paths(root))]
++    files[0]['sha256']='0'*64
++    with pytest.raises(ValueError):bridge.reverse_source(root,{'commit':'synthetic','files':files})
++
++
++def test_read_bounds_before_allocation(tmp_path):
++    p=tmp_path/'big';p.touch()
++    with p.open('r+b') as f:f.truncate(h.MAX_FILE+1)
++    with pytest.raises(ValueError):h.read({'path':str(p),'sha256':'0'*64})
++    with pytest.raises(ValueError):h.ref(p)
+diff --git a/tests/test_n27_continuation.py b/tests/test_n27_continuation.py
+new file mode 100644
+index 0000000..d5d7138
+--- /dev/null
++++ b/tests/test_n27_continuation.py
+@@ -0,0 +1,157 @@
++import copy
++import hashlib
++import json
++from pathlib import Path
++import pytest
++from scripts import qd_ed_final_runner as r,qd_ed_n23_worker as w,qd_ed_n27_contract as old
++from scripts import qd_ed_n27_cont_contract as c,qd_ed_n27_cont_history as h,qd_ed_n27_cont_prepare as prep
++from scripts import qd_ed_n27_cont_report as report,qd_ed_n27_cont_supervise as sup,qd_ed_n27_cont_bridge as bridge
++from n27_cont_fixtures import seal,write,group,snapshot
++
++@pytest.fixture
++def fixture(tmp_path,monkeypatch):
++    monkeypatch.setattr(c,'RUN_DIR',tmp_path/'controller');monkeypatch.setattr(c,'SEAL',tmp_path/'seal.json')
++    monkeypatch.setattr(c,'AUTHORITY',tmp_path/'authority.json');write(c.AUTHORITY,{})
++    monkeypatch.setattr(c,'PLAN',tmp_path/'plan.json');monkeypatch.setattr(c,'BRIDGE',tmp_path/'bridge.json')
++    s=seal(tmp_path);write(c.SEAL,s);write(c.BRIDGE,{})
++    monkeypatch.setattr(c,'history',lambda:s)
++    return s
++
++def test_rows_and_unchanged_plan(fixture):
++    p=prep.build_plan(fixture,{'commit':'new','files':[]});rr=p['episodes']
++    assert len(rr)==13 and [(x['task_id'],x['profile']) for x in rr]==[(0,'N27')]+[(t,a) for t in (1,2,3) for a in c.ARMS]
++    assert sum(x['budget_bucket']=='recovery' for x in rr)==1
++    assert {b:sum(x['budget_bucket']==b for x in rr) for b in ('baseline','development')}=={'baseline':3,'development':9}
++    assert rr[0]['retry_of']==h.FAILED and all(not x.get('retry_of') for x in rr[1:]) and p['frozen'] is False
++    assert p['n27_cohort']['worker_audit']==old.WORKER_CONTRACT and not p['n27_hydra_continuation']['executable']
++    for i,row in enumerate(rr,3):
++        oldrow=fixture['original_plan_content']['episodes'][i]
++        assert all(row[k]==oldrow[k] for k in oldrow if k not in {'iteration','episode_key','budget_bucket'})
++
++@pytest.mark.parametrize('field',['source','rows','named','cost','valid','prefix','resource','unknown'])
++def test_history_negative(fixture,field):
++    x=copy.deepcopy(fixture)
++    if field=='source':x['original_source']['commit']='x'
++    elif field=='rows':x['original_plan_content']['episodes'].reverse()
++    elif field=='named':x['old_events'][-1]['attempt_id']='wrong'
++    elif field=='cost':x['old_events'][-1].pop('gpu_process_wall_seconds')
++    elif field=='valid':x['old_events'][-1]['outcome_valid']=True
++    elif field=='prefix':x['accepted_prefix'][0]['cell']['source_commit']='new';x['accepted_prefix'][0]['cell']['attempt_id']='new'
++    elif field=='resource':x['old_resource_events'][-1]['event']='aborted'
++    else:x['historical_unknowns']=[]
++    with pytest.raises((ValueError,KeyError)):h.verify(x)
++
++def test_history_positive_and_unrelated_append(fixture):
++    assert h.verify(fixture)==fixture
++    h.current_subset(fixture,fixture['old_events']+[{'identity':{'iteration':'UNRELATED'}}],fixture['old_resource_events']+[{'kind':'unrelated'}])
++    with pytest.raises(ValueError):h.current_subset(fixture,fixture['old_events']+[fixture['old_events'][0]],fixture['old_resource_events'])
++
++@pytest.mark.parametrize('case',['named','unrelated','duplicate','wrong_named','valid_repeat','mixed'])
++def test_retry_exact_scope(fixture,case):
++    rr=c.rows(fixture);row=rr[0] if case in {'named','wrong_named','mixed'} else rr[1];events=copy.deepcopy(fixture['old_events'])
++    if case=='unrelated':
++        other=copy.deepcopy(row);other['iteration']='N26_PREVIOUS';events+=group(other,'unrelated')
++    elif case in {'duplicate','valid_repeat'}:events+=group(row,'already')
++    elif case=='wrong_named':row={**row,'retry_of':'wrong'}
++    elif case=='mixed':row={**row,'n27_recovery_eligibility':{}}
++    if case in {'named','unrelated'}:c.check_retry(events,row,vars(r))
++    else:
++        with pytest.raises(ValueError):c.check_retry(events,row,vars(r))
++
++@pytest.mark.parametrize('fault',[None,'baseline','development','recovery','hours','protected','local','unsettled','state','missingcost'])
++def test_capacity(fixture,monkeypatch,fault):
++    snap=snapshot();events=copy.deepcopy(fixture['old_events']);resources=fixture['old_resource_events']
++    if fault in {'baseline','development','recovery'}:snap['by_bucket'][fault]=c.CAPS['buckets'][fault]
++    if fault=='hours':snap['gpu_hours_consumed']=99.
++    if fault=='protected':snap['gpu_hours_by_bucket']['validation']=0.;snap['gpu_hours_consumed']=70.
++    if fault=='local':fixture['old_gpu_seconds']=9.25*3600-100.;monkeypatch.setattr(h,'current_subset',lambda *a:None)
++    if fault=='unsettled':snap['running']=1
++    if fault=='missingcost':
++        g=group(c.rows(fixture)[0],'new');g[-1].pop('gpu_process_wall_seconds');events+=g
++    state={'budget':{'dispatched':snap['dispatched'],'gpu_hours_consumed':snap['gpu_hours_consumed']}}
++    if fault=='state':state['budget']['dispatched']-=1
++    env={**vars(r),'budget_snapshot':lambda *a:snap}
++    if fault is None:assert c.budget_check(state,events,resources,env,dispatch=True)['remaining']=={'baseline':3,'development':9,'recovery':1}
++    else:
++        with pytest.raises(ValueError):c.budget_check(state,events,resources,env,dispatch=True)
++
++def test_capacity_exact_boundary(fixture,monkeypatch):
++    snap=snapshot();seconds=13*1840;reserved=34.;snap['gpu_hours_consumed']=100-reserved-seconds/3600
++    state={'budget':{'dispatched':342,'gpu_hours_consumed':snap['gpu_hours_consumed']}}
++    env={**vars(r),'budget_snapshot':lambda *a:snap};c.budget_check(state,fixture['old_events'],fixture['old_resource_events'],env,dispatch=True)
++    snap['gpu_hours_consumed']+=.001;state['budget']['gpu_hours_consumed']=snap['gpu_hours_consumed']
++    with pytest.raises(ValueError):c.budget_check(state,fixture['old_events'],fixture['old_resource_events'],env,dispatch=True)
++
++def test_router_old_and_new(fixture):
++    p=prep.build_plan(fixture,{'commit':'new','files':[]});assert r.is_n27_plan(p) and r.metered_support(p) is c
++    assert r.metered_support(fixture['original_plan_content']) is old
++    assert not r.is_n26_plan(p) and r.metered_plan(p)
++
++def test_closed_scope(fixture):
++    p=prep.build_plan(fixture,{'commit':'new','files':[]});row=p['episodes'][0]
++    with pytest.raises(ValueError):c.require_scope(p,c.ROOT,vars(r),row)
++    with c.supervised_scope(p,c.ROOT,row['episode_key']):
++        assert c.effective_row(p,row,[],c.ROOT,vars(r))==row
++        with pytest.raises(ValueError):c.require_scope(p,c.ROOT,vars(r),p['episodes'][1])
++        with pytest.raises(ValueError):
++            with c.supervised_scope(p,c.ROOT,row['episode_key']):pass
++
++def test_freeze_existing_blocks_before_io(tmp_path,monkeypatch):
++    monkeypatch.setattr(c,'PLAN',tmp_path/'p.json');write(c.PLAN,{})
++    monkeypatch.setattr(c,'history',lambda:pytest.fail('must not read history'))
++    with pytest.raises(ValueError):prep.freeze(c.PLAN,root=tmp_path)
++
++def run_report(fixture,*,wins=2,control=0,invalid=None,stop=13,substantive=True):
++    p=prep.build_plan(fixture,{'commit':'new','files':[]});ev=[]
++    for i,row in enumerate(p['episodes'][:stop]):
++        success=row['task_id']<(wins if row['profile']=='N27' else control)
++        ev+=group(row,'new'+str(i),source='new',valid=i!=invalid,success=success)
++    def accept(row,events):
++        f=next(x for x in events if x['event']=='valid' and x['episode_key']==row['episode_key'])
++        w.require(f['outcome_valid'],'invalid');return {k:row[k] for k in ('episode_key','task_id','profile')}|{'attempt_id':f['attempt_id'],'success':f['success']},{'guided_decisions':int(substantive),'parent_rounds_verified':10*int(substantive)},{}
++    return report.analyze(p,fixture,ev,accept),p,ev,accept
++
++@pytest.mark.parametrize('wins,control,substantive,expected',[(0,0,True,'REJECT_SCREEN'),(1,0,True,'REJECT_SCREEN'),(2,0,True,'ELIGIBLE_FOR_SEPARATELY_FROZEN_FULL_DEV'),(2,3,True,'REJECT_SCREEN'),(4,0,False,'REJECT_SCREEN')])
++def test_all_sixteen_thresholds_and_costs(fixture,wins,control,substantive,expected):
++    result,_,_,_=run_report(fixture,wins=wins,control=control,substantive=substantive)
++    assert result['decision']==expected and result['audited_cells']==16 and result['dispatched']==17
++    assert result['original_disposition']=='INVALID_OR_INTERRUPTED' and result['unknown_token_calls'] is None
++    assert result['unmeasured_token_call_attempts']==[h.FAILED]
++    assert result['all_attempt_denominators']=={'C0':4,'Q0':4,'N26':4,'N27':5}
++    assert all(x['source_commit']==h.BASE for x in result['accepted_cells'][:3])
++
++@pytest.mark.parametrize('stop,invalid',[(0,None),(1,0),(4,3),(13,12),(5,None)])
++def test_incomplete_never_promotes(fixture,stop,invalid):
++    result,_,_,_=run_report(fixture,stop=stop,invalid=invalid)
++    assert result['decision']=='INVALID_OR_INTERRUPTED' and not result['dev_gate_promoted']
++    assert len(result['attempts'])==4+stop
++
++def test_reordered_skipped_postinvalid_rejected(fixture):
++    result,p,ev,accept=run_report(fixture)
++    for bad in (ev[3:6]+ev[:3]+ev[6:],ev[:1]+ev[3:6]+ev[1:3]+ev[6:]):
++        with pytest.raises(ValueError):report.analyze(p,fixture,bad,accept)
++    with pytest.raises(ValueError):run_report(fixture,invalid=2)
++
++@pytest.mark.parametrize('profile',['C0','Q0','N26','N27'])
++def test_worker_route_real_shape(fixture,tmp_path,monkeypatch,profile):
++    p=prep.build_plan(fixture,{'commit':'new','files':[]});p['frozen']=True
++    p['n27_hydra_continuation'].update(cohort_id=c.COHORT,protocol={'path':'synthetic','sha256':c.PROTOCOL_SHA})
++    row=next(x for x in p['episodes'] if x['profile']==profile);out=Path(p['artifact_root'])/'attempts'/'new'
++    context={'schema':'n23-metered-worker-context-v1','attempt_id':'new','episode_key':row['episode_key'],'profile':profile,'output_dir':str(out),
++        'worktree':str(tmp_path),'main_argv':[str(tmp_path/'main.py'),'unchanged=1'],'plan':{},'runtime':{'path':p['runtime_manifest_path'],'sha256':p['runtime_manifest_sha256']},
++        'source':{'commit':'new','files':[],'sha256':'x'}}
++    runtime={'gpu_mapping':{'physical_gpu':7,'uuid':old.GPU7_UUID}}
++    monkeypatch.setattr(w,'ROOT',tmp_path);monkeypatch.setattr(w,'read_ref',lambda ref:p if ref==context['plan'] else runtime);monkeypatch.setattr(w,'verify_source',lambda *a:None)
++    assert w.validate_context(context,context['main_argv'])==(tmp_path,out,runtime)
++    p['n27_cohort']['worker_audit']={}
++    with pytest.raises(ValueError):w.validate_context(context,context['main_argv'])
++
++def test_native_zero_guided_gate_is_not_optional(tmp_path):
++    report={'accepted':True,'evidence_complete':True,'observed_counts':{'canonical_candidate_batch':0}}
++    # Actual immutable profile-bound counter routine must reject erased N27 markers, including zero work.
++    with pytest.raises(ValueError):c.native.counts('N27',[],report,0)
++    report['n27_feasible_ray_rbf_audit']={'schema':'n27-native-rbf-audit-v1','accepted':True,'guided_decisions':0,
++        'all_call_summaries_verified':0,'witness_calls_verified':0,'zero_gradient_calls':0,'clipped_components':0,'limited_rows':0,'realized_nonzero_delta_components':0}
++    assert c.native.counts('N27',[],report,0)[0]['guided_decisions']==0
++    # Specific accepted schema is checked by the existing native function; no implementation changes here.
++    assert c.native.counts('C0',[],{'accepted':True,'evidence_complete':True,'observed_counts':{'canonical_candidate_batch':0}},0)[0]['guided_decisions']==0

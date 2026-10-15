@@ -1,0 +1,120 @@
+diff --git a/experiments/qd_ed_n24/validation-controller-contract-v1.md b/experiments/qd_ed_n24/validation-controller-contract-v1.md
+index a1da6ef..e7e7311 100644
+--- a/experiments/qd_ed_n24/validation-controller-contract-v1.md
++++ b/experiments/qd_ed_n24/validation-controller-contract-v1.md
+@@ -34,7 +34,7 @@ Each eligibility records the original invalid result, exact source/plan/runtime/
+ 
+ ## Terminal reporting
+ 
+-Full protected detail is saved at `validation-execution/protected-detail-v1.json`; only `aggregate-disposition-v1.json` is printed. Full detail includes every planned cell, first-valid identity, all invalid/recovery attempts, paired gains/losses, 20-per-arm denominator, all observed costs and explicit partial/unknown tokens. No validation futility is added. Complete 60 cells, N24>=10/20 and >=C0/Q0, and substantive fixed QD/ED determine promotion. Positive rescue counts are descriptive, not a new veto. `cache_updates` means canonical batches whose best cache changes, not within-batch row assignment count.
++Controller and report files are confined to the exact owned variant path `RUN_DIR/validation-execution`, independently of the attempt artifact root. Attempts remain under the frozen `plan.artifact_root`; no data is moved. A symlink escape or another controller output directory is rejected before creation. Full protected detail is saved at `validation-execution/protected-detail-v1.json`; only `aggregate-disposition-v1.json` is printed. Full detail includes every planned cell, first-valid identity, all invalid/recovery attempts, paired gains/losses, 20-per-arm denominator, all observed costs and explicit partial/unknown tokens. No validation futility is added. Complete 60 cells, N24>=10/20 and >=C0/Q0, and substantive fixed QD/ED determine promotion. Positive rescue counts are descriptive, not a new veto. `cache_updates` means canonical batches whose best cache changes, not within-batch row assignment count.
+ 
+ If a valid journaled result is followed by a supervisor/status/postprocessing failure, the terminal writer retains it and every cost and returns INVALID. It records both controller count and journal-accepted keys; missing data remains unknown. No fabricated 0/20, silent promotion, resume or terminal overwrite. Detailed report failure preserves raw cohort events in an unadjudicated artifact plus INVALID aggregate. Aggregate output exposes no per-task/seed outcomes and does not authorize formal or declare target achieved.
+ 
+diff --git a/scripts/qd_ed_n24_validation_report.py b/scripts/qd_ed_n24_validation_report.py
+index 4952ae7..fe186ba 100644
+--- a/scripts/qd_ed_n24_validation_report.py
++++ b/scripts/qd_ed_n24_validation_report.py
+@@ -6,6 +6,13 @@ from scripts import qd_ed_n24_native as native
+ from scripts import qd_ed_n23_worker as w
+ 
+ 
++def output_directory(directory,r):
++    """Controller evidence belongs to the fixed variant directory, not attempt storage."""
++    path=r['owned'](directory,c.RUN_DIR)
++    c.require(path==(c.RUN_DIR/'validation-execution').resolve(),'N24 exact validation controller directory differs')
++    return path
++
++
+ def summarize(plan,events,root,r,*,force_invalid=False,controller_completed=None):
+     local=[e for e in events if e.get('identity',{}).get('iteration')==c.COHORT]
+     keys=[x['episode_key'] for x in plan['episodes']]
+@@ -60,7 +67,7 @@ def summarize(plan,events,root,r,*,force_invalid=False,controller_completed=None
+ 
+ 
+ def write_reports(plan,events,directory,root,r,*,force_invalid=False,controller_completed=None):
+-    directory=r['owned'](directory,plan['artifact_root']);directory.mkdir(parents=True,exist_ok=True)
++    directory=output_directory(directory,r);directory.mkdir(parents=True,exist_ok=True)
+     try:detail,aggregate=summarize(plan,events,root,r,force_invalid=force_invalid,controller_completed=controller_completed)
+     except (ValueError,RuntimeError,KeyError,OSError,TypeError) as exc:
+         detail={'schema':'n24-protected-validation-unadjudicated-v1','failure_class':type(exc).__name__,
+diff --git a/scripts/qd_ed_n24_validation_supervise.py b/scripts/qd_ed_n24_validation_supervise.py
+index fb5395c..1c83d4c 100644
+--- a/scripts/qd_ed_n24_validation_supervise.py
++++ b/scripts/qd_ed_n24_validation_supervise.py
+@@ -46,7 +46,7 @@ def one_attempt(plan_path,plan,row,*,eligibility=None):
+ 
+ 
+ def execute(plan_path,plan,profiles,runtime,output):
+-    output=r.owned(output,plan['artifact_root']);output.mkdir(parents=True,exist_ok=True)
++    output=reporting.output_directory(output,vars(r));output.mkdir(parents=True,exist_ok=True)
+     status=output/'aggregate-progress-v1.json';c.require(not status.exists(),'N24 validation cannot resume')
+     completed=0;failed=True
+     def progress(phase):
+@@ -77,8 +77,8 @@ def execute(plan_path,plan,profiles,runtime,output):
+ 
+ def launch(plan_path,release,output):
+     plan,profiles,runtime=r.validate_plan(plan_path,root=ROOT)
+-    c.require(Path(output).resolve()==(c.RUN_DIR/'validation-execution').resolve(),'N24 protected output path differs')
+-    Path(output).mkdir(parents=True,exist_ok=True)
++    output=reporting.output_directory(output,vars(r))
++    output.mkdir(parents=True,exist_ok=True)
+     with r.locked(Path(output)/'supervisor.lock',nonblocking=True):
+         c.require(not (Path(output)/'aggregate-progress-v1.json').exists() and not (Path(output)/'aggregate-disposition-v1.json').exists(),
+             'N24 validation no restart/result overwrite')
+diff --git a/tests/test_qd_ed_n24_validation_runtime.py b/tests/test_qd_ed_n24_validation_runtime.py
+index b6c4f35..eb27d37 100644
+--- a/tests/test_qd_ed_n24_validation_runtime.py
++++ b/tests/test_qd_ed_n24_validation_runtime.py
+@@ -418,3 +418,51 @@ def test_existing_worker_dev_routes_remain_unchanged(worker_job,monkeypatch,old_
+     assert w.run_worker(job.context_path,job.command[1:])==0
+     assert job.calls==['identity','cuda' if old_arm in {'N23','N24'} else 'cpu','audit']
+     job.calls.clear();assert w.verify_receipt(job.context_path,job.process)['accepted'] and not job.calls
++
++@pytest.mark.parametrize('fault',['none','different_variant','attempt_root','escape_link'])
++def test_production_split_variant_and_attempt_roots(tmp_path,monkeypatch,fault):
++    variant=tmp_path/'source-volume/variant';variant.mkdir(parents=True)
++    artifacts=tmp_path/'artifact-volume/attempt-data';artifacts.mkdir(parents=True)
++    monkeypatch.setattr(c,'RUN_DIR',variant);monkeypatch.setattr(sup,'ROOT',tmp_path/'worktree')
++    plan={'source_commit':'synthetic','artifact_root':str(artifacts),'episodes':rows(),
++        'n24_validation':{'seed_cohort':'c2','source_bridge':{},'dev_review':{},'metadata_selection':{}}}
++    path=variant/'plan.json';write(path,plan);monkeypatch.setattr(c,'VALIDATION_PLAN',path)
++    output=variant/'validation-execution'
++    if fault=='different_variant':output=variant/'elsewhere'
++    if fault=='attempt_root':output=artifacts/'validation-execution'
++    if fault=='escape_link':output.symlink_to(artifacts/'escaped-controller',target_is_directory=True)
++    monkeypatch.setattr(r,'validate_plan',lambda *a,**k:(plan,{'profiles':{}},{}))
++    monkeypatch.setattr(r,'read_events',lambda *a:[])
++    monkeypatch.setattr(sup,'release_check',lambda *a:None)
++    monkeypatch.setattr(sup.dev_supervisor,'device_check',lambda:None)
++    monkeypatch.setattr(sup,'one_attempt',lambda *a,**k:(_ for _ in ()).throw(ValueError('synthetic before first attempt')))
++    if fault=='none':
++        with pytest.raises(ValueError,match='synthetic'):sup.launch(path,variant/'release.json',output)
++        assert (output/'aggregate-disposition-v1.json').is_file()
++        value=json.loads((output/'protected-detail-v1.json').read_text())
++        assert value['dispatched']==0 and value['accepted_cells']==0 and value['decision']=='INVALID'
++        assert list(artifacts.iterdir())==[]
++    else:
++        # Every public boundary enforces the same exact owned controller path.
++        for call in (lambda:sup.launch(path,variant/'release.json',output),
++                     lambda:sup.execute(path,plan,{'profiles':{}},{},output),
++                     lambda:reporting.write_reports(plan,[],output,tmp_path,vars(r))):
++            with pytest.raises((ValueError,r.GateError)):call()
++        assert not (artifacts/'escaped-controller').exists()
++
++@pytest.mark.parametrize('name',['execution/attempt.json','validation-execution/protected-detail-v1.json','validation-execution-release-v1.json',
++    'plan.frozen.v1.gpu7.json','validation-plan.frozen.v1.gpu7.json','result-v1.json','root-review-v1.json',
++    'adoption-v1/authority.json','validation-adoption-v1/authority.json','validation-source-review-v1.json'])
++def test_guard_v3_sensitive_paths_deny_read_and_write_without_io(tmp_path,name):
++    import ast
++    # Execute only the guard callback in a synthetic namespace, never open a sensitive path.
++    tree=ast.parse((Path(r.ROOT).parent/'n24_validation_cpu_guard_v3.py').read_text())
++    node=next(x for x in tree.body if isinstance(x,ast.FunctionDef) and x.name=='audit')
++    namespace={'Path':Path,'os':os,'HERE':tmp_path/'variant','ROOT':tmp_path,'WORKTREES':(), 'STATIC':tmp_path/'static.json','BLOCKED':[]}
++    exec(compile(ast.Module(body=[node],type_ignores=[]),'<synthetic-guard-callback>','exec'),namespace)
++    for mode,flags in [('r',os.O_RDONLY),('w',os.O_WRONLY|os.O_CREAT),('a',os.O_WRONLY|os.O_APPEND)]:
++        with pytest.raises(PermissionError):namespace['audit']('open',(str(namespace['HERE']/name),mode,flags))
++    assert len(namespace['BLOCKED'])==3 and not namespace['HERE'].exists()
++    # Drafts are in the distinct non-executable template directory, never execution-prefix exceptions.
++    namespace['audit']('open',(str(namespace['HERE']/'validation-cpu-templates-v2/release.json'),'w',os.O_WRONLY|os.O_CREAT))
++    assert len(namespace['BLOCKED'])==3

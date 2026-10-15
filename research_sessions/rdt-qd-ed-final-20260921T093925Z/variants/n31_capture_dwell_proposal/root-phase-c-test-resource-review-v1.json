@@ -1,0 +1,307 @@
+{
+  "schema": "n31-root-phase-c-test-resource-review-v1",
+  "reviewed_at": "2026-10-04T04:26:47.879218+00:00",
+  "decision": "ACCEPT_FINAL_SYNTHETIC_TEST_AND_RESOURCE_EVIDENCE_ONLY",
+  "source_commit": "7428ce8a51f76c5f641537be9a7614631d82b0d9",
+  "receipts": [
+    {
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run1-external.json",
+        "sha256": "632795c8111db003727e445d8f517da929ec25e8c33f0e61b40816d7966af5e4",
+        "bytes": 696
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run1-resource.json",
+        "sha256": "0bbc7704a77bfa8f3b6501e2f2f065570c0796d6b71a57f9bd64072503aa84e2",
+        "bytes": 423048
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run1-source.json",
+        "sha256": "cc32422d2f1111b539b1b2e88afe0624ef878d1ecb6a1a27d5428dd047ee7c84",
+        "bytes": 79689
+      },
+      "exit": 1,
+      "guard_clean": true,
+      "pid_absent": true
+    },
+    {
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run2-external.json",
+        "sha256": "e0f3f22a118a1040e3c8bc93b2b993e447788e38310b5e6bac0da7c1bd6c8465",
+        "bytes": 703
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run2-resource.json",
+        "sha256": "165c7d055af673f04ad73e7a6702e2457e0ae9c72f8f1475c2305df7f34a6141",
+        "bytes": 424289
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run2-source.json",
+        "sha256": "89c97bfc4459214f999a2559e3eceba81f4ef160e2a9d99b2c462d2e5b4fb35b",
+        "bytes": 79983
+      },
+      "exit": 1,
+      "guard_clean": true,
+      "pid_absent": true
+    },
+    {
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run3-external.json",
+        "sha256": "a28b0a572790d588b1188169ecf5537dec5a771b0f1f4ca0089c9911037322d3",
+        "bytes": 695
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run3-resource.json",
+        "sha256": "441df3d44f4f8aa3be18f88825231858a1b4a5a41d71788707918665578bedd8",
+        "bytes": 424296
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run3-source.json",
+        "sha256": "db28de97b226f781bc74d2321459d705fdddb8798d677128620d3a0111bb005f",
+        "bytes": 79983
+      },
+      "exit": 1,
+      "guard_clean": true,
+      "pid_absent": true
+    },
+    {
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run4-external.json",
+        "sha256": "7290960e8ac37f9b8916b453ecba99f5b4fe0a0fc17b08e0cf30e2857841aaa9",
+        "bytes": 697
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run4-resource.json",
+        "sha256": "1861f59cfeff775e43c61e4749180b742a8220ba6d952d6597a16a644110b5ec",
+        "bytes": 433202
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run4-source.json",
+        "sha256": "7cc979dafc0112dd7e7e3477d1991610478f624d0b2cf70a27641b00b44c5673",
+        "bytes": 79983
+      },
+      "exit": 1,
+      "guard_clean": true,
+      "pid_absent": true
+    },
+    {
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run5-external.json",
+        "sha256": "6a3283004edd34fce6ad0bfc393d563c2a8646aebbe688bf61102ed59c3ea4bc",
+        "bytes": 976
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run5-resource.json",
+        "sha256": "a39495c93b86b9489751e6da1805e7734b4aa851017eef74af6ce7098e76de20",
+        "bytes": 747536
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run5-source.json",
+        "sha256": "56d2572b70b63f8fe4befcd85c3f16c40b7bafea9f8e8546da8362e824ef4185",
+        "bytes": 80939
+      },
+      "exit": 1,
+      "guard_clean": false,
+      "pid_absent": true
+    },
+    {
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run6-external.json",
+        "sha256": "747076e7436163c05165222f1a95852e32505352d80d7af2503b4eb05d4243e2",
+        "bytes": 875
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run6-resource.json",
+        "sha256": "aad13e23f662a9ee8da854602869ec546839c2f77835d484c91a34447d98663d",
+        "bytes": 557983
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run6-source.json",
+        "sha256": "4b5a1de75df7b4821c128c29d6925258edfee9d42d7e730cbe5d02f07c34cec4",
+        "bytes": 81252
+      },
+      "exit": 1,
+      "guard_clean": false,
+      "pid_absent": true
+    },
+    {
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run7-external.json",
+        "sha256": "329f363be31b4b4c9f8b647ee75ed16e8ffdef8dbe03ef8902054e097fd513ae",
+        "bytes": 1002
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run7-resource.json",
+        "sha256": "4a9fefefc24e69c7cef3291e3877e9c4615a8c8a083d5861fcf561e83e491a9f",
+        "bytes": 512492
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run7-source.json",
+        "sha256": "2470fdf7c3e79929ec5e1522b015671f907a362607500ee4a947a556ea16d368",
+        "bytes": 81574
+      },
+      "exit": 1,
+      "guard_clean": false,
+      "pid_absent": true
+    },
+    {
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run8-external.json",
+        "sha256": "d6337b450d598ba5b4361092353d399da709943661ff32c670eb3adeea4ff84c",
+        "bytes": 1124
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run8-resource.json",
+        "sha256": "d1e7ee2299999ab9b15d76d864f550965162a3897c6f746de0bd08577688061b",
+        "bytes": 903280
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run8-source.json",
+        "sha256": "a30d022009744623708704fb4acff4c6f1eae4d96cce4ba63934c14f8fc36a6f",
+        "bytes": 81577
+      },
+      "exit": 0,
+      "guard_clean": true,
+      "pid_absent": true
+    }
+  ],
+  "cumulative_child_cpu_seconds": 233.26410999999996,
+  "cumulative_wall_seconds": 180.51213396794628,
+  "final_distinct_passing_cases": 121,
+  "final_run_sources_rehashed": 255,
+  "final_run_git_blobs_rehashed": 253,
+  "root_reran_tests": false,
+  "root_arithmetic_replay": false,
+  "gpu_execution_authorized": false,
+  "budget_adopted": false,
+  "target_achieved": false,
+  "limitations": [
+    "Synthetic model/environment stubs are not real robot task evidence.",
+    "Runs5\u20137 have retained source-scan guard failures; only run8 provides final clean coverage.",
+    "Source packaging, independent bridge review and root adoption remain separate.",
+    "Source snapshot initially inspected with wrong dict assumption; corrected as255-entry list. No scientific execution resulted."
+  ],
+  "final_case_ids": [
+    "::test_native_real_recorder_full_chain[dtype0]",
+    "::test_native_real_recorder_full_chain[dtype1]",
+    "::test_native_tamper[mask]",
+    "::test_native_tamper[target]",
+    "::test_native_tamper[source_iter]",
+    "::test_native_tamper[insert]",
+    "::test_native_tamper[cell]",
+    "::test_native_tamper[slot]",
+    "::test_native_tamper[other15]",
+    "::test_native_tamper[projection]",
+    "::test_native_tamper[origin]",
+    "::test_native_tamper[quality]",
+    "::test_native_tamper[scope]",
+    "::test_native_tamper[snapshot]",
+    "::test_native_tamper[duplicate]",
+    "::test_native_tamper[decode]",
+    "::test_native_tamper[scalar]",
+    "::test_native_tamper[parent_native]",
+    "::test_native_tamper[provider_structure]",
+    "::test_all_arms_real_empty_provider_and_mixed[empty-C0]",
+    "::test_all_arms_real_empty_provider_and_mixed[empty-Q0]",
+    "::test_all_arms_real_empty_provider_and_mixed[empty-N31]",
+    "::test_all_arms_real_empty_provider_and_mixed[mixed-C0]",
+    "::test_all_arms_real_empty_provider_and_mixed[mixed-Q0]",
+    "::test_all_arms_real_empty_provider_and_mixed[mixed-N31]",
+    "::test_empty_score_cannot_be_forged[delete_all_effect]",
+    "::test_empty_score_cannot_be_forged[delete_one_effect]",
+    "::test_empty_score_cannot_be_forged[quality_nonzero]",
+    "::test_empty_score_cannot_be_forged[quality_negative_zero]",
+    "::test_empty_score_cannot_be_forged[cost_positive_zero]",
+    "::test_empty_score_cannot_be_forged[wrong_dtype]",
+    "::test_empty_score_cannot_be_forged[wrong_scope]",
+    "::test_empty_score_cannot_be_forged[changed_aux_scope]",
+    "::test_empty_score_cannot_be_forged[moved_auxiliary]",
+    "::test_empty_score_cannot_be_forged[normal_fake_empty]",
+    "::test_zero_guided_requires_explicit_native_gate[C0]",
+    "::test_zero_guided_requires_explicit_native_gate[Q0]",
+    "::test_zero_guided_requires_explicit_native_gate[N31]",
+    "::test_futility_complete_triples[12-INVALID_OR_INTERRUPTED]",
+    "::test_futility_complete_triples[17-INVALID_OR_INTERRUPTED]",
+    "::test_futility_complete_triples[18-REJECT_NUMERIC_DEV_FUTILITY]",
+    "::test_no_dispatch_past_first_futile_triple",
+    "::test_full_three_of_four_and_controls[extra0-True]",
+    "::test_full_three_of_four_and_controls[extra1-False]",
+    "::test_invalid_cost_missing_and_chronological_no_retry",
+    "::test_dedicated_route_control_route_and_mixed_marker",
+    "::test_each_episode_reserves_full_local_global_and_protected[16160.0-50.0-True]",
+    "::test_each_episode_reserves_full_local_global_and_protected[16160.001-50.0-False]",
+    "::test_each_episode_reserves_full_local_global_and_protected[0.0-55.48888888888889-True]",
+    "::test_each_episode_reserves_full_local_global_and_protected[0.0-55.489888888888885-False]",
+    "::test_supervisor_budget_closes_without_dispatch",
+    "::test_report_status_failure_preserves_valid_journal_prefix",
+    "::test_real_check_budget_then_protected_never_truncates_n31[1840.01]",
+    "::test_real_check_budget_then_protected_never_truncates_n31[1839.99]",
+    "::test_real_check_budget_then_protected_never_truncates_n31[1000.0]",
+    "::test_real_check_budget_then_protected_never_truncates_n31[39.0]",
+    "::test_real_check_budget_then_protected_never_truncates_n31[0.0]",
+    "::test_admission_cannot_bypass_completed_triple_futility[12-True]",
+    "::test_admission_cannot_bypass_completed_triple_futility[17-True]",
+    "::test_admission_cannot_bypass_completed_triple_futility[18-False]",
+    "::test_complete_runner_validate_and_all_three_real_hydra_commands",
+    "::test_complete_admission_rejects_boundary_mismatch[escaped_artifact]",
+    "::test_complete_admission_rejects_boundary_mismatch[global_attempt_root]",
+    "::test_complete_admission_rejects_boundary_mismatch[runtime_subroot]",
+    "::test_complete_admission_rejects_boundary_mismatch[mixed_marker]",
+    "::test_complete_admission_rejects_boundary_mismatch[seed]",
+    "::test_complete_admission_rejects_boundary_mismatch[profile]",
+    "::test_complete_admission_rejects_boundary_mismatch[authority]",
+    "::test_complete_admission_rejects_boundary_mismatch[source]",
+    "::test_missing_authority_fails_closed",
+    "::test_exact_authority_markdown_and_effective_cap[False]",
+    "::test_exact_authority_markdown_and_effective_cap[True]",
+    "::test_authority_tamper[draft]",
+    "::test_authority_tamper[bucket]",
+    "::test_authority_tamper[origin]",
+    "::test_authority_tamper[end]",
+    "::test_authority_tamper[increment]",
+    "::test_authority_tamper[amendment]",
+    "::test_authority_tamper[proposal_bytes]",
+    "::test_authority_tamper[history]",
+    "::test_weekly_window_requires_whole_attempt[1840.01]",
+    "::test_weekly_window_requires_whole_attempt[1839.99]",
+    "::test_independent_inclusive_binary64_faces[0--0.008-dtype0]",
+    "::test_independent_inclusive_binary64_faces[0--0.008-dtype1]",
+    "::test_independent_inclusive_binary64_faces[0-0.008-dtype0]",
+    "::test_independent_inclusive_binary64_faces[0-0.008-dtype1]",
+    "::test_independent_inclusive_binary64_faces[1--0.0195-dtype0]",
+    "::test_independent_inclusive_binary64_faces[1--0.0195-dtype1]",
+    "::test_independent_inclusive_binary64_faces[1-0.0195-dtype0]",
+    "::test_independent_inclusive_binary64_faces[1-0.0195-dtype1]",
+    "::test_independent_inclusive_binary64_faces[2--0.0116-dtype0]",
+    "::test_independent_inclusive_binary64_faces[2--0.0116-dtype1]",
+    "::test_independent_inclusive_binary64_faces[2-0.0044-dtype0]",
+    "::test_independent_inclusive_binary64_faces[2-0.0044-dtype1]",
+    "::test_actual_worker_route_exact_profile_even_zero_guided[C0]",
+    "::test_actual_worker_route_exact_profile_even_zero_guided[Q0]",
+    "::test_actual_worker_route_exact_profile_even_zero_guided[N31]",
+    "::test_disk_recorder_generic_native_same_worker_receipt",
+    "::test_reverse_complete_source_and_pinned_json",
+    "::test_closed_schema_and_no_nested_payload_follow",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[none]",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[context_episode]",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[context_attempt]",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[context_source]",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[terminal_source]",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[terminal_plan]",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[terminal_runtime]",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[terminal_input]",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[terminal_profile]",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[receipt]",
+    "::test_accepted_cell_binds_real_runner_terminal_shape[retry]",
+    "::test_future_qd_off_worker_route_closed",
+    "::test_full10_active_and_nohit_cost_rng_trace[False-dtype0]",
+    "::test_full10_active_and_nohit_cost_rng_trace[False-dtype1]",
+    "::test_full10_active_and_nohit_cost_rng_trace[True-dtype0]",
+    "::test_full10_active_and_nohit_cost_rng_trace[True-dtype1]",
+    "::test_observer_cannot_change_proposal[False]",
+    "::test_observer_cannot_change_proposal[True]",
+    "::test_real_unsupported_input_baseline_parity[empty_provider]",
+    "::test_real_unsupported_input_baseline_parity[no_keypoints]",
+    "::test_real_unsupported_input_baseline_parity[non_template]"
+  ]
+}

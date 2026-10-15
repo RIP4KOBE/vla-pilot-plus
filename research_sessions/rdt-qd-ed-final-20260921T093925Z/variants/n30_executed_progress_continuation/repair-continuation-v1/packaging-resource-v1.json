@@ -1,0 +1,9 @@
+{
+  "process_cpu_seconds": 0.11665112999999999,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "mode": "stdlib hashing/Git byte verification only",
+  "production_imports": false
+}

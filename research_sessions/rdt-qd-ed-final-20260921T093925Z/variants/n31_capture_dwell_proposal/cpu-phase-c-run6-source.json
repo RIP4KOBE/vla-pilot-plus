@@ -1,0 +1,1018 @@
+[
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_phase_c_guard_v1.py",
+    "sha256": "b81a519bf9f0305ba28372ccb26f091e6a64f39c048ca6e23d13c2b744318436"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/__init__.py",
+    "sha256": "233696e00a1ada9a70a50c11160a96884d223df0e7b92aa7ba8bc8a61503efe6"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/codex_stage.py",
+    "sha256": "45bc3512baa52500c4fb633dfc7a78ae474fb192c40745962a5d7cd5537208f9"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/codex_stage_lifecycle.py",
+    "sha256": "de10576f89368b81c03b7b8d1d7c04e757a394d8b0b4974515c0b08e606d00e6"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/codex_stage_policy.py",
+    "sha256": "92f78a80651e97390a296e42850aae0b70217afb1c362e9b5d0b8a07b8cbe432"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/decision_evidence.py",
+    "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/diffusion_policy_steer.py",
+    "sha256": "97f0ee3b9159461e15f6b58ea2bd95119a5514872025b4c99594ec6b71815eaa"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/eds_eval_metrics.py",
+    "sha256": "59b51b4a14d4f9bbdc3992173f96fd35508202e0349c50fdc08b94dcd74b8a13"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/eds_mechanism_trace.py",
+    "sha256": "312087f5c354f81a820f2acb8419c6380e96805de79f1789c5c7ff23a8fcabf3"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/egl_context_drift.py",
+    "sha256": "54162566be17e1b0a0cfbc01995ee2f509e708743ddb03bf3d7d04c8613152b2"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/env_adapters/__init__.py",
+    "sha256": "790830ee3d9a8a6a0c59a114fbc77fb50bc158d05e13ff9e2e634ad7f370d9c4"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/env_adapters/base_adapter.py",
+    "sha256": "a5bb4f9e06f458fc38e6cc7486e6c6d268fc67bfaf6fd9f84f90514236144de8"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/env_adapters/calvin_adapter.py",
+    "sha256": "396957c62660edddf9704a24cbef15d9cf5f2bbb4da39ee4b9123c4d240a0541"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/env_adapters/libero_adapter.py",
+    "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/fkd_class.py",
+    "sha256": "26ccfa9cf4837ce92baf0a5538ac3339d5c55a4f4f7b8f577366a0dd2a408412"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/gemini_grounder.py",
+    "sha256": "0d1a51c8dbd077f274235ae00c1b3ab538e0f9745d85fd12417e21f57980b1f6"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/keypoint_detector.py",
+    "sha256": "5fa108f01168ecb1f2433bc53f093701e0079fa6cf35abf910ec0347075d055e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/keypoint_tracker.py",
+    "sha256": "7925b62d8c6404c250ccdba6ae0df12df79dd23db1f308112b7b3f22e1a22190"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/passive_physics_trace.py",
+    "sha256": "5a703e5b4f5dec786340fb8964ebfc1a18acf036a8486a7f99122223ddf06d8b"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/pi05_steer.py",
+    "sha256": "ed9146d92bf09af1b1ec99774bd8042c70869ba2246c98ff04d23961ed83e962"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/policy_observation_sampling.py",
+    "sha256": "c7e93e81541c34dd45e22dffc43a24d428d043a56c0dd6766bfd286e2ff07f4d"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_actuator_clipped_quality.py",
+    "sha256": "14f43ab89b7e59c99ada6f66a832f3a3f08d60c4fb1c92c0c8a6bb27a57ef120"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_actuator_clipped_rbf.py",
+    "sha256": "d0a516046f9d9efc8694916a9ff845c8b67868d8d7d2d01381894bcc05b89408"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_capture_dwell.py",
+    "sha256": "b24e3c4a79c91fdf52748bf7fe4f76be853f5eb2ba88a2cc9d1ef6c904bc9d6e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_capture_dwell_proposal.py",
+    "sha256": "e0b274e418aa9adc3cf7955ca162d830e66ffe9db79c65428573757e95fee843"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_clean_output_rbf.py",
+    "sha256": "f107f50e45c233e291e5f5799633b0f3005fe54dc0649506dec41a4c02bb789c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_contact_sweep.py",
+    "sha256": "fcd88b6b9dcf58b03e14f182c8d345363faf702dd146ea244ae073f997cb8602"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_ed.py",
+    "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_executed_feedback.py",
+    "sha256": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_executed_progress.py",
+    "sha256": "7aead7c81424a2b247e4d74ae211947e0b78a47cf6fa1a8a97fb112a9739d9c0"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_executed_quality.py",
+    "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_feasible_ray_rbf.py",
+    "sha256": "f2494d1a2c55f4899d848d5f7e8af03cc8518cd53749c8875a117c1ff15a3207"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_feasible_ray_update.py",
+    "sha256": "146163977866af87d2c643b0446be9ebac12f83cf9337d534b736874c623203e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_grasp_timing.py",
+    "sha256": "f38c980b22df080991e4cb86d07c1dbc933652e584e8b897dbb16e1312fd6142"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_gripper_parent_rescue.py",
+    "sha256": "95e58de7f33a3f365f3d7640206f9f040b821d1bcd3d44aea008dd3236a25e3f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_lift_quality.py",
+    "sha256": "aa61a1b0969d9725161483d6fb255b1773aa8f68223e4e93836944a153910a82"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_parent_before_renoise.py",
+    "sha256": "648789ee3e0b84c65cf09a240c3b2b76b676ba20c1734ce4fa7ea05b308dee96"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_population_relative_rbf.py",
+    "sha256": "73e39e77fd9a175c7e3fc8d9b2879d564cd214de2c80cda68f389e9c64d0412b"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_population_relative_trust.py",
+    "sha256": "84d629a7d224c51dabe2d8bd962d887debbdc8a7468d72c20e0255134d08150b"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_terminal_population.py",
+    "sha256": "21ecfc9dd88ec737bc23d00cc238bd9eef1c2fbdefa5a2b9bc2803e4fccb2174"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/rdt_libero_action_converter.py",
+    "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/rdt_libero_obs_processor.py",
+    "sha256": "5b6f3857be13254e1d2266270f57199578dbc4066566265b147d91cc30bb2d14"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/rdt_policy_steer.py",
+    "sha256": "cc892eedbad6d40cdf16ff7529ee0aaf54e8e5568c728e6c3cca4eef72d57ea4"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/render_phase_diagnostics.py",
+    "sha256": "5c347b7988056de384f582b0fe12e4dc32d1999577812c83205925d02339804c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/sam3_segmenter.py",
+    "sha256": "e3f3cdd5a970b738ffcf17c7fd765041195d1b9f40a1d2b3809c1459cb5dce81"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/sam_refiner.py",
+    "sha256": "fbe8a642294895773a3aad1a5e4a9dd21b2af1ad0b09e6d89cecb94b171ad909"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/sam_segmenter.py",
+    "sha256": "c4e243d22adf3becfaa1f94f33e9ff05c1e2962899de4e11a656d2ffb16cb8bf"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/audit_decision_evidence.py",
+    "sha256": "17a63b0378136f00ba0941d28ffa0320b005b26888a3711e567b9002a42f809e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/audit_gripper_parent_rescue.py",
+    "sha256": "546ed6c7579b70fa6e99fb1525f144fb500b57ea9e3694af517434769f09ab68"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_autoresearch_runner.py",
+    "sha256": "6ba743a67d220eb38bce10e9748245de9699ba277e7c51db4daf46234bc1f202"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_autoresearch_v2_runner.py",
+    "sha256": "799fa07ea33af682f40c7d45cc75a443d94ee4de283d833813eec773a4676626"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_autoresearch_v3_dev_runner.py",
+    "sha256": "7a439fa9dcc781440ff0f843a955d1d3532bd6661960379c04eb4a8c6d76b55e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_autoresearch_v3_runner.py",
+    "sha256": "4feefcd165ddf4073a8ff23c4a993a1c4b801bd01a83e5b7cd622a2b1ae19ea0"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_autoresearch_v5_runner.py",
+    "sha256": "15f4d0ee4a4e5586a688a8e2c71f5c20cfe8e7e9748cfb166766a9caa39e3168"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_degenerate_fallback_preflight.py",
+    "sha256": "6bd193516e39f4175662ab312d1b75523957fe7b5532e85492a3e0c5dc43a4ad"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_global_quality_anchor_diagnostic.py",
+    "sha256": "b70d659f6c92769739d0d6c67c9d85275a851b285ede851a63a60fb4c5ceeb1b"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_global_quality_anchor_preflight.py",
+    "sha256": "a2c517a1b3d785cb0f6010bc0f78ddb3732ffcfb75a579a51d92782e215fb04b"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_protected_quality_lane_diagnostic.py",
+    "sha256": "579abbca7272141122ffc5ce1486bd9cb9851f7cbc5f6bdadbcfd561312285f0"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_protected_quality_lane_preflight.py",
+    "sha256": "163dcf3dce67ce457fbceb75d6cae191e070eb382ee035c3030aa337a2907fc1"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_quality_selection_calibration.py",
+    "sha256": "18315b181b49bb61a6f0a743cb76075e688150527374d61b29580c5f8375f859"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_qd_within_cell_aliasing_diagnostic.py",
+    "sha256": "58771912ddb5578845b6d68f9e17ff92528a093c3c5d161cde634fa60ca644e0"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_quality_diversity_audit.py",
+    "sha256": "7384ffdde3d5e22f650e27463f7aa7cad40d86627e4113aca0faf9ab0f084d6f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/eds_quality_diversity_runner.py",
+    "sha256": "fd60b70d999239ec446039d17322acf98107816a428b1cb2a06531acb4ebce05"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/p2_direction_normalized_rbf_audit.py",
+    "sha256": "94ebc9f80653763c22b8861d06e29d91c7faec884d3a1ac46d6bce72c6c88673"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/p2_direction_normalized_rbf_runner.py",
+    "sha256": "700019bfbedf04c4b9b070ce778b10c965692d42da738ea42df0e2dfb2e0d6be"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/p2_rollout_clean_tail_runner.py",
+    "sha256": "65ccccd3c25a0271509fbb7b131e81f475fdaca8e2aaf35408cc809ccd0b801e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_audit_backend.py",
+    "sha256": "893d5c0194859bd74202c1afd0ba13085e9cad563566b4a79f616c79235b053d"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_available_gpu_queue.py",
+    "sha256": "0732ca69ad8e8ce916926bdd839aafce51e2451b418d2d9903fe24e2335c2d23"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_codex_launch.py",
+    "sha256": "91101e37e4fab893d9a8de32b3ff5d910a08fc30caa049e69e4b6a5ffd2127bf"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_executable_behavior_diagnostic.py",
+    "sha256": "178e5997564c92e46034a36afd47d631caf6b7b577de9234bf974e3c991cf65b"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_execution_intent_replay.py",
+    "sha256": "b602818b3753c6110d2baf9c4d2e9fed5a23f9456829c71912e425bb90280bf1"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_final_report.py",
+    "sha256": "1e5ced6f6406ed4fd77f28c621d948ff111fcc2efc084dfdd1320366f41ff918"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_final_runner.py",
+    "sha256": "01ce94feae572d3a631e153346b26e622ff8c3c38259b29dd77620c9a0c94e83"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_gpu_probe.py",
+    "sha256": "0d9497b9780e91cb5174cf201917dc6d128eaac08512180ff527faef7dfcb07e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n11_dev_contract.py",
+    "sha256": "ea9089b138f6cf088101e1ae47262240de6bea1446ccfe8b1ecaef8e9474bf64"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n11_dev_prepare.py",
+    "sha256": "9957aada526417e767d0f6aca65a52e9432368c2fe95a3f9152c4a1d3bb7be49"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n11_dev_resume.py",
+    "sha256": "3b4312137b2517f31de272a91c15c49a2b07d213ff885d2b831ef59ffe73338e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n11_dev_resume_prepare.py",
+    "sha256": "8cf5ce7c16ce307350a819bc2607d9e95b53ca838df4c6afceee873626e74073"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n11_dev_supervise.py",
+    "sha256": "5afb4a1b96651a7a00a943590aeccd8277a824e4ef1d3021bb412b9c2445ac1e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n17_prepare.py",
+    "sha256": "305f984c357f406cb38e9b0fc3c5fba186070ba773a321d9dee2a695f508cddd"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n17_supervise.py",
+    "sha256": "df625d43940eac0c646a609e48f69a65f2c6f7df8f05584d85b92780c8b34e26"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n18_dev_contract.py",
+    "sha256": "636788b21f9ee87e1cb9b6a4c1f20e9b70eec43f31c0890210aecae2d73b531c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n18_dev_prepare.py",
+    "sha256": "901c9f746a63edddacf682da98f3adbc62c4d1e627b7267de3aefaf936ed54cd"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n18_dev_supervise.py",
+    "sha256": "f2ed42a608f664db9f8005c69a58068ec4396303e4cf3d0406f1e869223bad2b"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n18_gpu7_prepare.py",
+    "sha256": "02ec70f00b59763e7f969683ce70c617c6c968ae07568aef1891972d21ad1311"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n19_dev_contract.py",
+    "sha256": "a2319e9f45369854f1785735c9b1002f36a57da8341ad163bcdc9787cca2a717"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n19_dev_prepare.py",
+    "sha256": "79cc78efd1165919fa4f0948d301ae533152e2b8ab5aca0946f57c6ee4e83fd7"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n19_dev_supervise.py",
+    "sha256": "074bc3c33afb7b4499e095205f4f6d0a1f77739edecc4cc1b6935aefd6e611e7"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n20_dev_contract.py",
+    "sha256": "56853a51aada1329fb822b0e03d26203ed6394c0212d421a69c3faf1c92f7abb"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n20_dev_prepare.py",
+    "sha256": "6dda1ac0020785782a31a652b5cf2363882f0cac4dc045f61b2fd8ee226c9427"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n20_dev_supervise.py",
+    "sha256": "75ccf1ce820d1f79a557bb70d1aa5fea1701eafe3e9c356a9659615d10eef04a"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n21_dev_contract.py",
+    "sha256": "133a82e8b490562956a456ddfa13c1323f721be37f8162299faf006755f85eed"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n21_dev_prepare.py",
+    "sha256": "06f3daddaf83bb7090703c27d6ba0bd66f82339813982e2cbefa7fbe37e38296"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n21_dev_supervise.py",
+    "sha256": "de53e42a9cdc5c4ea0406c802fe80d39ab852b61c2b3970869238d44a89d03b9"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n22_dev_contract.py",
+    "sha256": "817a9a19a26d15838e9d98cede9ca853a667d7cb871d7891f59775526150393c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n22_dev_prepare.py",
+    "sha256": "d77ea1e4b6272f395674935a55dfba45496ba93371ae20684f48f934bd48537e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n22_dev_supervise.py",
+    "sha256": "5f95d5feef83f751fd78e31dc1d681504ee8af17f0c0ab6379e4050b3dc0fabd"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_arithmetic_repair.py",
+    "sha256": "b9010ebf9a699c7c046ff04ff3ac67b4fe5239764ae9ea745b9ed1a47f3ba9ca"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_backend_preflight.py",
+    "sha256": "fbdd30ac1864ea9d282ce849f45faddda4738c6a5f092351e08bd0d2d13795be"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_backend_prepare.py",
+    "sha256": "42b8942557f4420f248cd6a95a3836dda49b09958d8bc842025aaf628538b0b7"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_dev_contract.py",
+    "sha256": "0dd332174a5e2a605638e7be4791f8326203e98509bc09b2bbddb9be3c8c6930"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_dev_prepare.py",
+    "sha256": "61db29dae6194c699581221108164ac36266b1ae9469f8f871b9a6e47f8bd125"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_dev_supervise.py",
+    "sha256": "629b22ee6389511ba16993b674e0ad28a743644b440c7be273564f2acd7095eb"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_preflight_admit.py",
+    "sha256": "0394fc287196a0042130e0b31af09d6341d84cbcbcd66eadc919c7d167970aad"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_uuid_native_repair.py",
+    "sha256": "362707b2b13b666b1b73576515dd582cd5aa1e751228744d30e7651bcf520ac6"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_uuid_repair.py",
+    "sha256": "b48536663157da25ca996a2f4056355e2bf8a2aa185fd2e962bc80ed47192471"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_v2_backend.py",
+    "sha256": "e292b54f83842526414f297cab8875102a11992a00d9424d356f2fa8f02cadcb"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_v2_contract.py",
+    "sha256": "40492aec2aa88b0d0bb3595e8a47b9561bd919b76a6048d1b14278b173832a02"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_v2_predecessor.py",
+    "sha256": "f4ecc06186e303c2fd9375df17b784821a0e03bac48f9b035fbb2a4771714956"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_v2_preflight_admit.py",
+    "sha256": "be1f612432c71a2beb7a06554e7dad8e54c7212f103838ae4d5454dc1c0f26c7"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_v2_prepare.py",
+    "sha256": "8563c7edb6c4186b5c9b099bef1bf7be0165750486fde5869f3281404eac88a8"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_v2_recovery.py",
+    "sha256": "88457287d2621836324cd881d185b60bb60274d006cd01564f88dfac9f9a20fb"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_v2_supervise.py",
+    "sha256": "d04177236bc068f038a41b57ee07be1691e8a9c290fc4ba70e7c383acd1ad67d"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n23_worker.py",
+    "sha256": "cab2017efbb53410320995d1871e9bc49618f7be6de5893d73fe7a33c093d73e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n24_bridge.py",
+    "sha256": "30f8750ef22a81b596f9881c417b620c0c8cb7ddaadbfe110731c7802fa2520e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n24_contract.py",
+    "sha256": "3fdd1fbdb7e8c44250f4c3138a77157f86134fa0174b018f16c9318dd31dac85"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n24_native.py",
+    "sha256": "0e093f65dc6274d7ca7e5fe35bcb305a815c0b943f7f0ad2460db530a23ecb7f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n24_prepare.py",
+    "sha256": "4a0a53432d7a8f5d0b922c22e806e22852b6468473f587d47e6717840d44b8ea"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n24_recovery.py",
+    "sha256": "fe46eb25ac80ad557ca66e9501ece3ebec5799a57218aee08976365241a33378"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n24_report.py",
+    "sha256": "4b321e29d69718bf641448cdd251493acdf4a4d255adc83e69bd01767360c58f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n24_supervise.py",
+    "sha256": "758714905a75cf1922fe67256240482c316b073f69ce9efdc426e2e635fea0c6"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_backend.py",
+    "sha256": "9161dc40beba7e26a0932f64ba8036a3946727b2a03817ecbb64e0b7c079a7ea"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_bridge.py",
+    "sha256": "46999b04dc86621ab08e16d7fbb90c2d91f5136de09b499b3b4ea334d6efc942"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_cont_bridge.py",
+    "sha256": "2a7a535ba0838dd10ff4dd2f3beab725ebeeea2936be918104ae8fbe241c0546"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_cont_contract.py",
+    "sha256": "51cbe762bc38da98237aad3154ca7641e4b53805729b09958309a96cde9dc6de"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_cont_downstream.py",
+    "sha256": "60a27a867c4a0ed4921d7a86cdbd333a5439d2b0eb497eb503743adbf9427832"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_cont_evidence.py",
+    "sha256": "9bf4b8ce97e0f36ced03343f475a2f61913e1da2dfcf8ce3249615b08680b657"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_cont_prepare.py",
+    "sha256": "1346e124b94a4e34c3e886d143015872961c7ac84c0bec59057d1c2d763a3197"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_cont_report.py",
+    "sha256": "e7653fee42afa39742b1ad74f47ada4ac3d39fa73a9877ae78a16192694ea55e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_cont_seal.py",
+    "sha256": "ad9d56fe38aacecb50b9e36e55d9d8c71fd1a0f0a0b503418b3cfa32dd866154"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_cont_supervise.py",
+    "sha256": "b8cebea5e017b1479e5bde1c06f26f6f8df47821bb76636c9d390e4c66d4dce9"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_cont_terminal.py",
+    "sha256": "3f58a9e7e97453f65c5a184bb0b8597a4a5d1a365a63f69875a3e75981e04e41"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_contract.py",
+    "sha256": "5d991948ea897b12eab87f9d86de776dec350aa06c11e44ee2e1ae6d1c9fdd67"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_native.py",
+    "sha256": "ac0343de4af16d73c53b2bcff368598f5ed42bfaaf3eac3d9a2be4dc296d0b1d"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_preflight.py",
+    "sha256": "21aee372178ebb28242066b8788093d888ee7fbaf69468be7bfb5a5667e2c564"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_prepare.py",
+    "sha256": "33be58503e69d19e12ae95b390919549680c56e706d6fc80bf581faffe5abe20"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_recovery.py",
+    "sha256": "f6b2ac19be3a53348e83a9e098324bd72823bbdf0fe28350fb1f1203c8f50ffd"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_reference.py",
+    "sha256": "dd100a41021eb84b6a279d7dce8789eb65b53e04dc0a4df4df301abc1d241b3b"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_report.py",
+    "sha256": "eb37f2e3742d7dfe3fbaa512034b288985fa9b150e360b3eedc48a84cf7fc6a3"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n25_supervise.py",
+    "sha256": "f3fb5547a6b8c02a020de129de4ba7f34fc3b82c5886b9350050b2c14935026d"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_backend.py",
+    "sha256": "53970bca912aa8d413fae17ca9e9df243e6f8538344d7448f5efab387b1e4062"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_bridge.py",
+    "sha256": "1a9354faecf3a182f27187666beaf22e8e560727a2d4e3666bce50be55283fc7"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_contract.py",
+    "sha256": "e7a58c965f635062ba72a81acf2e84c26bcae735ca6b580862adae426d4d299f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_logical.py",
+    "sha256": "d5fde7a827c29a4e60789947701f4abb079e80399e45de69b6f1f1f877f6c7fe"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_native.py",
+    "sha256": "7454ba0be79e9568252f2d55e2ec3a96da7e81d3030b71b42a8eca8104eabf62"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_preflight.py",
+    "sha256": "b0afeb217f7a25ea06f82d3915808d4a1cd8fd7520fe1deb7baa058ba48461af"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_prepare.py",
+    "sha256": "21e0dcdcde7f813b8afd5a35a10a490c29f7c41ea788132f8457145e1ba09b11"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_recovery.py",
+    "sha256": "ef00fdbccd520d073638f50eacbfca8863f83c42fda8b9096c06db9fbc92a1fc"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_reference.py",
+    "sha256": "84269ba38075ffd423638282700026657fb2525dadd5761f824b515ebceb84ee"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_report.py",
+    "sha256": "d0d37c3fcb751c674316c255834648eddf11cacb98e3cddb7c0f17576e600ec5"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n26_supervise.py",
+    "sha256": "57dfae9e54d0087d233f8554dd432bef12f6cf076728f28ee97f7e38c3cf7772"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_backend.py",
+    "sha256": "a79f2188c98af91559120720626f9be066632bac916891f9cd956e3f63cdcf4a"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_bridge.py",
+    "sha256": "fde7b883cea9af0ec5033cd97d5813dcadac9f1d7d3d8a6fcc36baf90f06ad9f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_cont_bridge.py",
+    "sha256": "ee9e66ae423a0a33fc1f959321678fb04eba027ae2bfc81b43c7ba1e63686ede"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_cont_contract.py",
+    "sha256": "cb0fff8574c8d63b0cb20150136ea65db31190f13f9ec2c52c8395830d8ed009"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_cont_history.py",
+    "sha256": "cc1f9e0d870b53cd073375fbbbda41f622b86b5e34dd7173fddbc773b2b0c363"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_cont_prepare.py",
+    "sha256": "754efdf7736076524493f99d85cbb7cbb6fe500312990d41141daa3309ecfea5"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_cont_report.py",
+    "sha256": "354c7a5e8dc856d6e5163039a44960aab8e84bb47ad069870d3e20cf80b66efd"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_cont_supervise.py",
+    "sha256": "556fe562c77b8ca15e6ae0df8288bb786cb1ce662514a7c57dc62e13a304ac69"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_contract.py",
+    "sha256": "badfdb4225cc0a2d4ccc94a29d4e2deb4add0a4a85e2d78e8157b17261d84bc6"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_native.py",
+    "sha256": "76cf758a5e14786a6a168968d5099ae5fc5822fbd15eca3f47c582e6e2c536d2"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_preflight.py",
+    "sha256": "0ef5cecfaa13de0a5b3ddc543fc70c8ed33a56a2f0ef98abe33809a26c729526"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_prepare.py",
+    "sha256": "fc672cfced254208991a7009d11003432510f9594e01ec31b6107a6d5bca035c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_recovery.py",
+    "sha256": "56ae0d5b8dfc29a577115c2b3366a986ca61ce49aa04182dba20a3b801688284"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_reference.py",
+    "sha256": "b6f265f961b4592177cac016f5773f3a1484e0b84544b6a7bca6205e5bb45d63"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_report.py",
+    "sha256": "10a219ca45103ffca9efa173ca8fee07d8b519e386404d1597850e4fc1964f5d"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n27_supervise.py",
+    "sha256": "373f9e1e3d04e9417b3f2060dbfd28a9b9d06247e38189ef2448d7f1b51342cb"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n28_backend.py",
+    "sha256": "67e3677516b1742550888980389e1e194c1e1e9789f0d570896177a0129a7138"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n28_bridge.py",
+    "sha256": "d0760386b16a1206f8b3b2935ac3e2a511fe5f30b57260bb999062cc733a7333"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n28_contract.py",
+    "sha256": "da47c2d1df6484e388bdb898ab9be3b16bfd36b051795f2a043f07efddeb266a"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n28_native.py",
+    "sha256": "7a3c67798d59aa993e58c55d2376e96fe48da68170184288e8c7fecd635edac8"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n28_preflight.py",
+    "sha256": "ecea7d8418d2668ee1cb9322b6cbbd7f51d607ed5755c01f86327dbd5db07042"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n28_prepare.py",
+    "sha256": "129e978bb898eb66d3101d87486c8c7a3e67ae1f4661134190e7b00d926b9554"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n28_reference.py",
+    "sha256": "ac66299b581d08332beed3a209a16deb85d5f67b90eaecc9818fd430c3e82e52"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n28_report.py",
+    "sha256": "b969092fa201b0221687b64dababea7b9cfa774535bf3e583ac1d68a9c2ad1fd"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n28_supervise.py",
+    "sha256": "c2ad89ac6abd751511db9a969095a95ac6cb3336a07a69f63042af83c50e3b44"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n29_backend.py",
+    "sha256": "9f87ccc7d610c9683c12f08e9b667f5fe38a3136ea7de5d4b0c2e60bccef3ffb"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n29_bridge.py",
+    "sha256": "b275b3e362470b411a2c66514cb7e157ac2fe1e592f4ec363533775cbedcb584"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n29_contract.py",
+    "sha256": "2b8173697acb7f59259f5a16408ea9ae7c4bd31efa8378403c62c3bbc15a7705"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n29_native.py",
+    "sha256": "e8db27d975d775a12a11aa679c28761970885590a4e9202d1720d31b0d05fe54"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n29_preflight.py",
+    "sha256": "0ee04e1619cd13737126eec274e270283d23deb08d5a1db15d5dd67864e5084e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n29_prepare.py",
+    "sha256": "a84ecba06830b87815c1aaf0cba3cb8bf25bd8ed2e87e653db2005077ecfdc18"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n29_reference.py",
+    "sha256": "3a6c500fe63f783eb4a76c76421ed7b261dcc9e9db32d3eecb8aac81926b80ac"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n29_report.py",
+    "sha256": "49226fa1b25f6376e317a1cc1861ebefa2af5489e6929815b22bc7105c9e770d"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n29_supervise.py",
+    "sha256": "a0456a16987bbe83545881505a352599e1c1a167f636d6c4e809b61d873fdc5e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n2_plan.py",
+    "sha256": "cc39d7846a286f38de314dfa7a7b1a9f6d08e84792e20fee9ff2b84dac454ba1"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n2_supervise.py",
+    "sha256": "bb1d7e6ea07ceb743eff3710b0d3cb3882af2ec66a6e1e8b1491f12a4459ab02"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_bridge.py",
+    "sha256": "8cef986f854917a3760f6035f00bf07ae5ac9aa92f2c8252cd54cd5cc266f785"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_contract.py",
+    "sha256": "ff6da4797d39801d1c2bf1068e7a179114312da383c97d8a06a6be58bc480861"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_native.py",
+    "sha256": "c7d8c779f977aaae61976b33d9b52cec5fb068913896f6b09a0d8abecf8067c0"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_prepare.py",
+    "sha256": "4f9117c9a21d02372d5034bb0311e8174dbb0b4d70f576e368651b76c121f906"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_r1_bridge.py",
+    "sha256": "3abb8884a6b6a4c65a2f378626a4f740f1976b36c02bd17e1c5035406147aaef"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_r1_contract.py",
+    "sha256": "591b9cc00cae5ab352720badde73babb20516ca41f4754e59053432c23a2157c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_r1_prepare.py",
+    "sha256": "39da9842a022fc2b800d39a5b868ff0c8792f6d7c39b3d54d95a6f76f4a2b11c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_r1_report.py",
+    "sha256": "400ab6567b99c358853c14bedfb106b9fe3d82904b22007bf424b5c8786c9e9b"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_r1_supervise.py",
+    "sha256": "27e849273642cd3591e0ff7d563a539b8473069416f5d5ae876c3770f113ff02"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_r2_bridge.py",
+    "sha256": "63ca853d5a6fd5ee602e8b04943fbe8bb4e61d10a10503797b4a973c5b98cdaa"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_r2_contract.py",
+    "sha256": "30ca75f543e5bd705b15b9108e97f367897f2b137d854339cf2658547a51d922"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_r2_prepare.py",
+    "sha256": "723571d6559c76a532dada2b4cb629dd9884868378f3cf7a975542678fc0e944"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_r2_report.py",
+    "sha256": "9385c8f7f731f02dcae1cc9142f739b87191a26d3d973c3de848114e51e2354c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_r2_supervise.py",
+    "sha256": "70844fef7e90f9142e85fed56f4778370f14d40afbdaaf10cbb98011fd18f8cb"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_report.py",
+    "sha256": "f1b9f5e0afc0efce4b44fccbf282a4a72c723d8a7dc5504ccefa6883ff4f024f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n30_supervise.py",
+    "sha256": "aa39b1aca018e3d4fd21b311d6446a124fd48660f51c62fde2ca36987728a663"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n31_bridge.py",
+    "sha256": "b7a3b80690a6cd619d6116fa0c274ee028cce5f12ea25dff325344db8e8431e7"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n31_contract.py",
+    "sha256": "209492d6dfabfc058dfc8b36541a1bb94e363c28a232839d90c70cac310a147a"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n31_native.py",
+    "sha256": "d968c109cf604fbceff7065f6de0873484d86afd2b2b23fa95c7b435c84e1f7e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n31_prepare.py",
+    "sha256": "9110ac67dc5eb6f87fe8ab200fb737f17fcba6ee2c98917ad95a3af22d1cd288"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n31_reference.py",
+    "sha256": "6cda9a87566ec4e7dfae301fbf9c618d6d8fc0872ee4f8dbd46179ccaea580c2"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n31_report.py",
+    "sha256": "11c8422c4e2d26a1673372935b1f91d239bd15790c65074cc204282112489d1c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n31_supervise.py",
+    "sha256": "7c2b3f5a977414c3bded7d2da2f5ff0034fed1a9f0e26082dc6cb5e35603b756"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n3_plan.py",
+    "sha256": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n3_report.py",
+    "sha256": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n3_supervise.py",
+    "sha256": "e71f3297adea4a05b43bfe2cedd12cf47d849d3a0c5cd55858cbc28da0de0f1f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n4_plan.py",
+    "sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n4_report.py",
+    "sha256": "d26769d73e43e6b10b8171f6930604bc510d15b26174ca3a767bcdf84a72c2fb"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n4_supervise.py",
+    "sha256": "b6dd9224cfaf3066ccd40dd9abe51c93fe8fafe1018329a85c3a247ba74dd877"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n4e1_plan.py",
+    "sha256": "649449da2be43661080ce39f04f37fb5fd06e12360020937aca02da6d782f1cb"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n4e1_report.py",
+    "sha256": "69899bc1869d48c186a906a60d6d2d3d65269016d72c6914d60e4c3f19cc98ac"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n4e1_supervise.py",
+    "sha256": "6db2641a51e093d9c6b07afbbfed847256be8d22d55d8a2d5d5aa30f942ad41a"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n5_plan.py",
+    "sha256": "0c2f31462d733329f05548cbc700308113d479a505511bd98ecf297d177c8a75"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n5_report.py",
+    "sha256": "862789e1c685dcfa665f4c71c82d480595610f70e5e27faca1ce510868f54df4"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n5_supervise.py",
+    "sha256": "08b0bf3b8b276320889f652ab163d6f90acfbd440f9a7b2e6992159b44e3db95"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n6_plan.py",
+    "sha256": "05d64e3f51c8a60761ca352e6867271fba5ff8d0a61afff166c5db9bb267c16c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n6_report.py",
+    "sha256": "9308fe08a141a2031a1ba026f652b8003bb82a812b4d385ceeb4ec9fddddf89a"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n6_supervise.py",
+    "sha256": "cd6e285760a8a48a4241f3e2bc5bbbdc0a27abb199e104de6b3207bc3aebc7ba"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_e2_passive_diagnostic.py",
+    "sha256": "7d7dfc949db84256ce26549eca98700455b7aa385b4bed23df8efb645b635c7e"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_e2_prepare.py",
+    "sha256": "2b5eb11cf8175e39e222639a410e4e37828c106a5c7fafc656491f44dc9bdbce"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_passive_diagnostic.py",
+    "sha256": "d02f511dc1699a87bb8a35800fa942fc7f50a5e78fce4244772727a274ce816f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_plan.py",
+    "sha256": "a43286525551bee70ef1b8de5fc44c8754f5b893820e0895fd93b9a76af241e3"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_report.py",
+    "sha256": "e6a31048828d8be04eb422907f1f99ef6284e0aeea4409e1eb52bde279a02ffd"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_supervise.py",
+    "sha256": "f6639cdecc637594d5f8cf1a443ac0eadba9e4c57974e213a15a6cea59e0946a"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_validation_continuation.py",
+    "sha256": "c5b4872ce8b3be66a57309b89183f0b67ca1f98444188b1dc339cd1817a7ffe7"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_validation_continuation_report.py",
+    "sha256": "1cde8fcbc01bf2d80fcf5bab0ecaf214f377f64923655c0a047e21f25b22dd8f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_validation_continuation_supervise.py",
+    "sha256": "8541b4f094ff06f4aa7d2f2b4c6fe4034a3a44c17fbf3f9445cf30cae5a2f2f0"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_validation_plan.py",
+    "sha256": "bc2fa3fdc377d62d7d92b85ec0a657c90b45ffd8f51ccec3749c679208366d28"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_validation_report.py",
+    "sha256": "3afad0ca67718c8e1a0a2ac6f401fe85622c14747cc7798c4bc0bfb541cd703f"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n7_validation_supervise.py",
+    "sha256": "2bd8d8305cbb6d6c27ee8ad1e7a362788730dbe45bceceaa35b9c18cdba3b260"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n9_plan.py",
+    "sha256": "3184521a31cda86ab4ea70eef78c8284d66a9fb95e09061cb4c4f8e437efa750"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n9_report.py",
+    "sha256": "9d09634189c23cbe4647c37e8b83862d075d8d25334edf0a53ee672b2038f030"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_n9_supervise.py",
+    "sha256": "f60310b3df52e077772cdbbefb0c5d6b76030e7d2f68557416a0ff5379a8c184"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_native_probe_queue.py",
+    "sha256": "79d6153175248459e647989a7faaaf2a216377e7296c9960ddb0cf3f5e4c94a5"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_poe_launch.py",
+    "sha256": "86ecaf3d0d1454613ee4bec1337dca7ed81d35ce59cfda1e62d7839a58e39b82"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_policy_native_probe.py",
+    "sha256": "1ddddb7f72ea2dc2d297b3aaf9e80af47944f49ccfcb9d73c097ebe97880be92"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/qd_ed_runtime_setup.py",
+    "sha256": "ad05efd769034d3f9937aebbba10abc16039a5f1b5026e6bacd808e13d717a9c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/rdt_eds_eval_runner.py",
+    "sha256": "16c7b2cbc16da33b8792198b7ec6717e1a34a159e2a88634c83e52dce5cc311c"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/rdt_eds_mechanism_pretest_runner.py",
+    "sha256": "0a2d060780b68cb6c63b54a93668f5b61ed597107031b25e1bd2efe1a0c7f9d8"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/scripts/vls_pi05_ood_eval_runner.py",
+    "sha256": "f6e92c329d1717759445ad00f51e266954e2526eb40dd0052b145c39e3ffdd66"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_n31_admission.py",
+    "sha256": "f2e18781d58c9b25150bcee058c308fd0c49ff1ad6ae804ca2df158372a092a2"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_n31_budget_reference.py",
+    "sha256": "197b8ed3468ac5cede0c94ace361697fcc7f60f76f34e614e3f6500a0aae1df8"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_n31_capture_dwell_integration.py",
+    "sha256": "0d3464afe0dc68e0386cded4fa31ab9f50deb01dc3ec19846b344b9db5f39c72"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_n31_controller.py",
+    "sha256": "7f43cfabbc8b8862afa36370c2a6188236dfd8072c398e2cfcbf1abaf18b41c6"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_n31_native.py",
+    "sha256": "316261b005309636f471fd0ff5254a9986671007646ae358f69254a439a54e27"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_n31_worker.py",
+    "sha256": "cd7e14fa883a640bbeb8e5275b21c8ffd6c7311f47e413139783088096428284"
+  },
+  {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/launch_phase_c_cpu.py",
+    "sha256": "10d53a07c6173f712d42b94e891297f9705b81181687fcfac9cd969994340211"
+  }
+]

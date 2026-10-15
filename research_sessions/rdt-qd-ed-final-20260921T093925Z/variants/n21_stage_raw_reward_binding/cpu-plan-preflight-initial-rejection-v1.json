@@ -1,0 +1,9 @@
+{
+  "schema": "n21-cpu-plan-rejection-v1",
+  "preview_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n21_stage_raw_reward_binding/plan.preview.v1.gpu7.json",
+  "preview_sha256": "3096229b6d84eb4993d91b966b67155e406160165b3a653951ebd42679361d98",
+  "reason": "E2 Stage condition requires its dedicated prospective cohort plan",
+  "cause": "N21 missing from global recovered-error and engineering-condition cohort allowlists",
+  "gpu_dispatched": false,
+  "budget_consumed": false
+}

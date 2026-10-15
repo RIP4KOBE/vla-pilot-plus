@@ -1,0 +1,12 @@
+{
+  "schema": "n26-static-layout-note-v1",
+  "recorded_at": "2026-09-30T21:33:01.968306+00:00",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/rdt/models/rdt/model.py",
+    "sha256": "85ca164af0cf97678fe2a6f2e771b4c743ed41dfdf7c24b7b6bf747f14d23ad3"
+  },
+  "source_lines": "final_layer then x[:, -self.horizon:]",
+  "static_implication": "A model-like synthetic layout is (16,67,128) contiguous backing sliced to last64 tokens: stride(8576,128,1), storage_offset384. Adapter returns unified output unchanged.",
+  "actual_runtime_layout_observed": false,
+  "purpose": "Exercise the already frozen N26 CPU noncontiguous-output requirement; no model import, outcome/tensor read or scientific change."
+}

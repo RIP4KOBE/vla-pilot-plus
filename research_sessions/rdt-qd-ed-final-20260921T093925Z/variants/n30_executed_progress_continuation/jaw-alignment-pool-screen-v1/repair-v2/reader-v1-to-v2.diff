@@ -1,0 +1,259 @@
+--- frozen-v1/calculate_pool_v1.py
++++ repair-v2/calculate_pool_v2.py
+@@ -1,24 +1,25 @@
+ #!/usr/bin/env python3
+-"""Fixed two-pool N30 point-alignment screen. One CPU decode; no production imports."""
++"""Manual recovery preparation: actual archive elite pool. Execution disabled pending exact root release."""
+ import os, sys, pathlib, json, hashlib, time, resource, signal, stat, io, zipfile
+ import tempfile, collections, traceback
+ START_CPU=time.process_time(); START_WALL=time.monotonic()
+ os.sched_setaffinity(0,{0,1})
+-resource.setrlimit(resource.RLIMIT_CPU,(120,120))
++resource.setrlimit(resource.RLIMIT_CPU,(118,118))
+ resource.setrlimit(resource.RLIMIT_AS,(16*1024**3,16*1024**3))
+ for k in ('OMP_NUM_THREADS','OPENBLAS_NUM_THREADS','MKL_NUM_THREADS','NUMEXPR_NUM_THREADS'):
+     os.environ[k]='2'
+ os.environ['CUDA_VISIBLE_DEVICES']=''
+ import math, csv
+ H=pathlib.Path(__file__).resolve().parent
+-INPUT=H/"input-manifest.frozen.v1.json"
+-DECL=H/"measurement-declaration-v1.json"
+-MANIFEST=H/"calculation-source-manifest-v1.json"
+-PRIOR=H.parent/"approach-handoff-review-v1/decode-v1/result-v1.json"
++INPUT=H.parent/"input-manifest.frozen.v1.json"
++DECL=H/"measurement-declaration-v2.json"
++MANIFEST=H/"calculation-source-manifest-v2.json"
++PRIOR=H.parent.parent/"approach-handoff-review-v1/decode-v1/result-v1.json"
+ OUTPUT_NAMES={"invocation-v1.json","progress-v1.jsonl","partial-v1.json","result-v1.json","resource-v1.json","pool-table-v1.csv"}
+ READS=[]; DENIED=[]; PAYLOAD={}; OPEN_COUNTS=collections.Counter(); ACTIVE_PAYLOAD=None
+-APPROVED=False; ZIP_BYTES=0; STORAGE_BYTES=0; TORCH=None; PARTIAL=[]; ERROR=None
+-READ_ALLOW={str(p) for p in (INPUT,DECL,MANIFEST,PRIOR,pathlib.Path(__file__).resolve())}
++APPROVED=False; ZIP_BYTES=11041672; STORAGE_BYTES=10405925; TORCH=None; PARTIAL=[]; ERROR=None
++RELEASE=H/"root-manual-execution-release-v2.json"
++READ_ALLOW={str(p) for p in (INPUT,DECL,MANIFEST,PRIOR,RELEASE,pathlib.Path(__file__).resolve())}
+ DEPENDENCY_ROOTS=tuple(pathlib.Path(p).resolve() for p in (sys.prefix,sys.base_prefix,'/usr/lib','/usr/lib64','/usr/local/lib','/lib','/lib64'))
+ RUNTIME_READS={'/proc/self/maps','/proc/cpuinfo','/etc/ld.so.cache','/etc/localtime','/etc/os-release','/usr/lib/os-release','/sys/devices/system/cpu/online'}
+ DEPENDENCY_OPENS=collections.Counter(); DEPENDENCY_SCANS=collections.Counter()
+@@ -62,7 +63,7 @@
+ require((H/'tmp').is_dir(),'owned tmp missing')
+ tempfile.tempdir=str(H/'tmp')
+ def timeout_handler(*_):raise TimeoutError('bounded wall/CPU deadline')
+-signal.signal(signal.SIGALRM,timeout_handler);signal.signal(signal.SIGXCPU,timeout_handler);signal.alarm(179)
++signal.signal(signal.SIGALRM,timeout_handler);signal.signal(signal.SIGXCPU,timeout_handler);signal.alarm(177)
+ 
+ def write(name,x,exclusive=False):
+     require(name in OUTPUT_NAMES,'output name')
+@@ -131,7 +132,7 @@
+     return bool(x.item())
+ def one(events,kind):
+     xs=[e for e in events if e['event']==kind];require(len(xs)==1,'one '+kind);return xs[0]
+-def fingerprint(x):return hashlib.sha256(rawbytes(x.float())).hexdigest()
++def fingerprint(x):return hashlib.sha256(x.detach().float().contiguous().numpy().astype('<f4',copy=False).tobytes()).hexdigest()
+ def geometry(xyz,target,q,g):
+     norm=math.sqrt(math.fsum(v*v for v in q));require(math.isfinite(norm) and norm>0,'quaternion norm')
+     x,y,z,w=[v/norm for v in q]
+@@ -146,6 +147,7 @@
+         out.append({'target_hand_xyz_m':a,'euclidean_reach_m':math.sqrt(math.fsum(v*v for v in delta)),
+             'point_to_prism_m':None if lower>upper else math.sqrt(math.fsum(v*v for v in excess))})
+     return out
++
+ 
+ def analyze(ep,events,prior):
+     task=ep['cell']['task_id'];pool_events=[e for e in events if e['decision_id']=='e0:d3:s16']
+@@ -162,75 +164,122 @@
+     require(type(ti) is int and 0<=ti<len(points) and same(target,points[ti].double()) and same(cur['start'],pos.double()),'current target/start')
+     tr=packet['tracker'];tid=tr['targets'][str(ti)]
+     require(tr['instance_id']==cur['identity']['tracker_instance'] and tr['generation']==cur['identity']['tracker_generation'] and tid['status']==cur['identity']['target_status'] and flag(tid['valid']),'tracker binding')
+-    sel=one(pool_events,'final_selection');sv=sel['values'];term=sv['terminal_population']
+-    require(term.get('grasp_selection',{}).get('target_index')==ti,'final selector/current target binding')
+-    population=tensor(sv['population'],(16,64,128));selected=tensor(sv['selected_latent'],(1,64,128))
+-    byseq={e['sequence']:e for e in pool_events}
+-    canon=byseq[term['canonical_event_sequence']];score=byseq[term['scoring_batch_id']]
+-    require(canon['event']=='canonical_candidate_batch' and canon['values']['iter_idx']==9 and same(population,canon['values']['candidates']),'terminal canonical binding')
+-    require(score['event']=='scoring_inputs' and score['values']['scoring_scope']['iter_idx']==9 and same(population,score['values']['samples']),'terminal scoring binding')
+-    projection=tensor(score['values']['projected_xyz'],(16,9,3));originseqs=score['values']['projection_origin_sequences']
+-    require(isinstance(originseqs,list) and len(originseqs)==16 and len(set(originseqs))==16,'16 directly linked origins')
+-    origin_meta=[]
+-    for seq in originseqs:
+-        oe=byseq[seq];require(oe['event']=='projection_origin' and pk['sequence']<seq<score['sequence'],'projection-origin order')
+-        origin_meta.append({'sequence':seq,'field_names':sorted(oe['values'])})
+-    costs=tensor(term['native_costs'],(16,));quality=tensor(term['raw_provider_quality'],(16,))
+-    require(same(quality,canon['values']['effective_quality']),'provider-mode quality/canonical equality')
+-    ni=one(pool_events,'n30_selected_native_plan')['values'];require(same(ni['native_plan'],selected),'native selected binding')
+-    require(ni['selected']['start_step']==16 and equal_tree(ni['selected']['identity'],cur['identity']) and same(ni['selected']['target_snapshot'],target),'selected context')
+-    matches=[i for i in range(16) if same(selected[0],population[i])]
+-    idx=sv['selected_index'];require(type(idx) is int and 0<=idx<16 and same(selected[0],population[idx]),'selected row identity')
+-    require(fingerprint(selected[0])==sv['selected_fingerprint'] and fingerprint(selected[0])==canon['values']['canonical_fingerprints'][idx],'selected fingerprint')
+-    decoded=selected[:,:8,[39,40,41,42,43,44,10]].float().clone()
+-    decoded[:,:,-1]=TORCH.where(decoded[:,:,-1]<0,-1.,1.)
+-    for kind,key in [('policy_action_decode','action_chunk'),('n30_decode_binding','actions'),('n30_commit_binding','actions'),('decision_committed','action_chunk')]:
+-        require(same(decoded,one(pool_events,kind)['values'][key]),'selected decode/commit '+kind)
+-    require(one(pool_events,'n30_commit_binding')['values']['step']==16 and one(pool_events,'decision_committed')['values']['execution_horizon']==8,'commit step/horizon')
+-    prior_ep=[e for e in prior['episodes'] if e['attempt_id']==ep['cell']['attempt_id']];require(len(prior_ep)==1,'prior accepted actual commands episode')
++    sel=one(pool_events,'final_selection');sv=sel['values']
++    require(sv['selection_rule']=='archive_global_best' and 'terminal_population' not in sv,'actual N30 archive selection mode')
++    population=tensor(sv['population']);require(population.ndim==3 and tuple(population.shape[1:])==(64,128) and 1<=len(population)<=16,'variable occupied archive pool')
++    N=len(population);selected=tensor(sv['selected_latent'],(1,64,128));idx=sv['selected_index']
++    require(type(idx) is int and 0<=idx<N and same(selected[0],population[idx]),'selected archive row')
++    fp=fingerprint(selected[0]);require(fp==sv['selected_fingerprint']==sv['selected_canonical_fingerprint'],'selected fingerprint')
++    sn=one(pool_events,'n30_selected_native_plan')['values'];require(same(sn['native_plan'],selected),'selected native plan')
++    require(sn['selected']['start_step']==16 and equal_tree(sn['selected']['identity'],cur['identity']) and same(sn['selected']['target_snapshot'],target),'selected context')
++    require(same(one(pool_events,'policy_action_decode')['values']['selected_latent'],selected.float()),'native to FP32 decode boundary')
++    decoded=selected[:,:8,[39,40,41,42,43,44,10]].float().clone();decoded[:,:,-1]=TORCH.where(decoded[:,:,-1]<0,-1.,1.)
++    for kind,key in [('policy_action_decode','action_chunk'),('n30_decode_binding','actions'),('n30_commit_binding','actions'),('decision_committed','action_chunk')]:require(same(decoded,one(pool_events,kind)['values'][key]),'selected decode/commit '+kind)
++    cm=one(pool_events,'n30_commit_binding')['values']
++    require(cm['step']==16 and cm['execution_horizon']==one(pool_events,'decision_committed')['values']['execution_horizon']==8,'commit step/horizon')
++    prior_ep=[e for e in prior['episodes'] if e['attempt_id']==ep['cell']['attempt_id']];require(len(prior_ep)==1,'prior accepted episode')
+     pd=[v for v in prior_ep[0]['decisions'] if v['global_step']==16];require(len(pd)==1,'prior decision16')
+     require(same(decoded[0],TORCH.tensor(pd[0]['recorded_first8_commands'],dtype=TORCH.float32)),'prior recorded command binding')
+     require([o['step'] for o in pd[0]['observed_steps']]==list(range(16,24)),'actual step coverage')
+     for j,o in enumerate(pd[0]['observed_steps']):require(same(decoded[0,j],TORCH.tensor(o['command']['values'],dtype=TORCH.float32)),'prior actual executed command')
++
++    # These identities only locate the final archive rows. Other canonical rows are not geometric samples.
++    canonical=[e for e in pool_events if e['event']=='canonical_candidate_batch']
++    require(len(canonical)==11 and {e['values']['iter_idx'] for e in canonical}==set(range(-1,10)),'canonical identity coverage')
++    identities={e['values']['iter_idx']:e for e in pool_events if e['event']=='canonical_candidate_identity'}
++    require(set(identities)==set(range(-1,10)),'separate recorded fingerprint coverage')
++    occurrences=collections.defaultdict(list);byseq={e['sequence']:e for e in pool_events}
++    for ce in canonical:
++        cv=ce['values'];iteration=cv['iter_idx'];batch=tensor(cv['candidates'],(16,64,128))
++        require(batch.dtype==population.dtype,'canonical/archive native dtype')
++        require(cv['occurrence_ids']==[f"e0:d3:s16:q{ce['sequence']}:r{i}" for i in range(16)],'canonical occurrence format')
++        fps=[fingerprint(x) for x in batch]
++        require(fps==cv['canonical_fingerprints']==identities[iteration]['values']['fingerprints'],'recorded canonical fingerprint')
++        for j,fp in enumerate(fps):occurrences[fp].append((ce,j))
++
++    def association(ce,j):
++        cv=ce['values'];iteration=cv['iter_idx']
++        role='canonical_initial' if iteration==-1 else 'canonical_offspring'
++        site='initial_population' if iteration==-1 else 'rollout'
++        scores=[e for e in pool_events if e['event']=='scoring_inputs' and e['values']['scoring_scope']['role']==role and e['values']['scoring_scope']['iter_idx']==iteration]
++        if len(scores)!=1:return None
++        se=scores[0];v=se['values'];batch=cv['candidates']
++        if v['scoring_scope']['site']!=site or not same(v['samples'],batch) or not(pk['sequence']<se['sequence']<ce['sequence']):return None
++        eqs=[e for e in pool_events if e['event']=='effective_quality' and e['values']['scoring_batch_id']==se['sequence']]
++        aggregates=[e for e in pool_events if e['event']=='scoring_aggregate' and e['values']['scoring_batch_id']==se['sequence']]
++        if len(eqs)!=1 or len(aggregates)!=1:return None
++        eq=eqs[0];ev=eq['values'];av=aggregates[0]['values']
++        if not se['sequence']<aggregates[0]['sequence']<eq['sequence']<ce['sequence']:return None
++        if ev['scoring_scope']!=v['scoring_scope'] or av['scoring_scope']!=v['scoring_scope']:return None
++        if ev['reward_mode']!='normal' or not same(ev['quality'],cv['effective_quality']) or not same(av['aggregate_before_reward_mode'],ev['quality']):return None
++        costs=tensor(ev['costs'],(16,));quality=tensor(ev['quality'],(16,));xyz=tensor(v['projected_xyz'],(16,9,3))
++        origins=v['projection_origin_sequences']
++        if not isinstance(origins,list) or len(origins)!=16 or len(set(origins))!=16:return None
++        origin=byseq.get(origins[j])
++        if origin is None or origin['event']!='projection_origin' or not(pk['sequence']<origin['sequence']<se['sequence']):return None
++        native_origin=tensor(origin['values']['cast_eef_start'],(3,));source_origin=tensor(origin['values']['source_eef_position'],(3,))
++        if not same(xyz[j,0],native_origin):return None
++        return {'occurrence_id':cv['occurrence_ids'][j],'iteration':iteration,'canonical_sequence':ce['sequence'],'canonical_row':j,'scoring_sequence':se['sequence'],
++                'effective_quality_sequence':eq['sequence'],'projection_origin_sequence':origin['sequence'],
++                'projection':xyz[j,1:9],'quality':quality[j],'cost':costs[j],'source_origin':source_origin,'cast_origin':native_origin}
++
+     rows=[]
+-    for i in range(16):
+-        fp=fingerprint(population[i]);require(fp==canon['values']['canonical_fingerprints'][i],'row fingerprint')
+-        steps=geometry(projection[i,1:9].double().tolist(),target.tolist(),quat.double().tolist(),qpos.double().tolist())
++    for i in range(N):
++        fp=fingerprint(population[i]);matches=[(ce,j) for ce,j in occurrences[fp] if same(population[i],ce['values']['candidates'][j])]
++        assocs=[association(ce,j) for ce,j in matches]
++        ok=bool(matches) and all(x is not None for x in assocs)
++        if ok:
++            first=assocs[0]
++            ok=all(all(same(first[k],a[k]) for k in ('projection','quality','cost','source_origin','cast_origin')) for a in assocs[1:])
++        status=('UNIQUE_CANONICAL_OCCURRENCE' if len(matches)==1 else 'CONTENT_AGREEMENT_ORIGIN_AMBIGUOUS') if ok else 'Unknown'
+         signs=[-1 if v<0 else 1 for v in population[i,:8,10].float().tolist()]
+-        for j,v in enumerate(steps):v.update(offset=j+1,gripper_command=signs[j])
+-        def minimum(key,close):
+-            vs=[v[key] for v in steps if v[key] is not None and (not close or v['gripper_command']>0)]
+-            return min(vs) if vs else None
+-        rows.append({'task_id':task,'row':i,'selected':i==idx,'same_native_content_as_selected':i in matches,
+-            'canonical_fingerprint':fp,'occurrence_id':canon['values']['occurrence_ids'][i],
+-            'native_quality':float(quality[i]),'native_cost':float(costs[i]),'quality_dtype':str(quality.dtype),'cost_dtype':str(costs.dtype),
+-            'native_plan_dtype':str(population.dtype),'projection_dtype':str(projection.dtype),'close_commands':signs.count(1),'steps':steps,
+-            'prism_all8_min_m':minimum('point_to_prism_m',False),'prism_close_min_m':minimum('point_to_prism_m',True),
+-            'reach_all8_min_m':minimum('euclidean_reach_m',False),'reach_close_min_m':minimum('euclidean_reach_m',True)})
++        row={'task_id':task,'row':i,'selected':i==idx,'canonical_fingerprint':fp,'association_status':status,
++            'matching_occurrence_ids':[ce['values']['occurrence_ids'][j] for ce,j in matches],
++            'original_archive_insert_sequence':'Unknown: not recorded in these four containers',
++            'provenance':[None if a is None else {k:v for k,v in a.items() if k not in ('projection','quality','cost','source_origin','cast_origin')} for a in assocs],
++            'native_plan_dtype':str(population.dtype),'close_commands':signs.count(1),'native_quality':None,'native_cost':None,
++            'quality_dtype':None,'cost_dtype':None,'projection_dtype':None,'bound_source_origin':None,'bound_cast_origin':None,'steps':[],
++            'prism_all8_min_m':None,'prism_close_min_m':None,'reach_all8_min_m':None,'reach_close_min_m':None}
++        if ok:
++            first=assocs[0];steps=geometry(first['projection'].double().tolist(),target.tolist(),quat.double().tolist(),qpos.double().tolist())
++            for j,v in enumerate(steps):v.update(offset=j+1,gripper_command=signs[j])
++            def minimum(key,close):
++                vs=[v[key] for v in steps if v[key] is not None and (not close or v['gripper_command']>0)]
++                return min(vs) if vs else None
++            row.update(native_quality=float(first['quality']),native_cost=float(first['cost']),quality_dtype=str(first['quality'].dtype),cost_dtype=str(first['cost'].dtype),projection_dtype=str(first['projection'].dtype),steps=steps,
++                prism_all8_min_m=minimum('point_to_prism_m',False),prism_close_min_m=minimum('point_to_prism_m',True),reach_all8_min_m=minimum('euclidean_reach_m',False),reach_close_min_m=minimum('euclidean_reach_m',True))
++            row['bound_source_origin']={'dtype':str(first['source_origin'].dtype),'values':first['source_origin'].tolist()}
++            row['bound_cast_origin']={'dtype':str(first['cast_origin'].dtype),'values':first['cast_origin'].tolist()}
++            if i==idx:require(row['native_quality']==sv['selected_quality'] and row['native_cost']==sv['selected_cost'],'selected stored archive score equality')
++        rows.append(row)
++    complete=all(x['association_status']!='Unknown' for x in rows)
+     keys=['prism_all8_min_m','prism_close_min_m','reach_all8_min_m','reach_close_min_m','native_cost']
+     for row in rows:
+-        for key in keys:row[key+'_rank']=None if row[key] is None else 1+sum(x[key] is not None and x[key]<row[key] for x in rows)
++        for key in keys:row[key+'_rank']=None if not complete or row[key] is None else 1+sum(x[key] is not None and x[key]<row[key] for x in rows)
+     selected_row=rows[idx];comparisons={}
+     for subset in ('all8','close'):
+         pk='prism_'+subset+'_min_m';rk='reach_'+subset+'_min_m'
+-        comparisons[subset]={'rows_with_both_metrics':sum(x[pk] is not None and x[rk] is not None for x in rows),
+-            'rank_changed_rows':[x['row'] for x in rows if x[pk+'_rank']!=x[rk+'_rank']],
++        comparisons[subset]={'full_archive_association_complete':complete,'rows_with_both_metrics':sum(x[pk] is not None and x[rk] is not None for x in rows),
++            'rank_changed_rows':None if not complete else [x['row'] for x in rows if x[pk+'_rank']!=x[rk+'_rank']],
+             'unselected_strictly_better_prism':[x['row'] for x in rows if not x['selected'] and x[pk] is not None and selected_row[pk] is not None and x[pk]<selected_row[pk]],
+-            'strict_pair_order_reversals':[[i,j] for i in range(16) for j in range(i+1,16) if all(rows[k][v] is not None for k in (i,j) for v in (pk,rk)) and (rows[i][pk]-rows[j][pk])*(rows[i][rk]-rows[j][rk])<0]}
+-    return {'task_id':task,'attempt_id':ep['cell']['attempt_id'],'decision_id':'e0:d3:s16','selected_row':idx,'selected_native_matching_rows':matches,
+-        'analyzed_plans':16,'additional_selected_plan_needed':False,'target_index':ti,'target_snapshot':target.tolist(),
+-        'fixed_state':{'source_step':15,'eef_dtype':str(pos.dtype),'quat_dtype':str(quat.dtype),'qpos_dtype':str(qpos.dtype),'quat_xyzw':quat.tolist(),'qpos':qpos.tolist(),'gap_m':float(qpos[0])-float(qpos[1])-.001},
+-        'bindings':{'pre_action_raw_eef_bytes_equal':True,'no_reset':True,'selected_actual8_commands_equal':True,'original_receipt_attestation_inherited':ep['receipt'],
+-            'canonical_sequence':canon['sequence'],'scoring_sequence':score['sequence'],'projection_origins':origin_meta,'selected_sequence':sel['sequence']},
+-        'projection':'recorded native raw canonical projected_xyz[:,1:9], no reconstruction or clipping; fixed observed hand orientation and qpos',
+-        'rows':rows,'comparisons':comparisons,'physical_capture_or_future_feasibility':'Unknown'}
++            'strict_pair_order_reversals':[[i,j] for i in range(N) for j in range(i+1,N) if all(rows[k][v] is not None for k in (i,j) for v in (pk,rk)) and (rows[i][pk]-rows[j][pk])*(rows[i][rk]-rows[j][rk])<0]}
++    return {'task_id':task,'attempt_id':ep['cell']['attempt_id'],'decision_id':'e0:d3:s16','selection_rule':sv['selection_rule'],'selected_row':idx,'archive_rows':N,'analyzed_plans':sum(x['association_status']!='Unknown' for x in rows),
++        'target_index':ti,'target_snapshot':target.tolist(),'fixed_state':{'source_step':15,'observed_grip_site_position':pos.tolist(),'eef_dtype':str(pos.dtype),'quat_dtype':str(quat.dtype),'qpos_dtype':str(qpos.dtype),'quat_xyzw':quat.tolist(),'qpos':qpos.tolist(),'gap_m':float(qpos[0])-float(qpos[1])-.001},
++        'bindings':{'pre_action_raw_eef_bytes_equal':True,'no_reset':True,'selected_actual8_commands_equal':True,'original_receipt_attestation_inherited':ep['receipt'],'selected_sequence':sel['sequence']},
++        'projection':'recorded canonical scoring projection from controller.ee_pos snapshot, with current observed grip_site quaternion/qpos; not reprojection from observed grip_site and not proof of physical feasibility; no clipping/N5 target',
++        'rows':rows,'comparisons':comparisons,'physical_capture_or_future_feasibility':'Unknown','indirect_population_coupling':'Not excluded by identity association'}
+ 
+ def main():
+     global TORCH,APPROVED
+-    require(len(sys.argv)==1,'no argument variation')
++    require(len(sys.argv)==3 and sys.argv[1]=='--release' and pathlib.Path(sys.argv[2]).absolute()==RELEASE,'exact manual release CLI required')
+     require(not any((H/n).exists() for n in OUTPUT_NAMES),'prior invocation/output, no retry')
+     write('invocation-v1.json',{'pid':os.getpid(),'started_unix':time.time(),'payload_reads_yet':0},True)
+-    manifest=read_meta(MANIFEST);require(manifest['executable_one_pass'] is True,'not frozen')
++    release=read_meta(RELEASE,cap=65536)
++    require(release.get('schema')=='n30-jaw-pool-manual-recovery-v2' and release.get('executable') is True and release.get('one_execution') is True,'no manual release')
++    require(release.get('acknowledge_v1_two_containers_already_decoded') is True,'prior read allowance not acknowledged')
++    require(release.get('limits')=={'containers':4,'encoded_bytes':24183110,'cpu_seconds':118,'wall_seconds':178,'threads':2,'affinity':[0,1]},'release limits')
++    manifest=read_meta(MANIFEST,release['source_manifest']['sha256'])
++    require(release['source_manifest']['path']==str(MANIFEST) and release['reader']==manifest['reader'] and release['input_manifest']==manifest['input_manifest'],'release exact binding')
+     for key,path in [('reader',pathlib.Path(__file__).resolve()),('input_manifest',INPUT),('measurement_declaration',DECL)]:
+         require(manifest[key]['path']==str(path),'manifest path');read_meta(path,manifest[key]['sha256'],as_json=False)
+     inputs=read_meta(INPUT,manifest['input_manifest']['sha256']);read_meta(DECL,manifest['measurement_declaration']['sha256'])
+@@ -249,10 +298,10 @@
+     for ep in inputs['episodes']:
+         events=[]
+         for b in ep['containers']:events.extend(load_one(b))
+-        PARTIAL.append(analyze(ep,events));write('partial-v1.json',{'complete':False,'episodes':PARTIAL});del events
++        PARTIAL.append(analyze(ep,events,prior));write('partial-v1.json',{'complete':False,'episodes':PARTIAL});del events
+     require(len(OPEN_COUNTS)==4 and all(v==1 for v in OPEN_COUNTS.values()),'single filesystem opens')
+     require(not torch.cuda.is_initialized(),'CUDA initialized')
+-    write('result-v1.json',{'schema':'n30-fixed-jaw-pool-screen-v1','complete':True,'episodes':PARTIAL,'precision':'CPU binary64 geometry on recorded native projection, no CUDA replay','new_score_calls':0,'physical_benefit':'Unknown','algorithm_release':False})
++    write('result-v1.json',{'schema':'n30-fixed-jaw-archive-pool-screen-v2','complete':True,'episodes':PARTIAL,'precision':'CPU binary64 geometry on recorded native projection, no CUDA replay','new_score_calls':0,'physical_benefit':'Unknown','algorithm_release':False})
+     rows=[{k:v for k,v in row.items() if k!='steps'} for ep in PARTIAL for row in ep['rows']]
+     with (H/'pool-table-v1.csv').open('x',newline='') as f:
+         writer=csv.DictWriter(f,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
+@@ -266,7 +315,7 @@
+         record={'pid':os.getpid(),'complete':ERROR is None and len(PARTIAL)==2,'error':ERROR,'cpu_seconds':time.process_time()-START_CPU,'wall_seconds':time.monotonic()-START_WALL,
+             'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'rlimit_cpu':list(resource.getrlimit(resource.RLIMIT_CPU)),'rlimit_as':resource.getrlimit(resource.RLIMIT_AS)[0],
+             'affinity':sorted(os.sched_getaffinity(0)),'threads':2,'cuda_visible_devices':os.environ.get('CUDA_VISIBLE_DEVICES'),'cuda_initialized':TORCH.cuda.is_initialized() if TORCH is not None else None,
+-            'explicit_cuda_tensor_work':0,'no_driver_probe_claim':False,'reads':READS,'payload_open_counts':dict(OPEN_COUNTS),'zip_uncompressed_bytes':ZIP_BYTES,'decoded_cpu_storage_bytes':STORAGE_BYTES,
++            'explicit_cuda_tensor_work':0,'no_driver_probe_claim':False,'reads':READS,'payload_open_counts':dict(OPEN_COUNTS),'zip_uncompressed_bytes_cumulative_including_v1':ZIP_BYTES,'decoded_cpu_storage_bytes_cumulative_including_v1':STORAGE_BYTES,'prior_v1_zip_bytes':11041672,'prior_v1_storage_bytes':10405925,'prior_encoded_bytes':12091427,'combined_encoded_bytes':12091427+sum(x['bytes'] for x in READS if x['kind']=='payload'),
+             'denied_probes':DENIED,'guard_clean':not DENIED,'dependency_opens':dict(DEPENDENCY_OPENS),'dependency_scans':dict(DEPENDENCY_SCANS),'automatic_retries':0,'completed_episodes':len(PARTIAL)}
+         if not (H/'resource-v1.json').exists():write('resource-v1.json',record,True)
+     if ERROR is not None:sys.exit(1)

@@ -1,0 +1,20 @@
+{
+  "actual_payload_reads": 0,
+  "executable": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/design-v2-incomplete-infrastructure-addendum.md",
+      "sha256": "156f31dc996df99b434366161c7ffd39856c4d4a2179272ccd409db7bc0bea3b"
+    }
+  ],
+  "original_v1_preserved": true,
+  "parent_supplied_metadata_provisional": true,
+  "prior_delivery": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/delivery-manifest-v1.json",
+    "sha256": "6e98773ba271cf74db19acb36d975738f6b8537ac03a7123e31e70629ee19218"
+  },
+  "runtime_imports": 0,
+  "schema": "n25-infrastructure-continuation-design-delivery-v2",
+  "status": "DESIGN_ONLY_NO_IMPLEMENTATION",
+  "tests_executed": 0
+}

@@ -1,0 +1,11 @@
+{
+  "cpu_seconds_before_final_hash_packaging": 0.0026250390000000026,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "native_payload_reads": 0,
+  "numerical_replay": false,
+  "inputs": "existing result/resource/outer receipts only"
+}

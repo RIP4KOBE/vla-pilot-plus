@@ -1,0 +1,37 @@
+{
+  "frozen": false,
+  "source_commit": null,
+  "code_files": null,
+  "episodes": null,
+  "n27_cohort": null,
+  "n27_hydra_continuation": {
+    "schema": "n27-hydra-continuation-v1",
+    "cohort_id": "N27_HYDRA_CONTINUATION_V1_20261001",
+    "protocol": null,
+    "seal": null,
+    "final_review": null,
+    "authority": null,
+    "limits": {
+      "new_dispatches": 13,
+      "combined_dispatches": 17,
+      "named_retries": 1,
+      "additional_retries": 0,
+      "episode_timeout_seconds": 1800,
+      "cleanup_seconds": 40,
+      "combined_local_gpu_hours": 9.25,
+      "physical_gpu": 7
+    },
+    "imported_cells": 3,
+    "dispatchable": 13
+  },
+  "derived_from": null,
+  "runtime_manifest_path": null,
+  "runtime_manifest_sha256": null,
+  "phase_authorization": {
+    "dev": false,
+    "validation": false,
+    "formal": false
+  },
+  "executable": false,
+  "reason": "CPU preparation only; actual root seal, source review, finite adoption and release absent"
+}

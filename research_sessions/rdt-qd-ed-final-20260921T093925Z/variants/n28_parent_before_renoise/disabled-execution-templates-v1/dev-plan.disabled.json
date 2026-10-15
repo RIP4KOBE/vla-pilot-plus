@@ -1,0 +1,47 @@
+{
+  "schema": "n28-disabled-template-v1",
+  "executable": false,
+  "root_authorized": false,
+  "target_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/plan.frozen.v1.gpu7.json",
+  "missing_required": [
+    "not a runner plan; generate only with prepare.freeze after real prerequisites"
+  ],
+  "source_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/source-manifest-execution-v1.json",
+    "sha256": "a26a52fa413c43778a341d72b85e570892a13933954c4fa0b78c5a6357c1ef12"
+  },
+  "record": {
+    "schema": "qd-ed-final-plan-v1",
+    "frozen": false,
+    "cohort_id": "N28_PARENT_BEFORE_RENOISE_SCREEN_20261001",
+    "episode_keys": [
+      "n28_screen_t00_c0_20261001",
+      "n28_screen_t00_q0_20261001",
+      "n28_screen_t00_n27_20261001",
+      "n28_screen_t00_n28_20261001",
+      "n28_screen_t01_c0_20261001",
+      "n28_screen_t01_q0_20261001",
+      "n28_screen_t01_n27_20261001",
+      "n28_screen_t01_n28_20261001",
+      "n28_screen_t02_c0_20261001",
+      "n28_screen_t02_q0_20261001",
+      "n28_screen_t02_n27_20261001",
+      "n28_screen_t02_n28_20261001",
+      "n28_screen_t03_c0_20261001",
+      "n28_screen_t03_q0_20261001",
+      "n28_screen_t03_n27_20261001",
+      "n28_screen_t03_n28_20261001"
+    ],
+    "candidate_profiles": [
+      "N27",
+      "N28"
+    ],
+    "seed_mapping": "original frozen N27 task0..3 Dev rows; root prepare fills exact inputs",
+    "artifact_root": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/artifacts",
+    "phase_authorization": {
+      "dev": false,
+      "validation": false,
+      "formal": false
+    }
+  }
+}

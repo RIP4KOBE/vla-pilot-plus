@@ -1,0 +1,10 @@
+{
+  "refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py",
+      "sha256": "a46be1babfde66a07729c06d4e37b51575def4e27f05970dfaa852ae4db4afd7",
+      "bytes": 106688
+    }
+  ],
+  "cpu_seconds": 0.0009516479999999994
+}

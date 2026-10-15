@@ -1,0 +1,54 @@
+{
+  "schema": "n30-terminal-feedback-cpu-resources-v1",
+  "inventory_cpu_seconds": 0.958217745,
+  "real_replay_cpu_seconds": 13.246778386,
+  "synthetic_test_cpu_seconds": 26.965223932,
+  "cumulative_cpu_seconds": 41.170220063,
+  "limit_cpu_seconds": 900,
+  "real_bundle_loads": 2250,
+  "real_bundle_bytes": 297071656,
+  "old_replays": 1,
+  "repaired_replays": 1,
+  "synthetic_tests_passed": 21,
+  "failed_test_invocations": 0,
+  "synthetic_guard_clean": true,
+  "real_replay_guard_clean": false,
+  "blocked_import_probes": [
+    {
+      "event": "os.scandir",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/terminal-feedback-binding-repair-v1/nvidia/cuda_nvrtc/lib"
+    },
+    {
+      "event": "os.scandir",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/terminal-feedback-binding-repair-v1/cuda_nvrtc/lib"
+    },
+    {
+      "event": "os.scandir",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/terminal-feedback-binding-repair-v1/nvidia/nvjitlink/lib"
+    },
+    {
+      "event": "os.scandir",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/terminal-feedback-binding-repair-v1/nvjitlink/lib"
+    },
+    {
+      "event": "os.listdir",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/feat/rdt-libero-gt-rollout-reintegration/third_party/lerobot/src"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/feat/rdt-libero-gt-rollout-reintegration/third_party/lerobot/src"
+    }
+  ],
+  "blocked_probe_access_succeeded": false,
+  "cuda_initialized_in_both_processes": false,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "real_replay_peak_rss_kib": 968692,
+  "synthetic_peak_rss_kib": 992308,
+  "rlimit_as_bytes": 17179869184,
+  "immutable_original_receipt": true,
+  "scientific_acceptance": false
+}

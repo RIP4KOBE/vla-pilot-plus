@@ -1,0 +1,21 @@
+{
+  "schema": "n30-initial-observation-repair-cpu-resource-v1",
+  "run": "repair-run1",
+  "pytest_exit": 0,
+  "process_cpu_seconds": 15.195151868,
+  "wall_seconds": 11.497577963978983,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "denied": [],
+  "guard_clean": true,
+  "test_args": [
+    "tests/test_n30_initial_observation_repair.py",
+    "-q"
+  ],
+  "peak_rss_kib": 825944
+}

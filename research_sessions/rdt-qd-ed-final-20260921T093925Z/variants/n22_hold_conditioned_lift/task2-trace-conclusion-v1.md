@@ -1,0 +1,9 @@
+# Task2: first divergence is an online guidance decision
+
+Both N21 and N22 task2 attempts are native-valid failures. Their first20 decoded action chunks (steps0..152) are exactly equal. All55 canonical batches before the first changed action have identical native candidate pools, raw provider quality and effective quality, and the parent fingerprints are unchanged. The first changed decoded chunk is step160;70 subsequent chunks differ across the two runs.
+
+At step160, both Stage queries trigger on gripper opening, with stage2 and guidance=false before the query. Both successful Codex responses select stage1, but N21 receives guidance=yes and N22 receives guidance=no. No earlier common Stage reward-binding difference is recorded. The guidance decisions therefore diverge before the candidate's first changed executed chunk. Later N21/N22 search totals39 versus16 guided decisions cannot be attributed solely to the hold-conditioned quality change. Later action/state differences are not same-state comparisons.
+
+This establishes an attribution limitation, not exact request-level nondeterminism: full request/image-byte hashes are not retained by the current transport, so identical earlier actions do not prove identical provider input bytes. The trace and Stage responses support online guidance variation as the immediate recorded divergence. They do not establish algorithm benefit. Both failures remain in the frozen cohort; no provider/Stage change, retry, extra online request or task exclusion follows.
+
+Evidence: `task2-trace-contrast-result-v1.json` SHA `7cd37f474aaaae0a698c0de8bb6d3eac983460488e0b1ddc021706c74e2942a5`, its hashed native-bundle references, and `task2-stage-first-divergence-result-v1.json` with the two hashed Stage event sources and preboundary parsed responses. All reads used completed exposed Dev records only.

@@ -1,0 +1,87 @@
+{
+  "read_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160,
+      "windows": [
+        [
+          700,
+          729
+        ],
+        [
+          1143,
+          1172
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/env_wrapper.py",
+      "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0",
+      "bytes": 8781,
+      "windows": [
+        [
+          1,
+          100
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/robots/single_arm.py",
+      "sha256": "d233b1b785e8f88ffb5df1357666b02a397ae930ce98181b079e0496ab35fc57",
+      "bytes": 19104,
+      "windows": [
+        [
+          80,
+          126
+        ],
+        [
+          150,
+          219
+        ],
+        [
+          292,
+          330
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/robots/manipulators/panda_robot.py",
+      "sha256": "cedaeef03d4c01b6a76a56838f9cf8f68b34f85bac823cb2c76543492553c736",
+      "bytes": 1504,
+      "windows": [
+        [
+          15,
+          47
+        ],
+        [
+          90,
+          130
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/grippers/gripper_model.py",
+      "sha256": "0543b5a9e1d8b41e21880d8445c5d8fbf8535a4ac6fd55c5e70a3b1f323c3735",
+      "bytes": 5476,
+      "line_filter": "quaternion/frame attachment"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/robots/manipulators/manipulator_model.py",
+      "sha256": "ac21ce0b004a1ee93cb8b728c00b9c18c38ecabb2dedca370de80602ad26f059",
+      "bytes": 6579,
+      "line_filter": "quaternion/frame attachment"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/transform_utils.py",
+      "sha256": "1c2317895733449883b56af0decefb3529649b3a7779dc2ef3ed00816bb25bb0",
+      "bytes": 27506,
+      "line_filter": "quaternion/frame attachment"
+    }
+  ],
+  "cpu_seconds": 0.0019345920000000023,
+  "affinity": [
+    0,
+    1
+  ]
+}

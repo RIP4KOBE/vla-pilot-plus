@@ -1,0 +1,23 @@
+{
+  "schema": "n30-cpu-resource-v1",
+  "run": "phase-b-run4",
+  "pytest_exit": 1,
+  "process_cpu_seconds": 7.115481811,
+  "wall_seconds": 6.795280197984539,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "denied": [],
+  "guard_clean": true,
+  "test_args": [
+    "tests/test_n30_native.py::test_cpu_future_qd_off_control_uses_real_no_archive_path",
+    "tests/test_n30_controller.py::test_full_three_of_four_and_controls",
+    "tests/test_n30_worker.py",
+    "-q"
+  ],
+  "peak_rss_kib": 612704
+}

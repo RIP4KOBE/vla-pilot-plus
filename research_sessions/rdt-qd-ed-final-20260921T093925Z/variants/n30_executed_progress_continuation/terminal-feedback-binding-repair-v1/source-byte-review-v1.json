@@ -1,0 +1,24 @@
+{
+  "base_source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/source-manifest-execution-v1.json",
+    "sha256": "5ecec50164559cd96f86140c481d78d41120be9a1a3da3802fc7774d7912c01f"
+  },
+  "commit": "debda23a0e8eda86a3bb4f398e9596edf05b37e5",
+  "total_source_files": 463,
+  "base_files": 457,
+  "unchanged_base_files": 456,
+  "only_modified_base_file": "scripts/qd_ed_n30_native.py",
+  "exact_reverse_verified": true,
+  "all_git_blobs_verified": true,
+  "new_function": "terminal_bool",
+  "modified_function": "audit_events",
+  "other_native_functions_ast_unchanged": 10,
+  "new_files": [
+    "docs/experiments/n30/terminal-feedback-repair/cpu-repair-scope-v2.md",
+    "docs/experiments/n30/terminal-feedback-repair/input-manifest.frozen.v2.json",
+    "docs/experiments/n30/terminal-feedback-repair/original-native-v1.py",
+    "docs/experiments/n30/terminal-feedback-repair/replay_once_v1.py",
+    "docs/experiments/n30/terminal-feedback-repair/root-cpu-repair-release-v2.json",
+    "tests/test_n30_terminal_feedback_repair.py"
+  ]
+}

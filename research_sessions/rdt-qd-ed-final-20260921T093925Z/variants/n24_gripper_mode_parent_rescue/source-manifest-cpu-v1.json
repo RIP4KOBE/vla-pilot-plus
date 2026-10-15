@@ -1,0 +1,74 @@
+{
+  "schema": "n24-cpu-phase-a-source-manifest-v1",
+  "base_commit": "51104470983cdbafd08feb87f2f39b7553779405",
+  "protocol_commit": "591142f",
+  "implementation_commit": "3f6db2dc3dcc8db45b66a649568b43248c8b5f0e",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/implementation",
+  "score": "Unknown/not-run",
+  "files": [
+    {
+      "path": "configs/config.yaml",
+      "sha256": "5a0bce959afd4aad5e32e27dc5a278b600f8f0705069e9b36415af5f62cef183",
+      "bytes": 6574
+    },
+    {
+      "path": "configs/qd_ed_final/candidate_n24.json",
+      "sha256": "02e45be92c34ea61577d827b269d43d766ccf3917728faf7be620e4d0f976a51",
+      "bytes": 3687
+    },
+    {
+      "path": "core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241
+    },
+    {
+      "path": "core/eds_eval_metrics.py",
+      "sha256": "3b3861870ff9645edbff1b64c2274d99889e9ee16e421976ae0b19366e6a5974",
+      "bytes": 37637
+    },
+    {
+      "path": "core/qd_gripper_parent_rescue.py",
+      "sha256": "95e58de7f33a3f365f3d7640206f9f040b821d1bcd3d44aea008dd3236a25e3f",
+      "bytes": 7446
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "sha256": "aa91f6a0ce6a532c724fed559a93a08545241924028f621fe73101ee3bed3ea8",
+      "bytes": 398334
+    },
+    {
+      "path": "experiments/qd_ed_n24/protocol-dev-v1.md",
+      "sha256": "77163171815bdade8d05a4010ff59aa24a4157d447d6d7fb430f3163a80c4b3b",
+      "bytes": 10587
+    },
+    {
+      "path": "scripts/audit_decision_evidence.py",
+      "sha256": "df9b4294e02391f12f108671680072127054471a8c2eca02fed7b167a3a9addf",
+      "bytes": 94403
+    },
+    {
+      "path": "scripts/audit_gripper_parent_rescue.py",
+      "sha256": "546ed6c7579b70fa6e99fb1525f144fb500b57ea9e3694af517434769f09ab68",
+      "bytes": 12532
+    },
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "ecfe7130c2782aceca223e2c5ad3e45be145ed640f50caade52c0699db951490",
+      "bytes": 117928
+    },
+    {
+      "path": "tests/test_n24_native_loop.py",
+      "sha256": "6bfb2a16a12060304c146aeb0b879afacc572e098a11256aed3fdac960aa89e8",
+      "bytes": 9782
+    },
+    {
+      "path": "tests/test_qd_gripper_parent_rescue.py",
+      "sha256": "9d8f5c7aa0b8070e76dc89428c806b317a32a7dc73a180b1b20a0703ae7ccaf7",
+      "bytes": 6396
+    }
+  ],
+  "scientific_parity": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/scientific-byte-parity-v1.json",
+    "sha256": "b231e68ac104b4d8344b9c82525bad18d68ee98c05d18d0e55808e502971eced"
+  }
+}

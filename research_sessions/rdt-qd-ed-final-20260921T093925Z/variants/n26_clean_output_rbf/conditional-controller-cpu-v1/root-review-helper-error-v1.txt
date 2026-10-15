@@ -1,0 +1,3 @@
+Root CPU acceptance helper stopped before any acceptance output on its initial equality assertion.
+It incorrectly assumed the executor packaging manifest used the same schema as the pure verify_composition function output. The former is n26-logical-cpu-source-composition-v1; the latter is n26-logical-source-composition-v1. No scientific/source/runtime/test change occurred.
+Root corrected the helper to compare the actual corresponding source, historical commits, 280 and19 exact file lists, science subset, six file/function scopes, and both reverse references. Independent Git/source verification remains intact. No GPU/API or experiment opportunity was consumed.

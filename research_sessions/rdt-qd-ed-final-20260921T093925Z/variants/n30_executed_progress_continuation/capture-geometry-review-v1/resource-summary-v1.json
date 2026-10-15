@@ -1,0 +1,22 @@
+{
+  "schema": "n30-capture-geometry-resources-v1",
+  "source_read_cpu_seconds_recorded": 2.463641248,
+  "preparation_cpu_seconds_recorded": 0.0003265700000000017,
+  "calculation_process_cpu_seconds_including_startup": 0.030233,
+  "calculation_launcher_cpu_seconds": 0.0004769170000000003,
+  "recorded_subtotal_cpu_seconds": 2.494677735,
+  "packaging_cpu_seconds_at_receipt": 0.0014162649999999999,
+  "cpu_limit_seconds": 60,
+  "calculation_wall_limit_seconds": 180,
+  "source_script_interpreter_startup_not_in_process_time_deltas": true,
+  "scope_first_read_cpu_reported": 0.0,
+  "affinity": [
+    0,
+    1
+  ],
+  "thread_environment": 2,
+  "calculation_invocations": 1,
+  "retries": 0,
+  "cpu_receipt_precision": "Source timings are deltas after interpreter imports; calculation child rusage includes its full process. Not a claim that the subtotal measures all tool/interpreter overhead. All source tools were short-lived two-CPU stdlib processes.",
+  "filename_location_deviation_child_cpu_included": true
+}

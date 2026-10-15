@@ -1,0 +1,9 @@
+# N14 prerequisite: target-motion feedback is measurable in exposed Dev paths
+
+`readonly_audit.py` SHA-verifies the native decision bundles for all eight N7/N11 paths in the matched four-task N11 development cohort. The cohort's separate accepted report is `../n11_parent_survival/dev-comparison-v1.md`. It reads only the existing policy keypoint, tracker validity/identity, EEF origin and decoded gripper command at each chunk boundary. It does not call the simulator, Stage service or model and does not use validation/formal outcomes.
+
+All 562 decision contexts in these eight paths have a valid target-0 tracker snapshot. Every guided decision with a next chunk has stable tracker instance and generation. Four distinct tasks have a tracked target shift of at least 1 cm after a guided chunk; 13 shifts are followed immediately by another guided chunk in the same Stage. The recorded descriptor is the previous eight-action target displacement, EEF displacement and gripper-command sequence, with validity and same-stage checks. The 13 next opportunities are concentrated in task 0 and task 3; the count does **not** mean 13 independent tasks or that motion caused success.
+
+This satisfies the previously specified `SIGNAL_READY` feasibility gate. The target keypoint comes from the frozen benchmark's `KeypointTracker`, which currently uses simulator object-pose lookup; the algorithm below would consume the same policy-visible keypoint and validity metadata, not new contact or branch-simulation data. Signal readiness is not an efficacy claim and does not retroactively validate N10's failed Stage cell.
+
+An open-gripper target displacement precedes both successful N11 task 3 and failed N7 task 3. That is a reason to test whether conditioning QD search memory on observed displacement changes the next decision, not a success label or a tuned 2 cm grasp threshold. The same-state task 3 contrast already rejected a simple terminal grasp-gate relaxation.

@@ -1,0 +1,36 @@
+{
+  "schema": "n30-r2-cpu-total-v1",
+  "tests_process_cpu_seconds": 13.962925346999999,
+  "tests_wall_seconds": 13.669587424956262,
+  "distinct_passed": 60,
+  "executed_assertion_cases": 67,
+  "run1": {
+    "passed": 56,
+    "new_distinct": 56
+  },
+  "run2": {
+    "passed": 9,
+    "new_distinct": 2,
+    "repeated": 7,
+    "deselected": 19
+  },
+  "run3": {
+    "passed": 2,
+    "new_distinct": 2
+  },
+  "test_failures": 0,
+  "guard_denied": 0,
+  "cuda_initialized": false,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "source_packaging_self_cpu_seconds": 0.359295001,
+  "test_limit_seconds": 1200,
+  "instrumentation_limitation": "Small initial static/schema file-processing commands and Git child CPU were not separately instrumented; no exact whole-task CPU total is claimed. All test subprocesses are instrumented; no actual native/tensor computation or controllers were executed.",
+  "historical_tensors_loaded": 0,
+  "historical_native_replays": 0,
+  "owning_state_mutations": 0,
+  "gpu_release": false
+}

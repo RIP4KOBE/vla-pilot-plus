@@ -1,0 +1,5 @@
+Prepared [report-v1.md](../prospective-continuation-v3/report-v1.md) and [artifact-index-v1.json](../prospective-continuation-v3/artifact-index-v1.json).
+
+The artifacts bind 14 accepted cells, the retained invalid cell, and 16 proposed attempts. All 331 bounded continuity checks recorded no mismatch; final artifact hashes match.
+
+Release remains disabled. Blockers cover controller support, operational source review, new manifest audits, fresh accounting/admission, and detached root release. No source changes or launches occurred.

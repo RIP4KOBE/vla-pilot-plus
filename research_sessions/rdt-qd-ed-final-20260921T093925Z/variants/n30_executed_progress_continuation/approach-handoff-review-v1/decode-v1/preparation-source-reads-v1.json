@@ -1,0 +1,29 @@
+{
+  "reads": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/decoder-source-manifest-v1.json",
+      "sha256": "7905260c9cac6c2c3fae0814392d33909f30d78fefa724533d598c2cdabc6fe8",
+      "bytes": 4012
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/command.disabled.v1.json",
+      "sha256": "cd311a975bf613d2754d91b4a5b171360838218cdbefd9f9e8fc9bcb2c4a91af",
+      "bytes": 1800
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/handoff-bindings.disabled.v1.json",
+      "sha256": "a0e91ccb47a312a37e46b9c9ac9d6dcf8c3ec211d2cbb07a8084b6f8b6ad4345",
+      "bytes": 1456252
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/minimum-evidence-proposal.disabled.v1.json",
+      "sha256": "b3d1ce66d932f517be84100cecc33f2a2e669efb47eeb4c41199ab86f4e05e97",
+      "bytes": 6370
+    }
+  ],
+  "cpu_seconds": 0.008588767,
+  "affinity": [
+    0,
+    1
+  ]
+}

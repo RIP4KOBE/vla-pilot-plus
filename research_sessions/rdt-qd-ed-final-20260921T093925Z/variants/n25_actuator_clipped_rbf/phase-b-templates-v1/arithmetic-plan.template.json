@@ -1,0 +1,31 @@
+{
+  "schema": "n25-disabled-preparation-template-v1",
+  "executable": false,
+  "authorization": false,
+  "target_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/arithmetic-preflight/plan.frozen.v1.json",
+  "missing_prerequisites": [
+    "only admitted backend.run freezes resource plan before charging one worker"
+  ],
+  "payload": {
+    "schema": "n25-tensor-resource-plan-v1",
+    "frozen": false,
+    "resource_id": null,
+    "kind": "n25_tensor_arithmetic_v1",
+    "worktree": null,
+    "source": null,
+    "runtime": null,
+    "limits": {
+      "resource_processes": 1,
+      "episode_attempts": 0,
+      "model_calls": 0,
+      "api_calls": 0,
+      "simulation_steps": 0,
+      "timeout_seconds": 60,
+      "cleanup_seconds": 40,
+      "physical_gpu": 7,
+      "health_gpu_hours_bucket": "recovery"
+    },
+    "authority": null,
+    "output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/arithmetic-preflight/worker"
+  }
+}

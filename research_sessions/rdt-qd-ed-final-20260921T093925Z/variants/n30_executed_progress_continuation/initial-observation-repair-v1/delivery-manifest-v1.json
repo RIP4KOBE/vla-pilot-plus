@@ -1,0 +1,75 @@
+{
+  "schema": "n30-initial-observation-repair-cpu-delivery-v1",
+  "status": "CPU_COMPLETE_NO_EXECUTION_AUTHORITY",
+  "commit": "7c0d80d734fa8300173e56d9a8de03415bc55fe2",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/cpu-repair-scope-v1.md",
+      "sha256": "2bc74473ba50b4fc6cb33ec93188c0de5c9c45737705f88e103c63d6562a7f17",
+      "bytes": 3739
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/root-cpu-repair-release-v1.json",
+      "sha256": "34f5d72ef278e7f40d8c8494976369d40d8d98dcfa6d2ad061ecb5cdbdfbb5f0",
+      "bytes": 718
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/cpu_guard_v1.py",
+      "sha256": "8f6334944757b4aa5636045a407158173f00c920e4a2990b5cd6a500760ead46",
+      "bytes": 3506
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/cpu-repair-run1.log",
+      "sha256": "95e932c54556173572e9a1399de90e86e4fb523672106093927505f1d7083284",
+      "bytes": 1756
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/cpu-repair-run1-resource.json",
+      "sha256": "410e8e6430ebc1e831857e75d8f263b9c6a3f92471970c48de06db45023dadc2",
+      "bytes": 447
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/source-manifest-v1.json",
+      "sha256": "01820f01a1e879fc717542b7d63e088891ca72990aa65e1cc27dcc8420f727d9",
+      "bytes": 807
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/source-reverse-v1.json",
+      "sha256": "4f8cae543c8e87cc82f95891928e18821c16b2de474c3f4e25518980a9d95789",
+      "bytes": 1047
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/source-diff-v1.patch",
+      "sha256": "0c7d3b0345c655e7a46d2558779253b2c2792524ffd77a2926685c632393984a",
+      "bytes": 45034
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/resource-summary-v1.json",
+      "sha256": "1692f57f5949cf3775fa529a1a35cc32766c07376191f9c1d425ffb6f19c61e2",
+      "bytes": 902
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/report-v1.md",
+      "sha256": "033d8d5ee7178e0a182bff1b4627e8a0c833f3af41693808e77f5b499f05226b",
+      "bytes": 3657
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/implementation/main.py",
+      "sha256": "5209b0ac07362e1df85bf2fd842e57d4786e24c0a625ee5b9e49bee48f528f93",
+      "bytes": 108959
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/implementation/tests/test_n30_initial_observation_repair.py",
+      "sha256": "3a20181ff534dc410698ba7e1f7dce87b8aa764c9c834bee57b9e6a83f27c6ff",
+      "bytes": 12813
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/implementation/tests/n30_initial_observation_original.json",
+      "sha256": "09bedf6f014a84edff03e9754b71dff57e5e6761c9d1ae336fd3a0b33215af6a",
+      "bytes": 30941
+    }
+  ],
+  "gpu_release": false,
+  "budget_changed": false,
+  "old_cohort_restarted": false
+}

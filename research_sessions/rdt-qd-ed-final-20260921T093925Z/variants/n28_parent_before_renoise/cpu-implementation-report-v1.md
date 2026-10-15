@@ -1,0 +1,35 @@
+# N28 conditional CPU implementation
+
+Completed CPU preparation only. Frozen implementation commit `85154b4dcb43046a2fcf2df4e8179b45b58dd2b4`, branch `codex/n28-parent-before-renoise-20261001`, based on `e21d48ab33dbd3aca017349b6004c2ba7d981493`. Protocol was precommitted as `648877b`. The worktree is clean. GPU arithmetic, task score and efficacy remain **Unknown**. No source adoption, controller, budget, proof or experiment launch was performed.
+
+`rollout_diversity_placement=model_output` is the disabled/default spelling; N28 opts into `parent_before_renoise_v1`. Its profile differs from N27 by that one field. Each original 16-parent selected copy receives one clipped-EEF gradient and the unchanged scale-20 / feasible-ray assignment, immediately before the original renoise. Only its first eight translation triples are assigned. Allocation and the archive are not mutated. Original noise draws and every denoiser/scheduler/score call remain in place. Initial sampling remains N27.
+
+The implementation deliberately continues `_eds_rollout_rbf_diverse_reference`, with the new mode returning false from its per-step RBF mask. It does not switch to the plain rollout implementation. Thus the original timestep tail slice, scheduler arguments/order, sample checks, diagnostic projections, masking and final scoring remain. Original rollout, renoise and initial-denoise function bodies are byte-identical. Of 123 RDTSteer methods, 117 are byte-identical; six administrative/wiring methods change. The four original geometry/input/feasible helpers, QD/metrics/decision evidence, decoder, adapter, Codex policy and runner are byte-identical to base.
+
+For a full guided chunk the original integer schedule remains `[3,2,2,2,2,1,1,1,1,1]`: 21 model-forward batches including five initial batches, 176 canonical candidates / 11 score batches. RBF calls are four initial plus ten parent calls, **14 total versus N27's 19**. This is not matched total computational cost. Existing `rollout_diversity_steps_applied` continues to mean post-forward updates (zero in N28); parent scalar entries explicitly use `phase=parent`, one per iteration. They must not be misreported as denoising-step updates.
+
+Evidence uses `n28-parent-rbf-call-summary-v1` and `current_chunk_selected_parent_offspring`, with an actual `parent_allocation_sequence` when recording is active. It distinguishes the unconstrained proposed operand from the observed assignment delta. The bounded event family is `n28_rbf_witness`: first guided initial slot plus ten parent slots, at most 11 calls / 220 KiB numeric data and 16 KiB metadata per call. Initial tensors retain truthful `model_output_before/after` and original same-forward binding; parent tensors use `parent_offspring_before/after`. The input is byte-bound to the recorded parent-before prefix; no selection based on activity, no later-decision backfill, no added projector/model/score call. These CPU witnesses are not an independent native CUDA proof.
+
+## Necessary tests and retained failures
+
+The final command (from `implementation`, using `/home/hynx/miniconda3/envs/vla-pilot/bin/python`) was:
+
+```sh
+OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 NUMEXPR_NUM_THREADS=2 CUDA_VISIBLE_DEVICES='' PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 /home/hynx/miniconda3/envs/vla-pilot/bin/python ../cpu_guard_v3.py 3 tests/test_n28_parent_before_renoise.py
+```
+
+For reproduction, choose a new unused integer run ID; the guard refuses reuse, and accounts prior resource records. The original e21 policy source is frozen in `baseline-policy-e21.py` solely for the synthetic original-function comparison. No historical experiment data is a fixture.
+
+- Run 1: 14 setup errors, **8.116981164 CPU seconds**. Guard blocked an omitted static `utils` dependency and interpreter discovery of unrelated inherited search paths; no payload content was read. No test assertions ran. Original guard and log retained.
+- Run 2: 14 assertions passed, **14.445591903 CPU seconds**, but two denied enumerations of the isolated `vlm_query` directory mean this is **not guard-clean acceptance**. No prompt or Stage file was opened. The final guard permits only that exact directory enumeration, not its contents.
+- Run 3: **15 passed**, guard denials **0**, **14.634358972 CPU seconds / 11.737159964 wall seconds**. Cumulative test CPU **37.196932039 / 180 seconds**. Both CPUs `[0,1]`, two threads; peak RSS 637344 KiB. CUDA was hidden and `torch.cuda.is_initialized()` remained false; tensors and assertions were CPU-only. Normal Torch dependency discovery is not represented as proof of zero driver/runtime probes. No CUDA warning appeared in these logs.
+
+Coverage: FP32/BF16 mixed/interior/boundary/coincident/zero cases, model-like noncontiguous layout, zero/signed-zero bytes, unchanged tail/nontranslation, unchanged RNG and one projector acquisition per parent row; strict configuration and actual scheduler sample-only gates; no model-output RBF in any 3/2/1-step rollout; full synthetic 10-round execution order and original timestep/forward/score counts; first-guided witness association/caps and semantic corruptions; instrumentation on/off parity; old N27 default numerical/RNG/counter parity against actual e21 functions; actual Hydra composition of C0/Q0/N27/N28 using `n4_observed_baseline_profiles.json` and N27's real expanded override list. N28 and N27 composed configurations differ only by the new field. Runtime paths remain configuration strings; no runtime/model/env was instantiated.
+
+All warnings are the unchanged `core/fkd_class.py` docstring escape warning. One manifest packaging attempt used a nonexistent guessed worker filename and failed before manifest write; `packaging-error-v1.txt` preserves it. Removing that nonexistent manifest entry changed no source or tests.
+
+## Delivery and remaining integration
+
+`implementation-v1.patch` contains the exact six-file base delta; reverse-apply check passed. `source-delta-v1.json` records function equality. `source-manifest-cpu-v1.json` binds all six changed/added files and 13 explicit unchanged critical files; it is a CPU source inventory, not a complete future runtime/release manifest. `delivery-manifest-v1.json` binds these and every test/guard/failure artifact. Synthetic disk fixtures total about 104 KiB; no models or previous payloads were copied.
+
+The future phase still needs closed N28 runner profile expansion, N28-specific native auditing of initial versus parent semantics/sequence and actual before→assignment→renoise linkage, appropriate same-backend proof, controller/profile gates including zero-guided cases, complete source/runtime manifest and independently reviewed finite admission. Existing N27 native audit cannot be silently reused as if its 19-call schedule and same-forward rollout labels described N28. None of those future gates is activated here. Native arithmetic, denoiser transfer, final action feasibility and task benefit remain unproved; the synthetic stub establishes wiring and invariants only.

@@ -1,0 +1,33 @@
+{
+  "schema": "n32-ideation-provenance-v1",
+  "source": "7428ce8a51f76c5f641537be9a7614631d82b0d9",
+  "scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/hypothesis-and-cpu-scope-v1.md",
+    "sha256": "84a8da9a38cedce9d0fe8931c2bdc33b9f00011fd5efdecc4e00c078e422492b",
+    "bytes": 6164
+  },
+  "inputs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/root-terminal-review-v1.json",
+      "sha256": "77105ba3099a98edf412b7527670075f9cbe3302a21b146e318a5a2f6c9146dd",
+      "bytes": 14351
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-mechanism-v1/review-manifest.json",
+      "sha256": "66750f16cbd4c392cd595dba47e77a86a3f9e9d16bb55b4bc1a68c703bf26f89",
+      "bytes": 1504
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-native-decode-v1/review-manifest.json",
+      "sha256": "df10f68677dbe93e4831749c701b5d68350881766f0fa82c5170ea1290437fa6",
+      "bytes": 2403
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-target-motion-v1/tracker-source-review-v1.json",
+      "sha256": "0466940f786bd58d9f96df6ea5c1bd5164f6b738e59e6f0f3401cacfc874cefb",
+      "bytes": 2998
+    }
+  ],
+  "gpu_authorized": false,
+  "target_met": false
+}

@@ -1,0 +1,1717 @@
+{
+  "schema": "n31-phase-b-cpu-coverage-v1",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/source-manifest-phase-b-v1.json",
+    "sha256": "417e9e3b0b4b683d407244fe4c835e93d623192714eec180645f30d654767211",
+    "bytes": 13319
+  },
+  "limits": {
+    "aggregate_test_cpu_seconds": 1200,
+    "aggregate_test_wall_seconds": 1800,
+    "affinity": [
+      0,
+      1
+    ],
+    "threads": 2,
+    "AS_bytes": 17179869184
+  },
+  "runs": [
+    {
+      "run": 1,
+      "passed": 17,
+      "failed": 9,
+      "deselected": 0,
+      "disposition": "Fixture/expectation failures: original initial_final trace not synchronized with controlled synthetic sampler return; original Q0 grid gate correctly rejected altered route configs; provider RuntimeError expected as ValueError; frozen archive entry mutation; wrong resolver name; total active projection-row equality assumed despite changed final archive size.",
+      "external": {
+        "argv": [
+          "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+          "-I",
+          "-B",
+          "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_phase_b_guard_v1.py",
+          "run1",
+          "1200",
+          "1800"
+        ],
+        "cwd": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/artifacts/cpu-phase-b-scratch",
+        "pid": 3986190,
+        "exit_code": 1,
+        "wall_seconds": 17.716611047042534,
+        "child_cpu_seconds": 24.906934999999997,
+        "guard_sha256": "56766a038bb7ea65f860463bf054d46580cc42489a0ca2ee0e7523b164ffcdf4",
+        "parent_cpu_hard_limit": -1,
+        "reaped": true
+      },
+      "external_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run1-external.json",
+        "sha256": "417d109c2ec141cfe1bee546e5a6fa13b4fd1cab8e8009120092c5557912425c",
+        "bytes": 791
+      },
+      "resource_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run1-resource.json",
+        "sha256": "aa47808a429cdf017b70012c49790155fc8285291f2ae5b4e3be22a959481e2a",
+        "bytes": 471045
+      },
+      "log_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run1.log",
+        "sha256": "5d5681cdf1a71c9c26d7bdfb2ef3993569a50646bda84115d5bf54fd02546947",
+        "bytes": 94423
+      },
+      "source_ref": null,
+      "guard_clean": true,
+      "denied_count": 0,
+      "cuda_initialized": false,
+      "max_rss_kib": 852024,
+      "affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "tests": []
+    },
+    {
+      "run": 2,
+      "passed": 9,
+      "failed": 2,
+      "deselected": 15,
+      "disposition": "Remaining two negatives referenced canonical costs key; actual canonical schema exposes effective_quality. Other nine selected checks passed.",
+      "external": {
+        "argv": [
+          "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+          "-I",
+          "-B",
+          "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_phase_b_guard_v1.py",
+          "run2",
+          "1175",
+          "1782",
+          "-k",
+          "full10 or actual_rollout or profile or (provenance and (provider or archive_cost or source_iter))",
+          "--tb=short"
+        ],
+        "cwd": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/artifacts/cpu-phase-b-scratch",
+        "pid": 3988201,
+        "exit_code": 1,
+        "wall_seconds": 13.282516741892323,
+        "child_cpu_seconds": 18.38477,
+        "guard_sha256": "56766a038bb7ea65f860463bf054d46580cc42489a0ca2ee0e7523b164ffcdf4",
+        "parent_cpu_hard_limit": -1,
+        "reaped": true
+      },
+      "external_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run2-external.json",
+        "sha256": "08ae9119db7a586b29b28c2b5a4c192df6f0547123b495d1ee089c50a498e01f",
+        "bytes": 914
+      },
+      "resource_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run2-resource.json",
+        "sha256": "80b5f175588a70e3a5034a14c6bf7715e9a8d2c7f475164e24d5db26515fc919",
+        "bytes": 476106
+      },
+      "log_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run2.log",
+        "sha256": "2974ada580c0bdd7001aba433a4035d09cc6a7d62cb3521506f9e8bb70745311",
+        "bytes": 4687
+      },
+      "source_ref": null,
+      "guard_clean": true,
+      "denied_count": 0,
+      "cuda_initialized": false,
+      "max_rss_kib": 809588,
+      "affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "tests": []
+    },
+    {
+      "run": 3,
+      "passed": 11,
+      "failed": 0,
+      "deselected": 20,
+      "disposition": "Eleven selected full-search/Main/context checks passed. Historical four-file source snapshot retained; not final shared-fixture coverage.",
+      "external": {
+        "argv": [
+          "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+          "-I",
+          "-B",
+          "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_phase_b_guard_v1.py",
+          "run3",
+          "1156",
+          "1769",
+          "-k",
+          "full10 or complete_main or context_contract",
+          "--tb=short"
+        ],
+        "cwd": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/artifacts/cpu-phase-b-scratch",
+        "pid": 3990099,
+        "exit_code": 0,
+        "wall_seconds": 14.377692096983083,
+        "child_cpu_seconds": 20.61845,
+        "guard_sha256": "56766a038bb7ea65f860463bf054d46580cc42489a0ca2ee0e7523b164ffcdf4",
+        "parent_cpu_hard_limit": -1,
+        "reaped": true
+      },
+      "external_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run3-external.json",
+        "sha256": "9ef32e53ec93db5b28cfa537a566597d7777a0144e24801e6e9789ed361ac798",
+        "bytes": 860
+      },
+      "resource_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run3-resource.json",
+        "sha256": "fb710e8b66ab7e292f82f934951bff7c56d9173c536614a570b176bfd55ac70e",
+        "bytes": 424669
+      },
+      "log_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run3.log",
+        "sha256": "66d7f81116da587f64ddf72b4be92891547db652f788666694ad523abfab01b6",
+        "bytes": 933
+      },
+      "source_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run3-source.json",
+        "sha256": "9a0ad43d45d3c695d2879854103e1bd35f848294001a0c6e7840c5743e1bb2c8",
+        "bytes": 397
+      },
+      "guard_clean": true,
+      "denied_count": 0,
+      "cuda_initialized": false,
+      "max_rss_kib": 805972,
+      "affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "tests": []
+    },
+    {
+      "run": 4,
+      "passed": 32,
+      "failed": 0,
+      "deselected": 0,
+      "disposition": "Full then-current 32 tests passed with exact source binding. A later root review identified an uncovered empty-provider boundary.",
+      "external": {
+        "argv": [
+          "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+          "-I",
+          "-B",
+          "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_phase_b_guard_v2.py",
+          "run4",
+          "1136",
+          "1754",
+          "-vv",
+          "--tb=short"
+        ],
+        "cwd": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/artifacts/cpu-phase-b-scratch",
+        "pid": 3993039,
+        "exit_code": 0,
+        "wall_seconds": 20.690240729949437,
+        "child_cpu_seconds": 30.766122,
+        "guard_sha256": "ec82aa55ba5a1c9fe377c4ea67ab90d4ecace0cc637db55827f41bfefd3fa4ce",
+        "source_binding_sha256": "8ab5f3cb4fa916e38fab156870edb273d322192d2d8d31c3cdf83e94ee52b95d",
+        "parent_cpu_hard_limit": -1,
+        "reaped": true
+      },
+      "external_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run4-external.json",
+        "sha256": "438e273506a9c680d5ec23b1e8f3450073630b43d2570e563d9508b9a6eecb40",
+        "bytes": 906
+      },
+      "resource_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run4-resource.json",
+        "sha256": "4cb408a408a114915e93f5e374dc28ab081c8c5690c8164e1e4b3e17ee2600e2",
+        "bytes": 498992
+      },
+      "log_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run4.log",
+        "sha256": "266c9340c6b5e4baddc777f6aa93f08080ab492c53044831b38550cb98a28a1a",
+        "bytes": 3476
+      },
+      "source_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run4-source.json",
+        "sha256": "8ab5f3cb4fa916e38fab156870edb273d322192d2d8d31c3cdf83e94ee52b95d",
+        "bytes": 1655
+      },
+      "guard_clean": true,
+      "denied_count": 0,
+      "cuda_initialized": false,
+      "max_rss_kib": 833664,
+      "affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "tests": [
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype0]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.003968416014686227
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype0]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 3.28057198098395
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype0]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0021094499388709664
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype1]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0019218289526179433
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype1]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 1.4195628500310704
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype1]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0014663569163531065
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype0]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0012879499699920416
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype0]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 1.5416025680024177
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype0]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0016075680032372475
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype1]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0013535378966480494
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype1]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 1.5691987309837714
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype1]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0016246240120381117
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[False]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0007198690436780453
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[False]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.9617063159821555
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[False]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0010362130124121904
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[True]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.000697794952429831
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[True]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.8860656399047002
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[True]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.001029453007504344
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[baseline]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0007137189386412501
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[baseline]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.4994102040072903
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[baseline]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0006524469936266541
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[no_active_rbf]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0014188650529831648
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[no_active_rbf]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.5653924290090799
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[no_active_rbf]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0005913659697398543
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[fallback]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0007116360357031226
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[fallback]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.550145376008004
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[fallback]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0007725569885224104
+        },
+        {
+          "nodeid": "::test_cache_no_alias_auxiliary_bound_and_duplicate_provenance",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005837139906361699
+        },
+        {
+          "nodeid": "::test_cache_no_alias_auxiliary_bound_and_duplicate_provenance",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.02999412699136883
+        },
+        {
+          "nodeid": "::test_cache_no_alias_auxiliary_bound_and_duplicate_provenance",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00023820705246180296
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[target]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005427029682323337
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[target]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.024423482012934983
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[target]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002397199859842658
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[provider]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.00048361404333263636
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[provider]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.02129120798781514
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[provider]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002245960058644414
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[archive_cost]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0004807499935850501
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[archive_cost]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.024946764926426113
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[archive_cost]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00023442099336534739
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[source_iter]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0004949111025780439
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[source_iter]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.02434299001470208
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[source_iter]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002255879808217287
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[dtype]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0004929680144414306
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[dtype]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021308263996616006
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[dtype]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00023865699768066406
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[origin]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0004746710183098912
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[origin]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021486310986801982
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[origin]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00022554805036634207
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[order]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0004976259078830481
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[order]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021475434070453048
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[order]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00023768609389662743
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[double_apply]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.00047391990665346384
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[double_apply]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.025388907990418375
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[double_apply]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00022930302657186985
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[tracker]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005438250955194235
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[tracker]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.45869223098270595
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[tracker]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.000619748025201261
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[hand_quaternion_xyzw]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0006935989949852228
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[hand_quaternion_xyzw]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.463251800974831
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[hand_quaternion_xyzw]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0006122969789430499
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[gripper_qpos]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0006884420290589333
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[gripper_qpos]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.47152037895284593
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[gripper_qpos]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0006617821054533124
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[keypoints]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0007388259982690215
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[keypoints]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.5397917029913515
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[keypoints]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0006997180171310902
+        },
+        {
+          "nodeid": "::test_packet_copy_native_hplus1_and_no_cross_decision",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0006920569576323032
+        },
+        {
+          "nodeid": "::test_packet_copy_native_hplus1_and_no_cross_decision",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.12863923702389002
+        },
+        {
+          "nodeid": "::test_packet_copy_native_hplus1_and_no_cross_decision",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0003281120443716645
+        },
+        {
+          "nodeid": "::test_profile_and_actual_hydra_compose",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005658370209857821
+        },
+        {
+          "nodeid": "::test_profile_and_actual_hydra_compose",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.47288183798082173
+        },
+        {
+          "nodeid": "::test_profile_and_actual_hydra_compose",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00035333004780113697
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[False]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0012225809041410685
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[False]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 1.1456770149525255
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[False]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0003776049707084894
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[True]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0012717950157821178
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[True]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 1.222256003995426
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[True]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0003838749835267663
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[mask]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0006785569712519646
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[mask]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.023545996053144336
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[mask]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00026035995688289404
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[episode]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005389879224821925
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[episode]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021529875928536057
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[episode]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00023790693376213312
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[nonfinite]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005103140138089657
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[nonfinite]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021774713066406548
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[nonfinite]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002353619784116745
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[packet_shape]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005070300539955497
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[packet_shape]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.022467550938017666
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[packet_shape]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002593379467725754
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005037239752709866
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.02412674599327147
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00024562806356698275
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized_malformed]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005203189793974161
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized_malformed]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021698659053072333
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized_malformed]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002987069310620427
+        }
+      ]
+    },
+    {
+      "run": 5,
+      "passed": 2,
+      "failed": 1,
+      "deselected": 32,
+      "disposition": "Real implementation defect: old/off empty-provider with valid keypoints accepted while on required absent projected_xyz. Two other boundaries passed. Fixed only original score-short-circuit handling with explicit Unknown and no added projection.",
+      "external": {
+        "argv": [
+          "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+          "-I",
+          "-B",
+          "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_phase_b_guard_v2.py",
+          "run5",
+          "1105",
+          "1733",
+          "-k",
+          "real_unsupported",
+          "-vv",
+          "--tb=short"
+        ],
+        "cwd": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/artifacts/cpu-phase-b-scratch",
+        "pid": 3994614,
+        "exit_code": 1,
+        "wall_seconds": 7.537288812105544,
+        "child_cpu_seconds": 8.624429,
+        "guard_sha256": "ec82aa55ba5a1c9fe377c4ea67ab90d4ecace0cc637db55827f41bfefd3fa4ce",
+        "source_binding_sha256": "eb0f0d90f15afc141da67f860c170e582d2327f9fb0c6060cef9d300247b291e",
+        "parent_cpu_hard_limit": -1,
+        "reaped": true
+      },
+      "external_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run5-external.json",
+        "sha256": "f91475e8d63db4bc1c3a13e7749103cc8dac570146135370e390e6210d71271f",
+        "bytes": 938
+      },
+      "resource_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run5-resource.json",
+        "sha256": "354d41c84cf3b9af421af2aec8d674670305886e3696a99c2ba2ed5e1f4a2d6d",
+        "bytes": 420504
+      },
+      "log_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run5.log",
+        "sha256": "e86fa0466a32045d4aa4a30a52cdfcf9f165082b3f77f5b9f8c2bfdd222e56bd",
+        "bytes": 3480
+      },
+      "source_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run5-source.json",
+        "sha256": "eb0f0d90f15afc141da67f860c170e582d2327f9fb0c6060cef9d300247b291e",
+        "bytes": 1655
+      },
+      "guard_clean": true,
+      "denied_count": 0,
+      "cuda_initialized": false,
+      "max_rss_kib": 716904,
+      "affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "tests": [
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[empty_provider]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.003863158985041082
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[empty_provider]",
+          "when": "call",
+          "outcome": "failed",
+          "duration": 2.4717462299158797
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[empty_provider]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0008795020403340459
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[no_keypoints]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0012975239660590887
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[no_keypoints]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.189273537020199
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[no_keypoints]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0004270270001143217
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[non_template]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0012062570312991738
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[non_template]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.7298179320059717
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[non_template]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0017853430472314358
+        }
+      ]
+    },
+    {
+      "run": 6,
+      "passed": 37,
+      "failed": 0,
+      "deselected": 0,
+      "disposition": "Final frozen source full suite 37 passed; includes empty-provider old/off/on parity and strict missing-projection negatives. No source/code changes afterwards.",
+      "external": {
+        "argv": [
+          "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+          "-I",
+          "-B",
+          "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_phase_b_guard_v2.py",
+          "run6",
+          "1096",
+          "1726",
+          "-vv",
+          "--tb=short"
+        ],
+        "cwd": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/artifacts/cpu-phase-b-scratch",
+        "pid": 3996002,
+        "exit_code": 0,
+        "wall_seconds": 22.401884805993177,
+        "child_cpu_seconds": 33.575598,
+        "guard_sha256": "ec82aa55ba5a1c9fe377c4ea67ab90d4ecace0cc637db55827f41bfefd3fa4ce",
+        "source_binding_sha256": "1b18c93e5254b3585b56e867214d601556f61be15b04932d5be17dfff1fdf749",
+        "parent_cpu_hard_limit": -1,
+        "reaped": true
+      },
+      "external_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run6-external.json",
+        "sha256": "07accc22b216629c0591adab866600ba5b1ba2f103bd426812c8abc25e0b3827",
+        "bytes": 906
+      },
+      "resource_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run6-resource.json",
+        "sha256": "1f074cfa64e26545654c3221fd5d6afe188e83dd1e8c363e56a731c5cf44f916",
+        "bytes": 501701
+      },
+      "log_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run6.log",
+        "sha256": "8439ccaf3accc6d0c330a86af751d7659097aaf43253e7adb153dc5886704827",
+        "bytes": 3876
+      },
+      "source_ref": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run6-source.json",
+        "sha256": "1b18c93e5254b3585b56e867214d601556f61be15b04932d5be17dfff1fdf749",
+        "bytes": 1655
+      },
+      "guard_clean": true,
+      "denied_count": 0,
+      "cuda_initialized": false,
+      "max_rss_kib": 863792,
+      "affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "tests": [
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype0]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.004096717922948301
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype0]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 3.0655554360710084
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype0]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.002051587915048003
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype1]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0018859689589589834
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype1]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 1.4351492110872641
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[False-dtype1]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0018553020199760795
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype0]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0013757480774074793
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype0]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 1.545537899946794
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype0]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0015499800210818648
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype1]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0013273339718580246
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype1]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 1.6391791380010545
+        },
+        {
+          "nodeid": "::test_full10_active_and_nohit_cost_rng_trace[True-dtype1]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0017644250765442848
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[False]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0008236239664256573
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[False]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.9353756960481405
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[False]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.001028953935019672
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[True]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0007219900144264102
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[True]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.8795509620103985
+        },
+        {
+          "nodeid": "::test_observer_cannot_change_proposal[True]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0010525599354878068
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[baseline]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0007207680027931929
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[baseline]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.5743783230427653
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[baseline]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.000551773002371192
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[no_active_rbf]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0007032420253381133
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[no_active_rbf]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.5034844499314204
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[no_active_rbf]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0005656840512529016
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[fallback]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.000707658939063549
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[fallback]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.5539720940869302
+        },
+        {
+          "nodeid": "::test_actual_rollout_paths_insert_before_sole_score[fallback]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0007955109467729926
+        },
+        {
+          "nodeid": "::test_cache_no_alias_auxiliary_bound_and_duplicate_provenance",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005933059146627784
+        },
+        {
+          "nodeid": "::test_cache_no_alias_auxiliary_bound_and_duplicate_provenance",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.030507732066325843
+        },
+        {
+          "nodeid": "::test_cache_no_alias_auxiliary_bound_and_duplicate_provenance",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002518200781196356
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[target]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005588739877566695
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[target]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.02467465295922011
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[target]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002314690500497818
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[provider]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005024289712309837
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[provider]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.02145046298392117
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[provider]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00022678193636238575
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[archive_cost]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005004859995096922
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[archive_cost]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.024375380016863346
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[archive_cost]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00022968696430325508
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[source_iter]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005025190766900778
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[source_iter]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.025156910996884108
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[source_iter]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00022791395895183086
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[dtype]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0004924939712509513
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[dtype]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021369070978835225
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[dtype]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00022417795844376087
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[origin]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.000493645085953176
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[origin]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.02159537305124104
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[origin]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002380200894549489
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[order]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0004866149974986911
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[order]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021494611050002277
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[order]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00022970710415393114
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[double_apply]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005093589425086975
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[double_apply]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.02505511697381735
+        },
+        {
+          "nodeid": "::test_provenance_rejects_contradictions[double_apply]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00023192004300653934
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[tracker]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.000569669995456934
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[tracker]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.4821898309746757
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[tracker]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0006431809160858393
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[hand_quaternion_xyzw]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.000716672046110034
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[hand_quaternion_xyzw]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.4773550550453365
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[hand_quaternion_xyzw]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0006456150440499187
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[gripper_qpos]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0007050050189718604
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[gripper_qpos]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.5366957440273836
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[gripper_qpos]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0007007779786363244
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[keypoints]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0007164409616962075
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[keypoints]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.46646692301146686
+        },
+        {
+          "nodeid": "::test_missing_observation_explicit_skip[keypoints]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0006161300698295236
+        },
+        {
+          "nodeid": "::test_packet_copy_native_hplus1_and_no_cross_decision",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0006469869986176491
+        },
+        {
+          "nodeid": "::test_packet_copy_native_hplus1_and_no_cross_decision",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.12443915707990527
+        },
+        {
+          "nodeid": "::test_packet_copy_native_hplus1_and_no_cross_decision",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0003253709292039275
+        },
+        {
+          "nodeid": "::test_profile_and_actual_hydra_compose",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0006305029382929206
+        },
+        {
+          "nodeid": "::test_profile_and_actual_hydra_compose",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.47400285897310823
+        },
+        {
+          "nodeid": "::test_profile_and_actual_hydra_compose",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00034346897155046463
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[False]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0012346539879217744
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[False]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 1.1523604660760611
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[False]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.001071498030796647
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[True]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0020152629585936666
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[True]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 1.2220440639648587
+        },
+        {
+          "nodeid": "::test_complete_main_raw_packet_no_new_observation[True]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0003813059302046895
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[mask]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0006654850440099835
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[mask]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.023833440034650266
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[mask]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00025868089869618416
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[episode]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005581729346886277
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[episode]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021902394015341997
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[episode]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002537630498409271
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[nonfinite]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005244219209998846
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[nonfinite]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021925618057139218
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[nonfinite]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002610250376164913
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[packet_shape]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005102710565552115
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[packet_shape]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.022771916934289038
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[packet_shape]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002514199586585164
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005177019629627466
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.024054012959823012
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00025498506147414446
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized_malformed]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005263839848339558
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized_malformed]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.021922794985584915
+        },
+        {
+          "nodeid": "::test_context_contract_and_unrecognized_skip[unrecognized_malformed]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002538940170779824
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[empty_provider]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0011351240100339055
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[empty_provider]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.7030571339419112
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[empty_provider]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.001182054984383285
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[no_keypoints]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0013329630019143224
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[no_keypoints]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.2757934279507026
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[no_keypoints]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00041755998972803354
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[non_template]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0012661319924518466
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[non_template]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.7173187450971454
+        },
+        {
+          "nodeid": "::test_real_unsupported_input_baseline_parity[non_template]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0013891080161556602
+        },
+        {
+          "nodeid": "::test_missing_projection_is_not_generic_tolerance[False]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0006981540936976671
+        },
+        {
+          "nodeid": "::test_missing_projection_is_not_generic_tolerance[False]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.022980381036177278
+        },
+        {
+          "nodeid": "::test_missing_projection_is_not_generic_tolerance[False]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.0002511389320716262
+        },
+        {
+          "nodeid": "::test_missing_projection_is_not_generic_tolerance[True]",
+          "when": "setup",
+          "outcome": "passed",
+          "duration": 0.0005775620229542255
+        },
+        {
+          "nodeid": "::test_missing_projection_is_not_generic_tolerance[True]",
+          "when": "call",
+          "outcome": "passed",
+          "duration": 0.02206336590461433
+        },
+        {
+          "nodeid": "::test_missing_projection_is_not_generic_tolerance[True]",
+          "when": "teardown",
+          "outcome": "passed",
+          "duration": 0.00029677897691726685
+        }
+      ]
+    }
+  ],
+  "aggregate_test_cpu_seconds": 136.876304,
+  "aggregate_test_wall_seconds": 96.0062342339661,
+  "passed_test_executions_with_repeats": 108,
+  "failed_test_executions": 12,
+  "final_distinct_passed_cases": 37,
+  "final_nodeids": [
+    "::test_full10_active_and_nohit_cost_rng_trace[False-dtype0]",
+    "::test_full10_active_and_nohit_cost_rng_trace[False-dtype1]",
+    "::test_full10_active_and_nohit_cost_rng_trace[True-dtype0]",
+    "::test_full10_active_and_nohit_cost_rng_trace[True-dtype1]",
+    "::test_observer_cannot_change_proposal[False]",
+    "::test_observer_cannot_change_proposal[True]",
+    "::test_actual_rollout_paths_insert_before_sole_score[baseline]",
+    "::test_actual_rollout_paths_insert_before_sole_score[no_active_rbf]",
+    "::test_actual_rollout_paths_insert_before_sole_score[fallback]",
+    "::test_cache_no_alias_auxiliary_bound_and_duplicate_provenance",
+    "::test_provenance_rejects_contradictions[target]",
+    "::test_provenance_rejects_contradictions[provider]",
+    "::test_provenance_rejects_contradictions[archive_cost]",
+    "::test_provenance_rejects_contradictions[source_iter]",
+    "::test_provenance_rejects_contradictions[dtype]",
+    "::test_provenance_rejects_contradictions[origin]",
+    "::test_provenance_rejects_contradictions[order]",
+    "::test_provenance_rejects_contradictions[double_apply]",
+    "::test_missing_observation_explicit_skip[tracker]",
+    "::test_missing_observation_explicit_skip[hand_quaternion_xyzw]",
+    "::test_missing_observation_explicit_skip[gripper_qpos]",
+    "::test_missing_observation_explicit_skip[keypoints]",
+    "::test_packet_copy_native_hplus1_and_no_cross_decision",
+    "::test_profile_and_actual_hydra_compose",
+    "::test_complete_main_raw_packet_no_new_observation[False]",
+    "::test_complete_main_raw_packet_no_new_observation[True]",
+    "::test_context_contract_and_unrecognized_skip[mask]",
+    "::test_context_contract_and_unrecognized_skip[episode]",
+    "::test_context_contract_and_unrecognized_skip[nonfinite]",
+    "::test_context_contract_and_unrecognized_skip[packet_shape]",
+    "::test_context_contract_and_unrecognized_skip[unrecognized]",
+    "::test_context_contract_and_unrecognized_skip[unrecognized_malformed]",
+    "::test_real_unsupported_input_baseline_parity[empty_provider]",
+    "::test_real_unsupported_input_baseline_parity[no_keypoints]",
+    "::test_real_unsupported_input_baseline_parity[non_template]",
+    "::test_missing_projection_is_not_generic_tolerance[False]",
+    "::test_missing_projection_is_not_generic_tolerance[True]"
+  ],
+  "final_bound_source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run6-source.json",
+    "sha256": "1b18c93e5254b3585b56e867214d601556f61be15b04932d5be17dfff1fdf749",
+    "bytes": 1655
+  },
+  "phase_a_pure_tests_repeated": false,
+  "cpu_measurement": "Outer wait4 child user+system includes process startup/exit; internal resource values exclude part of startup. Static reads/edits and earlier administrative packaging were not individually timed; no false claim that this is all agent CPU.",
+  "warnings": "Final run20 SyntaxWarnings from unchanged core/fkd_class.py:39 docstring invalid escape sequence. No CUDA initialization recorded.",
+  "authority": "CPU production wiring only; no runtime/native proof or online release."
+}

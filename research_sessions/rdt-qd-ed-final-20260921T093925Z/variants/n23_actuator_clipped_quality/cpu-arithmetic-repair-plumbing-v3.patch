@@ -1,0 +1,662 @@
+diff --git a/experiments/iteration_023_actuator_clipped_quality/arithmetic-repair-engineering-exception-v3.md b/experiments/iteration_023_actuator_clipped_quality/arithmetic-repair-engineering-exception-v3.md
+new file mode 100644
+index 0000000..84d5f29
+--- /dev/null
++++ b/experiments/iteration_023_actuator_clipped_quality/arithmetic-repair-engineering-exception-v3.md
+@@ -0,0 +1,26 @@
++# N23 prospective arithmetic-audit correction — engineering exception v3
++
++This is a coordinator-authored, prospective engineering scope under the user's continuing instruction “继续完成满足目标且无需我介入的autoresearch”. It is not new user approval, a budget increase, or a claim that any earlier preflight passed. The v1/v2 one-opportunity rules and both UUID exceptions remain exhausted and immutable. This separate scope permits one additional charged backend attempt, at most four backend attempts total, only after the concrete CPU correction and final root review below. No GPU execution is authorized by this document alone.
++
++## Evidence and reason
++
++Preserve all three original backend attempts and their exact reports, plans, source identities, journal chronology and costs. The latest is rdt-qd-ed-final-20260921T093925Z__n23_backend_uuid_native_repair__839018c768de, source fbe5ac996467e00fcbc7a1d7e5f24659725f6b3d, plan SHA256 a12364193309ba5a3fd12130e1a978319e89b8155ffa2629fc4b550c06dfcaa0. Root review native-backend-arithmetic-failure-review-v1.json SHA256 6d9381fe1c0b8631df00a7eebb8f89d3b04869991e7e79fe7e8742f3accf1ada records 16.66395034897141 charged GPU-process seconds, accepted=false, no Dev/task outcome, exact matched physical GPU7 native UUID. It completed all176 real batches/2816 candidates:162 batches passed;7 batches had clipped_quality_or_mask mismatches;7 other batches had8 raw_score mismatches plus independent_arithmetic errors. All raw projections matched and all production-helper calls passed. FP32 synthetic failed clipped_quality_or_mask; BF16 synthetic passed; wrong bounds were rejected. These are numerical audit failures, not task failures or GPU hardware evidence.
++
++Frozen production/helper/provider normalize weights using a device tensor weights.sum(), while the independent audit and preflight raw/synthetic reconstruction use Python scalar13. Official pinned PyTorch2.7.1 CUDA BinaryDivTrueKernel.cu32–50 takes reciprocal multiplication for a CPU scalar and direct division for a device tensor. The mismatch is a concrete audit-expression defect; its sufficiency to explain all live discrepancies remains unproved until the new actual backend check passes. A CPU model and source inspection do not constitute CUDA acceptance.
++
++## Permitted correction and immutable boundaries
++
++From fbe5ac9, correct only independent arithmetic weights in scripts/audit_decision_evidence.py and scripts/qd_ed_n23_backend_preflight.py to use the same device-tensor normalization as production, retaining independent implementation, native dtype/device, seven-point expression, target0, clipping bounds, raw projection checks, bitwise equality/hashes and negative controls. Add focused synthetic regression tests demonstrating true-division versus rounded-reciprocal behavior and rejecting altered score/mask/bounds. Evaluation-only source/authority/plan/proof plumbing and this tracked scope may be added to bind the correction. No changes to core, policy, main.py, resolved profiles, scientific inputs, provider/cache/Stage transport or prompts, simulator, runtime corpus, task identities, GPU/EGL mapping, or tolerances. No production arithmetic “fix” is included.
++
++The entire corrected source must be root-reviewed and frozen before the attempt, including CPU tests and explicit source delta. No new model, Stage/provider, simulator, transition branch or extra tensor corpus may be invoked. The actual corrected preflight must use exactly the original N21 task0 corpus2250 bundles/176 batches/2816 candidates and two4-candidate FP32/BF16 synthetic cases, with the original wrong-bounds test and strict bitwise arithmetic gates.
++
++## Finite admission and accounting
++
++Use one idle GPU7 worker, physical UUID GPU-48473162-9548-1a19-04aa-ea86c5349187 and the frozen GPU7 runtime/probe. Charge recovery before launch; timeout120 seconds plus40 seconds cleanup, maximum160 seconds reserved. The new attempt has explicit retry_of the third named attempt. Require exactly the three previous reserved/dispatched/aborted groups, matched native identity, exact full failed numerical report, no previous N23 Dev reservation, no other backend reservation and no live owner. Preserve the previous two UUID failure proofs transitively. Any reservation consumes this new opportunity, including start failure, timeout, missing proof or rejection. No fifth backend attempt exists under this scope.
++
++Cumulative ceiling remains478 attempts/100 GPU hours, buckets baseline51/development187/validation180/formal40/recovery20, protected hour reservations32/12. Preserve all historical charges; no refunds, transfers or outcome reclassification. Full unspent N23 Dev maximum42 attempts/22 GPU hours, this160-second preflight and protected reserves must fit. Root adopts the separately hashed authority under private locks only after source/runtime/failure/capacity review. Existing authorities remain unchanged.
++
++## Proof and continuation
++
++Only an accepted complete actual proof, with native public UUID/type/bytes identity, all176 real batches plus both synthetic cases accepted, wrong-score/bounds rejection, final source/runtime binding, and three aborted predecessors followed by one valid charged attempt, can open the unchanged N23 Dev v2 plan. The subsequent Dev must use that exact corrected source and unchanged40-cell C0/Q0/N7/N23 matrix, scientific gates, typed Dev recovery and cost rules. Neither this exception nor successful backend proof releases protected validation or formal. A failed fourth attempt is closed with all evidence and costs retained; continue CPU diagnosis or research review without pretending that the backend or target passed.
++
+diff --git a/scripts/qd_ed_n23_arithmetic_repair.py b/scripts/qd_ed_n23_arithmetic_repair.py
+new file mode 100644
+index 0000000..db43098
+--- /dev/null
++++ b/scripts/qd_ed_n23_arithmetic_repair.py
+@@ -0,0 +1,225 @@
++#!/usr/bin/env python3
++"""One separately authorized arithmetic audit repair; no fifth opportunity."""
++from __future__ import annotations
++from collections import Counter
++import copy
++import math
++from pathlib import Path
++import subprocess
++from scripts import qd_ed_n23_v2_contract as c
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n23_uuid_repair as first
++from scripts import qd_ed_n23_uuid_native_repair as prior
++
++EXCEPTION=c.RUN_DIR/'arithmetic-repair-engineering-exception-v3.md'
++EXCEPTION_SHA='bf3f28caf3967c4d3cf4cc6674bdaafd2d54abbdd22f5e9bc676853a12424727'
++FAILURE_REVIEW=c.RUN_DIR/'native-backend-arithmetic-failure-review-v1.json'
++FAILURE_SHA='6d9381fe1c0b8631df00a7eebb8f89d3b04869991e7e79fe7e8742f3accf1ada'
++AUTHORITY=c.RUN_DIR/'arithmetic-repair-adoption-v3/authority.json'
++FINAL_REVIEW=c.RUN_DIR/'final-source-runtime-review.arithmetic-repair.v3.json'
++FAILED_ATTEMPT='rdt-qd-ed-final-20260921T093925Z__n23_backend_uuid_native_repair__839018c768de'
++FAILED_SOURCE='fbe5ac996467e00fcbc7a1d7e5f24659725f6b3d'
++FAILED_PLAN_SHA='a12364193309ba5a3fd12130e1a978319e89b8155ffa2629fc4b550c06dfcaa0'
++FAILED_SECONDS=16.66395034897141
++PRIOR_ATTEMPTS=[first.FAILED_ATTEMPT,prior.FAILED_ATTEMPT]
++LIMITS={**first.LIMITS,'max_total_backend_attempts':4}
++CAPS=first.CAPS
++CORRECTION={'scripts/audit_decision_evidence.py':'8c47a4d90fbec4e22329bdab7d53fddc2d01e88c742352e4f9e01a65d1dc8182',
++    'scripts/qd_ed_n23_backend_preflight.py':'fbdd30ac1864ea9d282ce849f45faddda4738c6a5f092351e08bd0d2d13795be'}
++EXTRA_SOURCE={'scripts/qd_ed_n23_arithmetic_repair.py','tests/test_qd_ed_n23_arithmetic_repair.py',
++    'experiments/iteration_023_actuator_clipped_quality/arithmetic-repair-engineering-exception-v3.md'}
++ALLOWED_DELTA=EXTRA_SOURCE|set(CORRECTION)|{'tests/test_qd_ed_n23_backend.py','scripts/qd_ed_n23_v2_contract.py',
++    'scripts/qd_ed_n23_v2_backend.py','scripts/qd_ed_n23_v2_preflight_admit.py','scripts/qd_ed_n23_v2_prepare.py'}
++verify_identity=prior.verify_identity
++
++
++def binding():
++    w.require(c.sha(EXCEPTION)==EXCEPTION_SHA and c.sha(FAILURE_REVIEW)==FAILURE_SHA
++        and c.sha(prior.FAILURE_REVIEW)==prior.FAILURE_SHA,'arithmetic repair immutable scope changed')
++    return {'schema':'n23-arithmetic-repair-binding-v3','exception':c.ref(EXCEPTION),'failed_review':c.ref(FAILURE_REVIEW),
++        'prior_failure':c.ref(prior.FAILURE_REVIEW),'authority':c.ref(AUTHORITY),'retry_of':FAILED_ATTEMPT,
++        'prior_attempts':PRIOR_ATTEMPTS}
++
++
++def source_delta(root):
++    changed=set(subprocess.check_output(['git','diff','--name-only',FAILED_SOURCE,'HEAD'],cwd=root,text=True).splitlines())
++    w.require(changed<=ALLOWED_DELTA,'arithmetic repair changed scientific or unrelated source bytes')
++    w.require(all(c.sha(Path(root)/p)==h for p,h in CORRECTION.items()),'arithmetic repair exact three normalization corrections differ')
++    w.require(c.sha(Path(root)/'experiments/iteration_023_actuator_clipped_quality'/EXCEPTION.name)==EXCEPTION_SHA,
++        'arithmetic repair tracked exception differs')
++    return sorted(changed)
++
++
++def final_review(source,runtime):
++    w.require(c.sha(c.PROTOCOL)==c.PROTOCOL_SHA and c.sha(c.BACKEND_PROTOCOL)==c.BACKEND_PROTOCOL_SHA
++        and c.sha(c.BUDGET_AMENDMENT)==c.AMENDMENT_SHA and c.sha(c.OBSERVABILITY)==c.OBSERVABILITY_SHA
++        and all(c.sha(module.EXCEPTION)==module.EXCEPTION_SHA and c.sha(module.FAILURE_REVIEW)==module.FAILURE_SHA
++            for module in (first,prior)) and c.sha(EXCEPTION)==EXCEPTION_SHA and c.sha(FAILURE_REVIEW)==FAILURE_SHA,
++        'arithmetic repair immutable protocol/amendment/exception/failure bytes differ')
++    reference=c.ref(FINAL_REVIEW);record=w.read_ref(reference)
++    w.require(record=={'schema':'n23-final-source-runtime-review-arithmetic-repair-v3','disposition':'accepted',
++        'source':source,'runtime':runtime,'dev_protocol':c.ref(c.PROTOCOL),'backend_protocol':c.ref(c.BACKEND_PROTOCOL),
++        'amendment':c.ref(c.BUDGET_AMENDMENT),'timeout_observability':c.ref(c.OBSERVABILITY),
++        'exception':c.ref(EXCEPTION),'failed_review':c.ref(FAILURE_REVIEW),'prior_failure':c.ref(prior.FAILURE_REVIEW),
++        'audit_correction':CORRECTION,'no_gpu_release':True},'arithmetic repair final source/runtime review missing or differs')
++    return reference
++
++
++def authority(meta,source,runtime,state=None):
++    w.require(meta==binding(),'arithmetic repair exact authority binding differs')
++    record=w.read_ref(meta['authority'])
++    keys={'schema','exception','failed_review','prior_failure','final_source_review','source','runtime',
++        'authority_interpretation','recorded_at','user_message','cumulative_caps','limits','validation_authorized','formal_authorized'}
++    w.require(set(record)==keys and record['schema']=='n23-arithmetic-repair-authority-v3'
++        and record['exception']==c.ref(EXCEPTION) and record['failed_review']==c.ref(FAILURE_REVIEW)
++        and record['prior_failure']==c.ref(prior.FAILURE_REVIEW)
++        and record['final_source_review']==final_review(source,runtime) and record['source']==source and record['runtime']==runtime
++        and all(isinstance(record[k],str) and record[k].strip() for k in ('authority_interpretation','recorded_at'))
++        and record['user_message']==c.AUTONOMOUS_REPLY and record['cumulative_caps']==CAPS and record['limits']==LIMITS
++        and record['validation_authorized'] is False and record['formal_authorized'] is False,'arithmetic repair finite authority differs')
++    if state is not None:w.require(state.get('n23_arithmetic_repair_authority')==meta['authority'],
++        'arithmetic repair not adopted in private state')
++    return record
++
++
++def numerical_failure(report,review,runtime):
++    batches=report.get('batches',[]);synthetic=report.get('synthetic',[])
++    w.require(len(batches)==176 and sum(v.get('candidates',0) for v in batches)==2816
++        and all(v.get('candidates')==16 and v.get('dtype')=='torch.bfloat16' and v.get('production_helper_passed') is True for v in batches)
++        and sum(v.get('accepted') is True for v in batches)==162 and report.get('errors')==[]
++        and report.get('wrong_bounds_rejected') is True,'arithmetic repair original complete failed corpus differs')
++    mismatch=Counter(v.get('check') for row in batches for v in row.get('mismatches',[]))
++    expected={'clipped_quality_or_mask':7,'raw_score':8,'independent_arithmetic':7}
++    w.require(mismatch==expected and review.get('mismatch_counts')==expected
++        and review.get('rejected_batches')==[v for v in batches if v.get('accepted') is not True],
++        'arithmetic repair exact failed batch evidence differs')
++    for row in batches:
++        kinds=[m['check'] for m in row['mismatches']]
++        if row['accepted']:
++            w.require(not kinds and row.get('independent_passed') is True and row.get('wrong_score_rejected') is True,
++                'arithmetic repair previously accepted batch differs')
++        elif kinds==['clipped_quality_or_mask']:
++            w.require(row.get('independent_passed') is True and row.get('wrong_score_rejected') is True,
++                'arithmetic repair clipped-only failure differs')
++        else:
++            w.require(Counter(kinds) in (Counter(raw_score=1,independent_arithmetic=1),Counter(raw_score=2,independent_arithmetic=1))
++                and row.get('independent_passed') is False
++                and all(m.get('error')=='AuditFailure:n23_seven_point_raw_provider' for m in row['mismatches'] if m['check']=='independent_arithmetic'),
++                'arithmetic repair raw-only failure differs')
++    w.require(len(synthetic)==2 and review.get('synthetic')==synthetic
++        and [v.get('dtype') for v in synthetic]==['torch.float32','torch.bfloat16']
++        and all(v.get('candidates')==4 and v.get('production_helper_passed') is True
++            and v.get('independent_passed') is True and v.get('wrong_score_rejected') is True for v in synthetic)
++        and synthetic[0].get('accepted') is False and synthetic[0].get('mismatches')==[{'check':'clipped_quality_or_mask'}]
++        and synthetic[1].get('accepted') is True and synthetic[1].get('mismatches')==[],
++        'arithmetic repair requires original FP32 rejection and BF16 synthetic pass')
++    verify_identity(report.get('backend',{}),runtime)
++    w.require(review.get('identity_diagnostic')==report['backend']['identity_diagnostic'],
++        'arithmetic repair original native UUID identity differs')
++
++
++def verify_arithmetic_success(report):
++    batches=report.get('batches',[]);synthetic=report.get('synthetic',[])
++    w.require(len(batches)==176 and len(synthetic)==2 and report.get('errors')==[]
++        and all(v.get('candidates')==16 and v.get('dtype')=='torch.bfloat16' for v in batches)
++        and [v.get('dtype') for v in synthetic]==['torch.float32','torch.bfloat16']
++        and all(v.get('candidates')==4 for v in synthetic)
++        and all(v.get('accepted') is True and v.get('mismatches')==[] and v.get('production_helper_passed') is True
++            and v.get('independent_passed') is True and v.get('wrong_score_rejected') is True for v in batches+synthetic)
++        and report.get('wrong_bounds_rejected') is True,
++        'arithmetic repair actual full dtype/candidate/negative-control proof differs')
++
++
++def named_failures(events,r):
++    _,original,_=prior.named_failures(events,r)
++    review=w.read_ref(c.ref(FAILURE_REVIEW))
++    w.require(c.sha(FAILURE_REVIEW)==FAILURE_SHA and review.get('schema')=='n23-native-backend-arithmetic-failure-review-v1'
++        and review.get('attempt_id')==FAILED_ATTEMPT and review.get('status')=='INVALID_BACKEND_ARITHMETIC'
++        and review.get('task_outcome') is False and review.get('dev_dispatched') is False
++        and review.get('gpu_process_wall_seconds')==FAILED_SECONDS and review.get('backend_opportunities_consumed')==3
++        and review.get('additional_gpu_under_v2_authorized') is False and review.get('stage_provider_calls')==0
++        and review.get('authority')==c.ref(prior.AUTHORITY) and review.get('batch_count')==176
++        and review.get('candidate_count')==2816 and review.get('accepted_batches')==162,
++        'arithmetic repair third named failure review differs')
++    plan=w.read_ref(review['plan']);report=w.read_ref(review['report']);terminal=w.read_ref(review['attempt_result'])
++    meta=plan.get('uuid_repair');prior.authority(meta,plan['source'],plan['runtime'])
++    w.require(review['plan']['sha256']==FAILED_PLAN_SHA and plan=={**original,'source':review['source'],'uuid_repair':meta}
++        and plan['source']['commit']==FAILED_SOURCE and report.get('plan')==review['plan'] and report.get('source')==plan['source']
++        and report.get('attempt_id')==FAILED_ATTEMPT and report.get('schema')=='n23-backend-preflight-proof-v2'
++        and report.get('accepted') is False and report.get('task_outcome') is False and report.get('runtime')==plan['runtime']
++        and report.get('uuid_repair')==meta and report.get('retry_of')==prior.FAILED_ATTEMPT
++        and type(report.get('worker_wall_seconds')) in (int,float) and math.isfinite(report['worker_wall_seconds'])
++        and 0<=report['worker_wall_seconds']<=FAILED_SECONDS,'arithmetic repair original plan/source/report differs')
++    numerical_failure(report,review,w.read_ref(plan['runtime']))
++    w.require(terminal.get('attempt_id')==FAILED_ATTEMPT and terminal.get('event')=='aborted'
++        and terminal.get('outcome_valid') is False and terminal.get('task_outcome') is False
++        and terminal.get('source_commit')==FAILED_SOURCE and terminal.get('plan_sha256')==FAILED_PLAN_SHA
++        and terminal.get('budget_bucket')=='recovery' and terminal.get('retry_of')==prior.FAILED_ATTEMPT
++        and terminal.get('gpu_process_wall_seconds')==FAILED_SECONDS and terminal.get('n23_preflight_dispatched') is True
++        and terminal.get('process')==report.get('process') and terminal.get('n23_uuid_repair')==meta
++        and terminal.get('n23_final_review')==prior.final_review(plan['source'],plan['runtime']),
++        'arithmetic repair original terminal/cost/source differs')
++    groups=r['event_groups'](events);group=groups.get(FAILED_ATTEMPT,[])
++    w.require([e['event'] for e in group]==['reserved','dispatched','aborted'] and group[-1]==terminal
++        and all(e.get('identity',{}).get('iteration')==c.PREFLIGHT and e.get('retry_of')==prior.FAILED_ATTEMPT
++            and e.get('source_commit')==FAILED_SOURCE and e.get('plan_sha256')==FAILED_PLAN_SHA
++            and e.get('n23_uuid_repair')==meta and e.get('n23_backend_preflight') is True
++            and e.get('budget_bucket')=='recovery' and e.get('physical_gpu')==7 for e in group),
++        'arithmetic repair third charged ledger group differs')
++    previous_end=next(i for i,e in enumerate(events) if e is groups[prior.FAILED_ATTEMPT][-1])
++    third_start=next(i for i,e in enumerate(events) if e is group[0])
++    w.require(previous_end<third_start,'arithmetic repair failed predecessors out of order')
++    return review,original,terminal
++
++
++def validate_plan(plan):
++    authority(plan['uuid_repair'],plan['source'],plan['runtime']);source_delta(plan['worktree'])
++    original=w.read_ref(w.read_ref(c.ref(first.FAILURE_REVIEW))['plan'])
++    w.require(plan=={**original,'source':plan['source'],'uuid_repair':plan['uuid_repair']},
++        'arithmetic repair changed original corpus/runtime/plan outside source and lineage')
++    return plan
++
++
++def admission(plan,state,events,resources,reservations,*,root,r):
++    from scripts import qd_ed_n23_v2_backend as backend
++    from scripts import qd_ed_n23_v2_preflight_admit as admit
++    c.require_state(state,r);authority(plan['uuid_repair'],plan['source'],plan['runtime'],state)
++    named_failures(events,r);first.no_dev(events)
++    w.require({e['attempt_id'] for e in first.backend_events(events)}==set(PRIOR_ATTEMPTS+[FAILED_ATTEMPT]),
++        'arithmetic repair already reserved or another backend opportunity exists')
++    w.require(plan['source']==w.source_record(root,c.source_paths(r)) and plan['runtime']==c.ref(c.GPU7_RUNTIME)
++        and plan['predecessor_review']==c.predecessor_review(),'arithmetic repair source/runtime/predecessor differs')
++    runtime=backend.validate_plan(plan);c.validate_runtime(runtime,root,r)
++    w.require(Path(plan['artifact_root']).resolve()==Path(state['artifacts']).resolve()
++        and Path(state.get('worktree',root)).resolve()==Path(root).resolve(),'arithmetic repair private owning roots differ')
++    w.require(r['check_budget'](state,events,admit.diagnostic_row(plan),resources,reservations,physical_gpu=7)==120,
++        'arithmetic repair existing recovery capacity unavailable')
++    c.full_capacity(state,events,resources,r,preflight=True)
++    return runtime
++
++
++def verify_lineage(plan,reference,events,source,r):
++    authority(plan['uuid_repair'],source,plan['runtime']);named_failures(events,r)
++    groups=r['event_groups'](first.backend_events(events));previous=set(PRIOR_ATTEMPTS+[FAILED_ATTEMPT])
++    w.require(set(groups)==previous|{reference['attempt_id']} and reference['attempt_id'] not in previous,
++        'arithmetic repair proof must retain exactly four backend attempts')
++    repaired=groups[reference['attempt_id']]
++    w.require([e['event'] for e in repaired]==['reserved','dispatched','valid']
++        and all(e.get('retry_of')==FAILED_ATTEMPT and e.get('n23_uuid_repair')==plan['uuid_repair']
++            and e.get('identity',{}).get('iteration')==c.PREFLIGHT and e.get('n23_backend_preflight') is True
++            and e.get('budget_bucket')=='recovery' and e.get('physical_gpu')==7
++            and e.get('source_commit')==source['commit'] and e.get('plan_sha256')==reference['plan']['sha256'] for e in repaired)
++        and repaired[-1].get('outcome_valid') is True and repaired[-1].get('n23_final_review')==final_review(source,plan['runtime']),
++        'arithmetic repair proof terminal lineage/review differs')
++    old_end=next(i for i,e in enumerate(events) if e is groups[FAILED_ATTEMPT][-1])
++    start=next(i for i,e in enumerate(events) if e is repaired[0])
++    w.require(old_end<start,'arithmetic repair precedes original failure closure')
++    boundary=next(i for i,e in enumerate(events) if e is repaired[-1]);first.no_dev(events[:boundary+1])
++    return repaired[-1]
++
++
++def build_plan(root,r):
++    original=w.read_ref(w.read_ref(c.ref(first.FAILURE_REVIEW))['plan'])
++    source=w.source_record(root,c.source_paths(r));plan=copy.deepcopy(original)
++    plan.update(source=source,uuid_repair=binding());validate_plan(plan)
++    return plan
+diff --git a/scripts/qd_ed_n23_v2_backend.py b/scripts/qd_ed_n23_v2_backend.py
+index 5a851f6..5977821 100644
+--- a/scripts/qd_ed_n23_v2_backend.py
++++ b/scripts/qd_ed_n23_v2_backend.py
+@@ -67,6 +67,8 @@ def validate_plan(plan):
+ 
+ 
+ def artifact_name(plan,kind):
++    if plan.get('uuid_repair',{}).get('schema')=='n23-arithmetic-repair-binding-v3':
++        return 'n23-backend-arithmetic-repair-'+kind+'-v3.json'
+     if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':
+         return 'n23-backend-uuid-native-repair-'+kind+'-v2.json'
+     prefix='n23-backend-uuid-repair' if plan.get('uuid_repair') is not None else 'n23-backend-preflight'
+@@ -173,8 +175,10 @@ def verify_preflight_proof(plan_path, report_path, attempt_result, future_source
+                    and len(report['batches']) == 176 and sum(r['candidates'] for r in report['batches']) == 2816
+                    and len(report['synthetic']) == 2 and all(r['accepted'] and not r['mismatches'] for r in report['batches'] + report['synthetic'])
+                    and report.get('wrong_bounds_rejected') is True, 'preflight CUDA coverage or strict arithmetic proof missing')
+-    if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':
++    if plan.get('uuid_repair',{}).get('schema') in {'n23-uuid-native-repair-binding-v2','n23-arithmetic-repair-binding-v3'}:
+         contract.repair_module(plan['uuid_repair']).verify_identity(backend,runtime)
++    if plan.get('uuid_repair',{}).get('schema')=='n23-arithmetic-repair-binding-v3':
++        contract.repair_module(plan['uuid_repair']).verify_arithmetic_success(report)
+     return {'path': str(Path(report_path).resolve()), 'sha256': worker.sha(report_path)}
+ 
+ 
+diff --git a/scripts/qd_ed_n23_v2_contract.py b/scripts/qd_ed_n23_v2_contract.py
+index dec1d6c..f372130 100644
+--- a/scripts/qd_ed_n23_v2_contract.py
++++ b/scripts/qd_ed_n23_v2_contract.py
+@@ -45,7 +45,9 @@ EXTRA_SOURCE={'scripts/qd_ed_n23_v2_contract.py','scripts/qd_ed_n23_v2_predecess
+  'scripts/qd_ed_n23_uuid_repair.py','tests/test_qd_ed_n23_uuid_repair.py',
+  'experiments/iteration_023_actuator_clipped_quality/uuid-repair-engineering-exception-v1.md',
+  'scripts/qd_ed_n23_uuid_native_repair.py','tests/test_qd_ed_n23_uuid_native_repair.py',
+- 'experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md'}
++ 'experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md',
++ 'scripts/qd_ed_n23_arithmetic_repair.py','tests/test_qd_ed_n23_arithmetic_repair.py',
++ 'experiments/iteration_023_actuator_clipped_quality/arithmetic-repair-engineering-exception-v3.md'}
+ sha=worker.sha
+ ref=v1.ref
+ _SCOPE=None
+@@ -167,11 +169,13 @@ ALLOWED_EXISTING={'scripts/qd_ed_final_runner.py','scripts/qd_ed_n23_preflight_a
+ 
+ 
+ def repair_module(meta):
+-    """Only the two explicit historical engineering exception schemas route."""
++    """Only explicit historical engineering exception schemas route."""
+     if isinstance(meta,dict) and meta.get('schema')=='n23-uuid-repair-binding-v1':
+         from scripts import qd_ed_n23_uuid_repair as selected
+     elif isinstance(meta,dict) and meta.get('schema')=='n23-uuid-native-repair-binding-v2':
+         from scripts import qd_ed_n23_uuid_native_repair as selected
++    elif isinstance(meta,dict) and meta.get('schema')=='n23-arithmetic-repair-binding-v3':
++        from scripts import qd_ed_n23_arithmetic_repair as selected
+     else:
+         raise ValueError('unrecognized N23 UUID repair authority schema')
+     return selected
+diff --git a/scripts/qd_ed_n23_v2_preflight_admit.py b/scripts/qd_ed_n23_v2_preflight_admit.py
+index dd4c16f..0cc6733 100644
+--- a/scripts/qd_ed_n23_v2_preflight_admit.py
++++ b/scripts/qd_ed_n23_v2_preflight_admit.py
+@@ -24,6 +24,8 @@ def diagnostic_row(plan=None):
+             'episode_key': 'n23_backend_preflight_v2_once', 'budget_bucket': 'recovery', 'timeout_seconds': 120}
+     if plan is not None and plan.get('uuid_repair') is not None:
+         row['episode_key']='n23_backend_uuid_native_repair_once' if plan['uuid_repair'].get('schema')=='n23-uuid-native-repair-binding-v2' else 'n23_backend_uuid_repair_once'
++    if plan is not None and plan.get('uuid_repair',{}).get('schema')=='n23-arithmetic-repair-binding-v3':
++        row['episode_key']='n23_backend_arithmetic_repair_once'
+     return row
+ 
+ 
+@@ -77,6 +79,7 @@ def run(plan_path, *, root=ROOT):
+             repaired=plan.get('uuid_repair') is not None
+             retry={'retry_of':plan['uuid_repair']['retry_of']} if repaired else {}
+             prefix='__n23_backend_uuid_native_repair__' if repaired and plan['uuid_repair'].get('schema')=='n23-uuid-native-repair-binding-v2' else ('__n23_backend_uuid_repair__' if repaired else '__n23_backend_preflight_v2__')
++            if repaired and plan['uuid_repair'].get('schema')=='n23-arithmetic-repair-binding-v3':prefix='__n23_backend_arithmetic_repair__'
+             attempt_id=state['run_name']+prefix+uuid.uuid4().hex[:12]
+             output = runner.owned(Path(plan['artifact_root']) / 'attempts' / attempt_id, plan['artifact_root'])
+             runner.require(not output.exists(), 'N23 preflight output already exists')
+diff --git a/scripts/qd_ed_n23_v2_prepare.py b/scripts/qd_ed_n23_v2_prepare.py
+index 5c8e080..d742cca 100644
+--- a/scripts/qd_ed_n23_v2_prepare.py
++++ b/scripts/qd_ed_n23_v2_prepare.py
+@@ -77,6 +77,7 @@ def freeze_backend(plan,path):
+     from scripts import qd_ed_n23_v2_preflight_admit as admit
+     name='backend-preflight-plan.uuid-repair.frozen.v1.json' if plan.get('uuid_repair') is not None else 'backend-preflight-plan.frozen.v2.json'
+     if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':name='backend-preflight-plan.uuid-native-repair.frozen.v2.json'
++    if plan.get('uuid_repair',{}).get('schema')=='n23-arithmetic-repair-binding-v3':name='backend-preflight-plan.arithmetic-repair.frozen.v3.json'
+     runner.require(Path(path).resolve()==(contract.RUN_DIR/name).resolve(),
+         'N23 v2 preflight plan path differs')
+     with runner.locked(ROOT/'data/qd-ed-runner.lock',nonblocking=True):
+@@ -90,11 +91,12 @@ def freeze_backend(plan,path):
+ 
+ def main():
+     p=argparse.ArgumentParser(description=__doc__)
+-    p.add_argument('--kind',choices=['dev','backend','uuid-repair','uuid-native-repair'],required=True);p.add_argument('--output',type=Path,required=True)
++    p.add_argument('--kind',choices=['dev','backend','uuid-repair','uuid-native-repair','arithmetic-repair'],required=True);p.add_argument('--output',type=Path,required=True)
+     p.add_argument('--freeze',action='store_true');p.add_argument('--corpus-index',type=Path);p.add_argument('--backend-proof',type=Path)
+     args=p.parse_args()
+-    if args.kind in {'uuid-repair','uuid-native-repair'}:
+-        if args.kind=='uuid-native-repair':from scripts import qd_ed_n23_uuid_native_repair as repair
++    if args.kind in {'uuid-repair','uuid-native-repair','arithmetic-repair'}:
++        if args.kind=='arithmetic-repair':from scripts import qd_ed_n23_arithmetic_repair as repair
++        elif args.kind=='uuid-native-repair':from scripts import qd_ed_n23_uuid_native_repair as repair
+         else:from scripts import qd_ed_n23_uuid_repair as repair
+         plan=repair.build_plan(ROOT,vars(runner))
+         if args.freeze:plan=freeze_backend(plan,args.output)
+diff --git a/tests/test_qd_ed_n23_arithmetic_repair.py b/tests/test_qd_ed_n23_arithmetic_repair.py
+new file mode 100644
+index 0000000..3a7dc97
+--- /dev/null
++++ b/tests/test_qd_ed_n23_arithmetic_repair.py
+@@ -0,0 +1,289 @@
++"""Synthetic four-group arithmetic repair authority/proof; no real outcomes."""
++import copy
++import json
++import os
++from pathlib import Path
++from types import SimpleNamespace
++import pytest
++import torch
++import yaml
++from test_qd_ed_n23_uuid_repair import case as prior_case,write,no_cuda
++from test_qd_ed_n23_uuid_native_repair import case as native_case,identity
++from scripts import qd_ed_final_runner as r
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n23_v2_contract as c
++from scripts import qd_ed_n23_v2_backend as b
++from scripts import qd_ed_n23_v2_preflight_admit as admit
++from scripts import qd_ed_n23_v2_prepare as prepare
++from scripts import qd_ed_n23_uuid_repair as first
++from scripts import qd_ed_n23_uuid_native_repair as prior
++from scripts import qd_ed_n23_arithmetic_repair as repair
++from scripts.qd_ed_audit_backend import AuditBackend
++
++
++@pytest.fixture
++def case(native_case,monkeypatch):
++    previous=native_case;root=previous.root;previous.source['commit']=repair.FAILED_SOURCE
++    write(prior.FINAL_REVIEW,previous.review);previous.auth['final_source_review']=c.ref(prior.FINAL_REVIEW)
++    write(prior.AUTHORITY,previous.auth);previous.meta['authority']=c.ref(prior.AUTHORITY)
++    thirdplan=write(root/'third-plan.json',previous.plan);monkeypatch.setattr(repair,'FAILED_PLAN_SHA',thirdplan['sha256'])
++    base={'attempt_id':repair.FAILED_ATTEMPT,'identity':r.episode_identity(admit.diagnostic_row(previous.plan)),
++        'episode_key':admit.diagnostic_row(previous.plan)['episode_key'],'budget_bucket':'recovery',
++        'retry_of':prior.FAILED_ATTEMPT,'source_commit':repair.FAILED_SOURCE,'plan_sha256':thirdplan['sha256'],
++        'n23_backend_preflight':True,'task_outcome':False,'physical_gpu':7,'n23_uuid_repair':previous.meta,
++        'n23_final_review':c.ref(prior.FINAL_REVIEW)}
++    batches=[{'decision_id':f'synthetic_{i}','score_sequence':i,'dtype':'torch.bfloat16','candidates':16,
++        'mismatches':[],'production_helper_passed':True,'independent_passed':True,'wrong_score_rejected':True,'accepted':True} for i in range(176)]
++    for i in range(7):batches[i].update(accepted=False,mismatches=[{'check':'clipped_quality_or_mask'}])
++    for i in range(7,14):
++        mismatch=[{'check':'raw_score','candidate':j,'stored':-.01,'reconstructed':-.0101} for j in range(2 if i==7 else 1)]
++        mismatch.append({'check':'independent_arithmetic','error':'AuditFailure:n23_seven_point_raw_provider'})
++        batches[i].update(accepted=False,independent_passed=False,mismatches=mismatch)
++    synthetic=[{'decision_id':'synthetic_'+dt,'score_sequence':-1,'dtype':dt,'candidates':4,'production_helper_passed':True,
++        'independent_passed':True,'wrong_score_rejected':True,'accepted':i==1,
++        'mismatches':[] if i else [{'check':'clipped_quality_or_mask'}]} for i,dt in enumerate(['torch.float32','torch.bfloat16'])]
++    process={'pid':987,'proc_start_ticks':'654','boot_id':'synthetic'}
++    report={'schema':'n23-backend-preflight-proof-v2','plan':thirdplan,'source':previous.source,
++        'attempt_id':repair.FAILED_ATTEMPT,'accepted':False,'task_outcome':False,'errors':[],
++        'batches':batches,'synthetic':synthetic,'runtime':previous.plan['runtime'],'process':process,'uuid_repair':previous.meta,
++        'retry_of':prior.FAILED_ATTEMPT,'worker_wall_seconds':15.,'backend':identity(),'wrong_bounds_rejected':True}
++    terminal={**base,'event':'aborted','outcome_valid':False,'gpu_process_wall_seconds':repair.FAILED_SECONDS,
++        'n23_preflight_dispatched':True,'process':process}
++    events=previous.events+[{**base,'event':'reserved'},{**base,'event':'dispatched'},terminal]
++    failure={'schema':'n23-native-backend-arithmetic-failure-review-v1','attempt_id':repair.FAILED_ATTEMPT,
++        'status':'INVALID_BACKEND_ARITHMETIC','task_outcome':False,'dev_dispatched':False,
++        'gpu_process_wall_seconds':repair.FAILED_SECONDS,'backend_opportunities_consumed':3,
++        'additional_gpu_under_v2_authorized':False,'stage_provider_calls':0,'authority':c.ref(prior.AUTHORITY),
++        'source':previous.source,'plan':thirdplan,'report':write(root/'third-report.json',report),
++        'attempt_result':write(root/'third-terminal.json',terminal),'batch_count':176,'candidate_count':2816,'accepted_batches':162,
++        'mismatch_counts':{'clipped_quality_or_mask':7,'raw_score':8,'independent_arithmetic':7},
++        'rejected_batches':[v for v in batches if not v['accepted']],'synthetic':synthetic,
++        'identity_diagnostic':identity()['identity_diagnostic']}
++    failurepath=root/'third-review.json';write(failurepath,failure)
++    monkeypatch.setattr(repair,'FAILURE_REVIEW',failurepath);monkeypatch.setattr(repair,'FAILURE_SHA',c.sha(failurepath))
++    source={'commit':'arithmetic-source','files':[],'sha256':'arithmetic-source-hash'}
++    review={'schema':'n23-final-source-runtime-review-arithmetic-repair-v3','disposition':'accepted',
++        'source':source,'runtime':previous.plan['runtime'],'dev_protocol':c.ref(c.PROTOCOL),
++        'backend_protocol':c.ref(c.BACKEND_PROTOCOL),'amendment':c.ref(c.BUDGET_AMENDMENT),
++        'timeout_observability':c.ref(c.OBSERVABILITY),'exception':c.ref(repair.EXCEPTION),
++        'failed_review':c.ref(failurepath),'prior_failure':c.ref(prior.FAILURE_REVIEW),'audit_correction':repair.CORRECTION,'no_gpu_release':True}
++    reviewpath=root/'arithmetic-review.json';write(reviewpath,review);monkeypatch.setattr(repair,'FINAL_REVIEW',reviewpath)
++    auth={'schema':'n23-arithmetic-repair-authority-v3','exception':c.ref(repair.EXCEPTION),'failed_review':c.ref(failurepath),
++        'prior_failure':c.ref(prior.FAILURE_REVIEW),'final_source_review':c.ref(reviewpath),'source':source,'runtime':previous.plan['runtime'],
++        'authority_interpretation':'synthetic independent exception','recorded_at':'synthetic','user_message':c.AUTONOMOUS_REPLY,
++        'cumulative_caps':repair.CAPS,'limits':repair.LIMITS,'validation_authorized':False,'formal_authorized':False}
++    authpath=root/'arithmetic-authority.json';write(authpath,auth);monkeypatch.setattr(repair,'AUTHORITY',authpath)
++    meta=repair.binding();plan={**previous.first.old,'source':source,'uuid_repair':meta}
++    state=copy.deepcopy(previous.state);state['n23_arithmetic_repair_authority']=meta['authority']
++    state['budget']['dispatched']=3
++    state['budget']['gpu_hours_consumed']=(first.ORIGINAL_SECONDS+prior.FAILED_SECONDS+repair.FAILED_SECONDS)/3600
++    return SimpleNamespace(previous=previous,first=previous.first,root=root,source=source,plan=plan,meta=meta,events=events,
++        report=report,terminal=terminal,failure=failure,state=state,review=review,auth=auth,runtime=previous.runtime)
++
++
++@pytest.mark.parametrize('fault',['none','wrong_attempt','wrong_source','other_error','missing_batch','added_batch','raw_projection',
++    'other_arithmetic','no_wrong_bounds','fp32_pass','bf16_fail','cost','retry','identity','prior_missing','unsettled','reorder','dev_claim'])
++def test_exact_three_failed_reports_costs_and_numerical_categories(case,monkeypatch,fault):
++    x=case
++    if fault=='wrong_attempt':x.failure['attempt_id']='other'
++    if fault=='wrong_source':x.report['source']={'commit':'other'}
++    if fault=='other_error':x.report['errors']=['error']
++    if fault=='missing_batch':x.report['batches'].pop()
++    if fault=='added_batch':x.report['batches'].append(copy.deepcopy(x.report['batches'][-1]))
++    if fault=='raw_projection':x.report['batches'][20]['mismatches']=[{'check':'raw_projection'}]
++    if fault=='other_arithmetic':x.report['batches'][7]['mismatches'][-1]['error']='other error'
++    if fault=='no_wrong_bounds':x.report['wrong_bounds_rejected']=False
++    if fault=='fp32_pass':x.report['synthetic'][0]['accepted']=True
++    if fault=='bf16_fail':x.report['synthetic'][1]['accepted']=False
++    if fault=='cost':x.terminal['gpu_process_wall_seconds']=0
++    if fault=='retry':x.terminal['retry_of']=first.FAILED_ATTEMPT
++    if fault=='identity':x.report['backend']['actual_uuid_bytes_hex']='00'*16
++    if fault=='prior_missing':x.events=x.events[3:]
++    if fault=='unsettled':x.events.pop()
++    if fault=='reorder':x.events=x.events[6:]+x.events[:6]
++    if fault=='dev_claim':x.failure['dev_dispatched']=True
++    x.failure['report']=write(x.root/'third-report.json',x.report)
++    x.failure['attempt_result']=write(x.root/'third-terminal.json',x.terminal)
++    write(repair.FAILURE_REVIEW,x.failure);monkeypatch.setattr(repair,'FAILURE_SHA',c.sha(repair.FAILURE_REVIEW))
++    if fault=='none':assert repair.named_failures(x.events,vars(r))[2]==x.terminal
++    else:
++        with pytest.raises((ValueError,KeyError)):repair.named_failures(x.events,vars(r))
++
++
++@pytest.mark.parametrize('fault',['none','missing','not_adopted','source','runtime','fifth','two_more','caps','protected','review','retry','schema'])
++def test_new_separate_authority_is_finite_and_not_old_uuid_authority(case,fault):
++    x=case
++    if fault=='missing':repair.AUTHORITY.unlink()
++    if fault=='not_adopted':x.state.pop('n23_arithmetic_repair_authority')
++    if fault=='source':x.auth['source']=None
++    if fault=='runtime':x.auth['runtime']=None
++    if fault=='fifth':x.auth['limits']={**x.auth['limits'],'max_total_backend_attempts':5}
++    if fault=='two_more':x.auth['limits']={**x.auth['limits'],'additional_backend_attempts':2}
++    if fault=='caps':x.auth['cumulative_caps']={**x.auth['cumulative_caps'],'attempts':479}
++    if fault=='protected':x.auth['formal_authorized']=True
++    if fault=='review':x.auth['final_source_review']=None
++    if fault=='retry':x.meta['retry_of']=prior.FAILED_ATTEMPT
++    if fault=='schema':x.meta['schema']='generic'
++    if fault not in {'missing','not_adopted','retry','schema'}:
++        write(repair.AUTHORITY,x.auth);x.meta['authority']=c.ref(repair.AUTHORITY);x.state['n23_arithmetic_repair_authority']=x.meta['authority']
++    if fault=='none':assert repair.authority(x.meta,x.source,x.plan['runtime'],x.state)==x.auth
++    else:
++        with pytest.raises((ValueError,FileNotFoundError)):repair.authority(x.meta,x.source,x.plan['runtime'],x.state)
++
++
++@pytest.mark.parametrize('fault',['none','dev','v1_dev','fourth_reserved','fourth_failed','unsettled','not_adopted','protected','slots'])
++def test_fourth_only_admission_and_no_protected_borrowing(case,monkeypatch,fault):
++    x=case
++    monkeypatch.setattr(w,'source_record',lambda *_:x.source);monkeypatch.setattr(c,'predecessor_review',lambda:x.first.old['predecessor_review'])
++    monkeypatch.setattr(b,'validate_plan',lambda *_:x.runtime);monkeypatch.setattr(c,'validate_runtime',lambda *_:None)
++    if fault in {'dev','v1_dev'}:x.events.append({'attempt_id':'dev','event':'reserved','identity':{'iteration':c.COHORT if fault=='dev' else c.v1.COHORT}})
++    if fault in {'fourth_reserved','fourth_failed'}:x.events.append({'attempt_id':'other','event':'aborted' if fault=='fourth_failed' else 'reserved','n23_backend_preflight':True})
++    if fault=='unsettled':x.events.pop()
++    if fault=='not_adopted':x.state.pop('n23_arithmetic_repair_authority')
++    if fault in {'protected','slots'}:
++        old=r.budget_snapshot
++        def snap(*a):
++            value=old(*a)
++            if fault=='protected':value['gpu_hours_consumed']=34.
++            else:value['by_bucket']['recovery']=18
++            return value
++        monkeypatch.setattr(r,'budget_snapshot',snap)
++    reserve=[{'event':'gpu_hour_reservations_changed','gpu_hour_reservations':{'validation':32.,'formal':12.},'rationale':'fixture','time_unix':1.}]
++    if fault=='none':assert admit.admission(x.plan,x.state,x.events,[],reserve,root=x.root)==x.runtime
++    else:
++        with pytest.raises((ValueError,r.GateError)):admit.admission(x.plan,x.state,x.events,[],reserve,root=x.root)
++    with pytest.raises(ValueError):prior.admission(x.previous.plan,x.state,x.events,[],reserve,root=x.root,r=vars(r))
++
++
++def setup_composition(x,monkeypatch):
++    x.source['files']=[{'path':p,'sha256':'fixture'} for p in sorted(c.source_paths(vars(r)))]
++    write(repair.FINAL_REVIEW,x.review);x.auth['final_source_review']=c.ref(repair.FINAL_REVIEW)
++    write(repair.AUTHORITY,x.auth);x.meta['authority']=c.ref(repair.AUTHORITY);x.state['n23_arithmetic_repair_authority']=x.meta['authority']
++    write(x.root/'data/attempt-ledger.jsonl',x.events,True)
++    write(x.root/'data/gpu-hour-reservation-ledger.jsonl',[{'event':'gpu_hour_reservations_changed',
++        'gpu_hour_reservations':{'validation':32.,'formal':12.},'rationale':'fixture','time_unix':1.}],True)
++    (x.root/'research-state.yaml').write_text(yaml.safe_dump(x.state))
++    monkeypatch.setattr(b,'ROOT',x.root);monkeypatch.setattr(w,'source_record',lambda *_:copy.deepcopy(x.source))
++    monkeypatch.setattr(w,'verify_source',lambda *_:None);monkeypatch.setattr(repair,'source_delta',lambda *_:[])
++    monkeypatch.setattr(b,'corpus_from_index',lambda _:copy.deepcopy(x.first.old['corpus']))
++    monkeypatch.setattr(b,'verify_corpus_files',lambda *_:None);monkeypatch.setattr(b,'predecessor_gate',lambda *_:{})
++    monkeypatch.setattr(c,'predecessor_review',lambda:x.first.old['predecessor_review']);monkeypatch.setattr(c,'validate_runtime',lambda *_:None)
++    monkeypatch.setattr(admit,'gpu_gate',lambda *a,**k:{'uuid':c.GPU7_UUID});monkeypatch.setattr(r,'child_environment',lambda *_:{})
++    monkeypatch.setattr(r,'verify_provider',lambda *a,**k:(_ for _ in ()).throw(AssertionError('provider forbidden')))
++    backend=AuditBackend(torch.device('cpu'),identity());backend.dtypes.update(['torch.float32','torch.bfloat16'])
++    monkeypatch.setattr(b,'create_backend',lambda *a,**k:backend)
++    monkeypatch.setattr(b,'iter_batches',lambda _:iter([{'batch':i,'dtype':'torch.bfloat16'} for i in range(176)]))
++    monkeypatch.setattr(b,'synthetic_batches',lambda _:iter([{'synthetic':True,'dtype':dt} for dt in ('torch.float32','torch.bfloat16')]))
++    monkeypatch.setattr(b,'check_batch',lambda batch,_:{'accepted':True,'candidates':4 if batch.get('synthetic') else 16,
++        'dtype':batch['dtype'],'mismatches':[],'production_helper_passed':True,'independent_passed':True,'wrong_score_rejected':True})
++
++
++@pytest.mark.parametrize('fault',['none','worker_error','worker_timeout','missing_proof','launch_error','fp32_rejected','identity'])
++def test_one_charge_four_groups_same_source_dev_composition_and_no_fifth(case,monkeypatch,fault):
++    x=case;setup_composition(x,monkeypatch);path=x.root/'backend-preflight-plan.arithmetic-repair.frozen.v3.json';write(path,x.plan)
++    calls=[];codes=[];cleanup=[]
++    def popen(command,**kwargs):
++        calls.append(command);events=r.read_events(x.root/'data/attempt-ledger.jsonl')
++        assert events[-1]['event']=='dispatched' and events[-1]['retry_of']==repair.FAILED_ATTEMPT
++        assert r.budget_snapshot(events)['by_bucket']['recovery']==4 and str(x.root/'main.py') in command
++        if fault=='launch_error':raise OSError('synthetic')
++        if fault in {'none','worker_error','fp32_rejected','identity'}:
++            if fault=='worker_error':monkeypatch.setattr(b,'create_backend',lambda *a,**k:(_ for _ in ()).throw(RuntimeError('synthetic')))
++            if fault=='fp32_rejected':monkeypatch.setattr(b,'check_batch',lambda batch,_:{'accepted':not batch.get('synthetic',False),'candidates':16,'mismatches':[{'check':'clipped_quality_or_mask'}] if batch.get('synthetic') else []})
++            if fault=='identity':
++                bad=identity();bad.pop('identity_diagnostic');backend=AuditBackend(torch.device('cpu'),bad);backend.dtypes.update(['torch.float32','torch.bfloat16'])
++                monkeypatch.setattr(b,'create_backend',lambda *a,**k:backend)
++            codes.append(b.run_preflight(command[command.index('--plan')+1],command[command.index('--release')+1],command[command.index('--attempt-context')+1]))
++        return SimpleNamespace(pid=os.getpid())
++    monkeypatch.setattr(admit.subprocess,'Popen',popen);monkeypatch.setattr(r,'terminate_owned',lambda p:cleanup.append(p))
++    def wait(*a,**k):
++        if fault=='worker_timeout':raise TimeoutError('synthetic')
++        return codes[-1] if codes else 0
++    monkeypatch.setattr(r,'wait_exclusively',wait)
++    if fault=='none':terminal=admit.run(path,root=x.root)
++    else:
++        with pytest.raises((ValueError,r.GateError,OSError,TimeoutError)):admit.run(path,root=x.root)
++    events=r.read_events(x.root/'data/attempt-ledger.jsonl');snap=r.budget_snapshot(events)
++    assert snap['dispatched']==snap['by_bucket']['recovery']==4 and snap['running']==0 and len(cleanup)==1
++    assert events[:9]==x.events and events[-1]['retry_of']==repair.FAILED_ATTEMPT
++    assert snap['gpu_hours_consumed']*3600>=first.ORIGINAL_SECONDS+prior.FAILED_SECONDS+repair.FAILED_SECONDS
++    assert events[-1]['outcome_valid'] is (fault=='none')
++    with pytest.raises(ValueError):admit.run(path,root=x.root)
++    assert len(calls)==1 and r.read_events(x.root/'data/attempt-ledger.jsonl')==events
++    if fault!='none':return
++    reference=json.loads((Path(terminal['output_dir'])/'backend-proof-reference.json').read_text())
++    assert Path(reference['report']['path']).name=='n23-backend-arithmetic-repair-report-v3.json'
++    assert c.backend_proof(reference,x.source,x.root,vars(r))==reference
++    parent={'n22_cohort':{'cohort_id':'N22_HOLD_LIFT_DEV_20260930'},'scientific_config_files':[],
++        'runtime_manifest_path':str(c.GPU7_RUNTIME),'stage_condition':r.E2_STAGE_CONDITION}
++    parentpath=x.root/'parent.json';write(parentpath,parent);monkeypatch.setattr(c,'SOURCE_PLAN',parentpath)
++    rows=[{'episode_key':f'{t}-{a}','task_id':t,'profile':a,'split':'dev','iteration':c.COHORT} for t in range(10) for a in c.ARMS]
++    monkeypatch.setattr(c,'expected_rows',lambda:copy.deepcopy(rows))
++    base=prepare.build_plan(predecessor=x.first.old['predecessor_review'],review=c.ref(repair.FINAL_REVIEW),proof=reference)
++    dev=prepare.build_plan(predecessor=x.first.old['predecessor_review'],review=c.ref(repair.FINAL_REVIEW),proof=reference,uuid_repair=x.meta)
++    manifest=r.read_json(r.ROOT/'configs/qd_ed_final/baseline_profiles.json')
++    for arm in ('N7','N23'):manifest['profiles'][arm]=r.expand_candidate(arm,w.read_ref(dev['candidate_profiles'][arm]),manifest['profiles']['Q0'])
++    reader=dict(vars(r));reader['read_state']=lambda *_:x.state;reader['read_events']=lambda *_:events
++    c.validate_contract(dev,manifest,x.runtime,None,r.ROOT,reader)
++    assert dev['episodes']==rows and dev['phase_authorization']=={'dev':True,'validation':False,'formal':False}
++    del dev['n23_cohort']['uuid_repair'];assert dev==base
++
++
++@pytest.mark.parametrize('fault',['none','fifth','unsettled','missing_retry','wrong_review','dev_before','dev_after','wrong_order'])
++def test_four_group_proof_chronology_and_closed_temporal_dev_boundary(case,fault):
++    x=case;planref=write(x.root/'fourth-plan.json',x.plan);reference={'attempt_id':'fourth','plan':planref}
++    base={'attempt_id':'fourth','identity':{'iteration':c.PREFLIGHT},'n23_backend_preflight':True,
++        'source_commit':x.source['commit'],'plan_sha256':planref['sha256'],'budget_bucket':'recovery','physical_gpu':7,
++        'retry_of':repair.FAILED_ATTEMPT,'n23_uuid_repair':x.meta,'n23_final_review':c.ref(repair.FINAL_REVIEW)}
++    new=[{**base,'event':e,**({'outcome_valid':True} if e=='valid' else {})} for e in ('reserved','dispatched','valid')]
++    if fault=='missing_retry':new[0]['retry_of']=None
++    if fault=='wrong_review':new[-1]['n23_final_review']=None
++    if fault=='unsettled':new.pop()
++    events=x.events+new
++    if fault=='fifth':events.append({'attempt_id':'fifth','event':'reserved','n23_backend_preflight':True})
++    dev={'attempt_id':'dev','event':'reserved','identity':{'iteration':c.COHORT}}
++    if fault=='dev_before':events.insert(9,dev)
++    if fault=='dev_after':events.append(dev)
++    if fault=='wrong_order':events=new+x.events
++    if fault in {'none','dev_after'}:assert repair.verify_lineage(x.plan,reference,events,x.source,vars(r))==new[-1]
++    else:
++        with pytest.raises(ValueError):repair.verify_lineage(x.plan,reference,events,x.source,vars(r))
++
++
++@pytest.mark.parametrize('fault',['none','main','core','profile','audit_drift','preflight_drift'])
++def test_exact_minimal_numerical_correction_and_scientific_source_gate(monkeypatch,tmp_path,fault):
++    names={'main':'main.py','core':'core/qd_actuator_clipped_quality.py','profile':'configs/qd_ed_final/candidate_n23.json'}
++    changed=[names[fault]] if fault in names else list(repair.CORRECTION)
++    monkeypatch.setattr(repair.subprocess,'check_output',lambda *a,**k:'\n'.join(changed))
++    if fault in {'audit_drift','preflight_drift'}:
++        expected=dict(repair.CORRECTION);expected[list(expected)[int(fault=='preflight_drift')]]='changed';monkeypatch.setattr(repair,'CORRECTION',expected)
++    if fault=='none':assert repair.source_delta(r.ROOT)==sorted(changed)
++    else:
++        with pytest.raises(ValueError):repair.source_delta(r.ROOT)
++
++
++@pytest.mark.parametrize('owner,field',[(c,'PROTOCOL'),(c,'BACKEND_PROTOCOL'),(c,'BUDGET_AMENDMENT'),(c,'OBSERVABILITY'),
++    (first,'EXCEPTION'),(first,'FAILURE_REVIEW'),(prior,'EXCEPTION'),(prior,'FAILURE_REVIEW'),(repair,'EXCEPTION'),(repair,'FAILURE_REVIEW')])
++def test_immutable_scope_rechecked_before_release(case,monkeypatch,owner,field):
++    changed=case.root/'drift.md';changed.write_text('changed');monkeypatch.setattr(owner,field,changed)
++    with pytest.raises(ValueError,match='immutable'):repair.final_review(case.source,case.plan['runtime'])
++
++
++@pytest.mark.parametrize('fault',['none','missing_wrong_score','wrong_bounds','wrong_dtype','wrong_synthetic_count',
++    'unaccepted_fp32','helper','independent','errors','missing_batch'])
++def test_success_proof_explicitly_requires_all_dtype_coverage_and_negative_controls(fault):
++    good={'accepted':True,'mismatches':[],'production_helper_passed':True,'independent_passed':True,'wrong_score_rejected':True}
++    report={'errors':[],'wrong_bounds_rejected':True,'batches':[{**good,'candidates':16,'dtype':'torch.bfloat16'} for _ in range(176)],
++        'synthetic':[{**good,'candidates':4,'dtype':d} for d in ('torch.float32','torch.bfloat16')]}
++    if fault=='missing_wrong_score':report['batches'][0].pop('wrong_score_rejected')
++    if fault=='wrong_bounds':report['wrong_bounds_rejected']=False
++    if fault=='wrong_dtype':report['synthetic'][0]['dtype']='torch.bfloat16'
++    if fault=='wrong_synthetic_count':report['synthetic'][0]['candidates']=16
++    if fault=='unaccepted_fp32':report['synthetic'][0]['accepted']=False
++    if fault=='helper':report['batches'][0]['production_helper_passed']=False
++    if fault=='independent':report['batches'][0]['independent_passed']=False
++    if fault=='errors':report['errors']=['error']
++    if fault=='missing_batch':report['batches'].pop()
++    if fault=='none':repair.verify_arithmetic_success(report)
++    else:
++        with pytest.raises(ValueError):repair.verify_arithmetic_success(report)

@@ -1,0 +1,1 @@
+Second administrative metadata pass failed at index event key kind; actual index uses event. Task0 index read/hash verified, no payload opened. CPU not separately metered; administrative upper bound 15 seconds. Source correction is metadata-only.

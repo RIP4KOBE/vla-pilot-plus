@@ -1,0 +1,43 @@
+{
+  "schema": "n29-executed-source-semantics-v1",
+  "source_commit": "d855cfd690482e018bb40ce98edec80fad9700e0",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "861509f3a491e28390a901623bc48523795a34ddacf25ccb839f122a13fce3a7",
+      "bytes": 410174
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py",
+      "sha256": "a46be1babfde66a07729c06d4e37b51575def4e27f05970dfaa852ae4db4afd7",
+      "bytes": 106688
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/keypoint_tracker.py",
+      "sha256": "7925b62d8c6404c250ccdba6ae0df12df79dd23db1f308112b7b3f22e1a22190",
+      "bytes": 11249
+    }
+  ],
+  "lines": {
+    "core/decision_evidence.py": "25-38 snapshot;136-144 event identity;176-206 context;231-258 action/outcome;274-293 complete container+index",
+    "core/env_adapters/libero_adapter.py": "99-115 xyzw policy convention;770-780 raw observation bridge;1685-1688 projection origin;1703-1722 actual command to env",
+    "core/rdt_policy_steer.py": "1652-1653 decode;7238-7277 selection;7259-7263 terminal_population.grasp_selection",
+    "core/keypoint_tracker.py": "17-45 passive whitelist;227-230 instance/generation/validity",
+    "main.py": "1812-1824 context/decode/postprocess;1896-1898 commit"
+  },
+  "prior_feedback_root_note": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/closed-executed-trajectory-20261004-v1/root-prior-feedback-contrast-v1.md",
+    "sha256": "907cd6c1cd79c19bef486b38f7eef51cd9fd2956edb18dc3b946dd9ec319e11b"
+  },
+  "attestation_limitations": "Historical accepted worker audit is inherited; this diagnostic independently checks only scoped index/hash/identity/order and selected numeric associations. No audit of unchosen candidates or actual target/contact truth."
+}

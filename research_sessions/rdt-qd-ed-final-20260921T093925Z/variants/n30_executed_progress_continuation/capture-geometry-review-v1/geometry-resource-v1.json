@@ -1,0 +1,20 @@
+{
+  "schema": "n30-fixed-geometry-resource-v1",
+  "complete": true,
+  "error": null,
+  "pid": 3881994,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cpu_seconds": 0.002594502999999998,
+  "wall_seconds": 0.0029482259415090084,
+  "input_json_reads": 1,
+  "tensor_video_reads": 0,
+  "production_imports": false,
+  "gpu_model_api_sim_calls": 0,
+  "automatic_retries": 0,
+  "rows_completed": 32,
+  "max_rss_kib": 15360
+}

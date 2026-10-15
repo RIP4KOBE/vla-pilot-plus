@@ -1,0 +1,20 @@
+{
+  "schema": "n32-actual-manifest-preparation-v1",
+  "at": "2026-10-04T17:00:17.508831+00:00",
+  "source": "abbdb396439094f034cd859d2d88217072f209d3",
+  "draft": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-release-v1/plan.draft.json",
+    "sha256": "bc8973f63dbae6e84a528d78cf131f04e889aa7d196ea0a02b710332a8f8782e"
+  },
+  "source_files": 545,
+  "manifests_verified": 30,
+  "runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260929/n18-close-then-lift-dev-v1/gpu7-rebind/runtime-manifest.gpu7.frozen.v3.json",
+    "sha256": "8b9aebb5af45ab355f4c03bf7669ed78c50b595185ff1e624ebc180dcca89dd7"
+  },
+  "runtime_worktree_resolves_to_owner": true,
+  "artifact_storage": "existing study data volume",
+  "gpu_dispatched": false,
+  "release_enabled": false,
+  "next_step": "Compose finite authority and released plan including generic runtime inventory fields; validate detached release then adopt under owning state lock before idle GPU7 dispatch."
+}

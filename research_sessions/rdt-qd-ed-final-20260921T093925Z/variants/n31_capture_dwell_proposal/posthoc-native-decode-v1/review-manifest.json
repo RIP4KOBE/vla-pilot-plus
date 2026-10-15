@@ -1,0 +1,39 @@
+{
+  "schema": "n31-posthoc-native-decode-review-v1",
+  "at": "2026-10-04T14:43:51.250241+00:00",
+  "artifacts": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-native-decode-v1/decode.py",
+      "sha256": "5d098047f87c19599095893a6669914b96cd3707883247dfa64fdc30c4d536e9",
+      "bytes": 3685
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-native-decode-v1/decoded.json",
+      "sha256": "15acddfa2ab9a134b7e98ac48f71b7e20ad0106218c08660b1d20627d0421ebd",
+      "bytes": 7256871
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-native-decode-v1/execution-findings.json",
+      "sha256": "65974f3a6bdb5fdf456b97973618da9d808754a8512433b2fa5ae94be23c51e5",
+      "bytes": 5681
+    }
+  ],
+  "scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-native-metadata-v1/decode-scope-v1.json",
+    "sha256": "e12543bad29f431986995966712b4f4b2ca2ff0f0382f41067918c848e4c7303",
+    "bytes": 2293284
+  },
+  "verified_bundles": 3638,
+  "changed_proposals": 32,
+  "selected_content_decisions": 12,
+  "all_selected_execute_close_dwell": true,
+  "findings_method": "Group selected candidate tensors by exact flattened torch.equal against same-decision final_selection. On selected decisions inspect executed action[6]==1 from arrival and action[:6]==0 after arrival. Preserve observed jaw endpoints and missing contemporaneous target pose. No reclassification of accepted audits.",
+  "resource_usage": {
+    "cpu_seconds": 69.817813366,
+    "wall_seconds": 69.80076352111064,
+    "max_rss_bytes": 494022656
+  },
+  "target_met": false,
+  "protected_evaluation_authorized": false,
+  "next_step": "Use decoded observation keypoints and tracker identity to compute target displacement across the next available same-target guided context; explicitly flag context gaps and tracking discontinuity before ideation."
+}

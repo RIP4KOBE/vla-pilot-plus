@@ -1,0 +1,298 @@
+{
+  "schema": "n31-phase-c-cpu-resource-ledger-v1",
+  "cpu_limit": 1200,
+  "wall_limit": 1800,
+  "child_cpu_seconds": 233.26411000000002,
+  "wall_seconds": 180.51213396794628,
+  "runs": [
+    {
+      "run": 1,
+      "cpu_seconds": 6.477928,
+      "wall_seconds": 6.331957106012851,
+      "exit": 1,
+      "guard_clean": true,
+      "denied": [],
+      "call_outcomes": {
+        "failed": 1
+      },
+      "cuda_initialized": false,
+      "affinity": [
+        0,
+        1
+      ],
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run1.log",
+        "sha256": "c573e3d856438fdc50dafe6ba58bb14ff3603810e87d97d32bc5244a6fc3b8b1"
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run1-resource.json",
+        "sha256": "0bbc7704a77bfa8f3b6501e2f2f065570c0796d6b71a57f9bd64072503aa84e2"
+      },
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run1-external.json",
+        "sha256": "632795c8111db003727e445d8f517da929ec25e8c33f0e61b40816d7966af5e4"
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run1-source.json",
+        "sha256": "cc32422d2f1111b539b1b2e88afe0624ef878d1ecb6a1a27d5428dd047ee7c84"
+      }
+    },
+    {
+      "run": 2,
+      "cpu_seconds": 7.789693000000001,
+      "wall_seconds": 7.23252489999868,
+      "exit": 1,
+      "guard_clean": true,
+      "denied": [],
+      "call_outcomes": {
+        "failed": 1
+      },
+      "cuda_initialized": false,
+      "affinity": [
+        0,
+        1
+      ],
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run2.log",
+        "sha256": "4d9ea26fc1d567ad6003faa0cc5172ce1fea7eb45c4ae3e5fbfecb9b02a2aadb"
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run2-resource.json",
+        "sha256": "165c7d055af673f04ad73e7a6702e2457e0ae9c72f8f1475c2305df7f34a6141"
+      },
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run2-external.json",
+        "sha256": "e0f3f22a118a1040e3c8bc93b2b993e447788e38310b5e6bac0da7c1bd6c8465"
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run2-source.json",
+        "sha256": "89c97bfc4459214f999a2559e3eceba81f4ef160e2a9d99b2c462d2e5b4fb35b"
+      }
+    },
+    {
+      "run": 3,
+      "cpu_seconds": 7.800753,
+      "wall_seconds": 7.279294001986273,
+      "exit": 1,
+      "guard_clean": true,
+      "denied": [],
+      "call_outcomes": {
+        "failed": 1
+      },
+      "cuda_initialized": false,
+      "affinity": [
+        0,
+        1
+      ],
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run3.log",
+        "sha256": "fe9f9fb51eceed7a8f606ac7951ae29ae785828555ba996dc534276520b9db88"
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run3-resource.json",
+        "sha256": "441df3d44f4f8aa3be18f88825231858a1b4a5a41d71788707918665578bedd8"
+      },
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run3-external.json",
+        "sha256": "a28b0a572790d588b1188169ecf5537dec5a771b0f1f4ca0089c9911037322d3"
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run3-source.json",
+        "sha256": "db28de97b226f781bc74d2321459d705fdddb8798d677128620d3a0111bb005f"
+      }
+    },
+    {
+      "run": 4,
+      "cpu_seconds": 27.116233,
+      "wall_seconds": 20.966500455979258,
+      "exit": 1,
+      "guard_clean": true,
+      "denied": [],
+      "call_outcomes": {
+        "passed": 10,
+        "failed": 1
+      },
+      "cuda_initialized": false,
+      "affinity": [
+        0,
+        1
+      ],
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run4.log",
+        "sha256": "abb6eb7a3c958b670f2c3a6a5acf3ac28212cfa8f70068e4baa14f03b5a6274c"
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run4-resource.json",
+        "sha256": "1861f59cfeff775e43c61e4749180b742a8220ba6d952d6597a16a644110b5ec"
+      },
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run4-external.json",
+        "sha256": "7290960e8ac37f9b8916b453ecba99f5b4fe0a0fc17b08e0cf30e2857841aaa9"
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run4-source.json",
+        "sha256": "7cc979dafc0112dd7e7e3477d1991610478f624d0b2cf70a27641b00b44c5673"
+      }
+    },
+    {
+      "run": 5,
+      "cpu_seconds": 40.502164,
+      "wall_seconds": 31.42453763599042,
+      "exit": 1,
+      "guard_clean": false,
+      "denied": [
+        {
+          "event": "os.scandir",
+          "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/vlm_query"
+        },
+        {
+          "event": "os.scandir",
+          "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/vlm_query"
+        }
+      ],
+      "call_outcomes": {
+        "passed": 52,
+        "failed": 28
+      },
+      "cuda_initialized": false,
+      "affinity": [
+        0,
+        1
+      ],
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run5.log",
+        "sha256": "2cb9069fa2475e3c37dc3f76ce7637945ca9e72ab6026f02c7676cfb3504f9d8"
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run5-resource.json",
+        "sha256": "a39495c93b86b9489751e6da1805e7734b4aa851017eef74af6ce7098e76de20"
+      },
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run5-external.json",
+        "sha256": "6a3283004edd34fce6ad0bfc393d563c2a8646aebbe688bf61102ed59c3ea4bc"
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run5-source.json",
+        "sha256": "56d2572b70b63f8fe4befcd85c3f16c40b7bafea9f8e8546da8362e824ef4185"
+      }
+    },
+    {
+      "run": 6,
+      "cpu_seconds": 19.143352999999998,
+      "wall_seconds": 15.88011373206973,
+      "exit": 1,
+      "guard_clean": false,
+      "denied": [
+        {
+          "event": "os.scandir",
+          "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/vlm_query"
+        },
+        {
+          "event": "os.scandir",
+          "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/vlm_query"
+        }
+      ],
+      "call_outcomes": {
+        "passed": 33,
+        "failed": 1
+      },
+      "cuda_initialized": false,
+      "affinity": [
+        0,
+        1
+      ],
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run6.log",
+        "sha256": "fb0ec584a3ad69a7d3cb0173a915ad007f2e28aaf2047e280511679fbdd6a359"
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run6-resource.json",
+        "sha256": "aad13e23f662a9ee8da854602869ec546839c2f77835d484c91a34447d98663d"
+      },
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run6-external.json",
+        "sha256": "747076e7436163c05165222f1a95852e32505352d80d7af2503b4eb05d4243e2"
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run6-source.json",
+        "sha256": "4b5a1de75df7b4821c128c29d6925258edfee9d42d7e730cbe5d02f07c34cec4"
+      }
+    },
+    {
+      "run": 7,
+      "cpu_seconds": 38.914663000000004,
+      "wall_seconds": 30.23117523791734,
+      "exit": 1,
+      "guard_clean": false,
+      "denied": [
+        {
+          "event": "os.scandir",
+          "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/vlm_query"
+        },
+        {
+          "event": "os.scandir",
+          "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/vlm_query"
+        }
+      ],
+      "call_outcomes": {
+        "passed": 36
+      },
+      "cuda_initialized": false,
+      "affinity": [
+        0,
+        1
+      ],
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run7.log",
+        "sha256": "cb62fcc402ab26d2f0f166291888359d24b6c5929137862c1227463324cdcb7d"
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run7-resource.json",
+        "sha256": "4a9fefefc24e69c7cef3291e3877e9c4615a8c8a083d5861fcf561e83e491a9f"
+      },
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run7-external.json",
+        "sha256": "329f363be31b4b4c9f8b647ee75ed16e8ffdef8dbe03ef8902054e097fd513ae"
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run7-source.json",
+        "sha256": "2470fdf7c3e79929ec5e1522b015671f907a362607500ee4a947a556ea16d368"
+      }
+    },
+    {
+      "run": 8,
+      "cpu_seconds": 85.519323,
+      "wall_seconds": 61.16603089799173,
+      "exit": 0,
+      "guard_clean": true,
+      "denied": [],
+      "call_outcomes": {
+        "passed": 121
+      },
+      "cuda_initialized": false,
+      "affinity": [
+        0,
+        1
+      ],
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run8.log",
+        "sha256": "f3ba16143b41c099eb6d9a1fda38e88d18a55cc22a9ca030785584040c75262f"
+      },
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run8-resource.json",
+        "sha256": "d1e7ee2299999ab9b15d76d864f550965162a3897c6f746de0bd08577688061b"
+      },
+      "external": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run8-external.json",
+        "sha256": "d6337b450d598ba5b4361092353d399da709943661ff32c670eb3adeea4ff84c"
+      },
+      "source": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-c-run8-source.json",
+        "sha256": "a30d022009744623708704fb4acff4c6f1eae4d96cce4ba63934c14f8fc36a6f"
+      }
+    }
+  ],
+  "resource_scope": "All eight focused test invocations, including failures and guard failures. Static source editing/packaging is separate; two packaging failures lack internal CPU timers and are explicitly Unknown.",
+  "historical_payload_reads": 0,
+  "gpu_api_model_env_sim_calls": 0
+}

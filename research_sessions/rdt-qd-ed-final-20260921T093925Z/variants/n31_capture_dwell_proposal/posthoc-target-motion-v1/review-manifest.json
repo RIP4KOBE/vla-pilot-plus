@@ -1,0 +1,30 @@
+{
+  "schema": "n31-target-motion-review-v1",
+  "at": "2026-10-04T14:47:17.420523+00:00",
+  "artifacts": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-target-motion-v1/scope-v1.json",
+      "sha256": "e69f4f785ad3a3508506feb7a887d75b598b5adc50fb7f0ae2960895703e02aa",
+      "bytes": 624
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-target-motion-v1/analyze.py",
+      "sha256": "e8bcb5e322f5f5694da63ccee9a88337a76feb5d4b8040f813774c5344790f8f",
+      "bytes": 2526
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-target-motion-v1/findings.json",
+      "sha256": "3d9944a4ef1b2c69f839e25507fc484a9c31a3187e970d1d6cb46c2a8c6c61fc",
+      "bytes": 9784
+    }
+  ],
+  "selected_decisions": 12,
+  "comparable_endpoints": 11,
+  "immediate_context_pairs": 5,
+  "immediate_pairs_with_exactly_unchanged_tracked_coordinates": 5,
+  "longer_gap_pairs": 6,
+  "missing_next_context": 1,
+  "interpretation": "Close/dwell command execution established by prior native review; physical capture remains Unknown. Endpoint motion does not resolve grasp; exact coordinate repetition may reflect tracker behavior and is not proof of physical immobility. N31 remains rejected 0/6, as do matched C0/Q0.",
+  "next_bounded_step": "Load Arbor tree constraints and ideation phase; use N31 terminal, execution and target-motion reviews to choose one falsifiable successor or bounded engineering diagnosis. Exact repeated tracked coordinates do not prove physical immobility; distinguish tracker update semantics from capture evidence. No N31 replay or protected-phase promotion.",
+  "target_met": false
+}

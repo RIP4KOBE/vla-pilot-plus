@@ -1,0 +1,25 @@
+{
+  "schema": "n24-clipped-eligibility-continuation-static-source-proof-v1",
+  "old_extractor": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-clipped-eligibility-reference/extract_cpu_v3.py",
+    "sha256": "03783982264adccf20d40c4e46c28a1d5f2e80ddc6a7abeed112d613199cea4b"
+  },
+  "new_extractor": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-clipped-eligibility-reference/continuation-v1/extract_cpu_v1.py",
+    "sha256": "c8f3e4473a449c140b0701bea8bba9fffffc08902adabcc660d13a5748ab9821"
+  },
+  "startup_template": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-runtime-startup-preflight/startup_cpu_v2.py",
+    "sha256": "fdeaa3d55133e316525d3749296474ed3acb511761efff67b1c93295736b99b2"
+  },
+  "native_processing_block_equal_except_output_filename": true,
+  "native_block_sha256_normalized": "a1badb6a8abe2d451bfa84c12fdeb178d99d38eeb60df04975bffd2444046bc6",
+  "ast_valid": true,
+  "scope_native_bundle_reads": 0,
+  "torch_imports": 0,
+  "process_execution_authorized": false,
+  "diff": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-clipped-eligibility-reference/continuation-v1/old-v3-to-continuation-v1.diff",
+    "sha256": "74571fd6dbae5fad6e0658789023f598a9dbd2fbad88bc47be6f11186920a6d1"
+  }
+}

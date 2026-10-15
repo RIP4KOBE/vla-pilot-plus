@@ -1,0 +1,63 @@
+{
+  "schema": "n30-r2-source-byte-check-v1",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/feedback-repair-continuation-v1/source-manifest-execution-v1.json",
+    "sha256": "b44fb2133c40922b692c3f4e89a011ec8c3a1c5ba8eebaf990440b59ee335bda"
+  },
+  "base_commit": "debda23a0e8eda86a3bb4f398e9596edf05b37e5",
+  "current_commit": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "base_files": 463,
+  "current_files": 480,
+  "unchanged_base_files": 461,
+  "modified_base_files": [
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n23_worker.py"
+  ],
+  "new_files": [
+    "docs/experiments/n30/r2/base-source-v1.json",
+    "docs/experiments/n30/r2/controller-contract-v1.md",
+    "docs/experiments/n30/r2/cpu-integration-scope-v1.md",
+    "docs/experiments/n30/r2/prospective-continuation-draft-v1.md",
+    "docs/experiments/n30/r2/r1-source-v1.json",
+    "docs/experiments/n30/r2/reverse-source-v1.json",
+    "docs/experiments/n30/r2/root-cpu-integration-release-v1.json",
+    "scripts/qd_ed_n30_r2_bridge.py",
+    "scripts/qd_ed_n30_r2_contract.py",
+    "scripts/qd_ed_n30_r2_prepare.py",
+    "scripts/qd_ed_n30_r2_report.py",
+    "scripts/qd_ed_n30_r2_supervise.py",
+    "tests/n30_r2_synthetic.py",
+    "tests/test_n30_r2_admission.py",
+    "tests/test_n30_r2_bridge.py",
+    "tests/test_n30_r2_controller.py",
+    "tests/test_n30_r2_worker.py"
+  ],
+  "whole_file_reversal": true,
+  "current_and_base_git_bytes_verified": true,
+  "clean": true,
+  "changes": [
+    "A\tdocs/experiments/n30/r2/base-source-v1.json",
+    "A\tdocs/experiments/n30/r2/controller-contract-v1.md",
+    "A\tdocs/experiments/n30/r2/cpu-integration-scope-v1.md",
+    "A\tdocs/experiments/n30/r2/prospective-continuation-draft-v1.md",
+    "A\tdocs/experiments/n30/r2/r1-source-v1.json",
+    "A\tdocs/experiments/n30/r2/reverse-source-v1.json",
+    "A\tdocs/experiments/n30/r2/root-cpu-integration-release-v1.json",
+    "M\tscripts/qd_ed_final_runner.py",
+    "M\tscripts/qd_ed_n23_worker.py",
+    "A\tscripts/qd_ed_n30_r2_bridge.py",
+    "A\tscripts/qd_ed_n30_r2_contract.py",
+    "A\tscripts/qd_ed_n30_r2_prepare.py",
+    "A\tscripts/qd_ed_n30_r2_report.py",
+    "A\tscripts/qd_ed_n30_r2_supervise.py",
+    "A\ttests/n30_r2_synthetic.py",
+    "A\ttests/test_n30_r2_admission.py",
+    "A\ttests/test_n30_r2_bridge.py",
+    "A\ttests/test_n30_r2_controller.py",
+    "A\ttests/test_n30_r2_worker.py"
+  ],
+  "reverse": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/feedback-repair-continuation-v1/implementation/docs/experiments/n30/r2/reverse-source-v1.json",
+    "sha256": "0175df306b2a40b3916946f8766691a14e933f1e29dad97b54d3ac577e43b29c"
+  }
+}

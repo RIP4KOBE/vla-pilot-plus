@@ -1,0 +1,11 @@
+# User-authorized available-server-GPU selection
+
+On2026-09-22 the user authorizes any usable GPU on the current server: “帮我使用当前服务器上任何能用的GPU来跑这个任务即可”. This supersedes the previous GPU7-only and GPU5-only restrictions for future execution of this same research task.
+
+Select a local GPU with no external compute process and less than1024MiB used memory, then bind exactly that physical index and UUID in the active runtime and state. Keep one exclusive worker and the existing runner lock, recheck admission immediately before startup, and monitor exclusivity while running. Do not share/preempt/terminate external work. If admission fails before dispatch, rescan the authorized server GPUs without needing a new user decision; waiting before GPU allocation consumes no GPU budget or episode attempt.
+
+Prefer the selected device throughout the comparison. If it becomes unavailable between attempts, another available server GPU may be selected with an explicit recorded hardware-only runtime revision, fresh UUID/PCI/EGL binding and actual context evidence where existing evidence no longer applies. Preserve all previous plans and dispatched records. Do not modify an in-flight attempt's identity or overwrite a completed result. Record hardware identity per attempt; disclose hardware changes in comparison reports. All current server GPUs are H200NVL according to the initial resource scan.
+
+No algorithm, provider, Codex login/policy, weight, prompt, image, seed, init-state, timeout, action, success definition or promotion criterion changes. The same frozen source and non-hardware runtime inputs apply across Q0/P2/N1. The complete twenty N1-round controls still precede candidate execution. All thirty original N1 Dev cells and their≤30-attempt allowance remain unchanged; no new N1-round outcome has been observed.
+
+Keep the total240-attempt/48GPU-hour limits, single final candidate, protected validation/formal reservations, and all historical/failed attempt costs. Existing successful GPU7 CUDA/EGL evidence may be reused when its device/driver/renderer/mask bindings remain identical; GPU5 was never actually probed because its admission failed. Resource selection is not authorization for scientific retries or denominator replacement.

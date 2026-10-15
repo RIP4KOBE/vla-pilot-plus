@@ -1,0 +1,165 @@
+{
+  "run": "1",
+  "pytest_exit": 1,
+  "cpu_seconds": 8.116981164,
+  "cumulative_cpu_seconds": 8.116981164,
+  "wall_seconds": 7.989363261964172,
+  "affinity": [
+    0,
+    1
+  ],
+  "thread_limit": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "blocked": [
+    [
+      "os.listdir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise",
+      "read"
+    ],
+    [
+      "os.scandir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/nvidia/cuda_nvrtc/lib",
+      "read"
+    ],
+    [
+      "os.scandir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/cuda_nvrtc/lib",
+      "read"
+    ],
+    [
+      "os.scandir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/nvidia/cuda_nvrtc/lib",
+      "read"
+    ],
+    [
+      "os.scandir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/cuda_nvrtc/lib",
+      "read"
+    ],
+    [
+      "os.scandir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/nvidia/nvjitlink/lib",
+      "read"
+    ],
+    [
+      "os.scandir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/nvjitlink/lib",
+      "read"
+    ],
+    [
+      "os.scandir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/nvidia/nvjitlink/lib",
+      "read"
+    ],
+    [
+      "os.scandir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/nvjitlink/lib",
+      "read"
+    ],
+    [
+      "os.listdir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise",
+      "read"
+    ],
+    [
+      "os.listdir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/feat/rdt-libero-gt-rollout-reintegration/third_party/lerobot/src",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/feat/rdt-libero-gt-rollout-reintegration/third_party/lerobot/src",
+      "read"
+    ],
+    [
+      "os.listdir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ],
+    [
+      "open",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/utils/__init__.py",
+      "read"
+    ]
+  ],
+  "dependency_exceptions": [
+    "/proc/36440/maps",
+    "dev_null_sink"
+  ],
+  "guard_sha256": "72b673dd0c0db637f65d5e6825d96deda362e1822f75a8a84f54d84c13b32802",
+  "test_argv": [
+    "tests/test_n28_parent_before_renoise.py"
+  ],
+  "peak_rss_kib": 505868
+}

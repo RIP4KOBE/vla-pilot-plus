@@ -1,0 +1,55 @@
+{
+  "actual_research_payload_reads": 0,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "cpu_budget_seconds": 600,
+  "cuda_initialized_any": false,
+  "final_distinct_cases": 46,
+  "focused_test_cpu_seconds": 42.680921495999996,
+  "focused_test_wall_seconds": 32.24943771015387,
+  "gpu_model_api_sim_calls": 0,
+  "packaging_cpu_seconds_through_manifest": 0.070972363,
+  "runs": [
+    {
+      "cpu_seconds": 10.763108162,
+      "denied_count": 213,
+      "guard_clean": false,
+      "pytest_exit": 1,
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/cpu-run1-resource.json",
+        "sha256": "bcffa996536d1a0c9f3bad865e10246895a0faaba283aa5fd038e9f2af94eb80"
+      },
+      "run": "run1",
+      "wall_seconds": 8.142108477069996
+    },
+    {
+      "cpu_seconds": 14.919858691,
+      "denied_count": 4,
+      "guard_clean": false,
+      "pytest_exit": 0,
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/cpu-run2-resource.json",
+        "sha256": "19085d0235554f2d6804f2f0391dfe102747d33554433840402bbb524703daa6"
+      },
+      "run": "run2",
+      "wall_seconds": 11.386868624016643
+    },
+    {
+      "cpu_seconds": 16.997954643,
+      "denied_count": 0,
+      "guard_clean": true,
+      "pytest_exit": 0,
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/cpu-run3-resource.json",
+        "sha256": "617dff7cc6b4254517c2374c318ff3748ab6cb88f68601f5c9975ed34d240c05"
+      },
+      "run": "run3",
+      "wall_seconds": 12.720460609067231
+    }
+  ],
+  "schema": "n30-phase-a-resource-summary-v1",
+  "scope_note": "Focused test processes individually metered. Short source editing/inspection/git CLI setup was not individually CPU-metered; do not interpret focused sum as exact total session CPU. No heavyweight setup or worker execution.",
+  "threads": 2
+}

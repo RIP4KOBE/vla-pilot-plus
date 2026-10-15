@@ -1,0 +1,53 @@
+{
+  "executable": false,
+  "root_authorized": false,
+  "actual_evidence_read": false,
+  "intended_future_location": "N26/final-source-runtime-review.logical-v1.json",
+  "record": {
+    "schema": "n26-source-runtime-review-v1",
+    "disposition": null,
+    "source": null,
+    "runtime": {
+      "path": null,
+      "sha256": null
+    },
+    "protocol": {
+      "path": null,
+      "sha256": null
+    },
+    "source_plan": {
+      "path": null,
+      "sha256": null
+    },
+    "source_bridge": {
+      "path": null,
+      "sha256": null
+    },
+    "predecessor": {
+      "path": null,
+      "sha256": null
+    },
+    "backend_proof": {
+      "path": null,
+      "sha256": null
+    },
+    "arithmetic_protocol": {
+      "path": null,
+      "sha256": null
+    },
+    "admission_clarification": {
+      "path": null,
+      "sha256": null
+    },
+    "composition_protocol": {
+      "path": null,
+      "sha256": null
+    },
+    "logical_admission_addendum": {
+      "path": null,
+      "sha256": null
+    },
+    "no_gpu_release": true
+  },
+  "notes": "Unresolved template; do not supply this wrapper to any production gate. Root must independently create and review the exact record after actual prerequisite closure."
+}

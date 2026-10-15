@@ -1,0 +1,116 @@
+{
+  "schema": "n31-phase-a-cpu-ledger-v1",
+  "runs": [
+    {
+      "tag": "run1",
+      "external": {
+        "argv": [
+          "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+          "-I",
+          "-B",
+          "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_guard_v1.py",
+          "run1"
+        ],
+        "cwd": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-tmp",
+        "pid": 3955863,
+        "exit_code": 1,
+        "reaped": true,
+        "wall_seconds": 1.7175689589930698,
+        "child_cpu_seconds": 1.79833,
+        "timeout": false,
+        "parent_cpu_limit": [
+          -1,
+          -1
+        ]
+      },
+      "resource_summary": {
+        "cpu_seconds": 1.559307439,
+        "wall_seconds": 1.4336235809605569,
+        "affinity": [
+          0,
+          1
+        ],
+        "threads": 2,
+        "cuda_initialized": false,
+        "guard_clean": false,
+        "denied": [
+          {
+            "event": "open",
+            "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/__pycache__/test_qd_capture_dwell_proposal.cpython-312-pytest-9.0.3.pyc",
+            "writing": false
+          },
+          {
+            "event": "open",
+            "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/__pycache__/qd_capture_dwell_proposal.cpython-312.pyc",
+            "writing": false
+          }
+        ],
+        "exit_code": 0,
+        "error": null
+      },
+      "assertions_passed": 37
+    },
+    {
+      "tag": "run2",
+      "external": {
+        "argv": [
+          "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+          "-I",
+          "-B",
+          "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_guard_v2.py",
+          "run2"
+        ],
+        "cwd": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-tmp",
+        "pid": 3956751,
+        "exit_code": 0,
+        "reaped": true,
+        "wall_seconds": 3.1232736619422212,
+        "child_cpu_seconds": 3.244665,
+        "timeout": false,
+        "parent_cpu_limit": [
+          -1,
+          -1
+        ]
+      },
+      "resource_summary": {
+        "cpu_seconds": 2.977741925,
+        "wall_seconds": 2.839572102064267,
+        "affinity": [
+          0,
+          1
+        ],
+        "threads": 2,
+        "cuda_initialized": false,
+        "guard_clean": true,
+        "denied": [],
+        "exit_code": 0,
+        "error": null
+      },
+      "assertions_passed": 37
+    }
+  ],
+  "distinct_tests": 37,
+  "assertion_pass_executions": 74,
+  "accepted_guard_clean_distinct_tests": 37,
+  "external_cumulative_child_cpu_seconds": 5.0429949999999995,
+  "external_cumulative_wall_seconds": 4.840842620935291,
+  "limits": {
+    "cumulative_test_cpu_seconds": 600,
+    "cumulative_test_wall_seconds": 900,
+    "threads": 2,
+    "affinity": [
+      0,
+      1
+    ]
+  },
+  "production_model_scorer_environment_imports": 0,
+  "payload_reads": 0,
+  "gpu_api_sim_calls": 0,
+  "score": "Unknown",
+  "notes": [
+    "run1 assertions passed, outer guard returned1 after two denied pycache probes; not guard-clean acceptance.",
+    "run2 used owned pycache_prefix and passed with zero denied probes.",
+    "Source/helper/tests unchanged between runs; only external guard startup changed.",
+    "Short static/editor/Git preparation commands were constrained to two CPUs/threads but not all individually CPU-metered."
+  ]
+}

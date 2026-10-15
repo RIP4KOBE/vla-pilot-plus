@@ -1,0 +1,117 @@
+{
+  "schema": "n30-r1-cpu-delivery-v1",
+  "commit": "b2775fa2008a8a88e374c43a5753f8862485af1f",
+  "gpu_release": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/authority.disabled.v1.json",
+      "sha256": "538c4d3728a0d12b0059c9306d8b799488605c83a0a4b6aebc48448d69ba6b4a",
+      "bytes": 79639
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-integration-report-v1.md",
+      "sha256": "cc7999e0c99465697ba5aed067c6cbbec4b432d806e8e9190d6a628fa46c619e",
+      "bytes": 5081
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-integration-scope-v1.md",
+      "sha256": "29cd0a694376c929a317be83df79fe76aaab13ff1d1ae0cd3e64f46b15f65a8e",
+      "bytes": 7526
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-resource-summary-v1.json",
+      "sha256": "5f94a662a22b2c77ddf1eb05abe74190ce5d6886dcd6b3786486c9fc4826d38f",
+      "bytes": 1587
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-run1-resource.json",
+      "sha256": "cf03484aff1661cfa474698f28d8ea1d295188a8f0b30ef0a968cd6cab0f84f9",
+      "bytes": 474
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-run1.log",
+      "sha256": "db0d37801c4e5bc914accabb7cfa9af9c650d5a739c3681763c7f303e7eb21c7",
+      "bytes": 545
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-run2-resource.json",
+      "sha256": "9da2d285c0e506401fa14c5701ca4a10e736a4877ec653b98600b714867c8fec",
+      "bytes": 559
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-run2.log",
+      "sha256": "1cd617df07a6a2eb25d7cd50e82170aa9625b6282cb151782f89aa21f123264a",
+      "bytes": 641
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-run3-resource.json",
+      "sha256": "94e4cee18f746820e66e94c6c541dd9c1e1252addc7a76d9158ba9ea325b24c5",
+      "bytes": 459
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-run3.log",
+      "sha256": "33b166648dd63f3a2c9ca0adc7630d365a6f1d3f35ee5d76d8c5b71b86b85d4b",
+      "bytes": 537
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu_guard_v1.py",
+      "sha256": "b86de7f21c9388996d72e7a67a479239ac305123b336db51917e352a6933eb57",
+      "bytes": 3484
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/empty-authoring-transient-v1.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/execution-release.disabled.v1.json",
+      "sha256": "f1d8db543a6509d1e09cf72f23beb2be0d93b9d29da8255dc460fad9a29342e7",
+      "bytes": 1392
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/final-source-runtime-review.disabled.v1.json",
+      "sha256": "76450a7f947caa62f6003dc2f80c72b0e332b1ef807d4ec3033c1036b6113ee7",
+      "bytes": 78704
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/package_delivery_v1.py",
+      "sha256": "29556c8430eb8994c091b881dfd9adf92999ff01e07a713bffa047d972bbddc3",
+      "bytes": 7049
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/packaging-resource-v1.json",
+      "sha256": "bac4abea25e26b3a1489740111dd7fcb5fdf29bdaef7b3f658797ec6b8e194b8",
+      "bytes": 173
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/plan.disabled.v1.json",
+      "sha256": "190a219e58a6294037fd23e609801819f8e80a6b22135673ceb716497eb60eac",
+      "bytes": 74739
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/root-cpu-integration-release-v1.json",
+      "sha256": "67573cd88c55dc23ebe6b8ca98127222815dcec482545bdbd8c785a6ef55173d",
+      "bytes": 1357
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/source-byte-check-v1.json",
+      "sha256": "d47d30f5fc771c0edf4ccb695c47ac8d29428b9264e27b2c29b2e55ff2d179e6",
+      "bytes": 1235
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/source-diff-v1.patch",
+      "sha256": "cb4cfc08eb3fe674cfa11b01da13d99fd3d8ca9cc0d6bd5862a221153e5896f4",
+      "bytes": 252352
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/source-history-bridge.disabled.v1.json",
+      "sha256": "c4de9ba3621882dd4a2526c57df0bc13e0197e7d0aa0b9c71e1d5409f05374f5",
+      "bytes": 228656
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/source-manifest-execution-v1.json",
+      "sha256": "5ecec50164559cd96f86140c481d78d41120be9a1a3da3802fc7774d7912c01f",
+      "bytes": 70585
+    }
+  ]
+}

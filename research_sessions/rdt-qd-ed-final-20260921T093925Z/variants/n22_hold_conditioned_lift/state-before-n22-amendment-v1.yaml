@@ -1,0 +1,2033 @@
+schema: qd-ed-final-state-v1
+run_id: 20260921T093925Z
+run_name: rdt-qd-ed-final-20260921T093925Z
+branch: exp/rdt-qd-ed-final-20260921T093925Z
+worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z
+artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z
+source_commit: 744e08ba4398f2f8e34fb05619c829fc01397f69
+gpu_pool:
+- 7
+max_concurrent_gpu_workers: 1
+project_target:
+  status: IN_PROGRESS_TARGET_NOT_YET_MET
+  required_formal_successes: 5
+  achieved: false
+study:
+  status: ACTIVE_EVIDENCE_BOUNDARY_TARGET_NOT_MET
+  mode: real
+  interaction: auto
+  automatic_continuation: true
+  resumed_at: '2026-09-23T04:07:12.266326+00:00'
+candidate:
+  id: N4
+  arbor_node: '8.1'
+  status: N4E1_DEV_REJECT_NUMERIC
+  primary_change: terminal_population_execution_v1
+  protocol: experiments/iteration_004_terminal_population/protocol.md
+  protocol_commit: 9e5c63632fbd9169e88b6437b50f365eac819d6b
+  protocol_snapshot:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-terminal-population-protocol-v1/protocol.md
+    sha256: b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2
+  prerequisite_protocol_snapshot:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-terminal-population-protocol-v1/q0-transfer-check-protocol.md
+    sha256: 3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca
+  protocol_root_review:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-terminal-population-protocol-v1/root-review-v1.json
+    sha256: d0ddcb615e5da56cdb5433b9704db5dd4ccaa6551befa10da641af3d5d4d8433
+  online_score:
+    split: dev
+    condition: N4_E1_t180
+    successes: 1
+    episodes: 4
+    C0_successes: 0
+    Q0_successes: 0
+    target_minimum: 2
+  scientific_decision: REJECT_NUMERIC_DEV_1_OF_4
+  actual_native_read_authorized: true
+  algorithm_implementation_authorized: true
+  online_dispatch_authorized: false
+  prerequisite_preparation_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923
+  dev_tasks:
+  - 0
+  - 3
+  - 6
+  - 9
+  dev_original_episodes: 12
+  dev_dispatch_limit: 16
+  dev_gpu_hour_limit: 8.5
+  accounting_allocation:
+    C0_all: baseline
+    Q0_all: development
+    N4_all: development
+    eligible_retry: recovery
+  protected_evaluation_gates_unchanged: true
+  online_resource_status: INDEPENDENT_GPU3_PRIVATE_BUDGET_ACTIVE
+  resource_conflict:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-conflict-v1/observation.json
+    sha256: c240b430dba6fac3bfcfd6a456cfd3b04207879237509957e2e3c753670cd020
+  prerequisite_preparation:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-q0-transfer-check-preparation-v1/root-preparation-review-v1.json
+    sha256: 16e33192f92672a25fa826f699cec001a331a491971f536d9f3bb261ef3f3863
+  prerequisite_authorization:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-q0-transfer-check-analysis/input-v1/authorization.json
+    sha256: 054629b2bb8928d31f752c35fe48fa5dc59db2141d2bfcc4721de663af413b57
+  prerequisite_complete_review:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-q0-transfer-check-analysis/root-complete-review-v1.json
+    sha256: 711cef1fdcec7b3c28d3c202fefb1294e02ec2672dfe53e4043fcdecbca1a0db
+  prerequisite_counts:
+    Q0_cells: 10
+    decisions: 825
+    guided_associations_known: 155
+    Unknown: 0
+    nonmember_and_actual_prefix_command_difference: 142
+    actual_actions: 6594
+  resource_amendment:
+    path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_004_terminal_population/resource-resumption-amendment-v1.md
+    sha256: a08b37836b5a9283118821bb5b6b2b2f2ccf3683bc145a6023f199484e4557dd
+  resource_amendment_commit: 09ac7d9
+  implementation_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-terminal-20260924
+  audit_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-audit-20260924
+  runner_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-runner-20260924
+  shared_resource_contract:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-resumption-v1/shared-resource-contract-v1.json
+    sha256: 26972958be5372d8dffd304abcba844259e882588ca86a20c3b703e9446768b5
+  integration:
+    status: PASS_INTEGRATED_CPU_AND_INDEPENDENT_REVIEW
+    core_commit: a6f1df7
+    audit_commits:
+    - d235f7c
+    - bb0ea4c
+    core_tests:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-integration-preparation-v1/core-tests-result.json
+      sha256: e2f8fa0a0032e03edf7f8e1040e4b5c77849f2552eeacac2e23a416346d8bf28
+    audit_tests:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-integration-preparation-v1/audit-tests-result.json
+      sha256: d961e4c24beb66766cd74eb5320f4278a1dfcd3c8c4ec04b54553ce4de809b52
+    synthetic_evidence_archive:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-integration-preparation-v1/evidence-archive-v1.json
+      sha256: 4c36d021c26881bb0ab9d3642b1db7602f2e70b0883158a6f0975aa28521aba3
+    runner_commit: f6a9ab0
+    runner_tests:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-integration-preparation-v1/runner-tests-result.json
+      sha256: 5954152b26f77258acff08c6f1a7d6764762e9c6625700903a9babc3af54e604
+    independent_review:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-integration-preparation-v1/runner-independent-review/review-v2.json
+      sha256: 56691aff1d5668dc0c3357b4db3752f7a087b9d08b4e27e8507848c05f970612
+  source_commit: b2a3076136b1abf2f22757bc73b6aa6456a43600
+  execution_release:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/first3-execution-release.json
+    sha256: 93c1e139029467a49ace9600ced56431c34120428c4f8e0e8b1efb6e7a41e31a
+  prelaunch_review:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/root-prelaunch-review.json
+    sha256: 2470acf6c259c01dbb2bb3d0a82dbc72dc6d6e5a5c51198c290893a8777163f5
+  frozen_plan:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/plan.frozen.json
+    sha256: c13e38a59f46b0a2ebe6175bb0a045991447dbc12c97ede800405c3339ea59e3
+  latest_report:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-e1-full12-report-v1/report.json
+    sha256: 19c53c7568c504ac67f3b170cc42b70b2ec10ce23496a1f2bf130cb0702ca558
+  external_interruption:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/external-resource-interruption-v1.json
+    sha256: 2d9f4b724d7e1d17fb4b0b09a3612fe3229b6be358f297787df6a1d7c3988bed
+  resource_priority_authorization: &id001
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-user-confirmation-v1/authorization.json
+    sha256: 199f5621939fe0ca23fc779abf62085120e4b7c2032ef19144df593778c41281
+  prepared_execution_release:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/resume-task0-n4-v1/execution-release.json
+    sha256: 0364019f1866e88be9405c82b33bee23f21cc4ada4fb7c0e76b7dfeba9bfeeb7
+  new_concurrent_resource_conflict:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-user-confirmation-v1/new-concurrent-n1v-conflict-v1/conflict.json
+    sha256: 626136d8d987ff52477e91cceb24ee5c6b6b6556f3f248e2da7b98745551a2f3
+  active_execution_release: null
+  resource_isolation_authorization:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/authorization.json
+    sha256: 4026c141ff9bd06f31734c0a43122327b359c35bd847670f641961df9ce81f47
+  correctness_checkpoint:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/first3-release-v1/correctness-checkpoint.json
+    sha256: 8cf09fcd39fc0e0ef0053d9d38d93623b61a7320ba154605028bc9cc6281a58c
+  first3_root_review:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/first3-release-v1/root-review.json
+    sha256: be8e071c24c23601858ba5fea29a7ffe0cc3499e28e0793b0d68d8179af60156
+  original_cohort_closure:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/transport-invalid-first7-report-v1/root-closure-review.json
+    sha256: a530955728910138931739b07ef5099569579609fefe60c09996088de7ff9665
+  original_same_cell_retry_allowed: false
+  engineering_dependency:
+    arbor_node: '5.7'
+    name: N4_E1_TRANSPORT180
+    card:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-engineering-design-v1/card.md
+      sha256: a28d1b15d3f7a46cc24a44c966abc02e30163b24b051f0308842e6a975699a2a
+    status: DEV_COMPLETE_VALID_TRANSPORT
+    online_authorized: false
+    stage_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-stage-lifecycle-20260924
+    runner_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n4-e1-runner-20260924
+  current_cohort_id: N4_E1_TRANSPORT180_DEV_20260924
+  closed_original_report:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/transport-invalid-first7-report-v1/report.json
+    sha256: eeb2737787d8f7d797d8572f7ea84c85e37995eff42b75400cceebb24c3c8ad2
+  original_correctness_checkpoint:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/first3-complete-report-v1/correctness-checkpoint.json
+    sha256: c369374fd564e8e4dddb4704fd5d0d49a6c5fb16c10d7c7febff46e63cae1022
+  original_first3_root_review:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/first3-complete-report-v1/root-review.json
+    sha256: 69769086d758e6fac44996ed53eea85ce6754a6f11cc252c4367d27897d21107
+  n4e1_checkpoint_plan:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/first3-release-v1/plan.checkpoint.frozen.json
+    sha256: 46abd2b4d9b7c3a4fc294a2d0b0766bf4a29c5f4450cc7c323bd5729feea2cfe
+  n4e1_remaining9_resource_preflight:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/first3-release-v1/remaining9-resource-preflight.json
+    sha256: ce1675a6718d95ce4507571efd544ee5f102403d38ae2d377bc54d20666d35dc
+  full_dev_root_review:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/full12-root-review-v1/root-review.json
+    sha256: a633bfd608eff21a4435a3d1cd0931ecc36587cb6053cb4d01646fc744c03b92
+  completed_execution_release:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/first3-release-v1/remaining9-execution-release.json
+    sha256: 950df39a5177313bf5ecdab19bccc8f63991556ee42e4490458bd2185607a169
+budget:
+  max_gpu_hours: 100.0
+  gpu_hours_consumed: 29.40175200130951
+  max_episode_attempts: 398
+  amendment:
+    schema: gpu7-n21-budget-amendment-v1
+    proposal_sha256: d7e5dfbfe58ad0509cb19b2733b6397dd101ebaf3d7b73ba671df1881cadf2ec
+    physical_gpu: 7
+  reserved:
+    baseline: 31
+    development: 127
+    validation: 180
+    formal: 40
+    recovery: 20
+  dispatched: 216
+  aborted: 4
+  valid: 199
+  running: 0
+  invalid: 13
+  completed: 212
+  gpu_hour_reservations:
+    validation: 32.0
+    formal: 12.0
+  resource_isolation_authorization:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/authorization.json
+    sha256: 4026c141ff9bd06f31734c0a43122327b359c35bd847670f641961df9ce81f47
+historical:
+  Q0:
+    profile: eds_quality_diversity_sparse_primary
+    success_count: 2
+    denominator: 10
+    tasks:
+    - 5
+    - 8
+  C0:
+    profile: p2_stage_on_abs_rbf_control
+    success_count: 3
+    denominator: 10
+    tasks:
+    - 3
+    - 8
+    - 9
+  Q1:
+    profile: eds_quality_diversity_uniform_expand20
+    success_count: 2
+    denominator: 10
+    tasks:
+    - 5
+    - 7
+  previous_study_outcome: TARGET_NOT_MET_NO_ADOPTION
+  previous_effective_attempts: 70
+  previous_reservations: 98
+  previous_gpu_hours: 6.946832055555556
+  previous_formal_episodes: 0
+active_iteration: iteration_012_grasp_relaxation_diagnostic_rejected
+next_action: Freeze and run N21 GPU7 task0 C0/Q0/N21; stop cohort on audit or candidate
+  task0 failure, otherwise continue matched Dev. Continue evidence-grounded autoresearch
+  autonomously under latest user steering; protected evaluation remains gated.
+source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
+derived_indexes:
+- .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
+authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
+  ledger is append-only event evidence, not a second mutable state.
+online_blockers: []
+updated_at: '2026-09-29T02:13:01+00:00'
+seed_plan:
+  path: data/frozen-seed-plan.json
+  sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
+cpu_validation:
+  integrated_passed: 631
+  post_accounting_change_focused_passed: 51
+  online_evidence: false
+  codex_integration_passed: 673
+  codex_integration_seconds: 40.74
+  startup_repair_passed: 118
+  gpu5_runner_passed: 61
+  gpu5_probe_metadata_passed: 64
+  available_gpu_queue_passed: 26
+  monitor_repair_runner_probe_queue_passed: 122
+  native_policy_probe_passed: 37
+  native_probe_queue_passed: 17
+  native_probe_queue_integrated_passed: 80
+  native_probe_queue_journal_wait_passed: 22
+  render_phase_timing_proposal_passed: 18
+  production_egl_observer_proposal_passed: 17
+  context_drift_and_timing_passed: 26
+  observer_lifecycle_and_dormant_context_passed: 30
+  existing_run_seed_regression_passed: 1
+  scene_model_probe_passed: 6
+  model_load_phases_probe_passed: 3
+  cuda_first_probe_passed: 5
+  render_thread_probe_passed: 4
+  render_process_probe_passed: 6
+  render_process_supervisor_passed: 9
+  render_idle_probe_passed: 5
+  model_first_probe_passed: 3
+  context_lifetime_probe_passed: 6
+  native_render_lifetime_helper_passed: 17
+  native_render_lifetime_probe_passed: 3
+  n2_implementation_unique_passed: 488
+  n2_recorded_analysis_synthetic_passed: 11
+  n2_integrated_focused_passed: 123
+prepared_baseline_plan:
+  path: data/qd-ed-final-plan.json
+  episodes: 20
+  frozen: true
+  refresh_source_fingerprints_before_freeze: true
+  source_commit: 4d9cd5d31e8dde6d298ec10805cde4542d5765a2
+  sha256: 2d12ceb95b51a6d8bea317864b801711cdc138fd685382e23d5b4526192432ac
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/baseline-codex-4d9cd5d31e8d.json
+engineering_baseline_changes:
+- Task-identity-bound guidance cache Stage descriptions; canonical tensor reward guidance
+  remains identical.
+- Owned LIBERO path/dependency bindings instead of stale old-worktree absolute paths.
+- Single-task process with explicit policy_seed and env_seed instead of legacy sequential
+  seed0 RNG stream; same across all arms.
+cuda_egl_context_verified: true
+stage_provider_ready: true
+runner:
+  by_bucket:
+    baseline: 28
+    development: 121
+    validation: 60
+    formal: 0
+    recovery: 7
+  reserved_attempts: 216
+  gpu_hours_by_bucket:
+    baseline: 4.075326463240571
+    development: 16.30405780018059
+    validation: 7.7591759975691845
+    formal: 0.0
+    recovery: 1.2631917403191872
+  gpu_healthcheck_hours: 0.20961513444019236
+  gpu_healthcheck_inflight: 0
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__n21_dev_t00_n21_20260930__a4957aa45fc2
+  last_event: valid
+gpu_admission_last_observation:
+  physical_gpu: 3
+  physical_index: 3
+  uuid: GPU-62052fa1-37e0-79dc-21aa-5c0f25c0c315
+  must_recheck_before_dispatch: true
+provider_migration_probe:
+  artifact: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/codex-stage-production-probe-v2-20260922/result.json
+  synthetic_image_only: true
+  gpu_hours: 0
+  episode_attempts: 0
+  input_tokens: 9780
+  output_tokens: 69
+  reasoning_output_tokens: 21
+  production_adapter_ready: true
+stage_condition:
+  label: codex_login_astra_low_n4e1_t180_v1
+  backend: codex_cli
+  model: gpt-6-astra
+  auth_mode: chatgpt
+  reasoning_effort: low
+  cli_version: 0.155.1
+  runtime_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/runtime-manifest.json
+  provider_amendment: experiments/iteration_001_execution_intent/codex-provider-amendment.md
+  http_request_retry_counts: unobserved_null
+  logical_calls_tokens_latency: observed
+  timeout_seconds: 180
+  engineering_condition: N4_E1_t180
+startup_failure:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__baseline_dev_t00_q0__49b1a88877f7
+  actions_executed: 0
+  stage_queries: 0
+  outcome_valid: false
+  reason: Stage configuration overwritten by grounding configuration during component
+    initialization
+  retry_allowed: false
+closed_baseline:
+  status: CLOSED_INCOMPLETE_INVALID
+  expected: 20
+  dispatched: 1
+  invalid: 1
+  not_dispatched: 19
+  complete_success_rate: null
+  report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
+active_plan: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/plan.frozen.json
+hardware_migration:
+  previous_physical_gpu: 7
+  authorized_physical_gpu: 5
+  user_instruction: "\u6539\u75285"
+  authorized_at: '2026-09-22T04:31:51.394735+00:00'
+  max_concurrent_gpu_workers: 1
+  earlier_attempts_and_costs_preserved: true
+  egl_device_index: 7
+  metadata_verified: true
+  cuda_egl_verified: false
+previous_gpu7_active_plan:
+  path: data/qd-ed-n1-dev-plan.json
+  source_commit: 71b5880c3dac41a5d26ba678b366f962b5a4af1f
+  sha256: 080985fead54fac3806702c0d8db51904ef94c6aa2231b21cecbf38c7f7bcbfd
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-dev-codex-71b5880c3dac.json
+  iteration: N1
+  controls: 20
+  candidate_cells: 10
+  candidate_dispatch_authorized: false
+n18_gpu7_rebind:
+  scope: N18_CLOSE_THEN_LIFT_DEV_20260929_only
+  user_reply: "\u5141\u8BB8\u6539\u7528\u5176\u4ED6\u7A7A\u95F2 GPU"
+  selected_gpu: 7
+  addendum_path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n18_lift_quality/gpu7-rebind-addendum-v1.md
+  addendum_sha256: cd44f34b61e8418dbc07e575ba7bcd718da888183ddaf2e4c41e931d8bf89bd4
+n19_gpu7_binding:
+  scope: N19_CORRECTED_LIFT_DEV_20260929_only
+  user_reply: "\u5141\u8BB8\u6539\u7528\u5176\u4ED6\u7A7A\u95F2 GPU"
+  selected_gpu: 7
+  addendum_path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n19_lift_quality_contract_repair/gpu7-binding-addendum-v1.md
+  addendum_sha256: bd2ce9251d5f940b4f18570d4989a9da690059aa002dd8fb726ad2c360680759
+authorized_gpu_selection:
+  policy: N20 matched Dev only on user-authorized idle GPU7; no automatic fallback
+  candidate_indices:
+  - 7
+  selected_physical_gpu: 7
+  user_instruction: "\u5141\u8BB8\u6539\u7528\u5176\u4ED6\u7A7A\u95F2 GPU"
+  authorized_at: '2026-09-30T02:08:40+00:00'
+  single_exclusive_worker: true
+  rescan_if_unavailable: true
+  reconfirmed_at: '2026-09-29T09:24:00+00:00'
+resource_queue:
+  pid: 3996172
+  proc_start_ticks: '373125345'
+  source_commit: 8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-monitor-recovery-plan.json
+  plan_sha256: 456c2c992c07b528909fdda892ce49890d3e18f17f6bbe99d1e2a736e6ee8f33
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue.log
+  started_at: '2026-09-22T05:43:42.696206+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-monitor-recovery-plan.json
+  - --episode-key
+  - n1_dev_t00_q0_r3
+  - --episode-key
+  - n1_dev_t00_c0
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json
+  scope: explicit linked r3 Q0 recovery and paired P2; stop for review
+  idle_stability_seconds: 120
+  status: failed
+  last_verified_at: '2026-09-22T06:19:36.975062+00:00'
+  active_plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json
+  selected_physical_gpu: 6
+  archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8fb001b-native-abort
+prepared_stable_queue_plan:
+  path: data/qd-ed-n1-stable-queue-plan.json
+  source_commit: 32d4d97c9773a2099b59c3128b3476e6980e95d5
+  sha256: 10c280b86d48b25d5e750100103ae1771d1771e87eb22ba26a25b0026420c269
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-stable-queue-32d4d97c9773.json
+  frozen: true
+  iteration: N1
+  expected_unique_scientific_cells: 30
+  rows_including_recovery: 32
+  candidate_dispatch_authorized: false
+prepared_monitor_recovery_plan:
+  path: data/qd-ed-n1-monitor-recovery-plan.json
+  source_commit: 8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2
+  sha256: 456c2c992c07b528909fdda892ce49890d3e18f17f6bbe99d1e2a736e6ee8f33
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-monitor-recovery-8fb001b7903c.json
+  frozen: true
+  iteration: N1
+  expected_unique_scientific_cells: 30
+  rows_including_recovery: 33
+  candidate_dispatch_authorized: false
+last_infrastructure_recovery:
+  retry_of: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r2__5621b7ebde96
+  original_episode_key: n1_dev_t00_q0_r2
+  new_episode_key: n1_dev_t00_q0_r3
+  identity:
+    split: dev
+    iteration: N1
+    profile: Q0
+    task_id: 0
+    env_seed: 1969522881
+    policy_seed: 1969522881
+    init_index: 0
+  budget_bucket: recovery
+  reason: NVIDIA metadata exclusivity query exceeded5-second monitor timeout
+native_failure:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r3__6df33a24c65f
+  physical_gpu: 6
+  signal: SIGABRT
+  exit_code: -6
+  outcome_valid: false
+  retry_allowed: false
+  stage_successful_queries: 1
+  last_stage_global_step: 24
+  guidance_before: true
+  guidance_after: false
+  root_cause: Unknown
+  core_available: false
+  confirmed_by: apport entry for pid4006998 signal6 corelimit0; no crashfile
+real_stage_transport_evidence:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r3__6df33a24c65f
+  global_step: 24
+  backend: codex_cli
+  model: gpt-6-astra
+  query_ok: true
+  latency_seconds: 19.772138726897538
+  input_tokens: 10800
+  output_tokens: 42
+  reasoning_output_tokens: 0
+  logical_calls: 1
+  failed_calls: 0
+  http_requests_retries: null
+  task_success_claimed: false
+native_diagnostic:
+  status: MATCHING_COMPLETED_GPU6_B1_EVIDENCE_REUSED
+  script: scripts/qd_ed_policy_native_probe.py
+  scope: B1 native inference on deterministic synthetic inputs; no simulator, actions,
+    Stage call or scientific episode
+  timeout_seconds: 600
+  source_plan_pending_freeze: false
+  limitation: Cannot establish guided-transition or EGL causality
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json
+  plan_sha256: 1ca7b9d970fc9b014820fc69596ec28100c55aed63a1416d23e7c1873d6d55a5
+  source_commit: 8771eaa74ede4159efb004e0709232175a6c0b8d
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/native-gpu7-queue-8771eaa74ede.json
+  physical_gpu: 7
+  reused_resource_id: rdt-qd-ed-final-20260921T093925Z__gpu6_native_b1__b689d3b01c36
+  matching_checks:
+    scope: true
+    synthetic_seed_task: true
+    policy_configuration: true
+    native_script_fingerprint: true
+    runtime_inventory: true
+    shared_source_fingerprints: true
+    evidence_digest: true
+  physical_gpu7_executed: false
+gpu_authorization_history:
+- policy: any idle GPU on current server
+  candidate_indices:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  selected_physical_gpu: 6
+  user_instruction: "\u5E2E\u6211\u4F7F\u7528\u5F53\u524D\u670D\u52A1\u5668\u4E0A\u4EFB\
+    \u4F55\u80FD\u7528\u7684GPU\u6765\u8DD1\u8FD9\u4E2A\u4EFB\u52A1\u5373\u53EF"
+  authorized_at: '2026-09-22T04:58:53.637965+00:00'
+  single_exclusive_worker: true
+  rescan_if_unavailable: true
+- policy: GPU7 only; wait if unavailable
+  candidate_indices:
+  - 7
+  selected_physical_gpu: 7
+  user_instruction: "\u540E\u7EED\u4EFB\u52A1\u90FD\u6536\u655B\u5230GPU7\u4E0A\u5B8C\
+    \u6210"
+  authorized_at: '2026-09-22T06:36:54.904959+00:00'
+  single_exclusive_worker: true
+  rescan_if_unavailable: true
+resource_journal_anomaly:
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu6_cuda_egl__74d84549721c
+  output_namespace: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z
+  observed_terminal: completed
+  wall_seconds: 15.178619010839611
+  note: Written concurrently from a different artifact namespace, not dispatched by
+    this continuation. Preserve append-only evidence and conservatively retain cost;
+    do not broaden GPU7 authorization.
+  additional_resource:
+    resource_id: rdt-qd-ed-final-20260921T093925Z__gpu6_native_b1__b689d3b01c36
+    event: completed
+    wall_seconds: 116.84877258958295
+  concurrent_attempt:
+    attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00__6e57273c45b3
+    physical_gpu: 6
+    source_commit: 5cafac6586e2b2d5f05468de466fbd56c8334405
+    output_namespace: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z
+    status: aborted
+    not_launched_by_this_continuation: true
+    gpu_process_wall_seconds: 695.8362217219546
+  scope_question_pending: true
+  continuation_decision: User requires continued work until completion; observed GPU6
+    attempt already infrastructure-aborted. Preserve evidence/costs; this continuation
+    launches only GPU7 and does not stop unrelated external workers.
+  new_concurrent_attempt:
+    attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df
+    physical_gpu: 5
+    source_commit: 79cdce092b4e9c32b42634262cc9d1f7e14bec4b
+    worker_pid: 115030
+    queue_pid: 107052
+    status: infrastructure_aborted_Xid31
+    not_launched_by_this_continuation: true
+  concurrent_serialization_diagnostic:
+    attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_egl_serial_c0_t00__00baf2a27328
+    physical_gpu: 5
+    status: aborted_Xid31
+    source_commit: c6f73da3a5bd8fe091e3058d8c469a0bdb349d17
+    gpu_process_wall_seconds: 87.51905658841133
+    context_matches_before_first_render: true
+    explicit_cuda_sync_and_context_bind_did_not_prevent_fault: true
+    not_launched_by_this_continuation: true
+previous_native_resource_queue:
+  pid: 4127385
+  proc_start_ticks: '373525473'
+  source_commit: 8771eaa74ede4159efb004e0709232175a6c0b8d
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json
+  plan_sha256: 1ca7b9d970fc9b014820fc69596ec28100c55aed63a1416d23e7c1873d6d55a5
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue.log
+  started_at: '2026-09-22T06:50:23.972162+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_native_probe_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json
+  - --poll-seconds
+  - '30'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json
+  authorized_physical_gpus:
+  - 7
+  scope: one bounded native diagnostic; no scientific episodes
+  status: failed
+  last_verified_at: '2026-09-22T06:55:26.355675+00:00'
+  heartbeat_unix: 1790060124.6141038
+  reason: state/ledger GPU accounting mismatch
+  archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8771eaa-shared-state-accounting
+native_resource_queue:
+  pid: 4193300
+  proc_start_ticks: '373729486'
+  source_commit: 8771eaa74ede4159efb004e0709232175a6c0b8d
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json
+  plan_sha256: 1ca7b9d970fc9b014820fc69596ec28100c55aed63a1416d23e7c1873d6d55a5
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue.log
+  started_at: '2026-09-22T07:24:24.103366+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_native_probe_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json
+  - --poll-seconds
+  - '30'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json
+  authorized_physical_gpus:
+  - 7
+  scope: one bounded native diagnostic; no scientific episodes
+  status: interrupted_before_dispatch_for_nonredundant_diagnosis
+  last_verified_at: '2026-09-22T08:17:43.179597+00:00'
+  heartbeat_unix: 1790062224.3071046
+  archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8771eaa-b1-evidence-reused
+user_persistence_instruction:
+  text: "\u8BB0\u4F4F\u4F60\u7684\u4EFB\u52A1\u662F\u5728\u5F53\u524D\u4F1A\u8BDD\u4E2D\
+    \u81EA\u5DF1\u6301\u7EED\u8FED\u4EE3\u4F18\u5316\u7B97\u6CD5\u4EE5\u5B8C\u6210\
+    \u6211\u8BBE\u5B9A\u7684\u4EFB\u52A1\u76EE\u6807\uFF0C\u9664\u975E\u6211\u8BF4\
+    \u505C\u6B62\uFF0C\u5426\u5219\u81EA\u5DF1\u4F18\u5316\u65E0\u9700\u505C\u6B62\
+    \u76F4\u5230\u8FBE\u6210\u4EFB\u52A1\u76EE\u6807"
+  recorded_at: '2026-09-23T04:07:12.266326+00:00'
+  interpretation: Continue autonomous engineering recovery, targeted evidence collection
+    and QD-ED algorithm iteration; do not end the overall objective because a candidate/cohort
+    fails or a bounded review lacks ready evidence. Preserve all failure records and
+    current accounting. Numerical GPU/episode budgets and validation/formal reservations
+    are unchanged pending any explicit numeric amendment.
+prepared_render_diagnostics:
+  status: CPU_REVIEWED_APPLIED
+  patch: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/main-render-phase-timing-proposal.patch
+  sha256: 7d62df655c630a318c28f28ea7a99765ab1482880a179e3a63fcd7207ae927da
+  base_source_commit: 8771eaa74ede4159efb004e0709232175a6c0b8d
+  cpu_tests_passed: 18
+  main_original_operations_ast_unchanged: true
+  draft_protocol: experiments/iteration_001_execution_intent/gpu7-render-timing-diagnostic-draft.md
+  gpu_execution_authorized_by_patch: false
+  timing_limit: inclusive host timings; observer overhead estimated, no kernel time
+    or isolated lock-wait claim
+  protocol: experiments/iteration_001_execution_intent/gpu3-render-timing-diagnostic.md
+prepared_production_context_observer:
+  status: CPU_REVIEWED_UNAPPLIED
+  patch: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/production-egl-identity-proposal.patch
+  sha256: ccfe8ede68fe20e9c190078e1864f2fd17c9f3f575a3ff835f8808d134d51f33
+  helper_sha256: 3d5392455339e7db268b15bc07da251fe42db0ec201ea0162534143c5ae49fc2
+  cpu_tests_passed: 17
+  native_queries_tested: false
+  limitation: Already-loaded raw entrypoints only; unsupported or client-only extension
+    evidence staysUnknown. CPU transparency does not prove native driver behavior
+    is side-effect-free.
+prepared_gpu3_render_plan:
+  path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-c0-render-plan.json
+  sha256: 6b434d451cdae49b5c2047d257633616bfb1e55f59d2d34a10d5e2e8042af28a
+  source_commit: e131ff67f97a5da7fd68d1dd9a8dfe6e08253dea
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/gpu3-c0-render-e131ff67f97a.json
+  frozen: true
+  episode_key: gpu3_native_c0_t00_r2
+  retry_of: rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df
+gpu3_render_queue:
+  pid: 134110
+  proc_start_ticks: '374175557'
+  source_commit: e131ff67f97a5da7fd68d1dd9a8dfe6e08253dea
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-c0-render-plan.json
+  plan_sha256: 6b434d451cdae49b5c2047d257633616bfb1e55f59d2d34a10d5e2e8042af28a
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/queue.log
+  started_at: '2026-09-22T08:38:44.819111+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-c0-render-plan.json
+  - --episode-key
+  - gpu3_native_c0_t00_r2
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/queue-status.json
+  authorized_physical_gpus:
+  - 3
+  status: interrupted_after_owned_Xid31
+  scope: one C0 render diagnostic; continue coordinator after result
+  last_verified_at: '2026-09-22T08:50:52.025777+00:00'
+gpu3_native_failure:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu3_native_c0_t00_r2__79342697c4d2
+  physical_gpu: 3
+  worker_pid: 142266
+  queue_pid: 134110
+  owned_xids:
+  - 31
+  - 109
+  gpu_process_wall_seconds: 179.21637980407104
+  retry_allowed: false
+  outcome_valid: false
+  actions_completed: 1
+  fresh_policy_calls: 1
+  stage_queries: 0
+  evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/kernel-observations.json
+  causal_status: Unknown; repeated graphics MMU faults and timeout, not explained
+    by physical GPU migration or Stage invocation
+prepared_gpu3_context_plan:
+  path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-context-drift-plan.json
+  sha256: 0fe02b5667cf4f88728ead4cc7c1e6bc9b304b5801a721260523a7ce0a8fac25
+  source_commit: 37178ab96079e88a6f027b47a09290b3f9a3de02
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/gpu3-context-drift-37178ab96079.json
+  frozen: true
+  episode_key: gpu3_context_drift_c0_t00
+  stop_after: three diagnostic boundaries
+  status: NOT_DISPATCHED_SUPERSEDED_BY_STRONGER_CONCURRENT_EVIDENCE
+gpu3_context_queue:
+  pid: 164924
+  proc_start_ticks: '374286377'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-context-drift-plan.json
+  - --episode-key
+  - gpu3_context_drift_c0_t00
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/queue-status.json
+  physical_gpu: 3
+  plan_sha256: 0fe02b5667cf4f88728ead4cc7c1e6bc9b304b5801a721260523a7ce0a8fac25
+  source_commit: 37178ab96079e88a6f027b47a09290b3f9a3de02
+  supervisor_pid: 164897
+  supervisor_sha256: 72b9138d6c5b8db95b4de18322d5847712fba8ba7b7e78d05d033b1cf6a580a7
+  started_at: '2026-09-22T08:57:13.012324+00:00'
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/queue.log
+  supervisor_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/supervise.py
+  status: failed_before_dispatch_shared_study_inflight
+  last_verified_at: '2026-09-22T09:10:48.651780+00:00'
+  gpu_dispatched: false
+gpu3_static_scene_diagnostic:
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-static-scene-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-static-scene-diagnostic/frozen-contract.json
+  contract_sha256: a080ed9625989cef5b0de19321fc367e14bfbaf0ed934ffb0a62b6b84ff98695
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-static-scene.py
+  tool_session_id: 26447
+  phase: completed
+  source_commit: a5e1236daa8de7eea3a9882028304bdcbc3096e2
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_static_scene__b8f0b3b6214f
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-static-scene-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_static_scene__b8f0b3b6214f/healthcheck-result.json
+  gpu_process_wall_seconds: 10.327968017198145
+  frame_count: 12
+  actions: 0
+  integration_transitions: 0
+  stage_calls: 0
+  owned_xids: []
+gpu3_scene_model_diagnostic:
+  status: ABORTED_OWNED_XID31_AFTER_LOAD_BEFORE_PREDICTION
+  protocol: experiments/iteration_001_execution_intent/gpu3-scene-model-diagnostic.md
+  physical_gpu: 3
+  maximum_gpu_process_seconds: 600
+  automatic_retry: false
+  tool_session_id: 31926
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-model.py
+  script_sha256: 82981d32eaf709ac3c7e4232749b92baeb86994fa98bdd49c81347819d715e70
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-scene-model.py
+  supervisor_sha256: 01549695362503f2960f1eff80e280d0e70a60e3ab3c0e96816664975f6358d1
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/status.json
+  source_commit: 9b1b4727a50c11ee0a36bb96aa64810807439039
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_scene_model__c83cfb349cba
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_scene_model__c83cfb349cba/healthcheck-result.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/frozen-contract.json
+  contract_sha256: 30b237ff4171bf0e49fd0f80e5234868ee73f62dc414e9507386dc34563f11bb
+  gpu_process_wall_seconds: 73.72699015820399
+  prediction_calls: 0
+  owned_xids:
+  - 31
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/diagnostic-analysis.json
+gpu3_load_phase_diagnostic:
+  status: ABORTED_NONFINITE_DEPTH_AFTER_CUDA_INIT_SEED
+  physical_gpu: 3
+  source_commit: d9416fb7bf56c5135ef49c6bdaa9935de9e14e18
+  tool_session_id: 95403
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-model-load-phases.py
+  script_sha256: 741c087a21228b5dc5f49801c3734b93ed690760a3731eb5c8b6b3138a0775a4
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-model-load-phases.py
+  supervisor_sha256: ab2796fe17200ab1178d9c1befb2fc5cfd49c8a9d4230a9a3181f1c9c1d4c735
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/frozen-contract.json
+  protocol: experiments/iteration_001_execution_intent/gpu3-model-load-phases-diagnostic.md
+  automatic_retry: false
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_model_load_phases__52ec6c4eb068
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_model_load_phases__52ec6c4eb068/healthcheck-result.json
+  contract_sha256: f87139677662de6cf65a47383c7d521b0b9c91b606ef88bac5f3fd8917337f3e
+  gpu_process_wall_seconds: 42.836270067840815
+  model_loads: 0
+  model_forward_calls: 0
+  owned_xids: []
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/diagnostic-analysis.json
+gpu3_cuda_first_diagnostic:
+  status: ABORTED_NONFINITE_DEPTH_AFTER_T5_LOAD
+  physical_gpu: 3
+  protocol: experiments/iteration_001_execution_intent/gpu3-cuda-first-diagnostic.md
+  automatic_retry: false
+  source_commit: be658cd47b3895ee56873c71b333d8046bca1708
+  tool_session_id: 25421
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-cuda-first.py
+  script_sha256: b0c4dd043cc2bb9b96ca72bf25ca40099a5da8b64a9651ab1e2fa24773725f9c
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-cuda-first.py
+  supervisor_sha256: c9fdd50852c16e53ce2a1ccca2835cbcd5f4bf22e080244bdac1b9fc85b1a35e
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/frozen-contract.json
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_first__c40589cf6c65
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_first__c40589cf6c65/healthcheck-result.json
+  contract_sha256: 5dc28f10b3bc99a12e9d917c0efcfb12f550d953ccd206a342e31681b8d4c502
+  gpu_process_wall_seconds: 82.97216953756288
+  model_forward_calls: 0
+  actions: 0
+  integration_transitions: 0
+  owned_xids: []
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/diagnostic-analysis.json
+gpu3_render_thread_diagnostic:
+  status: ABORTED_OWNED_XID31_AFTER_MODEL_LOAD
+  physical_gpu: 3
+  automatic_retry: false
+  production_patch_applied: false
+  scope: same static scene, model loading and one B1; all environment/context work
+    confined to one dedicated thread; zero actions/integration
+  protocol: experiments/iteration_001_execution_intent/gpu3-render-thread-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-thread.py
+  script_sha256: ce9457f5e184e6cad285a1444f97fefbaa1b8c353346e310b7c738cf76855ed0
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-render-thread.py
+  supervisor_sha256: 51e604cecf10f8eca134ba4edc6eba5354453ac94149892667fb680cd528792f
+  maximum_gpu_process_seconds: 600
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/frozen-contract.json
+  tool_session_id: 49770
+  source_commit: 5192e5d48f978cfe62fefd80e2a3426033b109f5
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_render_thread__be460ba14398
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_thread__be460ba14398/healthcheck-result.json
+  contract_sha256: 1eba79779c181c19774ddab2980cc5e0b2518ab651c6b014b6b7c7fc06343a83
+  gpu_process_wall_seconds: 72.35227173706517
+  model_forward_calls: 0
+  prediction_calls: 0
+  owned_xids:
+  - 31
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/diagnostic-analysis.json
+  cleanup_success: true
+gpu3_render_process_diagnostic:
+  status: ABORTED_RENDERER_XID31_AFTER_MODEL_LOAD
+  physical_gpu: 3
+  automatic_retry: false
+  production_patch_applied: false
+  scope: one model parent and one fresh spawn renderer on GPU3; original static scene,
+    model load and one B1; zero actions/integration
+  protocol: experiments/iteration_001_execution_intent/gpu3-render-process-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-process.py
+  script_sha256: 9eff1e42185316c5070b1d581e6238169657d1bdff9f4e20ebb76ac583e1a390
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-render-process.py
+  supervisor_sha256: 588e568057e54006a5b8e4b1b7002328647129c6006dacc29ad2509c6c05fc24
+  maximum_gpu_process_seconds: 600
+  maximum_cleanup_seconds: 40
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/frozen-contract.json
+  tool_session_id: 5827
+  source_commit: c1da591478b155e0bbfa191d1e62ac99dee5b050
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_render_process__7a179aced1de
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_process__7a179aced1de/healthcheck-result.json
+  contract_sha256: f7bbb68c2515413a89ce7869dd06a698c1d9224e247a36fb5ebfba9f9dfd5d6c
+  gpu_process_wall_seconds: 72.52888720668852
+  prediction_calls: 0
+  owned_xids:
+  - 31
+  cleanup_success: true
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/diagnostic-analysis.json
+gpu3_render_idle_diagnostic:
+  status: PASS_75_SECOND_NO_MODEL_IDLE_CONTROL
+  physical_gpu: 3
+  automatic_retry: false
+  idle_seconds: 75
+  maximum_gpu_process_seconds: 180
+  model_loads: 0
+  scope: same static scene and cameras before/after75s idle; no CUDA initialization/model/action/integration
+  protocol: experiments/iteration_001_execution_intent/gpu3-render-idle-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-idle.py
+  script_sha256: ec415acee0e57f29603bdf7dc6771ca6d55bdad31e22c28e9ab1463a6767ad05
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-render-idle.py
+  supervisor_sha256: bde008e92f2bbb96ef1cac1d7887d58a2fd3fd95b8ee2b9813c0da47106a6ae1
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/frozen-contract.json
+  tool_session_id: 23388
+  source_commit: a850f974625f09e7a5823a9a38169fdd845d86e7
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_render_idle__8d9503386162
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_idle__8d9503386162/healthcheck-result.json
+  contract_sha256: a0688ad3ebc0d732606b546614d052ca685f438fcd82d627113548cffdcc460b
+  gpu_process_wall_seconds: 82.93174356641248
+  frame_count: 10
+  all_static_hashes_match: true
+  owned_xids: []
+gpu3_model_first_diagnostic:
+  status: ABORTED_OWNED_XID31_AFTER_VALID_B1
+  physical_gpu: 3
+  automatic_retry: false
+  maximum_gpu_process_seconds: 600
+  scope: complete original model load before first application EGL context, then frozen
+    static scene and oneB1; zero actions/integration
+  protocol: experiments/iteration_001_execution_intent/gpu3-model-first-diagnostic.md
+  production_patch_applied: false
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-model-first.py
+  script_sha256: 63d0acaed3b5c1a3088dab79f49c2f224374406a0d9078c4c3aeeb2364eb2519
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-model-first.py
+  supervisor_sha256: e834d28838e0e9c324af42b7fcb8aa67f789f61963e36952b0cc41f5816edfde
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/frozen-contract.json
+  tool_session_id: 85251
+  source_commit: c97b1395f14c9d027ed2e88180b0820b7b888e24
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_model_first__256bd92ec777
+  worker_pid: 414431
+  worker_proc_start_ticks: '375188103'
+  supervisor_pid: 411006
+  contract_sha256: cf240423e1bc27969425d963cb9c208bf0a02011fc02abd2591ee66de0e0e1e1
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_model_first__256bd92ec777/healthcheck-result.json
+  gpu_process_wall_seconds: 73.69034509593621
+  pre_prediction_static_hashes_match: true
+  model_load_seconds: 64.78850958216935
+  prediction_calls: 1
+  model_forward_calls: 5
+  owned_xids:
+  - 31
+  cleanup_success: true
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/diagnostic-analysis.json
+gpu3_context_lifetime_diagnostic:
+  status: ABORTED_IMAGE_HASH_MISMATCH_NO_XID
+  physical_gpu: 3
+  automatic_retry: false
+  maximum_gpu_process_seconds: 600
+  production_patch_applied: false
+  scope: Retire complete rendering context before original B1, then recreate matching
+    context; fixed static scene, zero actions/integration.
+  protocol: experiments/iteration_001_execution_intent/gpu3-context-lifetime-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-context-lifetime.py
+  script_sha256: 76c600819d57cc7179b3ba75c3f88ba5901053e68f38523ebbbe021c9785784f
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-context-lifetime.py
+  supervisor_sha256: 995dcaae05ada01d445aadbee8ed9eae16b30f2216fd71e88a79dd63e78e6e69
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/frozen-contract.json
+  tool_session_id: 23017
+  source_commit: 5a6290a07f95447a509182329adfe0a4ea4cf5bb
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_context_lifetime__a426c0351816
+  worker_pid: 436246
+  worker_proc_start_ticks: '375288263'
+  supervisor_pid: 432062
+  contract_sha256: cd742189842d2de2217b2c03602dc5829ed29b0a66fde99589decfebacc0ebe0
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_context_lifetime__a426c0351816/healthcheck-result.json
+  gpu_process_wall_seconds: 81.47155109513551
+  finite_frame_count: 10
+  static_hash_mismatches:
+  - phase: after_prediction_sync
+    camera: agentview
+    width: 128
+    rgb_sha256: 6bcd547193f484aaf3f5d94cfe77a2f7bcb2ff6aa3ff8cedc909cd9239c8a741
+    matches_static: false
+  prediction_calls: 1
+  model_forward_calls: 5
+  mj_forward_calls: 6
+  owned_xids: []
+  cleanup_success: true
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/diagnostic-analysis.json
+gpu3_native_render_lifetime_diagnostic:
+  status: ABORTED_RGB_PARITY_BEFORE_MODEL_LOAD
+  physical_gpu: 3
+  automatic_retry: false
+  maximum_gpu_process_seconds: 600
+  production_patch_applied: false
+  scope: Original scene-first static/model/B1 order; native resources held only across
+    full render/readback, stable Python scene/camera/options; no extra mj_forward
+    or CUDA operations; zero actions/integration.
+  protocol: experiments/iteration_001_execution_intent/gpu3-native-render-lifetime-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-native-render-lifetime.py
+  script_sha256: cf48e493e74f2e44283eff537e1339c6ccb8e1a0ef643cbe4a65b11681c307c5
+  helper: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/native-render-lifetime-proposal/native_render_lifetime.py
+  helper_sha256: ebbff19af379a2e0db523ef32df66cb2edbef6e62d74090db45957e4767b55c0
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-native-render-lifetime.py
+  supervisor_sha256: a156aa0e7d752b57e1c4a554991036963c8a420edcb8186479f4a4546f064fd1
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/frozen-contract.json
+  tool_session_id: 25711
+  source_commit: 2435f86f601fa97070f6697670b29063078e91ac
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056
+  worker_pid: 458749
+  contract_sha256: 535ebb5115237529d775fde8e1b334552d811d94fd90a95e549ed71eaebcca78
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/healthcheck-result.json
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/diagnostic-analysis.json
+  gpu_process_wall_seconds: 6.335480608046055
+  model_loads: 0
+  prediction_calls: 0
+  finite_frame_count: 6
+  owned_xids: []
+  cleanup_success: true
+closed_n1:
+  status: INVALID_NOT_PROMOTABLE
+  dispatched_attempts: 4
+  unique_dispatched_cells: 1
+  expected_unique_cells: 30
+  undispatched_unique_cells: 29
+  required_attempts_to_fill_original_matrix: 33
+  frozen_attempt_cap: 30
+  nonretryable_invalid_control: true
+  candidate_online_evaluations: 0
+  algorithm_effect: UNKNOWN
+  source_protocol: experiments/iteration_001_execution_intent/protocol.md
+  ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
+  old_plan_preserved: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json
+  new_same_candidate_comparison_authorized: false
+bounded_mechanism_review:
+  status: COMPLETE_NO_SUPPORTED_SUCCESSOR
+  scope: One targeted review of existing historical/diagnostic evidence for a genuinely
+    different falsifiable QD-ED successor. No renamed N1, no new GPU/scientific dispatch.
+  if_no_supported_hypothesis: CONCLUDE_TARGET_NOT_MET
+  authority: User specification section6 permits failure review and next mechanism;
+    prior N1 limits remain binding.
+  decision: CONCLUDE_TARGET_NOT_MET
+  evidence_gap: Executed-horizon proposal lacks exact t8Z/start-EEF/provider-quality
+    reconstruction, actual selection changes and lawful next-observation progress
+    linkage; existing XY argmin differences do not establish quality misranking.
+final_delivery:
+  status: FINALIZED_NEGATIVE_RESULT
+  report: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/final-report.md
+  accounting: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/final_delivery/accounting.json
+  artifact_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/final_delivery/manifest.json
+  preclosure_audit: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/final_delivery/preclosure-audit.json
+  last_execution_source_commit: 2435f86f601fa97070f6697670b29063078e91ac
+  best_effective_candidate: null
+  candidate_online_evaluations: 0
+  validation_executed: false
+  formal_executed: false
+  owned_gpu_workers: []
+  active_queue: null
+  automatic_dispatch_authorized: false
+  stop_authority: 'User specification sections 6 and 10: bounded review found no supported
+    successor mechanism. Budget remains available; target not achieved.'
+  historical_as_of: '2026-09-22T12:20:20.701128+00:00'
+study_history:
+- timestamp: '2026-09-23T04:07:12.266326+00:00'
+  event: USER_REOPENS_CONTINUOUS_OPTIMIZATION
+  prior_study:
+    status: CONCLUDED_TARGET_NOT_MET
+    mode: real
+    interaction: auto
+    concluded_at: '2026-09-22T12:20:20.701128+00:00'
+    decision: TARGET_NOT_MET / NO_ADOPTION
+    automatic_continuation: false
+  prior_report_commit: 1a0e1b52c3cab9acac1ee6092d58d5925b41163f
+continuation:
+  id: continuation_20260923
+  status: ACTIVE
+  artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923
+  previous_delivery_is_historical_checkpoint: true
+  automatic_gpu_dispatch_authorized: true
+  gpu_pool:
+  - 3
+  scientific_dispatch_gate: New prospective protocol after engineering validity; validation/formal
+    remain protected.
+  current_owned_workers: []
+  external_postclosure_attempt: rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_memcheck_blocking_c0_t00__3a0defb917b0
+  external_attempt_accounting: Recorded as actual GPU2, invalid,154.8965663430281s;
+    no dispatch by this coordinator; included conservatively in shared study budget.
+  storage_observation: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/storage-observation.json
+  current_boot_id: 2a1fa95f-ab0d-488c-a298-fc488ddd2af7
+  temporary_local_evidence_root: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923
+  storage_status: RESTORED_EXTERNALLY
+  storage_restored_observation: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/storage-restored-observation.json
+  freshboot_model_first:
+    status: PASS
+    physical_gpu: 3
+    boot_id: 2a1fa95f-ab0d-488c-a298-fc488ddd2af7
+    protocol: experiments/iteration_001_execution_intent/gpu3-freshboot-model-first-control.md
+    supervisor: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/supervise-freshboot-model-first.py
+    supervisor_sha256: ba1a631ed9abf0d7802126120b33176510d1248b8668c8572792474b844d3cf2
+    output_root: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first
+    maximum_seconds: 600
+    automatic_retry: false
+    resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287
+    source_commit: c050470608c7103fb45a7bde16ef2f833cdc7ab9
+    contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first/frozen-contract.json
+    status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first/status.json
+    result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first/rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287/healthcheck-result.json
+    gpu_process_wall_seconds: 73.08866456900023
+    task_score: null
+    owned_xids: 0
+  user_confirmed_external_reboot: true
+  freshboot_production_c0:
+    status: COMPLETED_ENGINEERING_PASS_TASK_UNSUCCESSFUL
+    arbor_node: '5.5'
+    physical_gpu: 3
+    episode_key: freshboot_c0_t00_20260923
+    algorithm_score: null
+    source_commit: ea0cd8b5b7b9fa2aa2a8d2475de766121c03a74b
+    plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-c0/plan.v2.frozen.json
+    plan_sha256: dcd425bd5cb884b8f06a6a80667ef1e29f30abe0688b9c8e11382292ec828d97
+    queue_status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-c0/queue-status-v2.json
+    unified_exec_session_id: 6962
+    owned_episode_dispatches: 0
+    queue_failure_reason: unfinished attempt or healthcheck requires reconciliation
+    external_active_attempt: rdt-qd-ed-final-20260921T093925Z__n1r_dev_t00_c0__fc39e13b4f1d
+    next_step: Acquire real shared runner lock after external work ends, reconcile
+      only terminal state, retain lock through GPU3 idle/admission/one original C0
+      episode.
+    engineering_coverage: PASS
+    success: false
+    attempt_id: rdt-qd-ed-final-20260921T093925Z__freshboot_c0_t00_20260923__47a4507eacbe
+    summary_path: docs/03_evidence/qd_ed_final/continuation_20260923/freshboot-model-first/production-c0-result-summary.json
+    summary_sha256: 90372e96bc360b44e71305e2f9bc884e55eaa411d90157d6945c45090151c32b
+  decision_evidence_implementation:
+    status: INTEGRATED_PROVIDER_IDENTITY_REVIEWED
+    worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923
+    commits:
+    - 516cd92cddeb35e30ba568f92ae9ad5c86b2bb44
+    - f4b52d7
+    - 1ec9682290c2fe72f8ca7f50931015cd6119c522
+    integrated_into_production: false
+    gpu_validated: false
+    integrated_commit: 1b3553d
+    online_equivalence_proven: false
+    identity_fix_cpu_tests_passed: 36
+  observed_pairs:
+    arbor_node: '5.6'
+    status: CLOSED_THREE_VALID_ONE_TRANSPORT_INVALID
+    protocol: docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-draft/prospective-protocol.md
+    tasks:
+    - 0
+    - 5
+    profiles:
+    - C0
+    - Q0
+    attempt_cap: 4
+    physical_gpu: 3
+    observation_condition: decision_observed_v1
+    budget_bucket: development
+    automatic_retry: false
+    analysis_definition: docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft.md
+    analysis_source_commit: 0ea423a
+    provider_map_schema: qd-ed-provider-target-map-v2
+    preparation_gpu_dispatches: 0
+    plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/plan.frozen.json
+    plan_sha256: ac123471db9fa9468661238982b3bdb5cb1a68010ec8261e0e5b12239c57e7e8
+    source_commit: 0d59b853a241cd88d984f5126428720a14abbfd5
+    queue_status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/queue-status.json
+    supervisor_pid: null
+    unified_exec_session: null
+    last_completed_episode_key: observed_pairs_t05_q0_20260923
+    completed_terminal_summaries:
+    - docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-results/t00-c0-terminal-summary.json
+    - docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-results/t00-q0-terminal-summary.json
+    - docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-results/t05-c0-terminal-summary.json
+    - docs/03_evidence/qd_ed_final/continuation_20260923/observed-pairs-results/t05-q0-terminal-summary.json
+    last_completed_evidence_accepted: true
+    current_episode_key: null
+    original_frozen_summary: continuation_20260923/pair-summary/report-v3/summary.json
+    supplemental_identity_authorization: continuation_20260923/observed-pairs-v1/supplemental-identity-v3/authorization.json
+    gpu_queue_exit_code: 1
+    dispatched_rows: 4
+    valid_comparable_rows: 3
+    invalid_comparable_rows: 1
+    last_completed_outcome_valid: false
+    paired_inference: incomplete planned matrix; no complete two-pair comparison
+  latest_resource_observation:
+    at: '2026-09-23T19:42:42.231660+00:00'
+    root_supervisor_pid: null
+    root_status: N3_CPU_PREPARATION_NO_OWNED_GPU_WORKER
+    root_selected_gpu: 3
+    external_lease_owner_pid: null
+    external_resource_queue_counts_only:
+      selected: 29
+      completed: 16
+    inspection_scope: process/lock/resource status metadata only; external scientific
+      results not read
+    action: Prepare fixed N3 implementation/native activity check and new GPU3 Dev
+      cohort; no GPU dispatch yet.
+    runner_lease_owner_pid: null
+    external_queue_observation_closed: 2026-09-23T13:20:33.222617+00:00; external
+      queue released lease, no scientific results read
+    current_episode_key: null
+    completed_selected_keys: 26
+  future_evaluation_preparation:
+    status: CPU_IMPLEMENTED_REVIEWED_PENDING_DEV_CLOSURE_AND_PROMOTION
+    protocol:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/future-evaluation-preparation/protocol-v1.md
+      sha256: 75766ff02c4722c25f772e647937fc68cf9a3361129791585430115595f0e8fa
+    seed_metadata_precheck:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/future-evaluation-preparation/seed-identity-precheck-v1.json
+      sha256: 9ba586802605fec5d5ba16402bd4b5ba7ec0ad2c9f4f4d31257f1d8947335638
+    selected_validation_cohort: 1
+    executor_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923
+    production_integration_permitted: false
+    validation_execution_permitted: false
+    formal_execution_permitted: false
+    budget_entry_clarification:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/future-evaluation-preparation/budget-entry-clarification-v1.md
+      sha256: 9b1ccf9932f8fe2bf637d0e2a4674fae866740424ef523d83d665bac8c14c77c
+    executor_commits:
+    - 78aa6646503a114602dc08b799b49e2c60084ba8
+    - ed56611dc45d28dbc59ffa172a810a810360dfc1
+    related_CPU_tests_passed: 140
+    independent_targeted_rechecks_passed: 6
+    recheck_count_overlaps_not_added: true
+    independent_fix_review:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/future-evaluation-preparation/independent-fix-review-ed56611-v1.md
+      sha256: bd13e5dd03bcf4296f97cc9671ae50d03b397a9649b0fe738c350e797c8e8aa6
+    review_issues_fixed:
+    - immutable base plus appended recovery revision aggregation
+    - selected Dev/source bytes and HEAD bound to actually evaluated Dev evidence
+    post_integration_required_check: same production bytes; resolved phase overrides;
+      archive grid/none by fp32/bf16 full-loop176/11/raw-Stage CPU regression
+  task0_closed_loop_exploration:
+    status: COMPLETE_DESCRIPTIVE_NO_CAUSAL_OR_PERFORMANCE_DECISION
+    authorization:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-preparation-v1/root-read-authorization-v1.json
+      sha256: 5301e7ee421148b5cf0dd470c0f24b1a3977ec5d2146e52050ab717cea7d2b0b
+    cannot_change_frozen_N2: true
+    actual_hidden_eval_read_permitted: false
+    findings:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/explanatory-read-v1/output-v1/findings-v3.md
+      sha256: e1b7fb423ad2733a838bc775b0b5d903ddfcf3d2e5e06cd60373e6fc70bece96
+    analysis_commit: 8eeab50e511af833e2e559acb9300973ad7164d9
+    fresh_complete_audits: 3
+    CPU_synthetic_tests_passed: 12
+    cuda_initialized: false
+    first_guidance_off_steps:
+      C0: 24
+      Q0: 16
+      N2: 24
+    later_reactivation_count:
+      C0: 7
+      Q0: 5
+      N2: 0
+    N2_remaining_unguided_actions: 696
+    actual_normalized_stage_inputs: Unknown
+    grasp_or_causal_task_effect: Unknown
+  task0_visual_exploration:
+    status: COMPLETE_DESCRIPTIVE_NO_NEW_MECHANISM_OR_PROMOTION
+    analysis_commit: 54072e28a2694b15cc14f678171b2f69ae760894
+    authorization:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-preparation-v1/root-visual-authorization-v1.json
+      sha256: f488d1b66f624a27eea3bf887e20e9c5029e6ba50837e7bab94e9337b09c450f
+    decode_manifest:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/decode-manifest-v1.json
+      sha256: 492f5684e2644c04c82b4f899e43c1dcddb3fd405e6342df7594f7df6b5c8125
+    findings:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/visual-read-v1/output-v1/chronological-note-v1.md
+      sha256: 0deb725115c92bdafdd2706bb0592cb5d3e75f888968535850092bd43f1c366f
+    selected_frames: 48
+    contact_sheets: 4
+    root_reviewed_all_sheets: true
+    CPU_synthetic_tests_passed: 6
+    new_gpu_or_simulator_calls: 0
+    grasp_contact_target_or_causal_effect: Unknown
+  full_dev_chronology_preparation:
+    status: COMPLETE_REVIEWED
+    review:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/full-dev-closed-loop-preparation-v1/root-preparation-review-v1.json
+      sha256: 81db3dd7e897b747191da39cedeebb87c66412f842cee797739cfb7c553ec147
+    executor: codex_stage_adapter
+    worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923
+    current_dev_source_unchanged: true
+    actual_cohort_read_authorized: true
+    completion:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/full-dev-closed-loop-preparation-v1/completion-v1.json
+      sha256: f0c8a2bc6b8b2c059dcb48c9097aed7e6be0e5e5042d4a6b8ce9e6a112dc7797
+    freeze:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/full-dev-closed-loop-preparation-v1/source-v2/freeze-v2.json
+      sha256: 19f3c4cd12c8306270f9f721e1ffc881a9e4aa79175db486e4fa3cbdad963a90
+    independent_review:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/full-dev-closed-loop-preparation-v1/independent-review/review-v2.json
+      sha256: 41360babafa88b2e2e61ee6b64a9cfb91ca17ce6c23a8851e5bff6652d875be6
+    implementation_suite_tests: 30
+    independent_focused_checks_overlapping: 22
+  n2_dev_latest_report:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-matrix-report/report-full-dev-v1.json
+    sha256: d376f98a0d0d23d7b73b0a20ab768594c63ed6a6abce9473e0e67d2247bc88ab
+    manifest_sha256: fc81808dc352fe04ac2b84211858a8928c568f516ddddf39f24ceb2434c5b044
+    valid_cells: 30
+    missing_cells: 0
+    terminal_attempts: 31
+    input_scope_complete: true
+  owned_worker_phase: N4E1_COMPLETE_NO_OWNED_GPU_WORKER
+  n2_full_inventory_review:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-matrix-report/root-full-inventory-review-v1.json
+    sha256: f94b06d2fe16c502dc88fcfb4bd3be504df3c30ac25c1d48ad2460ebd3775c9c
+  n2_full_chronology_actual_read:
+    status: COMPLETE_REVIEWED
+    authorization: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/full-dev-closed-loop-preparation-v1/actual-read-authorization-v1.json
+    authorization_sha256: bd2312f951d2933ec9d7f17956077fd7a95e5b8c4af94fefcddc80e729bff00b
+    output: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/full-dev-closed-loop-analysis/read-v1
+    scope: 30 accepted valid N2 Dev representatives; CPU-only recorded chronology;
+      no new score or promotion
+    root_review:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/full-dev-closed-loop-analysis/read-v1/root-review-v1.json
+      sha256: 6258361e7be7724f91d53ba986234c782d629fadd7c5c83276e343cd1f329ed4
+  selected_tracking_preparation:
+    status: COMPLETE_REVIEWED_DESCRIPTIVE_ONLY
+    protocol: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/selected-tracking-preparation-v1/selected-tracking-protocol-draft-v1.md
+    sha256: abb6cf3d725a453397d49bc130d8889028bf59d86ca915abaff7ee48f2f9c539
+    actual_read_authorized: true
+    source_commit: d69b744401bba03545ebefe2d85bc6a8a3f53e5f
+    freeze_sha256: 248c0e50154c1d0546929a0b7e5bd3368a800aeb86aa13dac8b9c42a06ae6e92
+    independent_review_sha256: 48684138a21ad7c099e106caec0f7ad37aaec60d86793d4880aa4a1de15c43ec
+    authorization: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/selected-tracking-preparation-v1/actual-read-authorization-v1.json
+    authorization_sha256: 5b90a0484cc5fa00ebc31e7bd56703d99d6c42135c79ba4c0767a44c893bd639
+    output: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/selected-tracking-analysis/read-v1
+    completion_review:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/selected-tracking-analysis/read-v1/root-review-v1.json
+      sha256: 6e42cee7d283fa8225c992d7a0a7d4c9d51f1bb1d68f56ba09e04f4975a51ef8
+    summary:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/selected-tracking-analysis/summary-v1/all30-summary-v1.json
+      sha256: 391f0dbdb52783309374d318efa430bdf693cace0f261217b9322f206b0fce6a
+  closed_owned_plans:
+  - path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/post-checkpoint/plan.frozen.json
+    sha256: 107b90a136816e204b8b8c65e91e24bf76f139a6a761b207ed696eb34c7cd501
+    source_commit: 525506ca3198f54d86dadf84bbb76eb64926d87a
+    cohort_id: N2_EXECUTED_QUALITY_DEV_20260923
+    status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/post-checkpoint/queue-status.json
+    selected_episode_keys:
+    - n2_dev_t01_c0_20260923
+    - n2_dev_t01_q0_20260923
+    - n2_dev_t01_n2_20260923
+    - n2_dev_t02_c0_20260923
+    - n2_dev_t02_q0_20260923
+    - n2_dev_t02_n2_20260923
+    - n2_dev_t03_c0_20260923
+    - n2_dev_t03_q0_20260923
+    - n2_dev_t03_n2_20260923
+    - n2_dev_t04_c0_20260923
+    - n2_dev_t04_q0_20260923
+    - n2_dev_t04_n2_20260923
+    - n2_dev_t05_c0_20260923
+    - n2_dev_t05_q0_20260923
+    - n2_dev_t05_n2_20260923
+    - n2_dev_t06_c0_20260923
+    - n2_dev_t06_q0_20260923
+    - n2_dev_t06_n2_20260923
+    - n2_dev_t07_c0_20260923
+    - n2_dev_t07_q0_20260923
+    - n2_dev_t07_n2_20260923
+    - n2_dev_t08_c0_20260923
+    - n2_dev_t08_q0_20260923
+    - n2_dev_t08_n2_20260923
+    - n2_dev_t09_c0_20260923
+    - n2_dev_t09_q0_20260923
+    - n2_dev_t09_n2_20260923
+    supervisor_pid: 828304
+    unified_exec_session: 32980
+    status: COMPLETED
+    closed_at: '2026-09-23T19:42:42.231660+00:00'
+    pid_observed_absent: true
+  next_action: Execute all original remaining9 Dev cells on GPU3; audit every terminal;
+    review full12 only after completion. GPU2 study is independent.
+  post_n4_outer_loop:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/outer-loop-v1.md
+    sha256: b80b20401b4be8c82bb03f561b63ff322119867a132d2d84c2ea6d69525f6fe3
+  dev_exposure_reconciliation:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/dev-exposure-reconcile-v1/reconciliation.json
+    sha256: d9d2e63b57f2498d93b49ee3d8125668981856e3a9c151b9918e22d4f6ecc7b8
+current_owned_workers: []
+closed_candidates:
+  N1:
+    id: N1
+    arbor_node: '4.1'
+    status: INVALID_NOT_PROMOTABLE_COHORT
+    protocol: experiments/iteration_001_execution_intent/protocol.md
+    protocol_commit: 56031d2
+    primary_change: target_distance_gripper_duty_v1
+    online_score: null
+    scientific_decision: INVALID
+    ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
+    algorithm_effect: UNKNOWN_UNEVALUATED
+    closure_reason: One original N1 control cell is nonretryable invalid;4dispatches/1unique
+      cell already used means completing all30original cells would require33attempts,
+      exceeding the frozen30attempt cap. No retry or rename can repair this cohort.
+  N2:
+    id: N2
+    arbor_node: '6.1'
+    status: DEV_COMPLETE_REJECTED
+    protocol: experiments/iteration_002_executed_quality/protocol.md
+    primary_change: executed_prefix_v1
+    online_score: 0.1
+    scientific_decision: REJECT
+    protocol_commit: a71fb07
+    protocol_sha256: d5e560bb48cb705e13c931290adfccb3da905cf0a352e8d7bde8188dc5ca75b1
+    implementation_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923
+    runner_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923
+    implementation_commit: 61bda3a
+    executor_commit: 7e3acaaad6b0fdd89592d240c0c38066e04c7d30
+    recorded_choice_check:
+      status: PASS_IMPLEMENTATION_ACTIVITY_ONLY
+      artifact: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-fixed-candidate-quality/summary-v1.json
+      sha256: 51e04f816e9cadfe0e8c4812b8bddb931a882abff8e0be4fde2e173aa71d9fa9
+      C0:
+        eligible: 29
+        tie_robust_changed: 1
+      Q0:
+        eligible: 52
+        tie_robust_changed: 4
+        mixed_tie: 1
+      physical_effect: UNKNOWN
+    runner_commit: 8d48fdb
+    frozen_source_commit: 525506ca3198f54d86dadf84bbb76eb64926d87a
+    completed_dev_cells:
+    - task_id: 0
+      profile: C0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 0
+      profile: Q0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 0
+      profile: N2
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 1
+      profile: C0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_c0_20260923__cc90e218d323
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 1
+      profile: Q0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_q0_20260923__ade0e87c0fda
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 1
+      profile: N2
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_n2_20260923__2ef05a2ea69e
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 2
+      profile: C0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_c0_20260923__a7caab524ecc
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 2
+      profile: Q0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_q0_20260923__5621338664ed
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 2
+      profile: N2
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_n2_20260923__1fbdd93d0ba9
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 3
+      profile: C0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_c0_20260923__00eab44b3500
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 3
+      profile: Q0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_q0_20260923__6c72ee7e1726
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 3
+      profile: N2
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_n2_20260923__13df3ae055a9
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 4
+      profile: C0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_c0_20260923__695be5681246
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 4
+      profile: Q0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_q0_20260923__333584f44696
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 4
+      profile: N2
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_n2_20260923__2c3cf6dd13c3
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 5
+      profile: C0
+      success: true
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_c0_20260923__5d314c406280
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 5
+      profile: Q0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_q0_20260923__da259f430d35
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 5
+      profile: N2
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_n2_20260923__fc1ced4747dc
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 6
+      profile: C0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_c0_20260923__89f03f047b9b
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 6
+      profile: Q0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_q0_20260923__727226a3d7ab
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 6
+      profile: N2
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_n2_20260923__338dc43b286e
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 7
+      profile: C0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_c0_20260923__82244e140f10
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 7
+      profile: Q0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_q0_20260923__1ef119a81905
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 7
+      profile: N2
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_n2_20260923__a22c33849902
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 8
+      profile: C0
+      success: true
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_c0_20260923__3111277332ac
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 8
+      profile: Q0
+      success: true
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_q0_20260923__c6064f2b289c
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 8
+      profile: N2
+      success: true
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_n2_20260923__a0f81b80c939
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 9
+      profile: C0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_c0_20260923__2a7b4037d020
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 9
+      profile: Q0
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_q0_20260923__eb55f1b3e3e7
+      outcome_valid: true
+      audit_complete: true
+    - task_id: 9
+      profile: N2
+      success: false
+      attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_n2_20260923__6e0958800eb3
+      outcome_valid: true
+      audit_complete: true
+    invalid_dev_attempts:
+    - attempt_id: rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_20260923__c03cc47ce669
+      task_id: 0
+      profile: Q0
+      reason: codex_unexpected_event at step32; exact prospective transport recovery
+        eligibility
+      gpu_process_wall_seconds: 570.8762670479991
+      scientific_outcome_valid: false
+    controls_report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-matrix-report/report-t00-controls-v1.json
+    checkpoint_release:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/checkpoint/release-v1.json
+      sha256: 6db0af32a6b0508ab92e97bc2b6e1aecefb7bc80e5b882368fd47c065fbb4a8d
+    first_three_report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-matrix-report/report-t00-first3-v1.json
+    full_dev_decision:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-matrix-report/root-candidate-decision-v1.json
+      sha256: 140d1429c3cc76854c3e230cfed5bc3b43be9f9fdebc550c20fda87968aa41f2
+    closed_at: '2026-09-23T19:42:42.231660+00:00'
+  N3:
+    decision: REJECT
+    review:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-dev-v1/accounted-v2/full-report-v1/root-review-v1.json
+      sha256: a2abe850bbc81903e33b5d6d43f0a496f6a6ad52916e159fd40e955c170c96a5
+    source_commit: bd618b931eb9d8fc2c01b978c4ef220c9bb03889
+    successes: 0
+    valid_episodes: 10
+    same_round_control_successes:
+      C0: 3
+      Q0: 1
+    target_met: false
+    full_state_snapshot:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-terminal-population-protocol-v1/closed-N3-full-state.json
+      sha256: 174bfda9d181ebd2ad2c8557cdcb5c8f54c5a0aac479154fff264e55f07659f1
+    diagnostic_status: COMPLETE_30_REVIEWED
+  N4:
+    decision: REJECT_NUMERIC_DEV
+    report:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-e1-full12-report-v1/report.json
+      sha256: 19c53c7568c504ac67f3b170cc42b70b2ec10ce23496a1f2bf130cb0702ca558
+    review:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/full12-root-review-v1/root-review.json
+      sha256: a633bfd608eff21a4435a3d1cd0931ecc36587cb6053cb4d01646fc744c03b92
+    source_commit: b2a3076136b1abf2f22757bc73b6aa6456a43600
+    condition: N4_E1_t180
+shared_budget_reconciliation:
+  observed_utc: '2026-09-24T06:30:35.210621+00:00'
+  actual_by_bucket:
+    baseline: 13
+    development: 94
+    validation: 0
+    formal: 0
+    recovery: 7
+  approved_bucket_caps:
+    baseline: 20
+    development: 100
+    validation: 60
+    formal: 40
+    recovery: 20
+  current_overdraw_by_bucket:
+    baseline: 0
+    development: 0
+    validation: 0
+    formal: 0
+    recovery: 0
+  historical_events_reclassified: false
+  global_budget_increase_authorized: false
+  latest_explicit_user_authorization: *id001
+  prior_view:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-user-confirmation-v1/prior-resource-metadata.json
+    sha256: 8dd779808030f2b7962b052b7a0f6326d187e8b018a23c2d323b1d0a93aa1794
+  active: false
+  superseded_by: &id002
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/authorization.json
+    sha256: 4026c141ff9bd06f31734c0a43122327b359c35bd847670f641961df9ce81f47
+external_resource_hold:
+  active: false
+  do_not_auto_resume: false
+  superseded_by: *id002
+  reason: Latest explicit user authority ends cross-study holds and priority; each
+    study owns its private budget/locks. Previous hold details remain in the original
+    state archive.
+  historical_state_archive: &id003
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/archive/state-W.yaml
+    sha256: 5dd55ba9d873564dce855850f8fa4569f4fb16a5d91e32f6f651b3acc16d09c5
+shared_resource_priority:
+  active: false
+  priority: GPU3 N4 current continuation
+  authorization: *id001
+  authority_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z
+  counterpart_worktree: /home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z
+  physical_gpu: 3
+  bucket_caps:
+    baseline: 20
+    development: 100
+    validation: 60
+    formal: 40
+    recovery: 20
+  updated_at: '2026-09-24T06:30:35.210621+00:00'
+  superseded_by: *id002
+prior_budget_authorities:
+- authorization_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-user-confirmation-v1/authorization.json
+  authorization_sha256: 199f5621939fe0ca23fc779abf62085120e4b7c2032ef19144df593778c41281
+  synchronized_utc: '2026-09-24T06:30:35.210621+00:00'
+  shared_authority: Latest explicit user GPU3 N4 priority and original-cap restoration;
+    supersedes old GPU2 allocation prospectively, historical costs preserved.
+- N1V:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/resource/n1v-approved/authorization.json
+    sha256: 531c66107cafe3ad650b974f459f0f4a3ddc085042dd8354d7e59b562af87015
+resource_isolation:
+  status: ACTIVE
+  authorization: *id002
+  scope: Per-study private accounting/state/locks. Do not change peer state/budget
+    or preempt peer task. Root migration drains current episode before switch.
+  authority_worktree_for_one_time_migration: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z
+  owning_worktree_after_migration: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z
+  write_scope: Only the owning study writes its state/journals/locks; no peer mutation
+    or preemption
+  historical_state_archive: *id003
+  private_budget: true
+  max_owned_gpu_workers: 1
+  validation_status: PASS
+  validation:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/migration-validation.json
+    sha256: f1899d7fa7aa9af765279a58a2232774363d9e75ff5384570688f6a675772d9a
+  migration:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/migration.json
+    sha256: c716e03ae3111f103b9ebb4dc15c6d5696cf7c719cd67c04df7e566c033697e4
+  activated_utc: '2026-09-24T07:50:39.680836+00:00'
+  initial_resume_owner: study_owner_after_one_time_migration
+  initial_resumption:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/independent-task0-n4-v1/execution-release.json
+    sha256: 2623f0fdf0532964fd047fce0779f2e3de6f22d025d71be82ef29c4f8ae33a5a
+  initial_resume_status: COMPLETED_ACCEPTED_VALID
+  owned_supervisor:
+    pid: 3674060
+    launch:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/remaining9-v1/launch.json
+      sha256: aed6b4e701e8e46f0413bed3f1de75b8dee7fbc8f25bdabb1f9933a8c91f6e86
+    status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/remaining9-v1/status.json
+    launch_result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/remaining9-v1/launch-result.json
+    terminal_status: EXIT_0_COMPLETED
+    launch_result:
+      path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/remaining9-v1/launch-result.json
+      sha256: a38d7fa790e35fa4e0aff6669293a78c24e1f1a7e8065095813951daa8b153c3
+  handoff: Monitor the recorded existing supervisor. Do not start a duplicate. Further
+    scientific decisions and lifecycle belong only to this owning study; no peer mutations.
+previous_stage_condition:
+  label: codex_login_astra_low_v1
+  backend: codex_cli
+  model: gpt-6-astra
+  auth_mode: chatgpt
+  reasoning_effort: low
+  cli_version: 0.155.1
+  runtime_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/runtime-manifest.json
+  provider_amendment: experiments/iteration_001_execution_intent/codex-provider-amendment.md
+  http_request_retry_counts: unobserved_null
+  logical_calls_tokens_latency: observed
+same_state_diagnostic:
+  status: COMPLETED_CONTRAST_DIAGNOSTIC_ONLY
+  task_id: 9
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__n4_same_state_t09_20260925__0f1fa0322193
+  analysis:
+    path: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/artifacts/continuation_20260925/n4-same-state-v1/analysis-v1.json
+    sha256: b27327e495663008e620ecf8a96f1df3da735267a9163344acdb82d37768398f
+  official_success_rate_effect: null
+  development_attempts_charged: 1
+  gpu_process_wall_seconds: 84.4807696469943
+  validation_authorized: false
+  formal_authorized: false
+n12_same_state_diagnostic:
+  status: COMPLETED_VALID_DIAGNOSTIC_ONLY
+  decision: REJECT_GRASP_RELAXATION_LEAD
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__n12_same_state_t03_20260928__9b0c6d255b89
+  physical_gpu: 3
+  transitions: 96
+  development_attempts_charged: 1
+  gpu_process_wall_seconds: 14.202277149015572
+  plan_sha256: 298341649c9195bc1d534194132873ae21f91b5b92dd1779eaf8a31f95b81bfe
+  raw_result_sha256: ef85beefaca49c26c1ee4f0fb1610d0dadfb0ea814e20fcc223ec0aff7ec59e3
+  analysis_sha256: 4f2ea168ef40890fc62d4fa0dfcb18652d1014c735ca750847ded14475e79eb7
+  report: ../variants/n12_grasp_affordance/same-state-analysis-v1.md
+  official_task_success_rate: null
+  validation_authorized: false
+  formal_authorized: false
+n7_candidate:
+  id: N7
+  status: VALIDATION_REJECTED_NUMERIC_3_OF_20
+  algorithm: target_xy_quadrant_signed_height_v1
+  protocol: experiments/iteration_007_direction_height/protocol.md
+  protocol_commit: 5e76e0e
+  implementation_variant_commit: 34d420d
+  frozen_source_commit: 7cbe1ad45cd89bf25c87335f6d4327527a3431fe
+  frozen_plan:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n7-dev-v1/plan.frozen.v1.json
+    sha256: 9cef973dd2a2f7cd07f82eb1965b96e2bcb3557f372e25dc4cd04dc622b277be
+  retrospective_mechanism_read:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n7-prerequisite-readonly-v1.json
+    sha256: 65ecd0b855b46f35aaa88d6865f2c0549b42a757555aef6d7a479105b9ea5de3
+    exposed_decisions: 40
+    split_witness_decisions_against_old_xy: 40
+    split_witness_decisions_against_n6: 40
+    outcome_effect: unknown
+  algorithm_variant_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n7_direction_height/implementation
+  dev_tasks:
+  - 0
+  - 3
+  - 6
+  - 9
+  dev_score:
+    successes: 2
+    episodes: 4
+    successful_tasks:
+    - 6
+    - 9
+    old_xy_same_cell_new_split_pairs: 3200
+    n6_same_cell_new_split_pairs: 3186
+    parent_slots_from_split_cells: 5028
+  dev_report:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n7-dev-v1/full-dev-report-v1.json
+    sha256: c6ae8e5864f0e550d8d4c5651422e1b25a38161b2781bc1b7937b93d9edaa463
+  validation_authorized: true
+  formal_authorized: false
+n7_validation:
+  status: C1_COMPLETED_NUMERIC_REJECT
+  cohort_id: N7_VALIDATION_C1_20260925
+  protocol: experiments/iteration_007_direction_height/validation-protocol.md
+  protocol_commit: e46f6d3
+  runner_variant_commit: e5e74e5
+  frozen_source_commit: 7575b59e8a363e195dc3208e365ee4cc9a37d99a
+  frozen_plan:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n7-validation-c1-v1/plan.frozen.v3.json
+    sha256: f2f0242d11711163603e62fc66ad63967bbfeda1884bb948356f805c7b130f9c
+  prior_predispatch_supervisor_failure:
+    status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n7-validation-c1-v1/supervisor-status.json
+    completed_count: 0
+    attempt_events: 0
+    repair_commit: 7575b59e8a363e195dc3208e365ee4cc9a37d99a
+  exposure_preflight:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n7-validation-c1-v1/prelaunch-exposure-v1.json
+    sha256: e593d77e2bb2f6354b8633d932cdc7b0abbc84b7134b6d241d16b7eef8054cc9
+  expected_originals: 60
+  episodes_per_arm: 20
+  arms:
+  - C0
+  - Q0
+  - N7
+  candidate_success_threshold: 10
+  gpu_hour_cap: 14.0
+  physical_gpu: 3
+  formal_authorized: false
+  original_release_stop:
+    completed_audited_cells: 6
+    invalid_attempt_id: rdt-qd-ed-final-20260921T093925Z__n7v_b1_t02_c0_20260925__e5df6c421513
+    reason: Codex Stage stream_error invalidated frozen transport; old attempt remains
+      charged
+  continuation:
+    plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n7-validation-c1-recovery-v1/plan.frozen.v1.json
+    plan_sha256: 9fd4ace8f49b3e676d3a00b4aa8b2ca03fc3d2a26bfaffeff0c28cc6ba85f77b
+    source_commit: aa9cf3ac788a1fab144e8c3162607f0efe79b711
+    supervisor_pid: 1334060
+    status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n7-validation-c1-recovery-v1/supervisor-status.v1.json
+    recovery_limit: 1
+    remaining_originals: 53
+    formal_authorized: false
+  full_report:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n7-validation-c1-recovery-v1/full-validation-report-v1.json
+    sha256: 999752f85dbf27534ae35939f38b3237ac21165f0df5808e13946ce1079b1bae
+    accepted_cells: 60
+    terminal_attempts: 61
+    success_counts:
+      C0: 0
+      Q0: 3
+      N7: 3
+    candidate_numeric_gate: false
+    gpu_process_wall_seconds: 28603.353270446067
+    decision: REJECT_VALIDATION
+archive_layout:
+  root: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood
+  current_session_manifest:
+    path: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/archive-layout-v1.json
+    sha256: fb9f5ccd7ae7034a5c253e15b83adeeae69b9be47c6ce42ac7a662a7340757cd
+  historical_manifest:
+    path: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/historical_variants/historical-layout-v1.json
+    sha256: 957c6a31c0c8d0906b3158591defb5a5b24209b9853c435fe719e7cb6ae991b9
+  peer_gpu6_pending_until_other_session_stops: false
+  all_exp_in_scope_after_peer_stop: true
+n5_candidate:
+  id: N5
+  status: DEV_REJECT_NUMERIC_1_OF_4
+  algorithm: terminal_grasp_proximity_v1
+  protocol: experiments/iteration_005_grasp_timing/protocol.md
+  protocol_sha256: 14d1655c59501d356bbc6a297d47478b758b9f8c9da6e340dce9b996b1d05306
+  protocol_commit: eca6f40
+  implementation_commit: 946a15f
+  frozen_source_commit: 162c3677a3dbe4d7b36da6c5a991d522f84d2b97
+  frozen_plan:
+    path: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/artifacts/continuation_20260925/n5-dev-v1/plan.frozen.v4.json
+    sha256: 15cdcac295f72ed3fc8770d3949a1a66ac4897987c775efb04cdb70d79c21862
+  execution_release:
+    path: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/artifacts/continuation_20260925/n5-dev-v1/execution-release-v1.json
+    sha256: 1fa14abfac3d8a24d101a81e67cbb5d4fd726dd87ca74c6a6254e2710ba8c3cd
+  runtime_relocated_resolved_paths: 3000
+  algorithm_variant_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n5_grasp_timing/implementation
+  retrospective_task9_activity:
+    path: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/artifacts/continuation_20260925/n5-prerequisite-readonly-v1/activity-v1.json
+    sha256: 17d580eae0f81879bd8430648768f16ee703b51dc3811cfb265c7ce470216197
+    exposed_decisions: 55
+    eligible_decisions: 12
+    changed_selected_decisions: 2
+    outcome_effect: unknown
+  cpu_focused_tests_passed: 50
+  dev_tasks:
+  - 0
+  - 3
+  - 6
+  - 9
+  development_originals_planned: 4
+  development_originals_completed: 4
+  online_score:
+    successes: 1
+    episodes: 4
+    successful_tasks:
+    - 3
+    matched_C0_successes: 0
+    matched_Q0_successes: 0
+    matched_N4_successes: 1
+    changed_prefix_decisions: 7
+    dev_decision: REJECT_DEV
+  continuation_plan:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n5-dev-v1/plan.frozen.v6.json
+    sha256: 524214a087b4dd4276a801a03006052d4a8d4fd0d1cf3e62085a6ceaff5a58b8
+  prior_task0_proof:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n5-dev-v1/task0-prior-accepted-proof-v1.json
+    sha256: 9faca8c145cab03d25b9b5ae6a38f7fd7b31d9db5e75133b771f2ad5974029e6
+  full_dev_report:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n5-dev-v1/full-dev-report-v1.json
+    sha256: dadcf6f07572780b6486d780c8188f471c03451d25cdf343fb02cf6fa80e56bb
+  validation_authorized: false
+  formal_authorized: false
+n6_candidate:
+  id: N6
+  status: DEV_REJECT_NUMERIC_1_OF_4
+  algorithm: target_horizontal_radius_signed_height_v1
+  protocol: experiments/iteration_006_height_aware/protocol.md
+  protocol_sha256: 211cfef47c62faec0fd3cbff57ec8af82239b952214d72dc40e8fe8f66edcea3
+  protocol_commit: a613d3a
+  implementation_commit: 2124be1
+  frozen_source_commit: f0c51f891e450c1f53203b145e85898571d1bece
+  frozen_plan:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n6-dev-v1/plan.frozen.v2.json
+    sha256: 822240abf71493a9cb402729bf174558a4115ad60264fe3c1379cbdec605aa84
+  execution_release:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n6-dev-v1/execution-release-v1.json
+    sha256: b54ed1e1c495eea65d167749458bc5ce128f0628c0eca24ac94e65fe49093670
+  retrospective_mechanism_read:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n6-prerequisite-readonly-v1.json
+    sha256: 3bb83366736c8296a8a88cf3b821088965406b1c4a2eb518d84551718a2f73fe
+    exposed_decisions: 55
+    split_witness_decisions: 55
+    outcome_effect: unknown
+  algorithm_variant_worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n6_height_aware/implementation
+  dev_tasks:
+  - 0
+  - 3
+  - 6
+  - 9
+  development_originals_completed: 4
+  online_score:
+    successes: 1
+    episodes: 4
+    successful_tasks:
+    - 0
+    matched_C0_successes: 0
+    matched_Q0_successes: 0
+    matched_N4_successes: 1
+    matched_N5_successes: 1
+    old_xy_same_cell_new_split_pairs: 3619
+    parent_slots_from_split_cells: 5214
+    dev_decision: REJECT_DEV
+  full_dev_report:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n6-dev-v1/full-dev-report-v1.json
+    sha256: 6ba9508e55b7e58ecd9fb376f0105f217dfc67825fe762f70092ea9984344fe0
+  validation_authorized: false
+  formal_authorized: false
+n20_gpu7_binding:
+  scope: N20_TERMINAL_RAW_DEV_20260929_only
+  user_reply: "\u5141\u8BB8\u6539\u7528\u5176\u4ED6\u7A7A\u95F2 GPU"
+  selected_gpu: 7
+  addendum_path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n20_lift_quality_raw_binding/gpu7-binding-addendum-v1.md
+  addendum_sha256: 72edd3123f2419206cf71b65562ec2fac0e049a5ecd25c648663327416b60e74
+n20_budget_approval:
+  user_reply: "\u6279\u51C6\u4FEE\u8BA2\u5E76\u8FD0\u884C N20"
+  approved_at: '2026-09-30T02:08:40+00:00'
+  proposal_path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/budget-extension-proposal-20260929-n20.md
+  proposal_sha256: 7dccbad9ac063ba404f079573667b26a8d2bd6c9f1e892b144223ff1429673bc
+  scope: N20_TERMINAL_RAW_DEV_20260929
+n21_gpu7_binding:
+  scope: N21_STAGE_RAW_DEV_20260930_only
+  user_reply: "\u5141\u8BB8\u6539\u7528\u5176\u4ED6\u7A7A\u95F2 GPU"
+  selected_gpu: 7
+  addendum_path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n21_stage_raw_reward_binding/gpu7-binding-addendum-v1.md
+  addendum_sha256: c4b9d13b373bd38b151e84125f4e240e0d8b1681128c9b21a68ef69ede889480
+n21_budget_approval:
+  user_reply: "\u7EE7\u7EED\u5B8C\u6210\u6EE1\u8DB3\u76EE\u6807\u4E14\u65E0\u9700\u6211\
+    \u4ECB\u5165\u7684autoresearch"
+  recorded_at: '2026-09-30T03:38:39.777125+00:00'
+  interpretation: Proceed with the disclosed bounded N21 budget amendment and ordinary
+    in-scope research autonomously; preserve scientific gates, one owned GPU worker,
+    historical costs and private accounting. This does not waive scientific validity
+    or allow other-study mutation.
+  authorization_path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n21_stage_raw_reward_binding/authorization-v1.json
+  authorization_sha256: 60022cf9d1dfb1f632f49fa8d05d373ecaf7ae40c9d2b4b9b7dab9336c05cae4
+  proposal_path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/budget-extension-proposal-20260930-n21.md
+  proposal_sha256: d7e5dfbfe58ad0509cb19b2733b6397dd101ebaf3d7b73ba671df1881cadf2ec
+  scope: N21_STAGE_RAW_DEV_20260930
+autonomous_continuation:
+  user_message: "\u7EE7\u7EED\u5B8C\u6210\u6EE1\u8DB3\u76EE\u6807\u4E14\u65E0\u9700\
+    \u6211\u4ECB\u5165\u7684autoresearch"
+  recorded_at: '2026-09-30T03:38:39.777125+00:00'
+  ordinary_iteration_requires_reconfirmation: false
+  authority: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n21_stage_raw_reward_binding/authorization-v1.json
+  scientific_gates_unchanged: true

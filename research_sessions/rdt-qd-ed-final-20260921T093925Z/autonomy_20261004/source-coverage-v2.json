@@ -1,0 +1,20 @@
+{
+  "final_driver": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_v1.py",
+    "sha256": "33d060651ce37f470b9752692db9598750c2c8b84a9f81d8d286fa0c36a4b000"
+  },
+  "previous_driver": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_pre_ephemeral_v1.py",
+    "sha256": "8b3552676e8e2296fa48ff79dc6361b21225bf82e673e98312ac289a64cce627"
+  },
+  "only_followup_function_change": "command: add official --ephemeral",
+  "run4": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v4.json",
+    "sha256": "6d66ba1013b39b7206fbdc25142d4d686759420fe0d2c189f4b42edf106fb649"
+  },
+  "prior_coverage": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/source-coverage-v1.json",
+    "sha256": "9cf5e9663c0787a89ed8eb13098ebb22e3f4e639b938eb0e19b6964865592ab4"
+  },
+  "unchanged_function_class_count": 22
+}

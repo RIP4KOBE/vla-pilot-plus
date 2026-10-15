@@ -1,0 +1,194 @@
+{
+  "schema": "bounded-git-loader-cpu-delivery-v1",
+  "status": "CPU_COMPONENT_ONLY",
+  "files": [
+    {
+      "path": "bounded_git_blob.py",
+      "bytes": 12942,
+      "sha256": "ba8c6d5fcb3a3cd07c12a39c90435b37edf20301fdfe96f190a0c32e0bcf5466"
+    },
+    {
+      "path": "cpu-run-01.json",
+      "bytes": 942,
+      "sha256": "d498c07ce170802ba256489cf55a16b8d28fbbfa660ce27d1781b0be37a7ccae"
+    },
+    {
+      "path": "cpu-run-01.log",
+      "bytes": 1331,
+      "sha256": "19a5c81bc755357738d5795990f6e5abff969ebb42ab3f2254453a8eb5864465"
+    },
+    {
+      "path": "cpu-run-02.json",
+      "bytes": 915,
+      "sha256": "91867a02d74229e1bca44e6569a84a25c7f9e915f17e047f5a1ad4005db63d69"
+    },
+    {
+      "path": "cpu-run-02.log",
+      "bytes": 7365,
+      "sha256": "35e6cec4185ffbed0d50d3e156476140dca8b0adef05df1729b70ccb09069ffc"
+    },
+    {
+      "path": "cpu-run-03.json",
+      "bytes": 912,
+      "sha256": "51f318f672030aa6c3db6ecb0e888f4dad024bb6bf104e5660239d3aa820241c"
+    },
+    {
+      "path": "cpu-run-03.log",
+      "bytes": 6012,
+      "sha256": "d3f2ea77ae69922f11aaccffee64bc2dc141ecaeb0d4a6ba3a50afa774dd38c2"
+    },
+    {
+      "path": "cpu-run-04.json",
+      "bytes": 1331,
+      "sha256": "41828ad06f278bfdcbc4620916e879096d6c30d60438d6b7ea56ff11c2952ff2"
+    },
+    {
+      "path": "cpu-run-04.log",
+      "bytes": 945,
+      "sha256": "a757fb60b27e58158a391723cf91113cce34e4863cedd5eccb02c36a5dbfd25f"
+    },
+    {
+      "path": "fake_child.py",
+      "bytes": 1839,
+      "sha256": "a802a3992ab89924d89d3a3ded2aa47a687da0882d2e601ba50c01e7ea56cfaa"
+    },
+    {
+      "path": "fixtures/run-1790835385397517917/repo.git/HEAD",
+      "bytes": 23,
+      "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10"
+    },
+    {
+      "path": "fixtures/run-1790835385397517917/repo.git/config",
+      "bytes": 66,
+      "sha256": "dd548269913b6adbdfa7049170ea86850050cb762ea3b9c510a0b2986d2113e3"
+    },
+    {
+      "path": "fixtures/run-1790835385397517917/repo.git/objects/9f/a83729202aaf6a5987743942e82921fd306c93",
+      "bytes": 53,
+      "sha256": "a6952b72461b3f83190e7fb6dc1484fb2f39ed15704ab50ffdc6a6faef0f41e6"
+    },
+    {
+      "path": "fixtures/run-1790835385397517917/repo.git/objects/f2/ba8f84ab5c1bce84a7b441cb1959cfc7093b7f",
+      "bytes": 18,
+      "sha256": "3c303e6d1a74c6ee8a83f109d18103f4ecc85d11e99122bac95d089e8898496c"
+    },
+    {
+      "path": "fixtures/run-1790835385397517917/repo.git/objects/f3/f917f2cf7a79d18cb2ebe62f94010a6d9e9ddc",
+      "bytes": 118,
+      "sha256": "efefbbeacd50c69d861360b30581fcc27046e56548bef2681f1096458a5cdb27"
+    },
+    {
+      "path": "fixtures/run-1790835398988903208/repo.git/HEAD",
+      "bytes": 23,
+      "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10"
+    },
+    {
+      "path": "fixtures/run-1790835398988903208/repo.git/config",
+      "bytes": 66,
+      "sha256": "dd548269913b6adbdfa7049170ea86850050cb762ea3b9c510a0b2986d2113e3"
+    },
+    {
+      "path": "fixtures/run-1790835398988903208/repo.git/objects/9f/a83729202aaf6a5987743942e82921fd306c93",
+      "bytes": 53,
+      "sha256": "a6952b72461b3f83190e7fb6dc1484fb2f39ed15704ab50ffdc6a6faef0f41e6"
+    },
+    {
+      "path": "fixtures/run-1790835398988903208/repo.git/objects/f2/ba8f84ab5c1bce84a7b441cb1959cfc7093b7f",
+      "bytes": 18,
+      "sha256": "3c303e6d1a74c6ee8a83f109d18103f4ecc85d11e99122bac95d089e8898496c"
+    },
+    {
+      "path": "fixtures/run-1790835398988903208/repo.git/objects/f3/f917f2cf7a79d18cb2ebe62f94010a6d9e9ddc",
+      "bytes": 118,
+      "sha256": "efefbbeacd50c69d861360b30581fcc27046e56548bef2681f1096458a5cdb27"
+    },
+    {
+      "path": "fixtures/run-1790835457874692140/repo.git/HEAD",
+      "bytes": 23,
+      "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10"
+    },
+    {
+      "path": "fixtures/run-1790835457874692140/repo.git/config",
+      "bytes": 66,
+      "sha256": "dd548269913b6adbdfa7049170ea86850050cb762ea3b9c510a0b2986d2113e3"
+    },
+    {
+      "path": "fixtures/run-1790835457874692140/repo.git/objects/9f/a83729202aaf6a5987743942e82921fd306c93",
+      "bytes": 53,
+      "sha256": "a6952b72461b3f83190e7fb6dc1484fb2f39ed15704ab50ffdc6a6faef0f41e6"
+    },
+    {
+      "path": "fixtures/run-1790835457874692140/repo.git/objects/f2/ba8f84ab5c1bce84a7b441cb1959cfc7093b7f",
+      "bytes": 18,
+      "sha256": "3c303e6d1a74c6ee8a83f109d18103f4ecc85d11e99122bac95d089e8898496c"
+    },
+    {
+      "path": "fixtures/run-1790835457874692140/repo.git/objects/f3/f917f2cf7a79d18cb2ebe62f94010a6d9e9ddc",
+      "bytes": 118,
+      "sha256": "efefbbeacd50c69d861360b30581fcc27046e56548bef2681f1096458a5cdb27"
+    },
+    {
+      "path": "fixtures/run-1790835545756459242/repo.git/HEAD",
+      "bytes": 23,
+      "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10"
+    },
+    {
+      "path": "fixtures/run-1790835545756459242/repo.git/config",
+      "bytes": 66,
+      "sha256": "dd548269913b6adbdfa7049170ea86850050cb762ea3b9c510a0b2986d2113e3"
+    },
+    {
+      "path": "fixtures/run-1790835545756459242/repo.git/objects/9f/a83729202aaf6a5987743942e82921fd306c93",
+      "bytes": 53,
+      "sha256": "a6952b72461b3f83190e7fb6dc1484fb2f39ed15704ab50ffdc6a6faef0f41e6"
+    },
+    {
+      "path": "fixtures/run-1790835545756459242/repo.git/objects/f2/ba8f84ab5c1bce84a7b441cb1959cfc7093b7f",
+      "bytes": 18,
+      "sha256": "3c303e6d1a74c6ee8a83f109d18103f4ecc85d11e99122bac95d089e8898496c"
+    },
+    {
+      "path": "fixtures/run-1790835545756459242/repo.git/objects/f3/f917f2cf7a79d18cb2ebe62f94010a6d9e9ddc",
+      "bytes": 118,
+      "sha256": "efefbbeacd50c69d861360b30581fcc27046e56548bef2681f1096458a5cdb27"
+    },
+    {
+      "path": "report.md",
+      "bytes": 8264,
+      "sha256": "94ea5a20f4de84f40112a17416753fedfddd0ce1e990e26f6100d559ad94cc52"
+    },
+    {
+      "path": "root-cpu-protocol-v1.md",
+      "bytes": 3417,
+      "sha256": "95f89526965053844a56a851a642006cceefd3ed170e8c6d3fd4c923ee40e2f5"
+    },
+    {
+      "path": "run_cpu_checks.py",
+      "bytes": 7291,
+      "sha256": "d23e9d4037a29aaad9b8e468ee7ef1812240153af24da8a690d7f4041ad7077f"
+    },
+    {
+      "path": "test_bounded_git_blob.py",
+      "bytes": 14262,
+      "sha256": "72322a2eba8c26cf12eb7a1dea8cf38eef891d5ce43a6ed85fd5cff208625f05"
+    }
+  ],
+  "file_count_excluding_manifest": 34,
+  "bytes_excluding_manifest": 68880,
+  "limits": {
+    "files": 256,
+    "bytes": 8388608,
+    "aggregate_test_seconds": 120
+  },
+  "distinct_passed_tests": 64,
+  "aggregate_test_seconds": 2.511709159007296,
+  "production_integration_authorized": false,
+  "real_historical_inventory_created": false,
+  "actual_study_history_reads": false,
+  "read_only_dependencies": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/verified_immutable_cache.py",
+      "sha256": "f580ea88186b82364f14c4e8b2afbfa613e38a3a89683b0e2103fbe2e360675a"
+    }
+  ]
+}

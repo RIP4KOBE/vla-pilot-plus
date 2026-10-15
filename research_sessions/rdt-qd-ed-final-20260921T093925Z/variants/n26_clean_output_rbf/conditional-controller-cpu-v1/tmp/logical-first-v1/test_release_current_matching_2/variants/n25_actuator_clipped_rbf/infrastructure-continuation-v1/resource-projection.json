@@ -1,0 +1,83 @@
+{
+  "all_matching_events_included": true,
+  "collected_at": "2026-10-01T00:00:00Z",
+  "collector": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/NEVER_READ_COLLECTOR",
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "event_count": 3,
+  "events": [
+    {
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "event": "reserved",
+      "gpu_process_wall_seconds": 11.0,
+      "kind": "n25_tensor_arithmetic_v1",
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/old-proof-plan.json",
+        "sha256": "85f864241aa9978d41a5d293d0ff4b5f97bd4aaa090dde9985109d9f93c20c24"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/old-proof-process.json",
+        "sha256": "db8f6057d32ae4904b3f6fc5714ccee2ffe3cd8f410b7b95aedea3483d3c5ed6"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/old-proof-report.json",
+        "sha256": "dc2401f9262231fe6ef65ed667ff6188990adb58dc2f9365f7019851a1bc984a"
+      },
+      "resource_id": "synthetic__n25_tensor_arithmetic_v1"
+    },
+    {
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "event": "dispatched",
+      "gpu_process_wall_seconds": 11.0,
+      "kind": "n25_tensor_arithmetic_v1",
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/old-proof-plan.json",
+        "sha256": "85f864241aa9978d41a5d293d0ff4b5f97bd4aaa090dde9985109d9f93c20c24"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/old-proof-process.json",
+        "sha256": "db8f6057d32ae4904b3f6fc5714ccee2ffe3cd8f410b7b95aedea3483d3c5ed6"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/old-proof-report.json",
+        "sha256": "dc2401f9262231fe6ef65ed667ff6188990adb58dc2f9365f7019851a1bc984a"
+      },
+      "resource_id": "synthetic__n25_tensor_arithmetic_v1"
+    },
+    {
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "event": "completed",
+      "gpu_process_wall_seconds": 11.0,
+      "kind": "n25_tensor_arithmetic_v1",
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/old-proof-plan.json",
+        "sha256": "85f864241aa9978d41a5d293d0ff4b5f97bd4aaa090dde9985109d9f93c20c24"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/old-proof-process.json",
+        "sha256": "db8f6057d32ae4904b3f6fc5714ccee2ffe3cd8f410b7b95aedea3483d3c5ed6"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/old-proof-report.json",
+        "sha256": "dc2401f9262231fe6ef65ed667ff6188990adb58dc2f9365f7019851a1bc984a"
+      },
+      "resource_id": "synthetic__n25_tensor_arithmetic_v1"
+    }
+  ],
+  "protected_events_included": false,
+  "resource_id": "synthetic__n25_tensor_arithmetic_v1",
+  "resource_kind": "n25_tensor_arithmetic_v1",
+  "root_terminal_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/variants/n25_actuator_clipped_rbf/infrastructure-continuation-v1/root-review.json",
+    "sha256": "2aa4f3f45b7a017f4bb0fc18c439603f14583c67c58b05617d9fdbfd43d8fe5d"
+  },
+  "schema": "n25-current-resource-projection-v1",
+  "source_ledger": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional-controller-cpu-v1/tmp/logical-first-v1/test_release_current_matching_2/NEVER_READ_FULL_LEDGER",
+    "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  }
+}

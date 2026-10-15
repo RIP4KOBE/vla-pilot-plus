@@ -1,0 +1,70 @@
+{
+  "schema": "n23-executed-proprioception-output-manifest-v1",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/command-runs-detail-v1.csv",
+      "sha256": "7acefe69d1db09efadaa64270e2fcec01364f094ad8c636c0c08e7674788aa0f",
+      "bytes": 152624
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/command-runs-v1.csv",
+      "sha256": "2f9cbc1b5854bfbb6c21956d00327e1e3a83311aa81d623e29a411414f56ab0d",
+      "bytes": 15077
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/conclusion-v1.md",
+      "sha256": "d74698172952154f4a4c6162a520daa221fcb2a3530cd5715d30701ae6c0191a",
+      "bytes": 15510
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/extract-v1.log",
+      "sha256": "6ead00a6052996f0dbfab223cd9b950fb359c39b1f6d0ed227869936acb03feb",
+      "bytes": 2207
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/extract_cpu_v1.py",
+      "sha256": "6f43d3321fd94ac4082a55223afcadf292b8fb9b5a8b0874ed1987bcb7522a03",
+      "bytes": 17153
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/freeze-v1.log",
+      "sha256": "318ba2381738388138d19da75eb84b35e34507890cd9c87fb77530977c825d12",
+      "bytes": 732
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/freeze_scope_v1.py",
+      "sha256": "801165251845d7e001fa59d387ee4d4ef0edc7977fa0d21cd8cb358d769eed84",
+      "bytes": 4103
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/prefixes-detail-v1.csv",
+      "sha256": "e07eeb30fcc374b7f118f81658446f3b742c4ada93714129f9603401bd1ea100",
+      "bytes": 326333
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/prefixes-v1.csv",
+      "sha256": "09f55f6e4038d18ba0ce35f264fce159331c40fd7508cba0b9ea45f5c09a13fe",
+      "bytes": 38972
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/read-scope-v1.json",
+      "sha256": "562c021300c743db343975ea63c20cb7be451839ac22464902e48943d9e31eab",
+      "bytes": 98487395
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/report_cpu_v1.py",
+      "sha256": "f237c64293f3255ec3fd064213630e60b2c7452c90ddb74aac701d716015240e",
+      "bytes": 12932
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/result-v1.json",
+      "sha256": "d658ea7ab4a053a69b019dfa39d20035948e8c5d3af75ce1896f0d325e96f02a",
+      "bytes": 11822626
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/executed_proprioceptive_continuity_diagnostic/strict-pairs-v1.csv",
+      "sha256": "045fdd50dcdb04709129a7cc7678b7fd7dda7f866d611afed44d56b2738a5940",
+      "bytes": 8125
+    }
+  ]
+}

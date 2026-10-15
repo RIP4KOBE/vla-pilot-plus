@@ -1,0 +1,62 @@
+{
+  "schema": "n26-index-cap-cpu-preparation-v1",
+  "status": "CPU_ONLY_NOT_ACTUAL_READ_RELEASE",
+  "files": [
+    {
+      "path": "cpu-checks-v1.log",
+      "bytes": 1922,
+      "sha256": "4961c35746ed678a6494b43b18b193c4f58061ab1153b0a31847a0dc0e2da249"
+    },
+    {
+      "path": "cpu-results-v1.json",
+      "bytes": 1258,
+      "sha256": "22f7c7f8fdf093c26fd32a671dcdf8f0667b7493ee2ac32e1d8018d786043d10"
+    },
+    {
+      "path": "cpu_boundary_v1.py",
+      "bytes": 6082,
+      "sha256": "04ace3fea4d5d0c191dc210ba012da9bdc9daf7eaa2d6aecbf70a9186c6ea33b"
+    },
+    {
+      "path": "reader-diff-v1.patch",
+      "bytes": 2208,
+      "sha256": "50fb3efb26252da93f27d2924f1888bf93e834a03b579b802bbcddcc336a05b1"
+    },
+    {
+      "path": "report-v1.md",
+      "bytes": 3085,
+      "sha256": "73888187811a80de43144d0385b1300f0c2a013a8436df873d5167cacc52fc78"
+    },
+    {
+      "path": "root-protocol-v1.md",
+      "bytes": 1718,
+      "sha256": "40c641d9285bb685aee5594ec43dec044a6aaa8f5d03b999224e171d31d83857"
+    },
+    {
+      "path": "run_index_cap_checks_v1.py",
+      "bytes": 2951,
+      "sha256": "b5c62e34caaf0ec74aaf068f6ed894408015002384b9bb99956331999a5f8f0b"
+    },
+    {
+      "path": "synthetic-index.bin",
+      "bytes": 4,
+      "sha256": "88d4266fd4e6338d13b845fcf289579d209c897823b9217da3e161936f031589"
+    },
+    {
+      "path": "test_index_cap_v1.py",
+      "bytes": 7094,
+      "sha256": "c7efdffa2597035427537c147417425a5b503b4ddbc2e551234a2cb8d6112446"
+    },
+    {
+      "path": "witness_reader_v1.py",
+      "bytes": 35062,
+      "sha256": "3d9d29bba17f65c1dc7b0e89fd737d12357f17617b5d37de4aabc9d985565c30"
+    }
+  ],
+  "file_count_excluding_manifest": 10,
+  "bytes_excluding_manifest": 61384,
+  "tests_passed": 15,
+  "cumulative_test_seconds": 0.14864695305004716,
+  "actual_data_read": false,
+  "gpu_authorized": false
+}

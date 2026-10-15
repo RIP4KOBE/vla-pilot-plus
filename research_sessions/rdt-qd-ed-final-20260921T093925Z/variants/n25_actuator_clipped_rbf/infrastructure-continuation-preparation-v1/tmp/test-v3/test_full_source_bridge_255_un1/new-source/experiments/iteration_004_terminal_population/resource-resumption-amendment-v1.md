@@ -1,0 +1,25 @@
+# N4 resource resumption amendment v1
+
+This is a prospective resource allocation amendment only. Preserve the main N4 protocol SHA b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2 and scientific Q0 prerequisite SHA3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca. No task, seed, action, hypothesis, success predicate, numerator/denominator, numerical gate, tie rule, scientific source or recovery eligibility changes.
+
+## Basis and exact authority boundary
+
+After the shared-resource priority question, the user instructed this session “继续执行任务”. The coordinator continues this same GPU3-only Arbor task within its original 48GPUh/240-attempt contract. Resource-only observations independently confirm that the external GPU2 N1U parent has exited, the real shared runner lease has been released and all episode/health resource records are terminal. No external scientific outcome is imported, no external process is interrupted and no completed cost is reclassified. The external source, plans, approval and manifests remain historical immutable records.
+
+The coordinator selects the already reviewed original-cap option for the still-unused resources of this task: baseline20/development100/validation60/formal40/recovery20. These are the original W contract/source/state caps, with no increase to any original cap or global budget. This is a new explicit current resource-priority record following the user's continuation, not an assertion that the user separately uttered an approval of a numerical transfer and not an automatic rollback inferred from queue exit. The external earlier 11/122/60/40/7 allocation and all its dispatched costs remain documented; it does not serve as a second simultaneously spendable pool. No additional or competing cohort is authorized here. Prospective GPU3 N4 admission must use one consistent current resource contract and the actual shared lease.
+
+## Deterministic row allocation
+
+At resource review, usage is112 dispatched/base11/dev94/recovery7 and15.739958095529593 GPUh, zero in flight. Only six original development slots remain under this task's caps. Keep all12 original scientific rows and task-major C0,Q0,N4 on tasks0,3,6,9 unchanged. Assign all four unchanged C0 controls and the first two Q0 controls in this already frozen task order (tasks0 and3) to baseline. Assign Q0 tasks6 and9 plus all four N4 candidates to development. Thus new originals consume6 baseline+6 development, ending baseline17/development100/recovery7 and total124. The Q0 controls are genuine unchanged baselines; no candidate becomes baseline. This rule is derived solely from settled resource arithmetic and fixed row order, with no prerequisite result or N4 outcome used to choose rows.
+
+Retain at most four eligible infrastructure replacements, at most one per scientific cell, recovery bucket only: maximal totals baseline17/development100/recovery11 and128 dispatched. Do not rewrite historical rows. Ordinary valid task failures remain in the complete matrix and cannot be repeated. The main protocol's12 accepted-cell and2/4 plus both-control promotion gates are unchanged, as is the first-triplet correctness-only release. The exact later runner/plan must bind this amendment and original protocol together; no generic/default dispatch bypass.
+
+## Time and protected capacity
+
+The local N4 limit remains16 real dispatches and8.5GPUh including associated new health cost, but it is a ceiling rather than available capacity. At this snapshot actual unprotected time is48-24-15.739958095529593 =8.260041904470407h. Sixteen full1800+40s admission windows use8.177777777777777h, leaving296.150856 seconds for new associated health in the worst case. Fresh/shared costs can reduce that headroom; reject admission if a full window does not fit. No clipped allowance, missing cost, reserve borrowing or claim that completion is guaranteed.
+
+Validation60attempts/14h and formal40attempts/10h remain protected, with all original performance/source/ablation requirements. The new resource record does not promote N4, prove its prerequisite, implement an algorithm or launch GPU work. Complete the separately frozen CPU read, review its whole output, and only then implement the single candidate if its original prerequisite passes. Future GPU work is physicalGPU3 only, one owned worker, exclusive real lease and fresh complete source/runtime/input/Stage checks.
+
+## Evidence and preservation
+
+Resource evidence: artifact continuation_20260923/n4-resource-resumption-v1/resource-release-v2.json SHA319d74bd32c112ed23f51da453fbe289dd168340503fcef6b6aec40867143771; options memo SHA fdec1964d2c4c9de51e69e974bcc56386187092df589a25790ca04b7e95a1ce9. Preserve the prior conflict review and old coordination text. This amendment must be reviewed, committed and referenced by the active shared resource record before N4 plan admission. No old failed/invalid candidate or external result becomes evidence for this candidate through resource reconciliation.

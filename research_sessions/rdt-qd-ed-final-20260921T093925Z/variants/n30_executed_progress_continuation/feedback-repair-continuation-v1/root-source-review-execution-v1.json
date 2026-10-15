@@ -1,0 +1,47 @@
+{
+  "schema": "n30-r2-root-source-review-v1",
+  "at": "2026-10-03T22:38:09.552963+00:00",
+  "decision": "ACCEPT_SOURCE_BYTE_SCOPE",
+  "commit": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "repair_base": "debda23a0e8eda86a3bb4f398e9596edf05b37e5",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/feedback-repair-continuation-v1/source-manifest-execution-v1.json",
+    "sha256": "b44fb2133c40922b692c3f4e89a011ec8c3a1c5ba8eebaf990440b59ee335bda"
+  },
+  "source_files_rehashed_and_git_bound": 480,
+  "repair_base_files_independently_git_bound": 463,
+  "existing_source_files_unchanged": 461,
+  "existing_files_changed": [
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n23_worker.py"
+  ],
+  "added_files": [
+    "docs/experiments/n30/r2/base-source-v1.json",
+    "docs/experiments/n30/r2/controller-contract-v1.md",
+    "docs/experiments/n30/r2/cpu-integration-scope-v1.md",
+    "docs/experiments/n30/r2/prospective-continuation-draft-v1.md",
+    "docs/experiments/n30/r2/r1-source-v1.json",
+    "docs/experiments/n30/r2/reverse-source-v1.json",
+    "docs/experiments/n30/r2/root-cpu-integration-release-v1.json",
+    "scripts/qd_ed_n30_r2_bridge.py",
+    "scripts/qd_ed_n30_r2_contract.py",
+    "scripts/qd_ed_n30_r2_prepare.py",
+    "scripts/qd_ed_n30_r2_report.py",
+    "scripts/qd_ed_n30_r2_supervise.py",
+    "tests/n30_r2_synthetic.py",
+    "tests/test_n30_r2_admission.py",
+    "tests/test_n30_r2_bridge.py",
+    "tests/test_n30_r2_controller.py",
+    "tests/test_n30_r2_worker.py"
+  ],
+  "reverse_hunks_independently_reconstruct_full_original_bytes": true,
+  "main_and_native_byte_identical_to_accepted_repair": true,
+  "accepted_repair_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/terminal-feedback-binding-repair-v1/root-cpu-repair-review-v1.json",
+    "sha256": "ed8d17d91231f516f699c076c21172fe95c3b508513f4646a1ecb70f0e282805"
+  },
+  "manual_review": "Root reviewed finite history/source binding, final runner/worker diff, report closure, controller/admission and route regression evidence across preparation and final delivery. No online/scientific change.",
+  "cpu_or_gpu_numerical_replay": false,
+  "gpu_release": false,
+  "goal_status": "TARGET_NOT_MET"
+}

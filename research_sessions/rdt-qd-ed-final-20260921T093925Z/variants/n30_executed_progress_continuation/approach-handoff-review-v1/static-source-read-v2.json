@@ -1,0 +1,65 @@
+{
+  "sources": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py",
+      "sha256": "5209b0ac07362e1df85bf2fd842e57d4786e24c0a625ee5b9e49bee48f528f93",
+      "bytes": 108959,
+      "read_count": 1,
+      "windows": [
+        {
+          "start": 1761,
+          "end": 1840,
+          "sha256": "f50a66251a2d6823acdf1bc76f6987e2f8e2d7d5ccea00505bbdfe9fdea54819"
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_executed_progress.py",
+      "sha256": "7aead7c81424a2b247e4d74ae211947e0b78a47cf6fa1a8a97fb112a9739d9c0",
+      "bytes": 11581,
+      "read_count": 1,
+      "windows": [
+        {
+          "start": 67,
+          "end": 139,
+          "sha256": "b7477a6d2d1492d985ccce70adb1dda213bd0e92ee136bce3355b76231ff30c8"
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241,
+      "read_count": 1,
+      "windows": [
+        {
+          "start": 170,
+          "end": 276,
+          "sha256": "b18e631dfd4a4062298d277a8ee4a1c0a1deed2d54e8383ab2c1f60e7343c9c3"
+        }
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/feedback-repair-continuation-v1/conditional-next-hypothesis-v1/review-v1.md",
+      "sha256": "b601ac5d4c6088ec8c9b73a5855f8f5420063616d1a64156efe844c7c621a351",
+      "bytes": 8375,
+      "read_count": 1,
+      "windows": [
+        {
+          "start": 1,
+          "end": 41,
+          "sha256": "b601ac5d4c6088ec8c9b73a5855f8f5420063616d1a64156efe844c7c621a351"
+        }
+      ]
+    }
+  ],
+  "source_bytes": 145156,
+  "cpu_seconds": 0.009936409,
+  "wall_seconds": 0.010580266010947526,
+  "affinity": [
+    0,
+    1
+  ],
+  "production_imports": 0,
+  "tests": 0
+}

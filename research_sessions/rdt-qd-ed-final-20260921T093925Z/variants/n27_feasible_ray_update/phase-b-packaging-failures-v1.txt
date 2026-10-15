@@ -1,0 +1,2 @@
+Protocol first git add refused ignored experiments path; corrected with explicit git add -f before protocol commit. No scientific execution.
+phase-b-edit-routes.py initial authoring script asserted an incorrect static function argument name (label vs candidate_id); failed before any source write. Preserved v1; v2 corrects exact static anchor. No tests/native/API/GPU run.

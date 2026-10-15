@@ -1,0 +1,16 @@
+{
+  "schema": "n24-task0-rescue-survival-output-manifest-v2",
+  "native_read_scope_closed": true,
+  "native_extraction_runs": 1,
+  "prior_complete_delivery": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/output-manifest-v1.json",
+    "sha256": "ee6abb722cd3eca26664badf2cb6636f98535b55418a99ca0ee052be39729e29",
+    "bytes": 8441
+  },
+  "additional_static_errata_index": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/documentation-unit-errata-index-v1.json",
+    "sha256": "3ad1a8cd3dc6747c17485560c4edd163f57f0431276f445d8aec85db7639bb72",
+    "bytes": 3606
+  },
+  "algorithm_or_source_modified": false
+}

@@ -1,0 +1,27 @@
+{
+  "run": "7",
+  "pytest_exit": 1,
+  "cpu_seconds": 5.564802386999999,
+  "cumulative_cpu_seconds": 75.71786758100001,
+  "wall_seconds": 5.4438926939619705,
+  "affinity": [
+    0,
+    1
+  ],
+  "thread_limit": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "blocked": [],
+  "dependency_exceptions": [
+    "/proc/58119/maps",
+    "/proc/cpuinfo",
+    "dev_null_sink"
+  ],
+  "guard_sha256": "eabb296a0434820c27dca00168bc604ff5c1c84c53d25d52e46f23cecd27c9d8",
+  "test_argv": [
+    "tests/test_n28_admission.py",
+    "-k",
+    "complete"
+  ],
+  "peak_rss_kib": 546844
+}

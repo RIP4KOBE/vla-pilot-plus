@@ -1,0 +1,42 @@
+{
+  "schema": "autonomy-driver-cpu-resource-ledger-v1",
+  "test_cpu_cap": 120,
+  "test_total_cpu_seconds": 1.000873146,
+  "test_total_wall_seconds": 1.5781594119034708,
+  "runs": [
+    {
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v1.json",
+        "sha256": "1310424bd5a5d96ad2911f8e542ba011f05dd06e39e69a2b84359d39daf109ed"
+      },
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-tests-v1.log",
+        "sha256": "d5a35096a7b22a8302b99ac69630d24e42ef56725011dfc180eb79a3e7f88f8e"
+      }
+    },
+    {
+      "resource": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v2.json",
+        "sha256": "57e0b4c4cb7c7882349c08ef7026463164d9c7a4cba4c6ab2c1a9ebeb1c5d111"
+      },
+      "log": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-tests-v2.log",
+        "sha256": "5d52a6d35c67cb0a2ef073bfb43a2e224a11dd4b45c6899805cfa045b8702b8a"
+      }
+    }
+  ],
+  "official_cli_help_only": true,
+  "official_cli_model_calls": 0,
+  "driver_launched": false,
+  "guard1": "13 assertion passes; guard failed on dir_fd cleanup relative opens resolved incorrectly by test guard. No outside access succeeded. Preserved tests/log.",
+  "guard2": "16 assertion passes, exit0, guard_clean=true; small synthetic fixtures retained rather than opening cleanup paths.",
+  "test_source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/test_driver_v2.py",
+    "sha256": "19311762f57ef97e0b4a1a3bd2d34893486dbb4a4bcdc86df7691f6955b8fcdc"
+  },
+  "driver_source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_v1.py",
+    "sha256": "068db4dee2132936f06d6ba92a7d5c60a5f813167520da491a2e0514935c431a"
+  },
+  "static_preparation_cpu": "not separately metered; no model/GPU/API invocation"
+}

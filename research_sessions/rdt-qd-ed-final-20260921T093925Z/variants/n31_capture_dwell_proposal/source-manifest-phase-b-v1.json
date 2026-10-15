@@ -1,0 +1,223 @@
+{
+  "schema": "n31-phase-b-source-v1",
+  "commit": "ae5ecf82ccbfd8f904a655ea78f75d433e8a5c77",
+  "base_commit": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "phase_a_commit": "d6de4b4fecc2784d1f7a6b4d4b93d451b09a79d0",
+  "protocol_precommit": "ce83f491671f8f06dd16a3b9f4ebbec44c035276",
+  "branch": "codex/n31-capture-dwell",
+  "clean": true,
+  "scope": "Phase A + Phase B changed source closure, not a new runtime/adoption manifest",
+  "base_diff_counts": {
+    "modified": 3,
+    "added": 10,
+    "total": 13
+  },
+  "phase_a_diff_counts": {
+    "modified": 3,
+    "added": 6,
+    "total": 9
+  },
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/configs/config.yaml",
+      "sha256": "40512b5e218dab4433ba23257fc251dfea930d7bad1441b99731b94265a8a404",
+      "bytes": 6841,
+      "relative_path": "configs/config.yaml",
+      "status": "M",
+      "git_blob": "cb9018a817e1ed87943fc9fa58d9c343b514e8d6",
+      "base_sha256": "0162b33c39673351a5ecfe093a9384dd8a3caeb28d7aa27a29264b5c14a3b237",
+      "base_bytes": 6802
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/configs/qd_ed_final/candidate_n31.json",
+      "sha256": "7360954167a4edad7bdf4b03a48bf7c01b070342063592045fafe099e86d2b12",
+      "bytes": 3415,
+      "relative_path": "configs/qd_ed_final/candidate_n31.json",
+      "status": "A",
+      "git_blob": "0ed4ab3b826825d823951698721b7eed355d3528"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_capture_dwell.py",
+      "sha256": "6616f69145d8f7dc878771766924c93a85daed0004f34183c5b26bd0f8d07564",
+      "bytes": 17713,
+      "relative_path": "core/qd_capture_dwell.py",
+      "status": "A",
+      "git_blob": "bf8826cfe273d0bd4ed0f402f2f3f697b5f5041a"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_capture_dwell_proposal.py",
+      "sha256": "e0b274e418aa9adc3cf7955ca162d830e66ffe9db79c65428573757e95fee843",
+      "bytes": 5604,
+      "relative_path": "core/qd_capture_dwell_proposal.py",
+      "status": "A",
+      "git_blob": "9f239ef9d5604efc1afb970d1131e2ca92280876"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/rdt_policy_steer.py",
+      "sha256": "1b722faf2e23e27dd7bc8a090199392b61a645cf97a2d39d9fd604f2bf3e7e8d",
+      "bytes": 418495,
+      "relative_path": "core/rdt_policy_steer.py",
+      "status": "M",
+      "git_blob": "c689c8dba6bab4c732444ded1f77720ddb185691",
+      "base_sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "base_bytes": 415962
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/docs/experiments/n31_capture_dwell_phase_a.md",
+      "sha256": "3f8493b6500fecaccdc36031fb6ab98d7906454634de07d6995a1b02354abecf",
+      "bytes": 8868,
+      "relative_path": "docs/experiments/n31_capture_dwell_phase_a.md",
+      "status": "A",
+      "git_blob": "d6e6b7f290a61af0bd37d31def2e8a8daca1cc07"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/docs/experiments/n31_capture_dwell_phase_a_protocol.md",
+      "sha256": "921bd41d16141a5cd69314b8e28a354a126402daa9f410937c09aebe143609e5",
+      "bytes": 10719,
+      "relative_path": "docs/experiments/n31_capture_dwell_phase_a_protocol.md",
+      "status": "A",
+      "git_blob": "6a7fc18d41fdce163258bad87a516582338b54af"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/docs/experiments/n31_phase_b_integration.md",
+      "sha256": "424ff2c6fab1f37e45acafff4d04f9d41094d12a830217da036ec14617c4f4ea",
+      "bytes": 7255,
+      "relative_path": "docs/experiments/n31_phase_b_integration.md",
+      "status": "A",
+      "git_blob": "d535df0469296be788a0965b34f0f7c09c399828"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/docs/experiments/n31_phase_b_protocol.md",
+      "sha256": "028ce032c540fbac0fdf2436333bb729d31cb42c6f5e4456a96d167e13288348",
+      "bytes": 7765,
+      "relative_path": "docs/experiments/n31_phase_b_protocol.md",
+      "status": "A",
+      "git_blob": "54da556f2e432699027699ef663c2abb39238ef7"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/main.py",
+      "sha256": "32ff2c8368c15d3777ebba497d356d835a6cca6aa59dca5b4a2ac8142b3dfd72",
+      "bytes": 109716,
+      "relative_path": "main.py",
+      "status": "M",
+      "git_blob": "567cedd38a9c10587aadd6f509203f66184f986b",
+      "base_sha256": "5209b0ac07362e1df85bf2fd842e57d4786e24c0a625ee5b9e49bee48f528f93",
+      "base_bytes": 108959
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/n31_original_methods.json",
+      "sha256": "51d5f0e66c549a6c5b8438b46ada4526427b389b8267eb6bd58babc56cfe7ca5",
+      "bytes": 209877,
+      "relative_path": "tests/n31_original_methods.json",
+      "status": "A",
+      "git_blob": "1626864ed090aedd690804c48e90f744f76b97cd"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_n31_capture_dwell_integration.py",
+      "sha256": "0d3464afe0dc68e0386cded4fa31ab9f50deb01dc3ec19846b344b9db5f39c72",
+      "bytes": 23729,
+      "relative_path": "tests/test_n31_capture_dwell_integration.py",
+      "status": "A",
+      "git_blob": "d498e1573c2ca7a602ee7236fa5b2c2ae902ed06"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_qd_capture_dwell_proposal.py",
+      "sha256": "2ef8448fdbc5b0b247803ad94505aacbf3a5f9f19a3b44b6c183707a99c9eefe",
+      "bytes": 8223,
+      "relative_path": "tests/test_qd_capture_dwell_proposal.py",
+      "status": "A",
+      "git_blob": "d49e750e64e0087b59a7ee4314746bb2dec184c7"
+    }
+  ],
+  "phase_a_files_unchanged": [
+    "core/qd_capture_dwell_proposal.py",
+    "docs/experiments/n31_capture_dwell_phase_a.md",
+    "docs/experiments/n31_capture_dwell_phase_a_protocol.md",
+    "tests/test_qd_capture_dwell_proposal.py"
+  ],
+  "final_test_bound_sources": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_capture_dwell_proposal.py",
+      "sha256": "e0b274e418aa9adc3cf7955ca162d830e66ffe9db79c65428573757e95fee843",
+      "bytes": 5604,
+      "relative_path": "core/qd_capture_dwell_proposal.py"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_capture_dwell.py",
+      "sha256": "6616f69145d8f7dc878771766924c93a85daed0004f34183c5b26bd0f8d07564",
+      "bytes": 17713,
+      "relative_path": "core/qd_capture_dwell.py"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/rdt_policy_steer.py",
+      "sha256": "1b722faf2e23e27dd7bc8a090199392b61a645cf97a2d39d9fd604f2bf3e7e8d",
+      "bytes": 418495,
+      "relative_path": "core/rdt_policy_steer.py"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/main.py",
+      "sha256": "32ff2c8368c15d3777ebba497d356d835a6cca6aa59dca5b4a2ac8142b3dfd72",
+      "bytes": 109716,
+      "relative_path": "main.py"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/configs/config.yaml",
+      "sha256": "40512b5e218dab4433ba23257fc251dfea930d7bad1441b99731b94265a8a404",
+      "bytes": 6841,
+      "relative_path": "configs/config.yaml"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/configs/qd_ed_final/candidate_n31.json",
+      "sha256": "7360954167a4edad7bdf4b03a48bf7c01b070342063592045fafe099e86d2b12",
+      "bytes": 3415,
+      "relative_path": "configs/qd_ed_final/candidate_n31.json"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/configs/qd_ed_final/n4_observed_baseline_profiles.json",
+      "sha256": "9ad91066bc0cf91bc8c79d9b02acbd4b83e5e5a45ae31072b0e92d2221baa54f",
+      "bytes": 56700,
+      "relative_path": "configs/qd_ed_final/n4_observed_baseline_profiles.json"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_n31_capture_dwell_integration.py",
+      "sha256": "0d3464afe0dc68e0386cded4fa31ab9f50deb01dc3ec19846b344b9db5f39c72",
+      "bytes": 23729,
+      "relative_path": "tests/test_n31_capture_dwell_integration.py"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/n31_original_methods.json",
+      "sha256": "51d5f0e66c549a6c5b8438b46ada4526427b389b8267eb6bd58babc56cfe7ca5",
+      "bytes": 209877,
+      "relative_path": "tests/n31_original_methods.json"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_rdt_steer.py",
+      "sha256": "1f16056a9ada4715a2c86c64ddc59324f85f09fb9890e4f0e530e488d1ae6df4",
+      "bytes": 422556,
+      "relative_path": "tests/test_rdt_steer.py"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_n30_executed_progress.py",
+      "sha256": "f750e30d67eb674ec4f4d91d259692117cf8a4638ca3031b9104d0104d8511ed",
+      "bytes": 19499,
+      "relative_path": "tests/test_n30_executed_progress.py"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_n30_initial_observation_repair.py",
+      "sha256": "3a20181ff534dc410698ba7e1f7dce87b8aa764c9c834bee57b9e6a83f27c6ff",
+      "bytes": 12813,
+      "relative_path": "tests/test_n30_initial_observation_repair.py"
+    }
+  ],
+  "final_test_source_ref": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-run6-source.json",
+    "sha256": "1b18c93e5254b3585b56e867214d601556f61be15b04932d5be17dfff1fdf749",
+    "bytes": 1655
+  },
+  "phase_b_protocol": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-b-production-integration-v1.md",
+    "sha256": "028ce032c540fbac0fdf2436333bb729d31cb42c6f5e4456a96d167e13288348",
+    "bytes": 7765
+  },
+  "gpu_release": false
+}

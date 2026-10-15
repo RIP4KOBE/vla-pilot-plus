@@ -1,0 +1,7 @@
+Committed `c427e7acdef0a42fa56c53460dd8587ca3489b1d`.
+
+- Added the validated runtime worktree alias; containment and fingerprint checks remain intact.
+- All 28 focused CPU-only tests passed. Worktree clean.
+- Wrote `../runtime-alias-repair-v1/result-v1.json` and `report-v1.md` with commit, hashes, test evidence, and limitations.
+
+No adoption, release approval, or dispatch occurred. Root review and a distinct new source-bound release remain required.

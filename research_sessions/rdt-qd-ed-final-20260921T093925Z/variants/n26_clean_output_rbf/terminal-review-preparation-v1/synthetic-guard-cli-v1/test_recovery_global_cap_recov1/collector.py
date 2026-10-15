@@ -1,0 +1,1 @@
+# synthetic collector; never executed

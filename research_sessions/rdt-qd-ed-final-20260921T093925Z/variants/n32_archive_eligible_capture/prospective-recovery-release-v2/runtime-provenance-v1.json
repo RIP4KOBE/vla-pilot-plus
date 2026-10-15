@@ -1,0 +1,17 @@
+{
+  "schema": "n32r2-runtime-provenance-v1",
+  "template": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260929/n18-close-then-lift-dev-v1/gpu7-rebind/runtime-manifest.gpu7.frozen.v3.json",
+    "sha256": "8b9aebb5af45ab355f4c03bf7669ed78c50b595185ff1e624ebc180dcca89dd7"
+  },
+  "candidate": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-recovery-release-v2/runtime.n32r2.candidate-v1.json",
+    "sha256": "bbf1f4c04dee16bd9f38add54af2256bab894a558876bb53e79f3ca8f4e74530"
+  },
+  "operation": "lexical checkout rebinding; preserve all 3291 file fingerprints and task/cache/provider contracts",
+  "old_worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+  "new_worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/implementation_worktree",
+  "runtime_readiness": "Inherited historical assertions only; no fresh GPU or provider probe",
+  "execution_authorized": false,
+  "http_counters": "Unknown"
+}

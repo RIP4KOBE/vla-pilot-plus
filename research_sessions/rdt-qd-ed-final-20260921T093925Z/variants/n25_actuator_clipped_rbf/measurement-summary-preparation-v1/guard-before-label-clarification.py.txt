@@ -1,0 +1,48 @@
+"""Exact-path guard. Production permits four frozen JSON roles, never their linked refs."""
+import os
+from pathlib import Path
+import sys
+
+def install(*, read_paths=(), write_paths=(), synthetic_root=None):
+    os.environ['CUDA_VISIBLE_DEVICES']=''
+    for k in ('OMP_NUM_THREADS','MKL_NUM_THREADS','OPENBLAS_NUM_THREADS','NUMEXPR_NUM_THREADS'):
+        os.environ[k]='2'
+    reads={str(Path(p).resolve()) for p in read_paths}
+    writes={str(Path(p).resolve()) for p in write_paths}
+    synthetic=Path(synthetic_root).resolve() if synthetic_root else None
+    stdlib=Path(os.__file__).resolve().parent
+    own=Path(__file__).resolve().parent
+    stats={'schema':'n25-measurement-guard-v1','denied':[],'cuda_visible_devices':'',
+           'cpu_thread_limit':2,'torch_imported':False,'network_calls':0,'subprocess_calls':0,
+           'real_payload_reads_authorized':synthetic is None}
+    def deny(event,path):
+        stats['denied'].append({'event':event,'path':str(path)})
+        raise PermissionError('N25 measurement guard: '+event+' '+str(path))
+    def event(name,args):
+        if name=='import' and (str(args[0]).split('.')[0] in
+            {'torch','core','main','robosuite','mujoco','requests','httpx','openai','socket'}):
+            deny(name,args[0])
+        if name.startswith(('socket.','subprocess.')) or name in ('os.system','os.fork','os.posix_spawn'):
+            deny(name,'disabled')
+        if name=='open' and not isinstance(args[0],int):
+            p=Path(os.fsdecode(args[0])).resolve()
+            mode=args[1];flags=args[2]
+            writing=(isinstance(mode,str) and any(c in mode for c in 'wax+')) or bool(
+                isinstance(flags,int) and flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND))
+            if p.suffix in {'.pt','.pth','.safetensors','.png','.mp4'}:deny(name,p)
+            fixture=synthetic is not None and (p==synthetic or p.is_relative_to(synthetic))
+            if writing:
+                if str(p) not in writes and not fixture:deny('write',p)
+            else:
+                static=(p.is_relative_to(stdlib) and 'site-packages' not in p.parts and
+                        p.suffix in {'.py','.pyc','.so'})
+                if str(p) not in reads and not fixture and not static and not (
+                    p.parent==own and p.name in {'summarize_v1.py','guard_v1.py','test_summary_v1.py'}):
+                    deny('read',p)
+        if name in ('os.remove','os.rename','os.mkdir','os.rmdir'):
+            for raw in args[:2] if name=='os.rename' else args[:1]:
+                if not isinstance(raw,(str,bytes,os.PathLike)):continue
+                p=Path(os.fsdecode(raw)).resolve()
+                if synthetic is None or not (p==synthetic or p.is_relative_to(synthetic)):deny(name,p)
+    sys.addaudithook(event)
+    return stats

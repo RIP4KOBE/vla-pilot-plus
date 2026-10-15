@@ -1,0 +1,11 @@
+# N29 terminal conclusion
+
+N29 is **REJECT_NUMERIC_DEV_FUTILITY**. All24 original dispatched cells are valid. C0, Q0, N28 and N29 each succeeded0/6 on tasks0..5. At the complete sixth task block, even success on every remaining candidate task would yield at most4/10, below the preregistered5/10 gate. Tasks6..9 are unrun and Unknown; do not report a full-ten success rate. There are no paired gains or losses among the four arms in this cohort, and no retry.
+
+The new per-row population-relative cap was substantively active:100684 trust-limited rows; N29 box-limited rows13919/104160 versus N28 40214/44576. N29 ran465 guided decisions and81840 scored candidates versus N28 199 and35024. These are descriptive mechanism/compute measures, not success surrogates or proof of why failure occurred. The bounded first-guided witnesses and same-worker CUDA audit passed; task utility was not established. A still-needed distinction is whether usable proposals are missing, selection loses them, or closed-loop continuation loses progress; unexecuted outcomes remain Unknown.
+
+All482 completed Stage calls used codex_cli/chatgpt/gpt-6-astra through the current managed login, with0failed calls and complete observed usage. Input5210452 tokens, of which2729472 were cached; output26599. Internal HTTP request/retry counts remain Unknown. No Poe/fallback; saved credentials untouched.
+
+Episode GPU process wall11107.552780834725seconds plus the once-only17.575451474054717second native proof yields3.0903133978635497GPUh. Cumulative395dispatches/53.08404692669838GPUh; no live owned worker. Current caps578/100 and all prior costs remain unchanged. Wrapper exit-status file is absent; root does not infer an exit code. Independent identity checks confirm the controller and all24 original workers have exited, terminal journal and native receipts reconcile, and the frozen controller produced the mathematical-futility result.
+
+The original research goal remains unmet. The user has now explicitly requested a week of continuous autonomous work, and a thread Goal is active. This candidate's rejection closes only N29. Continue the outer loop with bounded task-related evidence, preserve protected phases and existing limits pending the concrete week budget audit, and never lower the target to manufacture completion.

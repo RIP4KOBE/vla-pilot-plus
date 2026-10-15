@@ -1,0 +1,51 @@
+{
+  "schema": "n28-numerical-lineage-preparation-delivery-v1",
+  "execution_authorized": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/closed-numerical-lineage-v1/execution-release.template-v1.json",
+      "sha256": "bfc1c04975c93aef2566907dac24fec216f27ba01288ae364237478cf15f9490",
+      "bytes": 506
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/closed-numerical-lineage-v1/input-bindings.draft-v1.json",
+      "sha256": "4b9221967d1697a717da55dac16b45edee76024ffa1d957de53ad1e4e6ec5a67",
+      "bytes": 4218799
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/closed-numerical-lineage-v1/input-bindings.frozen.v1.json",
+      "sha256": "242c0038fe1a2b952ffb59a6093acb24c38eb96f3110539e8ce7897b4602336b",
+      "bytes": 4219133
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/closed-numerical-lineage-v1/preparation-provenance-v1.json",
+      "sha256": "802fc0f3bde9c72e72eb1c508dd56d8fe6c38b6a8ee27a9cb1b97ecbe72de4fa",
+      "bytes": 32515
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/closed-numerical-lineage-v1/preparation-report-v1.md",
+      "sha256": "23ec41954f7b76173dfdd9f033e9f7a806fcd390ed0c9953bc1f7c329f803cd0",
+      "bytes": 2894
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/closed-numerical-lineage-v1/preparation-resource-v1.json",
+      "sha256": "0e7f9eb3adbffb843757de67e35b5978dd1ea702df2494a9ba88c76fe96e327d",
+      "bytes": 1290
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/closed-numerical-lineage-v1/protocol-v1.md",
+      "sha256": "6cb47ff3fe58ee0ec0219ab448d080f4e2af7ea3ca3620d0945febace86cd001",
+      "bytes": 8103
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/closed-numerical-lineage-v1/reader-v1.py",
+      "sha256": "f121c1f7d7ea9c1e56f0bc56e382bfeca024d00feb9426979e4320f124022380",
+      "bytes": 20126
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/closed-numerical-lineage-v1/static-schema-v1.json",
+      "sha256": "d8caf760f711fdf48c19a8e9c043badd2ff9a00b03ff606d1d3d05d060729c98",
+      "bytes": 2532
+    }
+  ]
+}

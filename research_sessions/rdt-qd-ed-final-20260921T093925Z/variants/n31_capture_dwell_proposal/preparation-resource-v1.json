@@ -1,0 +1,12 @@
+{
+  "final_document_preparation_cpu_seconds": 0.0013994690000000004,
+  "static_preparation_all_commands_individually_metered": false,
+  "thread_limits": 2,
+  "affinity": [
+    0,
+    1
+  ],
+  "historical_payload_reads": 0,
+  "production_imports": 0,
+  "note": "Short source inspection/editor/Git commands were two-CPU/thread bounded but not individually timed. All synthetic suite invocations have exact inner and external receipts."
+}

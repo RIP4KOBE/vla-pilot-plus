@@ -1,0 +1,143 @@
+{
+  "schema": "autonomy-driver-cpu-test-resource-v1",
+  "source_hashes": {
+    "driver_v1.py": "068db4dee2132936f06d6ba92a7d5c60a5f813167520da491a2e0514935c431a",
+    "test_driver_v1.py": "1ab8691dc521c06006ee6c8b67ba0244ce419de0dbc6e18fe407f234d90a6d73",
+    "run_cpu_tests_v1.py": "70bed760254e5cd0414a4553cf046b8aec082a0832f35cfafa2a7244e206f272"
+  },
+  "exit": 0,
+  "guard_clean": false,
+  "denied": [
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/turns"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/000001"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/logs"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/autonomy"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/turns"
+    },
+    {
+      "event": "open",
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/study_worktree"
+    }
+  ],
+  "cpu_seconds": 0.447621351,
+  "child_cpu_seconds": 0.02218,
+  "wall_seconds": 0.7461498219054192,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "official_cli_calls": 0,
+  "gpu_api_model_sim_calls": 0
+}

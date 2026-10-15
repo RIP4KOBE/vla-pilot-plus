@@ -1,0 +1,32 @@
+{
+  "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/keypoint_tracker.py",
+  "sha256": "7925b62d8c6404c250ccdba6ae0df12df79dd23db1f308112b7b3f22e1a22190",
+  "bytes": 11249,
+  "ranges": [
+    [
+      14,
+      81
+    ],
+    [
+      34,
+      46
+    ],
+    [
+      90,
+      102
+    ],
+    [
+      113,
+      125
+    ],
+    [
+      226,
+      238
+    ],
+    [
+      255,
+      267
+    ]
+  ],
+  "cpu_seconds": 0.00030100100000000213
+}

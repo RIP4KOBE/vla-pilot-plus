@@ -1,0 +1,47 @@
+{
+  "schema": "n28-root-independent-source-review-v1",
+  "reviewed_at": "2026-10-01T12:14:41.733773+00:00",
+  "decision": "ACCEPT_SOURCE_BYTE_SCOPE",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/source-manifest-execution-v1.json",
+    "sha256": "a26a52fa413c43778a341d72b85e570892a13933954c4fa0b78c5a6357c1ef12"
+  },
+  "commit": "52b9eb0a8a365ee2ea12daffdb7a98c76bec0a72",
+  "files_verified": 383,
+  "files_verified_against_git_blobs": 383,
+  "old_files_unchanged": 355,
+  "changed_existing": [
+    "configs/config.yaml",
+    "core/rdt_policy_steer.py",
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n23_worker.py"
+  ],
+  "new_files": 24,
+  "reverse_verified_against_git_base": true,
+  "rdt_methods": 123,
+  "rdt_methods_byte_unchanged": 116,
+  "rdt_changed_methods": [
+    "__init__",
+    "reset",
+    "_eds_rbf_witness",
+    "_eds_renoise_reference",
+    "_eds_rollout_diversity_step_mask",
+    "_eds_guided_denoise_loop",
+    "_resolve_eds_config_with_reference_defaults"
+  ],
+  "original_renoise_numerical_body_ast_unchanged": true,
+  "candidate_profile_sole_delta": {
+    "rollout_diversity_placement": "parent_before_renoise_v1"
+  },
+  "fixed_model_score_budget": "21 model batches;176 canonical candidates/11 score batches per full guided chunk",
+  "rbf_calls": "N28 14 versus N27 19; not equal total computation",
+  "provider_policy_unchanged": true,
+  "provider_policy_source_sha256": "92f78a80651e97390a296e42850aae0b70217afb1c362e9b5d0b8a07b8cbe432",
+  "gpu_proof_replaced_by_this_review": false,
+  "native_boundary_proven_by_this_review": false,
+  "gpu_dispatch_authorized": false,
+  "gpu_model_api_sim_calls": 0,
+  "tensor_payload_reads": 0,
+  "limitations": "Source/byte review only. CPU tests, runtime, metered CUDA proof, budget adoption and exact execution release remain separate checks.",
+  "review_cpu_seconds": 0.914094215
+}

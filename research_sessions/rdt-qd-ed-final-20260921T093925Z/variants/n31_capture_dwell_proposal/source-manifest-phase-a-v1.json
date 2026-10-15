@@ -1,0 +1,43 @@
+{
+  "schema": "n31-phase-a-source-v1",
+  "commit": "d6de4b4fecc2784d1f7a6b4d4b93d451b09a79d0",
+  "base_commit": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "branch": "codex/n31-capture-dwell",
+  "clean": true,
+  "existing_tracked_files_modified": 0,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_capture_dwell_proposal.py",
+      "sha256": "e0b274e418aa9adc3cf7955ca162d830e66ffe9db79c65428573757e95fee843",
+      "bytes": 5604,
+      "relative_path": "core/qd_capture_dwell_proposal.py",
+      "status": "added",
+      "git_blob": "9f239ef9d5604efc1afb970d1131e2ca92280876"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/docs/experiments/n31_capture_dwell_phase_a.md",
+      "sha256": "3f8493b6500fecaccdc36031fb6ab98d7906454634de07d6995a1b02354abecf",
+      "bytes": 8868,
+      "relative_path": "docs/experiments/n31_capture_dwell_phase_a.md",
+      "status": "added",
+      "git_blob": "d6e6b7f290a61af0bd37d31def2e8a8daca1cc07"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/docs/experiments/n31_capture_dwell_phase_a_protocol.md",
+      "sha256": "921bd41d16141a5cd69314b8e28a354a126402daa9f410937c09aebe143609e5",
+      "bytes": 10719,
+      "relative_path": "docs/experiments/n31_capture_dwell_phase_a_protocol.md",
+      "status": "added",
+      "git_blob": "6a7fc18d41fdce163258bad87a516582338b54af"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/tests/test_qd_capture_dwell_proposal.py",
+      "sha256": "2ef8448fdbc5b0b247803ad94505aacbf3a5f9f19a3b44b6c183707a99c9eefe",
+      "bytes": 8223,
+      "relative_path": "tests/test_qd_capture_dwell_proposal.py",
+      "status": "added",
+      "git_blob": "d49e750e64e0087b59a7ee4314746bb2dec184c7"
+    }
+  ],
+  "scope": "pure helper/tests/arithmetic and future hook contract only; no production integration"
+}

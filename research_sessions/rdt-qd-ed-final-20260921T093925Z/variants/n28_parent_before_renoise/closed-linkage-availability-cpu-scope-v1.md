@@ -1,0 +1,22 @@
+# N28 closed-cohort linkage-availability audit — CPU scope v1
+
+Prepared2026-10-01 after N28 task2 closed as a valid failure. This is an unblinded diagnostic protocol, not an advance efficacy preregistration. The running sixteen-cell experiment remains immutable. N28 is currently0/3, so its prespecified2/4 screen threshold is no longer reachable. Complete the originally frozen matrix; this document grants no stop, restart, source edit or extra episode.
+
+Activation requires all16 original cells closed valid, controller exited, immutable result-v1.json says REJECT_SCREEN, and root-terminal-review-v1.json independently accepts that reconstruction. Until then PREPARATION ONLY. Root must explicitly release this CPU read after closure. No GPU/model/API/simulator or counterfactual branch; no budget expansion. Existing original-witness proofs are not replayed.
+
+Question: Are existing records sufficient to join parent allocation identity -> pre-mutation parent -> post-mutation parent -> observed actual renoise entry -> canonical offspring identity -> final selected executable prefix? Answer availability and identity correspondence only. An ancestry link is not a causal effect size, and all-offspring-treated ancestry is not evidence that mutation information survived denoising. No claim of causal absorption/preservation without same-noise, same-input untreated comparison.
+
+Coverage must include every accepted N28 cell from this fixed cohort (allfour if activation succeeds), exactly the already-recorded first-guided witness segment for each, including an explicit zero-guided/missing-data row where relevant. Never choose cells by success, nonzero gradient, number of guided decisions or appealing qualitative behavior. No C0/Q0/N27 raw artifacts and no older cohorts.
+
+Allowlist after release:
+- Immutable N28 plan, result, root terminal review and source-manifest metadata.
+- Each accepted N28 cell's own process.json, attempt-result.json, eds_eval/in-worker-audit-receipt.json, eds_eval/decision-evidence-audit.json, n23-worker-context.json, and eds_eval/eds_metrics.jsonl. Read explicit schema/identity/reference/selected-index fields and declared shapes, not whole numeric arrays or image/text payloads into the model context. No Stage files or credentials.
+- For the first guided segment only, JSON sidecars explicitly referenced by those audited records, limited to existing identities, paths, keys, declared shapes, scalar audit statuses and chosen/parent indices. Resolve paths inside that same attempt output. No recursive arbitrary directory traversal. At most64 referenced JSON sidecars across the four cells and128MiB of total JSON input. Report missing references rather than guessing paths.
+- Current frozen static source core/rdt_policy_steer.py, core/qd_parent_before_renoise.py, scripts/qd_ed_n28_audit.py, scripts/qd_ed_n28_native.py and scripts/qd_ed_n28_contract.py, solely to locate the emitting schema and identity semantics. If an exact script is absent, use the existing source manifest to locate its corresponding N28 file; do not broaden to unrelated source.
+
+Tensor/NumPy/model/checkpoint/image/video files are NOT to be opened, loaded or numerically analyzed. Their exact referenced filenames and filesystem size/existence may be listed as availability evidence. Do not import torch/numpy/production modules, replay helpers or infer absent values as zero. Do not recalculate scores, selectors, gradients or model outputs. Shape metadata must be labelled declared vs independently observed; unopened tensors remain unverified for content.
+
+At most30 cumulative tool-side CPU seconds, <=2 threads; measured blocks plus disclosed startup allowance, not false exact whole-session accounting. Output only under variants/n28_parent_before_renoise/closed-linkage-availability-v1/. Existing executor may perform the release after root's final gate. No new agents or automatic follow-on work.
+
+Deliver: per-cell coverage table, per-edge availability classification (explicit/joinable/absent/unverified), exact read references/hashes and CPU resource record. Separate implemented ancestry, numerical differences, model causal transport, chosen-action consequences and physical success. If availability cannot answer the question, retain Unknown and specify only the minimal missing observation; do not fabricate or run an intervention. Any new numeric decode, model replay, new instrumentation or candidate implementation needs a separately concrete reviewed scope.
+

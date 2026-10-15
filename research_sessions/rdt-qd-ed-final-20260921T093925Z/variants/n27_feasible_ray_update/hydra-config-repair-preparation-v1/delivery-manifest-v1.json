@@ -1,0 +1,113 @@
+{
+  "schema": "n27-hydra-repair-cpu-delivery-v1",
+  "source_commit": "095cfeecd6af55477d2529441c307ab712e8a8da",
+  "source_adoption_authorized": false,
+  "experiment_restart_authorized": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/scope-v1.md",
+      "sha256": "973c1f845780439e3bfd0ce20489e88f325e8e38f5b0990b40df6d9523e25984",
+      "bytes": 1166
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/static-inputs-v1.json",
+      "sha256": "013f3054aba3433d4c6abeb8e6618752a1d8d34252bd06aeb66e60f5b78e525e",
+      "bytes": 10189
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/proposed-config-default.diff",
+      "sha256": "fcb37cf70f211259c6a558b19909ea8be34224ab2ef9f6d476841b3a799c640b",
+      "bytes": 332
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/check_hydra_cpu_v1.py",
+      "sha256": "30a479f29e54e3d17922a5f8edcbc419a24c13dbb149273c430c5abcdace4911",
+      "bytes": 9562
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/check_hydra_cpu_v2.py",
+      "sha256": "009e0e8a4296795adf08180a6c9c3e51903bc4eaaa381f45d21193327f0a3fad",
+      "bytes": 9623
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/guard_cpu_v1.py",
+      "sha256": "d1b0b8aa47805143cc68a00993b8f705177d01c9cd1638807029acabaf986522",
+      "bytes": 2281
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/guard_cpu_v2.py",
+      "sha256": "3678524df378d497ae257f0db9e4a7b937206ba76b91b4f3b7728618fd9e7fe9",
+      "bytes": 2281
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/cpu-check-v1.log",
+      "sha256": "af919502e61e0d4e8df670a00681f671fdefdd09aeaef10fe8bc2f4f7bc135a6",
+      "bytes": 1417
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/cpu-check-v2.log",
+      "sha256": "af954654c505a39099693a5bed3a26085aeaf060c90dc13391cd055676a7a20f",
+      "bytes": 250
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/cpu-result-v1.json",
+      "sha256": "d534f5a8e8dd575e414643554392a3f92c8c0561ca8e183b13418a280220f377",
+      "bytes": 7144
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/synthetic-build-command-argv-v1.json",
+      "sha256": "c06afb5cfe9eb05a5ef76f95fd17694ff9c7306cbf5908724585795abcf6a5ee",
+      "bytes": 39577
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/cpu-test-results-v1.json",
+      "sha256": "874360598bae2a8b021b0f9e5968ab40187abaf42917f786a9c0c2b3e490aa19",
+      "bytes": 1777
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/diagnosis-and-repair-proposal-v1.md",
+      "sha256": "1f1996082d0eeb1b9191eb8023dc1a6749a6393720bb68e8ce376330d656485c",
+      "bytes": 8359
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/original/configs/config.yaml",
+      "sha256": "0fafab23cb97a4171d27e47d9b016eea84a909302ed02892922f040ca41c52b7",
+      "bytes": 6615
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/original/configs/policy.yaml",
+      "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6",
+      "bytes": 1487
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/original/configs/perception.yaml",
+      "sha256": "3432a29b12ca634835aa81dce87923e06e188a6c283b961a18a906eb1d6d8ff8",
+      "bytes": 2524
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/original/configs/backend/libero.yaml",
+      "sha256": "e1d1f41f178c7e5968e04b8337c13e8f37b691a7b3e93f9f8e9f7bb5796deb14",
+      "bytes": 1341
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/patched/configs/config.yaml",
+      "sha256": "654508563250e59ac56695ed3853157992ac946401179c593d74f10082282ee0",
+      "bytes": 6658
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/patched/configs/policy.yaml",
+      "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6",
+      "bytes": 1487
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/patched/configs/perception.yaml",
+      "sha256": "3432a29b12ca634835aa81dce87923e06e188a6c283b961a18a906eb1d6d8ff8",
+      "bytes": 2524
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/patched/configs/backend/libero.yaml",
+      "sha256": "e1d1f41f178c7e5968e04b8337c13e8f37b691a7b3e93f9f8e9f7bb5796deb14",
+      "bytes": 1341
+    }
+  ]
+}

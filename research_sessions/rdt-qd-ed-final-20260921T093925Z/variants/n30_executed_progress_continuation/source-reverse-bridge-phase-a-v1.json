@@ -1,0 +1,173 @@
+{
+  "algorithm": "zero-based keepends lines; replace new_start:new_end with original_lines, descending offsets; exact SHA and original Git bytes verified",
+  "base_commit": "d855cfd690482e018bb40ce98edec80fad9700e0",
+  "commit": "9029b384a34343efd73b4ea02184d83c5e52de61",
+  "modified": [
+    {
+      "current_sha256": "0acd3900021b9e2b12b018c7a2f5a3847e4e88f39726a51c1b5390a23c8b01ef",
+      "edits": [
+        {
+          "new_end": 118,
+          "new_start": 117,
+          "original_lines": []
+        }
+      ],
+      "original_sha256": "883a907cda4b8d062cf23f3e7ab99b0b33c8757c6e60aedd20a6ef1e65fa2b93",
+      "path": "configs/config.yaml",
+      "reverse_byte_equal": true
+    },
+    {
+      "current_sha256": "59b51b4a14d4f9bbdc3992173f96fd35508202e0349c50fdc08b94dcd74b8a13",
+      "edits": [
+        {
+          "new_end": 371,
+          "new_start": 370,
+          "original_lines": []
+        },
+        {
+          "new_end": 557,
+          "new_start": 555,
+          "original_lines": []
+        }
+      ],
+      "original_sha256": "3b3861870ff9645edbff1b64c2274d99889e9ee16e421976ae0b19366e6a5974",
+      "path": "core/eds_eval_metrics.py",
+      "reverse_byte_equal": true
+    },
+    {
+      "current_sha256": "ff1bbe63347853082de8b67f875f2706503f568aa453fc6cd105c51af159ad5e",
+      "edits": [
+        {
+          "new_end": 37,
+          "new_start": 34,
+          "original_lines": []
+        },
+        {
+          "new_end": 180,
+          "new_start": 179,
+          "original_lines": []
+        },
+        {
+          "new_end": 1427,
+          "new_start": 1425,
+          "original_lines": []
+        },
+        {
+          "new_end": 1461,
+          "new_start": 1459,
+          "original_lines": []
+        },
+        {
+          "new_end": 1591,
+          "new_start": 1590,
+          "original_lines": []
+        },
+        {
+          "new_end": 1608,
+          "new_start": 1604,
+          "original_lines": []
+        },
+        {
+          "new_end": 1661,
+          "new_start": 1658,
+          "original_lines": []
+        },
+        {
+          "new_end": 1740,
+          "new_start": 1716,
+          "original_lines": []
+        },
+        {
+          "new_end": 5100,
+          "new_start": 5085,
+          "original_lines": []
+        },
+        {
+          "new_end": 5265,
+          "new_start": 5256,
+          "original_lines": []
+        },
+        {
+          "new_end": 5280,
+          "new_start": 5267,
+          "original_lines": [
+            "        initial_trace_particle_sources = None\n"
+          ]
+        },
+        {
+          "new_end": 5619,
+          "new_start": 5615,
+          "original_lines": []
+        },
+        {
+          "new_end": 7321,
+          "new_start": 7316,
+          "original_lines": []
+        },
+        {
+          "new_end": 8207,
+          "new_start": 8206,
+          "original_lines": []
+        },
+        {
+          "new_end": 8720,
+          "new_start": 8719,
+          "original_lines": []
+        }
+      ],
+      "original_sha256": "861509f3a491e28390a901623bc48523795a34ddacf25ccb839f122a13fce3a7",
+      "path": "core/rdt_policy_steer.py",
+      "reverse_byte_equal": true
+    },
+    {
+      "current_sha256": "866e8a7c3debabe4e0c135d88e2138f2359132c803d2fd88c3a20665aed8b2f4",
+      "edits": [
+        {
+          "new_end": 102,
+          "new_start": 81,
+          "original_lines": []
+        },
+        {
+          "new_end": 1648,
+          "new_start": 1644,
+          "original_lines": []
+        },
+        {
+          "new_end": 1713,
+          "new_start": 1712,
+          "original_lines": [
+            "                    self.keypoint_tracker, evidence_enabled=evidence is not None)\n"
+          ]
+        },
+        {
+          "new_end": 1830,
+          "new_start": 1827,
+          "original_lines": []
+        },
+        {
+          "new_end": 1923,
+          "new_start": 1921,
+          "original_lines": []
+        },
+        {
+          "new_end": 2145,
+          "new_start": 2141,
+          "original_lines": []
+        }
+      ],
+      "original_sha256": "a46be1babfde66a07729c06d4e37b51575def4e27f05970dfaa852ae4db4afd7",
+      "path": "main.py",
+      "reverse_byte_equal": true
+    }
+  ],
+  "new_paths": [
+    "configs/qd_ed_final/candidate_n30.json",
+    "core/qd_executed_progress.py",
+    "docs/experiments/n30/compute-interpretation-v1.md",
+    "docs/experiments/n30/hypothesis-and-protocol-v1.md",
+    "docs/experiments/n30/interface-and-arithmetic-v1.md",
+    "tests/n30_original_control_functions.json",
+    "tests/test_n30_executed_progress.py"
+  ],
+  "schema": "n30-four-file-reverse-bridge-v1"
+}

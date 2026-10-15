@@ -1,0 +1,59 @@
+{
+  "schema": "n31-cpu-source-closure-v1",
+  "commit": "7428ce8a51f76c5f641537be9a7614631d82b0d9",
+  "base": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "files": 511,
+  "required_code_complete": true,
+  "required_source_files": 76,
+  "unchanged_old": 474,
+  "changed_existing": [
+    "configs/config.yaml",
+    "core/rdt_policy_steer.py",
+    "main.py",
+    "scripts/audit_decision_evidence.py",
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n23_worker.py"
+  ],
+  "new": [
+    "configs/qd_ed_final/candidate_n31.json",
+    "configs/qd_ed_final/n31_dev_task_identities.json",
+    "core/qd_capture_dwell.py",
+    "core/qd_capture_dwell_proposal.py",
+    "docs/experiments/n31/base-plan-metadata-v1.json",
+    "docs/experiments/n31/base-source-v1.json",
+    "docs/experiments/n31/historical-input-bindings-v1.json",
+    "docs/experiments/n31/reverse-source-v1.json",
+    "docs/experiments/n31_capture_dwell_phase_a.md",
+    "docs/experiments/n31_capture_dwell_phase_a_protocol.md",
+    "docs/experiments/n31_controller_native_contract.md",
+    "docs/experiments/n31_dev_protocol.md",
+    "docs/experiments/n31_phase_b_integration.md",
+    "docs/experiments/n31_phase_b_protocol.md",
+    "docs/experiments/n31_phase_c_protocol.md",
+    "scripts/qd_ed_n31_bridge.py",
+    "scripts/qd_ed_n31_contract.py",
+    "scripts/qd_ed_n31_native.py",
+    "scripts/qd_ed_n31_prepare.py",
+    "scripts/qd_ed_n31_reference.py",
+    "scripts/qd_ed_n31_report.py",
+    "scripts/qd_ed_n31_supervise.py",
+    "tests/n31_original_methods.json",
+    "tests/test_n31_admission.py",
+    "tests/test_n31_budget_reference.py",
+    "tests/test_n31_capture_dwell_integration.py",
+    "tests/test_n31_controller.py",
+    "tests/test_n31_native.py",
+    "tests/test_n31_source_contract.py",
+    "tests/test_n31_worker.py",
+    "tests/test_qd_capture_dwell_proposal.py"
+  ],
+  "reverse": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/docs/experiments/n31/reverse-source-v1.json",
+    "sha256": "a5e89d8ba912713c39df5e106da7c937a4b8a56ce8e8a005b887bbff04d51618"
+  },
+  "phase_a_helper": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation/core/qd_capture_dwell_proposal.py",
+    "sha256": "e0b274e418aa9adc3cf7955ca162d830e66ffe9db79c65428573757e95fee843"
+  },
+  "base_audit": "All current files equal committed Git blobs; all old files equal base or reverse byte-exactly. No history payload/proof execution."
+}

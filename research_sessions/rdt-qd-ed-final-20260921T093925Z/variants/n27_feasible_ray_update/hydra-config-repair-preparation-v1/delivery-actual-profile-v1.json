@@ -1,0 +1,48 @@
+{
+  "schema": "n27-hydra-repair-actual-profile-delivery-v1",
+  "previous_delivery": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/delivery-manifest-v1.json",
+    "sha256": "1195c5b67feb66df0f03e1ef403d2a76915d765743883c27ea2001d87e5544db"
+  },
+  "source_adoption_authorized": false,
+  "experiment_restart_authorized": false,
+  "additional_test_seconds": 1.0670376860070974,
+  "aggregate_test_seconds": 2.432581852073781,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/static-inputs-v2.json",
+      "sha256": "8216121f1deeb5941d79d0bffc6e920640146ee1eedf86bab0f608fb9870f22d",
+      "bytes": 10640
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/check_hydra_actual_profile_v1.py",
+      "sha256": "aca2caf317acbd8cdd5ce93883094263ddea69964c99eebed97d619efed58c8d",
+      "bytes": 8998
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/guard_actual_profile_v1.py",
+      "sha256": "b2108027f469e424feaa828f7fef123a3c536c93bc8c729314b80d9986261921",
+      "bytes": 2292
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/cpu-check-actual-profile-v1.log",
+      "sha256": "924a6e2c7a259ca3dabb3d7dd0eba98951d08b790d5404e1b636fe3ead9863f4",
+      "bytes": 250
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/cpu-result-actual-profile-v1.json",
+      "sha256": "49347091726e558a3fe437d9a6c8e1b2f8920fd679da7faa960be604a4f433c0",
+      "bytes": 7129
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/synthetic-build-command-argv-actual-profile-v1.json",
+      "sha256": "5aac844275d3775bed3e59deeee53e545ac38166a674516a5f1e7fd6a5e2dced",
+      "bytes": 39959
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-config-repair-preparation-v1/actual-profile-coverage-addendum-v1.md",
+      "sha256": "b968061d38e51e526ab2cca992df2e151e28afc6139820ab2e4381f35474944f",
+      "bytes": 2815
+    }
+  ]
+}

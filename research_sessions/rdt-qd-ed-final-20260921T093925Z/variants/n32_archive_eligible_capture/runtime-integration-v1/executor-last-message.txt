@@ -1,0 +1,7 @@
+Committed as `260f19ed29c38aa1c361fda50acb3abdf7fb0af0`; worktree clean.
+
+- Implemented N32 runtime adapter and independent native auditor.
+- Passed 48 N32 tests and 150 regression tests.
+- Reports: [report-v1.md](../runtime-integration-v1/report-v1.md), [result-v1.json](../runtime-integration-v1/result-v1.json).
+
+CPU synthetic validation only. No GPU or protected-result access. GPU costs and physical efficacy remain unverified; root review is required before release.

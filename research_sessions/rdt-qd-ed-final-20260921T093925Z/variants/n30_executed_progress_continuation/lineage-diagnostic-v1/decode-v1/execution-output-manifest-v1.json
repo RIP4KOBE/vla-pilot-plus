@@ -1,0 +1,46 @@
+{
+  "schema": "n30-lineage-execution-output-manifest-v1",
+  "execution_count": 1,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/invocation-v1.json",
+      "sha256": "b88c7bb460de7dd3a8a533da758f5b4b4c0882f8de4979b18e46ad2eb14d5c0c",
+      "bytes": 153
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/progress-v1.jsonl",
+      "sha256": "a8f322543d7898537c8a301d590832c73851b831f30631fc1ee2960a2eac96c6",
+      "bytes": 17538
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/partial-v1.json",
+      "sha256": "504739c9f86e5ba3ef0e17d774197b0565b40190fbe44f5feb8318dc857fada0",
+      "bytes": 140220
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/result-v1.json",
+      "sha256": "a365d087f905093a6a323ac1f559c032645f8235be3793431cf22540ff5c6ccf",
+      "bytes": 140494
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/resource-v1.json",
+      "sha256": "3c232c60fbc8714e762450597366a5a012fb30f7727da78e4b2aa7581c44423d",
+      "bytes": 194277
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/execution-v1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/summary-v1.md",
+      "sha256": "706569f9482466c6f5b066997b82739190b65af517cde44dcc837851df7a8144",
+      "bytes": 5815
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/closure-v1.json",
+      "sha256": "793388cf69f2d583f95a22325983d4e60d96fc41edcb0e951816b522f3e312fd",
+      "bytes": 2597
+    }
+  ]
+}

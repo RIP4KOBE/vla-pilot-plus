@@ -1,0 +1,21 @@
+backend:
+  backend: libero
+  libero:
+    task_ids_filter:
+    - 8
+main:
+  episode_num: 1
+  episode_seed_schedule:
+  - 991
+  require_task_cache_identity: true
+perception:
+  gemini:
+    allow_recovered_error_events: true
+    backend: codex_cli
+    cli_path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/n23-v2-guarded-fixtures-validation-regression-v1/test_typed_timeout_rejects_eve17/codex
+    disabled_skill_paths:
+    - /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/n23-v2-guarded-fixtures-validation-regression-v1/test_typed_timeout_rejects_eve17/account/.codex/skills/fixture
+    model: gpt-6-astra
+    reasoning_effort: low
+    timeout_seconds: 180
+seed: 993

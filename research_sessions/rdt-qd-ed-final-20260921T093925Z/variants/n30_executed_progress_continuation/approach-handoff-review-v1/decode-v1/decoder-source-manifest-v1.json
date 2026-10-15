@@ -1,0 +1,52 @@
+{
+  "schema": "n30-handoff-decoder-source-v1",
+  "source_commit": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "reader": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/decode_cpu_v1.py",
+    "sha256": "4f11e72f7e15c81c5fe5094499e74ebbfed5113e05e467e2adae33f108497ed0"
+  },
+  "input_bindings": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/handoff-bindings.disabled.v1.json",
+    "sha256": "a0e91ccb47a312a37e46b9c9ac9d6dcf8c3ec211d2cbb07a8084b6f8b6ad4345"
+  },
+  "protocol": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/minimum-evidence-proposal.disabled.v1.json",
+    "sha256": "b3d1ce66d932f517be84100cecc33f2a2e669efb47eeb4c41199ab86f4e05e97"
+  },
+  "phase_c_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/root-terminal-review-v1.json",
+    "sha256": "9abbe70fcc2797f11798624d2c5b73007bc54f6616a37133b85f3eea38cec58e"
+  },
+  "preparation_scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/root-preparation-scope-v1.md",
+    "sha256": "da8415d563b1641df753db8bf22e5131efa8f62f35f92ce55a104697b3497ce8"
+  },
+  "scientific_source_files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_executed_progress.py",
+      "sha256": "7aead7c81424a2b247e4d74ae211947e0b78a47cf6fa1a8a97fb112a9739d9c0",
+      "bytes": 11581
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/scripts/qd_ed_n30_native.py",
+      "sha256": "c7d8c779f977aaae61976b33d9b52cec5fb068913896f6b09a0d8abecf8067c0",
+      "bytes": 19175
+    }
+  ],
+  "reused_reader": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/decode_cpu_v1.py",
+    "sha256": "3f6404a29c0108f190a5eb83dffbfb0e42696f1cef1be44d9612c5c4dc99263d"
+  },
+  "source_binding_note": "Four frozen source files are statically interpreted, not imported. Future reader hashes these before payload access. Native auditor/provider/source template execution is not performed; source validity and selection arithmetic remain inherited from bound accepted worker evidence.",
+  "real_payload_read_count_during_preparation": 0
+}

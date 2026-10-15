@@ -1,0 +1,66 @@
+budget:
+  amendment:
+    physical_gpu: 7
+    proposal_sha256: 11607aa4a056e8defa8c2acafeab5b2270bb18f24ecb7780cb35762e61fe938f
+    schema: gpu7-n22-budget-amendment-v1
+  dispatched: 1
+  gpu_hour_reservations:
+    formal: 12.0
+    validation: 32.0
+  gpu_hours_consumed: 0.0
+  max_episode_attempts: 438
+  max_gpu_hours: 100.0
+  reserved:
+    baseline: 41
+    development: 157
+    formal: 40
+    recovery: 20
+    validation: 180
+  running: 1
+  aborted: 0
+  valid: 0
+  invalid: 0
+  completed: 0
+gpu_pool:
+- 7
+max_concurrent_gpu_workers: 1
+n22_gpu7_binding:
+  addendum_path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n22_hold_conditioned_lift/protocol-dev-v1.md
+  addendum_sha256: 650489b28f8b048b1963cfd7268dc937274a12f33132beabe93d4bc9bde0c295
+  scope: N22_HOLD_LIFT_DEV_20260930_only
+  selected_gpu: 7
+  user_reply: "\u7EE7\u7EED\u5B8C\u6210\u6EE1\u8DB3\u76EE\u6807\u4E14\u65E0\u9700\u6211\
+    \u4ECB\u5165\u7684autoresearch"
+n22_validation_authorization:
+  cohort_id: N22_VALIDATION_20260930
+  dev_review:
+    synthetic: 1
+  physical_gpu: 7
+  protocol_sha256: b2e94ebd3a79495a6a12db052ddd8ca6db764f65b2632fa092c31d593cd7c51b
+  run_once: true
+  schema: n22-validation-authorization-v1
+  seed_cohort: c2
+  source_review:
+    synthetic: 2
+resource_isolation:
+  private_budget: true
+  status: ACTIVE
+  validation_status: PASS
+runner:
+  by_bucket:
+    baseline: 0
+    development: 0
+    validation: 1
+    formal: 0
+    recovery: 0
+  reserved_attempts: 1
+  gpu_hours_by_bucket:
+    baseline: 0.0
+    development: 0.0
+    validation: 0.0
+    formal: 0.0
+    recovery: 0.0
+  gpu_healthcheck_hours: 0.0
+  gpu_healthcheck_inflight: 0
+  last_attempt_id: one
+  last_event: dispatched

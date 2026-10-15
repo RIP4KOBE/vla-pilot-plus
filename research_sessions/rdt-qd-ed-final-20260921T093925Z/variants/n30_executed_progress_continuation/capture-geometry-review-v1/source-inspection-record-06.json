@@ -1,0 +1,68 @@
+{
+  "read_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/robots/mounted_panda.py",
+      "sha256": "c89ab36decca6d9fa242021971513960c3ce31aa42735009c73258f397be126c",
+      "bytes": 1658,
+      "windows": [
+        [
+          1,
+          110
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/robots/on_the_ground_panda.py",
+      "sha256": "7d580aeee632e164f327cf6b1951861bec40cf814cdbe92bcfc469a93e1f9fa8",
+      "bytes": 1726,
+      "windows": [
+        [
+          1,
+          110
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/base.py",
+      "sha256": "a5d7bc8c7f317735b76347c0038d3c0888e592da0ee059d0f937eb9f1b272b34",
+      "bytes": 24667,
+      "windows": [
+        [
+          53,
+          113
+        ],
+        [
+          328,
+          395
+        ],
+        [
+          500,
+          530
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_ed.py",
+      "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89",
+      "bytes": 46573,
+      "line_filter": "descriptor function locations"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962,
+      "line_filter": "observation quaternion wiring"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/result-v1.json",
+      "sha256": "fd63df833c0839efd87ddea5d3ffcb75eebfe493730aef018f809d9937324f46",
+      "bytes": 111308,
+      "schema_only_inspection": true
+    }
+  ],
+  "cpu_seconds": 0.010145861999999999,
+  "affinity": [
+    0,
+    1
+  ]
+}

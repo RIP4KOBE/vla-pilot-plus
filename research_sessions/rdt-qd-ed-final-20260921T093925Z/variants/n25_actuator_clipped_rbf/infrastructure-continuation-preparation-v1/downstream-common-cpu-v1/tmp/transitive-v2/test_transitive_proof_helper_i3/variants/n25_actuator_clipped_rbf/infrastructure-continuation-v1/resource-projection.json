@@ -1,0 +1,83 @@
+{
+  "all_matching_events_included": true,
+  "collected_at": "2026-10-01T00:00:00Z",
+  "collector": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/NEVER_READ_COLLECTOR",
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "event_count": 3,
+  "events": [
+    {
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "event": "reserved",
+      "gpu_process_wall_seconds": 11.0,
+      "kind": "n25_tensor_arithmetic_v1",
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/old-proof-plan.json",
+        "sha256": "7507ebc964c11c125ca0f74bda731b3361ae479a74d71f4b54cfa0517eadada7"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/old-proof-process.json",
+        "sha256": "db8f6057d32ae4904b3f6fc5714ccee2ffe3cd8f410b7b95aedea3483d3c5ed6"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/old-proof-report.json",
+        "sha256": "fdd234bf982ea8f0c80d6bec8da5a6e39c75db3f13c07ee8f59bf09ef8b8acd8"
+      },
+      "resource_id": "synthetic__n25_tensor_arithmetic_v1"
+    },
+    {
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "event": "dispatched",
+      "gpu_process_wall_seconds": 11.0,
+      "kind": "n25_tensor_arithmetic_v1",
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/old-proof-plan.json",
+        "sha256": "7507ebc964c11c125ca0f74bda731b3361ae479a74d71f4b54cfa0517eadada7"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/old-proof-process.json",
+        "sha256": "db8f6057d32ae4904b3f6fc5714ccee2ffe3cd8f410b7b95aedea3483d3c5ed6"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/old-proof-report.json",
+        "sha256": "fdd234bf982ea8f0c80d6bec8da5a6e39c75db3f13c07ee8f59bf09ef8b8acd8"
+      },
+      "resource_id": "synthetic__n25_tensor_arithmetic_v1"
+    },
+    {
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "event": "completed",
+      "gpu_process_wall_seconds": 11.0,
+      "kind": "n25_tensor_arithmetic_v1",
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/old-proof-plan.json",
+        "sha256": "7507ebc964c11c125ca0f74bda731b3361ae479a74d71f4b54cfa0517eadada7"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/old-proof-process.json",
+        "sha256": "db8f6057d32ae4904b3f6fc5714ccee2ffe3cd8f410b7b95aedea3483d3c5ed6"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/old-proof-report.json",
+        "sha256": "fdd234bf982ea8f0c80d6bec8da5a6e39c75db3f13c07ee8f59bf09ef8b8acd8"
+      },
+      "resource_id": "synthetic__n25_tensor_arithmetic_v1"
+    }
+  ],
+  "protected_events_included": false,
+  "resource_id": "synthetic__n25_tensor_arithmetic_v1",
+  "resource_kind": "n25_tensor_arithmetic_v1",
+  "root_terminal_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/variants/n25_actuator_clipped_rbf/infrastructure-continuation-v1/root-review.json",
+    "sha256": "a5304fe53cb2f0f16a9880c431629b1b259a9979a890661b96b1eef85036dfa5"
+  },
+  "schema": "n25-current-resource-projection-v1",
+  "source_ledger": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/transitive-v2/test_transitive_proof_helper_i3/NEVER_READ_FULL_LEDGER",
+    "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  }
+}

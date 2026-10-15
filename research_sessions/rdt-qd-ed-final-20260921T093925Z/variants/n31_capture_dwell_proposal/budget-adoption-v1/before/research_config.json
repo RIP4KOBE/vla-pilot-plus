@@ -1,0 +1,18 @@
+{
+  "task": "Implement and independently review N30: Q0 plus one observed-progress-conditioned executed-plan continuation slot. No GPU release yet; proposed12cell C0/Q0/N30 Dev screen fits existing buckets. Keep week expansion pending and protected phases closed.",
+  "coordinator": {
+    "max_cycles": 32,
+    "ui": {
+      "interaction_mode": "auto"
+    }
+  },
+  "budget": {
+    "max_gpu_hours": 100,
+    "max_episode_attempts": 578,
+    "formal_candidates": 1
+  },
+  "gpu_pool": [
+    7
+  ],
+  "max_concurrent_gpu_workers": 1
+}

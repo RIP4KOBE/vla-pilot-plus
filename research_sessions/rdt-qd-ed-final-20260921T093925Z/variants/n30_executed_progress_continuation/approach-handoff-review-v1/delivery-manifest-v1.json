@@ -1,0 +1,78 @@
+{
+  "schema": "n30-handoff-review-delivery-v1",
+  "frozen": true,
+  "source_or_science_changed": false,
+  "new_algorithm_nominations": 0,
+  "decoder_or_execution_release": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/root-scope-v1.md",
+      "sha256": "eac3977ce33116aec4d97eae63ea864f752107d04e6a2cefbecdcb4254623c14",
+      "bytes": 5896
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/inventory_handoff_v1.py",
+      "sha256": "a49f90a01f9c467ac905a501cbb39751b7a4d49a4a165ec54c6abf37310a759e",
+      "bytes": 10303
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/inventory-run-v1.log",
+      "sha256": "bf97e33a7745c09aaec7392b21e0d29fb39e06d305bf70d6cd1f6a5f75e8b0df",
+      "bytes": 79
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/handoff-bindings.disabled.v1.json",
+      "sha256": "a0e91ccb47a312a37e46b9c9ac9d6dcf8c3ec211d2cbb07a8084b6f8b6ad4345",
+      "bytes": 1456252
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/metadata-summary-v1.json",
+      "sha256": "c037ba384608a2306689422c4e47b803fe6ecdca826cd82b962581b3bec0298f",
+      "bytes": 6914
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/metadata-resource-v1.json",
+      "sha256": "2b455df050ca677dc73c602425efb54706ad77351dede09f55d082fc49f10d5e",
+      "bytes": 8837
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/static-source-read-v1.json",
+      "sha256": "76561faf749d55186b426bc232175ddf76d533c744d8f7583f49576fdb64ccc3",
+      "bytes": 3688
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/static-source-read-v2.json",
+      "sha256": "aca7a78d6c3555eea81458e30e520c459c8dbd7e26e96704f3e97b17a288cb75",
+      "bytes": 2303
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/handoff-coverage-v1.csv",
+      "sha256": "fe5a56d8dc15e7c83ce1ed2f2218f90c6bf335847b4f7a9ca6b056d6f0e23a23",
+      "bytes": 698
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/minimum-evidence-proposal.disabled.v1.json",
+      "sha256": "b3d1ce66d932f517be84100cecc33f2a2e669efb47eeb4c41199ab86f4e05e97",
+      "bytes": 6370
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/input-source-manifest-v1.json",
+      "sha256": "83d90527e22d3dd1e56c23870c1d5db6233e80b2309030c83867def07996f82e",
+      "bytes": 15356
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/review-v1.md",
+      "sha256": "69ba320598f9e96528ed168b785e7429e428c978db0d11ebdba9e1a78df401c5",
+      "bytes": 7794
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/resource-summary-v1.json",
+      "sha256": "84116d64eb640d71e98c01a625976e8ba16baf919657a313222ebf9d288676fb",
+      "bytes": 1642
+    }
+  ],
+  "own_delivery_bytes_read_this_pass": 1526132,
+  "external_inputs_reopened_for_packaging": false,
+  "packaging_cpu_seconds_to_manifest": 0.0028405519999999997,
+  "resource_note": "Small unmetered stdout-only review commands and packaging are covered by the explicit conservative 60 CPU-second debit; no fabricated precise total. Even conservatively charging the entire own delivery file size once per all 10 command invocations, plus inventoried external reads, is below64MiB."
+}

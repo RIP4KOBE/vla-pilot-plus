@@ -1,0 +1,1 @@
+Read ../stop-path-repair-v1/scope-v1.md and execute its bounded CPU-only repair. Preserve all owning records.

@@ -1,0 +1,24 @@
+{
+  "run": "3",
+  "pytest_exit": 0,
+  "cpu_seconds": 14.634358972000001,
+  "cumulative_cpu_seconds": 37.196932039000004,
+  "wall_seconds": 11.737159964046441,
+  "affinity": [
+    0,
+    1
+  ],
+  "thread_limit": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "blocked": [],
+  "dependency_exceptions": [
+    "/proc/37445/maps",
+    "dev_null_sink"
+  ],
+  "guard_sha256": "3554ca6beaa0c3661019e4c47339dcdcf348685befa3594c984e37d8ca0659b6",
+  "test_argv": [
+    "tests/test_n28_parent_before_renoise.py"
+  ],
+  "peak_rss_kib": 637344
+}

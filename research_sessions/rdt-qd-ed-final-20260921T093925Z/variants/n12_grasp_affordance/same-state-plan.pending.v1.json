@@ -1,0 +1,393 @@
+{
+  "alternative_actions": [
+    [
+      -1.5625,
+      -1.109375,
+      -0.41015625,
+      0.0027313232421875,
+      0.026123046875,
+      0.008056640625,
+      1.0
+    ],
+    [
+      -1.4921875,
+      -1.046875,
+      -0.328125,
+      -0.00323486328125,
+      0.0245361328125,
+      0.004608154296875,
+      1.0
+    ],
+    [
+      -1.328125,
+      -0.9765625,
+      -0.271484375,
+      -0.0084228515625,
+      0.02880859375,
+      0.0010986328125,
+      1.0
+    ],
+    [
+      -1.1796875,
+      -0.81640625,
+      -0.166015625,
+      -0.0142822265625,
+      0.0308837890625,
+      -0.0017852783203125,
+      1.0
+    ],
+    [
+      -1.0234375,
+      -0.640625,
+      -0.0306396484375,
+      -0.01806640625,
+      0.0322265625,
+      -0.0036773681640625,
+      1.0
+    ],
+    [
+      -0.8046875,
+      -0.47265625,
+      0.103515625,
+      -0.021728515625,
+      0.03271484375,
+      -0.00579833984375,
+      1.0
+    ],
+    [
+      -0.53125,
+      -0.306640625,
+      0.2392578125,
+      -0.025146484375,
+      0.032958984375,
+      -0.008056640625,
+      1.0
+    ],
+    [
+      -0.236328125,
+      -0.08837890625,
+      0.36328125,
+      -0.02294921875,
+      0.04150390625,
+      -0.00921630859375,
+      1.0
+    ]
+  ],
+  "alternative_fingerprint": "369d2a8482e9aff9a611cd725914871be624ac3299dd7bce487a142aa88a4391",
+  "alternative_index": 6,
+  "approved": false,
+  "attempt_id": null,
+  "automatic_retry": false,
+  "budget_bucket": "development",
+  "checked_native_bundles": {
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000003.pt": "5cb59aed0475279ee43988c10a1855c2e0f4ad8c9057f3d64a9149cbe79eb747",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000006.pt": "1884f92458c558bcb6b1f63edee166198b267b656937f30e7227403b983af176",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000009.pt": "5f0ee6d6ac0b526d51a7a727b418b6195962c0f8972a79ded1605e1e4c0f8011",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000012.pt": "aaf973d57ecb6e59cd5ebcf8733adfb175fc2a9f99b0573117bb38dc15d6b90f",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000015.pt": "55dee2b530be95ad4406d3ae50822eb3a134a8d9ed13de11d383951b943bb6f2",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000018.pt": "8f7338bfdc8cb7b4069c599ac25a9f4faaeb6bf66f29b703772e7550e7bc8951",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000021.pt": "ce0b437873a7fd708cd6f37c686c174a92927ff0266eb6938be0a93ffdb58097",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000024.pt": "da0893d5acafce5f1c90b11f31f25ffa2775e7a9a35581166e1cd5ab9ab84e49",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000028.pt": "fc37a749a69551c7f77166a37ef6889ed00bda0070bd5bcff6a50841f37c058d",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000031.pt": "a8b34ac4047ed9c89b752678d2f92c8bbc29ea1127ee8ab1c33afea07cb1d4b5",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000034.pt": "dd71aaab9107c59b6c38c177cf72bfef9ebd4be87772728beec8ff1416d715be",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000037.pt": "53065093c68b01211f0baaae19097b1aa75898639961516b0e706fc7bd77106a",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000040.pt": "91fde1c87efbb04228e0289223715991760e3661cb527d84edebd4c1236b79d8",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000043.pt": "126653c1e114022eedf966435bc2231c9c0013bdf8d5ff8f85bacba85944e3e7",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000046.pt": "99dcf13387a627e5d5f448d57eafddee19d6d08c826090a9f48b696b838ce4b0",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000049.pt": "2412ba9793c9cd38ce44aee420fe52c0c5a2601ab11a5249cedb31102b195d5e",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000050.pt": "676d1afe7200481829ecaa417700cd8d235e87ea1d9e0303bdc3b58042ca1f1f",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000051.pt": "5a0500a2523624eb7bc47114d9988e33701e605a333e87904a8abbe0a021d868",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000053.pt": "b511e029e33fbfdaba29ebfbbbd836bcd31731a452eab88c5f2c2c34589f0d41",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000056.pt": "6e90ec8240aaade8b68f2863230bd0173e9efbd499ee05f61cce48897ea4acaa",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000059.pt": "17a241eec7af5217e9696aa66e3a86f2823accdb9336af326832588dd4ad3acc",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000062.pt": "a18b8413e2cfdf7ed9c86988abbf290d1b6ae85837f20ae5186aef6f9c833c5f",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000065.pt": "281ac501a9d5c1de75a1a045748aea94199b5774e30e10633e966cb9c3ac9a80",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000068.pt": "108da7fcba51f7bd75e70b46cc235505f667501cebb798e20b5224d00133d361",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000071.pt": "a6aeb841fcdf5afbed5223e737549f83b1b26b3f8413ec9f959e4eb911b643f5",
+    "artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000074.pt": "1ce00103bfef5df181ce19f003b0c70034d551620bd9719177946707160e5aef"
+  },
+  "child_sha256": "60e014a055999a492ef1bad8c8daff1e5a4e4892e12acf433d42309eb2ae7cae",
+  "cleanup_seconds": 40,
+  "critical_code": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "f2130791c4c975603d8bab4fad4739374cbbba967df2fa2334ea881b6557d6bf"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/decision_evidence.py",
+      "sha256": "1ce35b19672083a9e86b0a8aabd8e13b222fe595e36a44e184e6ad19afa79006"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "346972b0efdca4241798a6b2719c747f1de3ccd23424db6ccb15a376c66551e0"
+    }
+  ],
+  "diagnostic_only": true,
+  "egl_device_index": 0,
+  "env_seed": 851784825,
+  "formal_authorized": false,
+  "gpu_uuid": "GPU-62052fa1-37e0-79dc-21aa-5c0f25c0c315",
+  "historic_step15_observation": {
+    "eef_xyz": [
+      -0.14375745134419943,
+      0.03449879857837112,
+      0.07191534542923056
+    ],
+    "gripper_qpos": [
+      0.03905961036157995,
+      -0.03915198322701064
+    ]
+  },
+  "init_index": 0,
+  "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+  "max_diagnostic_transitions": 96,
+  "max_settling_steps": 40,
+  "official_task_success_rate": null,
+  "output_dir": null,
+  "physical_gpu": 3,
+  "prefix_actions_max": 8,
+  "protocol": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n12_grasp_affordance/same-state-diagnostic-scope-v1.md",
+  "protocol_sha256": "ce99a14b6fdf5a6df45ca8e634421599bc8ae05b73941f5ee6f5132d343884d8",
+  "replay_actions": [
+    [
+      0.5078125,
+      -0.1484375,
+      -2.34375,
+      -0.00045013427734375,
+      -0.07568359375,
+      0.012939453125,
+      -1.0
+    ],
+    [
+      0.578125,
+      0.015625,
+      -2.46875,
+      -0.003082275390625,
+      -0.08447265625,
+      0.0145263671875,
+      -1.0
+    ],
+    [
+      0.71875,
+      0.34375,
+      -2.359375,
+      -0.00616455078125,
+      -0.08642578125,
+      0.00921630859375,
+      -1.0
+    ],
+    [
+      0.66796875,
+      0.5859375,
+      -2.03125,
+      -0.0091552734375,
+      -0.0927734375,
+      0.004913330078125,
+      -1.0
+    ],
+    [
+      0.44140625,
+      0.8046875,
+      -1.7109375,
+      -0.0128173828125,
+      -0.09326171875,
+      0.0015716552734375,
+      -1.0
+    ],
+    [
+      0.240234375,
+      0.76171875,
+      -1.3828125,
+      -0.01312255859375,
+      -0.0966796875,
+      -0.004638671875,
+      -1.0
+    ],
+    [
+      0.09375,
+      0.6328125,
+      -1.2890625,
+      -0.0155029296875,
+      -0.10400390625,
+      -0.0113525390625,
+      -1.0
+    ],
+    [
+      -0.1484375,
+      0.4453125,
+      -0.80859375,
+      -0.010009765625,
+      -0.1025390625,
+      -0.017333984375,
+      -1.0
+    ],
+    [
+      -0.447265625,
+      -0.19921875,
+      -1.5546875,
+      0.017822265625,
+      -0.06787109375,
+      0.0311279296875,
+      -1.0
+    ],
+    [
+      -0.5390625,
+      -0.1845703125,
+      -1.5859375,
+      0.01416015625,
+      -0.0771484375,
+      0.03271484375,
+      -1.0
+    ],
+    [
+      -0.52734375,
+      -0.1484375,
+      -1.5625,
+      0.0087890625,
+      -0.08154296875,
+      0.03515625,
+      -1.0
+    ],
+    [
+      -0.490234375,
+      -0.1220703125,
+      -1.5078125,
+      0.00543212890625,
+      -0.0791015625,
+      0.030517578125,
+      -1.0
+    ],
+    [
+      -0.44140625,
+      -0.099609375,
+      -1.421875,
+      0.0030975341796875,
+      -0.07421875,
+      0.027587890625,
+      -1.0
+    ],
+    [
+      -0.3828125,
+      -0.08447265625,
+      -1.3125,
+      0.0045166015625,
+      -0.06689453125,
+      0.0238037109375,
+      -1.0
+    ],
+    [
+      -0.302734375,
+      -0.08349609375,
+      -1.1484375,
+      0.0031280517578125,
+      -0.0595703125,
+      0.01708984375,
+      -1.0
+    ],
+    [
+      -0.1591796875,
+      -0.076171875,
+      -0.91796875,
+      0.0015106201171875,
+      -0.044189453125,
+      0.003631591796875,
+      -1.0
+    ]
+  ],
+  "resets_max": 4,
+  "schema": "n12-task3-same-state-plan-v1",
+  "selected_actions": [
+    [
+      -0.08251953125,
+      1.0234375,
+      -0.12109375,
+      -0.02294921875,
+      0.00897216796875,
+      -0.0146484375,
+      -1.0
+    ],
+    [
+      -0.1337890625,
+      1.078125,
+      -0.1171875,
+      -0.0286865234375,
+      0.0062255859375,
+      -0.0130615234375,
+      -1.0
+    ],
+    [
+      -0.115234375,
+      1.015625,
+      -0.185546875,
+      -0.029052734375,
+      -0.00225830078125,
+      -0.0111083984375,
+      -1.0
+    ],
+    [
+      -0.09716796875,
+      0.953125,
+      -0.2490234375,
+      -0.0279541015625,
+      -0.00433349609375,
+      -0.01275634765625,
+      -1.0
+    ],
+    [
+      -0.022705078125,
+      0.87890625,
+      -0.322265625,
+      -0.020751953125,
+      -0.01190185546875,
+      -0.01324462890625,
+      -1.0
+    ],
+    [
+      0.030029296875,
+      0.7734375,
+      -0.400390625,
+      -0.015625,
+      -0.0167236328125,
+      -0.015869140625,
+      -1.0
+    ],
+    [
+      0.11328125,
+      0.5625,
+      -0.43359375,
+      -0.01055908203125,
+      -0.0245361328125,
+      -0.014404296875,
+      -1.0
+    ],
+    [
+      0.1640625,
+      0.244140625,
+      -0.375,
+      -0.000705718994140625,
+      -0.035400390625,
+      -0.01611328125,
+      -1.0
+    ]
+  ],
+  "selected_fingerprint": "53ae0f05063e52d8ac9e8456e8a6a83dd3b0e3a88f0371917e699681c573723c",
+  "selected_index": 7,
+  "source_bundle": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/eds_eval/decision_evidence/episode_000/bundle_000051.pt",
+  "source_bundle_sha256": "5a0500a2523624eb7bc47114d9988e33701e605a333e87904a8abbe0a021d868",
+  "source_commit": "7e932065ba8924fe3dbc3451faf15ecb0781fcc6",
+  "source_config": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/artifacts/attempts/rdt-qd-ed-final-20260921T093925Z__n11_dev_t03_n7_20260928__d78c5a6004a8/.hydra/config.yaml",
+  "source_config_sha256": "1dfd9de015f2578dba7f5d15bdc7fb975a04452ef8d464556dd52ec603ceebb1",
+  "source_plan": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/artifacts/continuation_20260928/n11-parent-survival-dev-v1/plan.frozen.v2.json",
+  "source_plan_sha256": "133a8c4bb9a9272985e242fe90b86b81052526833b5d0d6ae2c91588d94a1c80",
+  "source_report": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n11_parent_survival/dev-comparison-v1.json",
+  "source_report_sha256": "25927f8e6d1285979a165af3d659a46897f80b3d90bc10bc8709d7297ceaff63",
+  "study_worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree",
+  "task_id": 3,
+  "timeout_seconds": 900,
+  "validation_authorized": false
+}

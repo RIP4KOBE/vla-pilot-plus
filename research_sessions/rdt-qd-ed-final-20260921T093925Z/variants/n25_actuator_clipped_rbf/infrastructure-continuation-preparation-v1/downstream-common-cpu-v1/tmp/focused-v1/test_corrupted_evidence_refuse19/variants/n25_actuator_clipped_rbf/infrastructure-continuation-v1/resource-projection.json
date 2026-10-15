@@ -1,0 +1,83 @@
+{
+  "all_matching_events_included": true,
+  "collected_at": "2026-10-01T00:00:00Z",
+  "collector": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/NEVER_READ_COLLECTOR",
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "event_count": 3,
+  "events": [
+    {
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "event": "reserved",
+      "gpu_process_wall_seconds": 11.0,
+      "kind": "n25_tensor_arithmetic_v1",
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/old-proof-plan.json",
+        "sha256": "a086218ca846248f07f3602cdcb94b9314dee28d83cb928d6c05402318c977a3"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/old-proof-process.json",
+        "sha256": "db8f6057d32ae4904b3f6fc5714ccee2ffe3cd8f410b7b95aedea3483d3c5ed6"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/old-proof-report.json",
+        "sha256": "d45f1f3998b148d95a2865f6429f7c8fca59f5f987b997394748e364974fc6ed"
+      },
+      "resource_id": "synthetic__n25_tensor_arithmetic_v1"
+    },
+    {
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "event": "dispatched",
+      "gpu_process_wall_seconds": 11.0,
+      "kind": "n25_tensor_arithmetic_v1",
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/old-proof-plan.json",
+        "sha256": "a086218ca846248f07f3602cdcb94b9314dee28d83cb928d6c05402318c977a3"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/old-proof-process.json",
+        "sha256": "db8f6057d32ae4904b3f6fc5714ccee2ffe3cd8f410b7b95aedea3483d3c5ed6"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/old-proof-report.json",
+        "sha256": "d45f1f3998b148d95a2865f6429f7c8fca59f5f987b997394748e364974fc6ed"
+      },
+      "resource_id": "synthetic__n25_tensor_arithmetic_v1"
+    },
+    {
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "event": "completed",
+      "gpu_process_wall_seconds": 11.0,
+      "kind": "n25_tensor_arithmetic_v1",
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/old-proof-plan.json",
+        "sha256": "a086218ca846248f07f3602cdcb94b9314dee28d83cb928d6c05402318c977a3"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/old-proof-process.json",
+        "sha256": "db8f6057d32ae4904b3f6fc5714ccee2ffe3cd8f410b7b95aedea3483d3c5ed6"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/old-proof-report.json",
+        "sha256": "d45f1f3998b148d95a2865f6429f7c8fca59f5f987b997394748e364974fc6ed"
+      },
+      "resource_id": "synthetic__n25_tensor_arithmetic_v1"
+    }
+  ],
+  "protected_events_included": false,
+  "resource_id": "synthetic__n25_tensor_arithmetic_v1",
+  "resource_kind": "n25_tensor_arithmetic_v1",
+  "root_terminal_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/variants/n25_actuator_clipped_rbf/infrastructure-continuation-v1/root-review.json",
+    "sha256": "3adcf9b543bb8846c9c4bda0080a3b3b0ddf40de3c02bb96d3074a2c2f826e72"
+  },
+  "schema": "n25-current-resource-projection-v1",
+  "source_ledger": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-common-cpu-v1/tmp/focused-v1/test_corrupted_evidence_refuse19/NEVER_READ_FULL_LEDGER",
+    "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "n30-r1-cpu-resource-summary-v1",
+  "runs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-run1-resource.json",
+      "sha256": "cf03484aff1661cfa474698f28d8ea1d295188a8f0b30ef0a968cd6cab0f84f9"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-run2-resource.json",
+      "sha256": "9da2d285c0e506401fa14c5701ca4a10e736a4877ec653b98600b714867c8fec"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/cpu-run3-resource.json",
+      "sha256": "94e4cee18f746820e66e94c6c541dd9c1e1252addc7a76d9158ba9ea325b24c5"
+    }
+  ],
+  "process_cpu_seconds": 12.837909315,
+  "wall_seconds": 12.544396886019967,
+  "test_limit_cpu_seconds": 1200,
+  "distinct_passed": 51,
+  "failed_invocations": 0,
+  "guard_denied": 0,
+  "cuda_initialized": false,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "brief_authoring_and_git_not_test_execution": true,
+  "authoring_scope_deviation": "One empty /tmp/n30_unused was accidentally created, then moved intact to K/empty-authoring-transient-v1.txt; no payload or source content was written/read there."
+}

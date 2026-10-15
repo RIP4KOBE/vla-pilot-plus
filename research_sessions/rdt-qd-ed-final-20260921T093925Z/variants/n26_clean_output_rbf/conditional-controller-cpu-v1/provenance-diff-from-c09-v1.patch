@@ -1,0 +1,247 @@
+diff --git a/scripts/qd_ed_final_runner.py b/scripts/qd_ed_final_runner.py
+index 6baefee..cdded1a 100644
+--- a/scripts/qd_ed_final_runner.py
++++ b/scripts/qd_ed_final_runner.py
+@@ -656,6 +656,9 @@ def typed_metered_plan(plan):
+ 
+ 
+ def metered_support(plan):
++    if plan.get('n25_infrastructure_continuation') is not None:
++        from scripts import qd_ed_n25_cont_contract
++        return qd_ed_n25_cont_contract
+     if is_n26_plan(plan):
+         from scripts import qd_ed_n26_contract
+         return qd_ed_n26_contract
+@@ -1259,7 +1262,11 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(),
+     require(physical_gpu is None or (type(physical_gpu) is int and physical_gpu == selected_gpu),
+             'GPU policy/runtime physical device mismatch')
+     amendment = budget.get('amendment')
+-    if row.get('iteration') == 'N26_CLEAN_OUTPUT_RBF_DEV_20260930':
++    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':
++        from scripts import qd_ed_n25_cont_contract as n25c
++        n25c.require_state(state, globals())
++        bucket_caps = n25c.CAPS['buckets']
++    elif row.get('iteration') == 'N26_CLEAN_OUTPUT_RBF_DEV_20260930':
+         from scripts import qd_ed_n26_contract as n26
+         n26.require_state(state, globals())
+         bucket_caps = n26.budget_authority()['caps']['buckets']
+@@ -1375,6 +1382,9 @@ def check_budget(state, events, row, resource_events=(), reservation_events=(),
+ 
+ 
+ def check_retry(events, row):
++    if row.get('iteration') == 'N25_ACTUATOR_CLIPPED_RBF_DEV_INFRA_CONTINUATION_V1_20260930':
++        from scripts import qd_ed_n25_cont_contract as n25c
++        return n25c.check_retry(events, row, globals())
+     if row.get('n26_recovery_eligibility') is not None:
+         from scripts import qd_ed_n26_recovery as recovery
+         return recovery.check_retry(events, row, globals())
+diff --git a/scripts/qd_ed_n23_worker.py b/scripts/qd_ed_n23_worker.py
+index b7c7379..70c287c 100644
+--- a/scripts/qd_ed_n23_worker.py
++++ b/scripts/qd_ed_n23_worker.py
+@@ -135,6 +135,9 @@ def validate_context(context, main_argv):
+     require(root == ROOT.resolve() and context['main_argv'] == list(main_argv)
+             and main_argv[0] == str(root / 'main.py') and output.name == context['attempt_id'], "worker command/root/attempt differs")
+     plan, runtime = read_ref(context['plan']), read_ref(context['runtime'])
++    if plan.get('n25_infrastructure_continuation') is not None:
++        from scripts import qd_ed_n25_cont_contract as n25c
++        return n25c.validate_worker_context(context, main_argv, root, output, plan, runtime)
+     if plan.get('n26_cohort') is not None:
+         from scripts import qd_ed_n26_contract as n26
+         return n26.validate_worker_context(context, main_argv, root, output, plan, runtime)
+diff --git a/scripts/qd_ed_n26_backend.py b/scripts/qd_ed_n26_backend.py
+index 1f5feec..d410ed1 100644
+--- a/scripts/qd_ed_n26_backend.py
++++ b/scripts/qd_ed_n26_backend.py
+@@ -20,7 +20,9 @@ def source_review(source,runtime,root):
+     expected={'schema':'n26-arithmetic-source-review-v1','accepted':True,'source':source,'runtime':runtime,
+         'source_bridge':c.ref(c.BRIDGE),'phase_b_protocol':c.ref(c.PROTOCOL),
+         'arithmetic_protocol':c.ref(c.ARITHMETIC_PROTOCOL),'admission_clarification':c.ref(c.CLARIFICATION),'predecessor':c.predecessor(),
+-        'budget_authority':c.ref(c.BUDGET_AUTHORITY),'limits':LIMITS,'gpu_release':False}
++        'budget_authority':c.ref(c.BUDGET_AUTHORITY),'composition_protocol':c.ref(c.LOGICAL_PROTOCOL),
++        'logical_admission_addendum':c.ref(Path(root)/'experiments/qd_ed_n26_logical/admission-addendum-v1.md'),
++        'limits':LIMITS,'gpu_release':False}
+     w.require(w.read_ref(c.ref(REVIEW))==expected,'N26 arithmetic source review missing/different')
+     return c.ref(REVIEW)
+ 
+diff --git a/scripts/qd_ed_n26_bridge.py b/scripts/qd_ed_n26_bridge.py
+index e240a37..dfda695 100644
+--- a/scripts/qd_ed_n26_bridge.py
++++ b/scripts/qd_ed_n26_bridge.py
+@@ -19,10 +19,11 @@ def functions(text):
+ 
+ 
+ def build(source,runtime,root):
+-    root=Path(root);phase=w.read_ref(c.ref(root/c.PHASE_A_MANIFEST))
++    from scripts import qd_ed_n26_logical as logical
++    root=Path(root);composition=logical.verify_composition(root,source);phase=w.read_ref(c.ref(root/c.PHASE_A_MANIFEST))
+     w.require(phase['commit']==c.PHASE_A,'N26 Phase A source differs')
+     changed=set(subprocess.check_output(['git','diff','--name-only',c.PHASE_A,'HEAD'],cwd=root,text=True).splitlines())
+-    w.require(changed<=c.CONTROLLER_DELTA,'N26 changed scientific source')
++    w.require(changed<=logical.source_paths(root),'N26 changed scientific source')
+     unchanged=[];deltas={}
+     for row in phase['files']:
+         path=row['path'];current=(root/path).read_bytes()
+@@ -37,7 +38,8 @@ def build(source,runtime,root):
+         deltas[path]={k:{'old':hashlib.sha256(old[k].encode()).hexdigest() if k in old else None,
+                         'new':hashlib.sha256(new[k].encode()).hexdigest()} for k in sorted(ROUTES[path]|NEW_FUNCTIONS[path])}
+     plan=c.original_plan();w.require(plan['source_commit']=='51104470983cdbafd08feb87f2f39b7553779405','N26 old quality proof source differs')
+-    return {'schema':'n26-source-equivalence-bridge-v1','phase_a_source':c.PHASE_A,'new_source':source,'runtime':runtime,
++    return {'schema':'n26-source-equivalence-bridge-logical-v1','composition':composition,
++        'logical_predecessor':c.predecessor(),'composition_protocol':c.ref(c.LOGICAL_PROTOCOL),'phase_a_source':c.PHASE_A,'new_source':source,'runtime':runtime,
+         'unchanged_files':unchanged,'shared_route_functions':deltas,'reverse_insertions':verify_reverse(root),'prior_backend_proof':plan['n23_cohort']['backend_proof'],
+         'phase_a_review':phase_a_review(), 'prior_n25_backend_proof':historical_control_proof(runtime,root),
+         'new_rbf_arithmetic_proof_required':True,'old_proof_scope':'N23 quality and unchanged N25 control math only; not N26 clean-input wiring'}
+@@ -55,7 +57,8 @@ def verify_reverse(root):
+         and {r['path'] for r in record['files']}==set(ROUTES),'N26 reverse route schema differs')
+     result=[]
+     for row in record['files']:
+-        current=(Path(root)/row['path']).read_text();lines=current.splitlines(keepends=True)
++        from scripts import qd_ed_n26_logical as logical
++        current=logical.restore_shared(root,row['path']).decode();lines=current.splitlines(keepends=True)
+         w.require(hashlib.sha256(current.encode()).hexdigest()==row['new_sha256'],'N26 new route bytes differ')
+         last=len(lines)
+         for edit in reversed(row['edits']):
+@@ -94,5 +97,7 @@ def historical_control_proof(runtime,root):
+ 
+ 
+ def settled_control_proofs(record,events,resources,r):
++    from scripts import qd_ed_n26_logical as logical
++    logical.current_matching(events,resources)
+     settled_backend(record,events,r)
+     old_backend.settled_proof(w.read_ref(record['prior_n25_backend_proof']),resources,r)
+diff --git a/scripts/qd_ed_n26_contract.py b/scripts/qd_ed_n26_contract.py
+index 3766223..0f6f760 100644
+--- a/scripts/qd_ed_n26_contract.py
++++ b/scripts/qd_ed_n26_contract.py
+@@ -23,9 +23,9 @@ CLARIFICATION=RUN_DIR/'admission-clarification-v1.md'
+ CLARIFICATION_SHA='1ebd4242dc9462f13136f3517e46230aca255fe8400bde215976d991bf3e2365'
+ OBSERVABILITY=SESSION/'variants/n23_actuator_clipped_quality/timeout-observability-addendum-v2.md'
+ OBSERVABILITY_SHA='fa0723919c67d0417b101be2a36d9832cfaaf15e4b1c4e0cdfbf61caa43e34c6'
+-FINAL_REVIEW=RUN_DIR/'final-source-runtime-review-v1.json'
+-AUTHORITY=RUN_DIR/'adoption-v1/authority.json'
+-BRIDGE=RUN_DIR/'source-equivalence-bridge-v1.json'
++FINAL_REVIEW=RUN_DIR/'final-source-runtime-review.logical-v1.json'
++AUTHORITY=RUN_DIR/'logical-adoption-v1/authority.json'
++BRIDGE=RUN_DIR/'source-equivalence-bridge.logical-v1.json'
+ PHASE_A='8fd01eb77e2e83a100e54b21dc955c34bda9a3cc'
+ BASE='5a65ef15968cc68c82314e8c0773b3365ad45fa0'
+ COHORT='N26_CLEAN_OUTPUT_RBF_DEV_20260930'
+@@ -35,8 +35,9 @@ LIMITS={'primary_cells':40,'episode_dispatches':42,'recoveries':2,'recoveries_pe
+  'maximum_local_gpu_hours':22.,'episode_timeout_seconds':1800,'cleanup_seconds':40,'physical_gpu':7}
+ BASE_CAPS={'attempts':494,'gpu_hours':100.,'buckets':{'baseline':55,'development':199,'validation':180,'formal':40,'recovery':20},
+  'protected_gpu_hours':{'validation':32.,'formal':12.}}
+-PREDECESSOR=RUN_DIR/'predecessor-review-v1.json'
+-BUDGET_AUTHORITY=RUN_DIR/'budget-adoption-v1/authority.json'
++PREDECESSOR=RUN_DIR/'predecessor-logical-review-v1.json'
++LOGICAL_PROTOCOL=SESSION/'variants/n25_actuator_clipped_rbf/infrastructure-continuation-preparation-v1/downstream-adapter-design-v1/root-conditional-controller-cpu-protocol-v1.md'
++BUDGET_AUTHORITY=RUN_DIR/'budget-logical-adoption-v1/authority.json'
+ BACKEND_PROOF=RUN_DIR/'arithmetic-preflight/proof-v1.json'
+ ARITHMETIC_PROTOCOL=RUN_DIR/'independent-arithmetic-protocol-v1.md'
+ GPU7_UUID='GPU-48473162-9548-1a19-04aa-ea86c5349187'
+@@ -85,9 +86,8 @@ def expected_rows():
+ 
+ 
+ def source_paths(r):
+-    phase_a=w.read_ref(ref(Path(r['ROOT'])/PHASE_A_MANIFEST))
+-    w.require(phase_a['commit']==PHASE_A,'N26 Phase A manifest differs')
+-    return {v['path'] for v in phase_a['files']} | r['REQUIRED_CODE'] | w.REQUIRED_SOURCE | EXTRA_SOURCE
++    from scripts import qd_ed_n26_logical as logical
++    return logical.source_paths(Path(r['ROOT'])) | r['REQUIRED_CODE'] | w.REQUIRED_SOURCE
+ 
+ 
+ 
+@@ -107,7 +107,8 @@ def final_review(source,runtime,root):
+     expected={'schema':'n26-source-runtime-review-v1','disposition':'accepted','source':source,'runtime':runtime,
+       'protocol':ref(PROTOCOL),'source_plan':ref(SOURCE_PLAN),'source_bridge':ref(BRIDGE),
+       'predecessor':predecessor(),'backend_proof':ref(BACKEND_PROOF),
+-      'arithmetic_protocol':ref(ARITHMETIC_PROTOCOL),'admission_clarification':ref(CLARIFICATION),'no_gpu_release':True}
++      'arithmetic_protocol':ref(ARITHMETIC_PROTOCOL),'admission_clarification':ref(CLARIFICATION),'composition_protocol':ref(LOGICAL_PROTOCOL),
++      'logical_admission_addendum':ref(Path(root)/'experiments/qd_ed_n26_logical/admission-addendum-v1.md'),'no_gpu_release':True}
+     w.require(record==expected and bound['new_source']==source and proof['accepted'] is True,'N26 final root review differs')
+     return ref(FINAL_REVIEW)
+ 
+@@ -116,12 +117,13 @@ def final_review(source,runtime,root):
+ def authority(source,runtime,root,state=None):
+     record=w.read_ref(ref(AUTHORITY));caps=budget_authority()
+     keys={'schema','cohort_id','source','runtime','protocol','final_review','budget_authority','limits','local_gpu_hours',
+-          'recorded_at','authority_interpretation','admission_clarification','validation_authorized','formal_authorized'}
++          'recorded_at','authority_interpretation','admission_clarification','composition_protocol','logical_predecessor','validation_authorized','formal_authorized'}
+     local=record.get('local_gpu_hours')
+     w.require(set(record)==keys and record['schema']=='n26-dev-authority-v1' and record['cohort_id']==COHORT
+         and record['source']==source and record['runtime']==runtime and record['protocol']==ref(PROTOCOL)
+         and record['final_review']==final_review(source,runtime,root) and record['limits']==LIMITS
+         and record['admission_clarification']==ref(CLARIFICATION)
++        and record['composition_protocol']==ref(LOGICAL_PROTOCOL) and record['logical_predecessor']==predecessor()
+         and record['budget_authority']==ref(BUDGET_AUTHORITY)
+         and type(local) in (int,float) and math.isfinite(local) and 1840/3600<=local<=22.
+         and all(isinstance(record[k],str) and record[k].strip() for k in ('recorded_at','authority_interpretation'))
+@@ -223,6 +225,7 @@ def metadata(source,root):
+     return {'schema':'n26-clean-output-rbf-dev-v1','cohort_id':COHORT,'limits':LIMITS,
+         'protocol':ref(PROTOCOL),'source_plan':ref(SOURCE_PLAN),'timeout_observability':ref(OBSERVABILITY),
+         'final_review':final_review(source,runtime,root),'authority':authority(source,runtime,root),
++        'composition_protocol':ref(LOGICAL_PROTOCOL),'logical_predecessor':predecessor(),
+         'worker_audit':WORKER_CONTRACT,'n25_role':'ablation_control_only_no_promotion',
+         'early_stop':'numeric_futility_after_complete_task_quadruple'}
+ 
+@@ -313,6 +316,8 @@ def admission(plan,runtime,row,events,resources,root,r):
+ 
+ 
+ def require_protocols(root):
++    from scripts import qd_ed_n26_logical as logical
++    logical.protocol(root)
+     for path,expected in ((PROTOCOL,PROTOCOL_SHA),(ARITHMETIC_PROTOCOL,ARITHMETIC_SHA),(CLARIFICATION,CLARIFICATION_SHA),(OBSERVABILITY,OBSERVABILITY_SHA)):
+         w.require(w.sha(path)==expected,'N26 immutable protocol changed')
+     for name,path in (('conditional-dev-controller-protocol-v1.md',PROTOCOL),
+@@ -322,26 +327,8 @@ def require_protocols(root):
+ 
+ 
+ def predecessor():
+-    record=w.read_ref(ref(PREDECESSOR))
+-    w.require(set(record)=={'schema','source_commit','dev_result','dev_root_review','disposition','allow_n26','admission_clarification'}
+-        and record['schema']=='n26-predecessor-review-v1' and record['source_commit']==BASE
+-        and record['allow_n26'] is True and record['disposition']=='VALID_DEV_REJECTION'
+-        and record['admission_clarification']==ref(CLARIFICATION),'N26 valid Dev rejection predecessor missing')
+-    w.require(w.sha(CLARIFICATION)==CLARIFICATION_SHA,'N26 predecessor restriction drift')
+-    dev=w.read_ref(record['dev_result']);review=w.read_ref(record['dev_root_review']);source=w.read_ref(review['source'])
+-    w.require(dev.get('source_commit')==BASE and review.get('result')==record['dev_result']
+-        and review.get('schema')=='n25-root-terminal-review-v1'
+-        and review.get('decision')=='ACCEPT_TERMINAL_RECONSTRUCTION'
+-        and source.get('commit')==BASE and len(source.get('files',[]))==257
+-        and source.get('sha256')==w.canonical_sha(source['files']) and review.get('source_files_verified')==257
+-        and review.get('cohort_disposition')==dev.get('decision')
+-        and review.get('accepted_cells')==dev.get('audited_cells')
+-        and review.get('counts')==dev.get('counts') and review.get('native')==dev.get('native')
+-        and review.get('plan')==dev.get('plan') and review.get('ledger')==dev.get('ledger_snapshot')
+-        and dev.get('controller_evidence',{}).get('consistent') is True,
+-        'N26 predecessor source/result root reconstruction differs')
+-    w.require(dev.get('decision') in {'REJECT','REJECT_NUMERIC_FUTILITY'} and dev.get('dev_gate_promoted') is False,
+-              'N26 promotion/invalid predecessor not authorized by this protocol')
++    from scripts import qd_ed_n26_logical as logical
++    logical.read_gate(root=ROOT)
+     return ref(PREDECESSOR)
+ 
+ 
+diff --git a/scripts/qd_ed_n26_prepare.py b/scripts/qd_ed_n26_prepare.py
+index 0c35351..478d83d 100644
+--- a/scripts/qd_ed_n26_prepare.py
++++ b/scripts/qd_ed_n26_prepare.py
+@@ -12,7 +12,7 @@ from scripts import qd_ed_n26_contract as c
+ from scripts import qd_ed_n23_worker as w
+ 
+ 
+-def build_plan(*,source=None,root=ROOT,review=None,authority=None):
++def build_plan(*,source=None,root=ROOT,review=None,authority=None,predecessor_ref=None):
+     source=source or w.source_record(root,c.source_paths(vars(r)))
+     plan=copy.deepcopy(c.original_plan())
+     for key in list(plan):
+@@ -25,7 +25,8 @@ def build_plan(*,source=None,root=ROOT,review=None,authority=None):
+     plan['scientific_config_files']=sorted(set(plan['scientific_config_files'])|{'configs/qd_ed_final/candidate_n25.json','configs/qd_ed_final/candidate_n26.json'})
+     plan['n26_cohort']={'schema':'n26-clean-output-rbf-dev-v1','cohort_id':c.COHORT,'limits':c.LIMITS,
+         'protocol':c.ref(c.PROTOCOL),'source_plan':c.ref(c.SOURCE_PLAN),'timeout_observability':c.ref(c.OBSERVABILITY),
+-        'final_review':review,'authority':authority,'worker_audit':c.WORKER_CONTRACT,
++        'final_review':review,'authority':authority,'composition_protocol':c.ref(c.LOGICAL_PROTOCOL),
++        'logical_predecessor':predecessor_ref if review is None else c.predecessor(),'worker_audit':c.WORKER_CONTRACT,
+         'n25_role':'ablation_control_only_no_promotion','early_stop':'numeric_futility_after_complete_task_quadruple'}
+     return plan
+ 

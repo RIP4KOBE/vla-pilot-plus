@@ -1,0 +1,5 @@
+Committed `1e50517` atop `260f19e`. Clean checkout; 50 focused CPU tests passed; 30 external manifests prepared.
+
+**Partial delivery:** production dispatch/ledger integration remains unfinished and disabled. No GPU work, adoption, or release.
+
+Exact commands, hashes, and limitations: [report](../release-preparation-v1/report-v1.md) · [result](../release-preparation-v1/result-v1.json).

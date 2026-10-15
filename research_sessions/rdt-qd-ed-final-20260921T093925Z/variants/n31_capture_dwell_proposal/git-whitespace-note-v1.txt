@@ -1,0 +1,1 @@
+git diff --cached --check returned2 only for docs/experiments/n31_capture_dwell_phase_a_protocol.md:65 new blank line at EOF. This file deliberately retains exact bytes/SHA921bd41d... of the immutable root protocol. No helper/test whitespace issue was reported; protocol was not reformatted.

@@ -1,0 +1,38 @@
+{
+  "schema": "n30-cpu-resource-v1",
+  "run": "run2",
+  "pytest_exit": 0,
+  "process_cpu_seconds": 14.919858691,
+  "wall_seconds": 11.386868624016643,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "denied": [
+    {
+      "event": "os.scandir",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/nvidia/cuda_nvrtc/lib"
+    },
+    {
+      "event": "os.scandir",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/cuda_nvrtc/lib"
+    },
+    {
+      "event": "os.scandir",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/nvidia/nvjitlink/lib"
+    },
+    {
+      "event": "os.scandir",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/nvjitlink/lib"
+    }
+  ],
+  "guard_clean": false,
+  "test_args": [
+    "-q",
+    "tests/test_n30_executed_progress.py"
+  ],
+  "peak_rss_kib": 896508
+}

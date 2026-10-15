@@ -1,0 +1,116 @@
+{
+  "schema": "n30-jaw-pool-execution-output-manifest-v2",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/calculate_pool_v2.py",
+      "sha256": "e7036561b172bc8fdc359b24fb9a5329c9d69ab9c5186a67e517b7cb9a69a8b8",
+      "bytes": 27506
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/calculation-source-manifest-v2.json",
+      "sha256": "0a8f395d0cae358e99e895f262208137c1c6c67de3d5c850c59bbaeb16c6a9fd",
+      "bytes": 5775
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/measurement-declaration-v2.json",
+      "sha256": "4b898fcd0ad05495b3e124c6506c5af97fe554621340d99ed37ad96f33b91535",
+      "bytes": 7090
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/binding-repair-contract-v2.md",
+      "sha256": "476080a7d300756e58699b59cb053fe0a5a202b3e5db1e2b613bb707ec2ba0de",
+      "bytes": 4734
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/command.disabled.v2.json",
+      "sha256": "799713ff98f8783e314945642f54615958a9aabf2cdae10e15bad30184ed3412",
+      "bytes": 1486
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/root-manual-execution-release-v2.json",
+      "sha256": "178c71f6d9b95ac95cb8e70cfb4e7a3c2675394c5bd25c182630271da08368f6",
+      "bytes": 1964
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/root-static-review-v2.json",
+      "sha256": "24521b33fb12f1a38d66f44252878d0a4eb8833bd1325b4b8dda3d50cab6772f",
+      "bytes": 3369
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/delivery-manifest-v2.json",
+      "sha256": "e19292dbaaf3ff479256c087326b243eacf2fd8432d73b20e22d1c102777880d",
+      "bytes": 3502
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/invocation-v1.json",
+      "sha256": "3166988b9778b361609ee79f961284b77e45c1b14cbcdcdaa69a455da943e716",
+      "bytes": 85
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/progress-v1.jsonl",
+      "sha256": "660106b0f234b499ab7cf4b39ba04206c7bcc16577e7e0cabe43c0db18b45c02",
+      "bytes": 1978
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/partial-v1.json",
+      "sha256": "53369981f670430135ff73534b8d0d9cbf1278f407c2db0d4680098163968110",
+      "bytes": 164678
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/result-v1.json",
+      "sha256": "6f6ca60ea332919099b09886be750aa339aacf2f3c7a4f8dbbbedb1a82ee26b6",
+      "bytes": 164902
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/pool-table-v1.csv",
+      "sha256": "6d88184fed7a2284fa8b0ab40e94dddb9fe5a51471f887bd6304597dea13917d",
+      "bytes": 23760
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/resource-v1.json",
+      "sha256": "b2836d7f7dd8f98c16f19ee7da3e1dd61fc29045d218ffe0e9ce036f94a9d0ef",
+      "bytes": 168664
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/execution-v2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/external-execution-v2.json",
+      "sha256": "c3238cf2128564f9c3aae44f08f3ff5ad7caf6267d6d41012538db8ca4abd24e",
+      "bytes": 1506
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/summary-v2.md",
+      "sha256": "0a7b3e159222ebdbd0abdd01841332f103d8987fc9637a5db56d2037bff9d12c",
+      "bytes": 4412
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/closure-v2.json",
+      "sha256": "dafbcb01b50c7598a1c1cf8df36ca0578372116e6eb480c8b8725dfdd2818656",
+      "bytes": 983
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/repair-v2/packaging-resource-execution-v2.json",
+      "sha256": "270b5225bdea6195f58032035f509d33d8ffe56d58d81dfdb535227e7f09fac0",
+      "bytes": 239
+    }
+  ],
+  "original_input_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/input-manifest.frozen.v1.json",
+    "sha256": "5d56abae37a421420f203649ccbe0afe9268cc5fc369adb13e6a34ee686c6f64",
+    "bytes": 1409965
+  },
+  "prior_failure_delivery": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/delivery-manifest-v1.json",
+    "sha256": "7bbb420f11f2f737957c37f51f7a07b158f0db30cd7bd64c51afaa6fc0ad6551",
+    "bytes": 10371
+  },
+  "prior_failure_resource": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/resource-v1.json",
+    "sha256": "680f47d07a17303063656390e21a42d1f35190a100f5e084792efee95910a535",
+    "bytes": 166431
+  },
+  "actual_payloads_not_rehashed_during_packaging": true
+}

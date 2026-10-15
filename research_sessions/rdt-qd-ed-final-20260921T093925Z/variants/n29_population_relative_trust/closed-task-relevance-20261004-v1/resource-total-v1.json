@@ -1,0 +1,50 @@
+{
+  "schema": "n29-task-relevance-resource-total-v1",
+  "original_metadata_reader": {
+    "schema": "n29-task-relevance-resource-v1",
+    "reader_cpu_seconds": 6.00859404,
+    "reader_wall_seconds": 6.018819525954314,
+    "metadata_bytes": 446245086,
+    "affinity": [
+      0,
+      1
+    ],
+    "thread_environment": {
+      "OMP_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "MKL_NUM_THREADS": "2"
+    },
+    "address_space_limit_bytes": 8589934592,
+    "peak_rss_kib": 148096,
+    "cuda_visible_devices": "",
+    "torch_imported": false,
+    "denied": [],
+    "error": null,
+    "completed_attempts": 24,
+    "gpu_model_api_sim_calls": 0,
+    "tensor_payload_reads": 0
+  },
+  "measured_static_preparation_cpu_seconds": 0.04014163799999999,
+  "measured_this_packaging_cpu_seconds": 0.028312820999999995,
+  "measured_cumulative_cpu_seconds": 6.077048499,
+  "unmetered_setup_and_small_output_inspection": "A few earlier stdlib/shell inspections were not independently timed; exact aggregate CPU cannot be reconstructed. These were small bounded operations, no original-data extraction rerun.",
+  "conservative_unmetered_cpu_allowance_seconds": 30,
+  "recorded_plus_allowance_cpu_seconds": 36.077048499,
+  "cpu_cap_seconds": 240,
+  "original_input_bytes_exact": 446245086,
+  "recorded_preparation_bytes": 2846177,
+  "this_packaging_own_artifact_read_bytes": 4744281,
+  "conservative_additional_small_metadata_and_output_reads_allowance_bytes": 33554432,
+  "recorded_plus_allowance_bytes": 487389976,
+  "metadata_cap_bytes": 1073741824,
+  "allowances_are_not_measured_consumption": true,
+  "successful_original_extraction_passes": 1,
+  "extraction_retries": 0,
+  "source_and_data_changes": false,
+  "new_payload_reads": 0,
+  "new_experiment_authorized": false,
+  "affinity": [
+    0,
+    1
+  ]
+}

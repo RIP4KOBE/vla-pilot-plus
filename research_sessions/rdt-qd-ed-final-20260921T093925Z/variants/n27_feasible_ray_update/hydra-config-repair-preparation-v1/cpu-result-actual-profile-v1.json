@@ -1,0 +1,289 @@
+{
+  "schema": "n27-hydra-repair-actual-profile-result-v1",
+  "profiles_path": "configs/qd_ed_final/n4_observed_baseline_profiles.json",
+  "profiles_sha256": "9ad91066bc0cf91bc8c79d9b02acbd4b83e5e5a45ae31072b0e92d2221baa54f",
+  "synthetic_only": true,
+  "hydra_version": "1.3.2",
+  "omegaconf_version": "2.3.0",
+  "source_commit": "095cfeecd6af55477d2529441c307ab712e8a8da",
+  "compositions": [
+    {
+      "arm": "C0",
+      "tree": "original",
+      "composed": true
+    },
+    {
+      "arm": "C0",
+      "tree": "patched",
+      "composed": true,
+      "update_mode": "legacy_additive"
+    },
+    {
+      "arm": "Q0",
+      "tree": "original",
+      "composed": true
+    },
+    {
+      "arm": "Q0",
+      "tree": "patched",
+      "composed": true,
+      "update_mode": "legacy_additive"
+    },
+    {
+      "arm": "N26",
+      "tree": "original",
+      "composed": true
+    },
+    {
+      "arm": "N26",
+      "tree": "patched",
+      "composed": true,
+      "update_mode": "legacy_additive"
+    },
+    {
+      "arm": "N27",
+      "tree": "original",
+      "composed": false,
+      "expected_hydra_error": "Could not override 'main.eds_config.diversity_update_mode'.\nTo append to your config use +main.eds_config.diversity_update_mode=feasible_ray_v1"
+    },
+    {
+      "arm": "N27",
+      "tree": "patched",
+      "composed": true,
+      "update_mode": "feasible_ray_v1"
+    }
+  ],
+  "checks": [
+    "C0_whole_composed_and_resolved_EDS_parity_except_registered_disabled_key",
+    "Q0_whole_composed_and_resolved_EDS_parity_except_registered_disabled_key",
+    "N26_whole_composed_and_resolved_EDS_parity_except_registered_disabled_key",
+    "N27_vs_N26_sole_resolved_EDS_delta_feasible_ray_v1"
+  ],
+  "ast_functions": [
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "CODEX_CONFIG_KEYS",
+      "first_line": 86,
+      "last_line": 86
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "E2_STAGE_CONDITION",
+      "first_line": 87,
+      "last_line": 87
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "CODEX_STAGE_CONDITION",
+      "first_line": 88,
+      "last_line": 88
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "GateError",
+      "first_line": 111,
+      "last_line": 112
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "require",
+      "first_line": 115,
+      "last_line": 117
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "owned",
+      "first_line": 173,
+      "last_line": 176
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "hydra",
+      "first_line": 179,
+      "last_line": 189
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "expand_candidate",
+      "first_line": 224,
+      "last_line": 417
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "is_n17_plan",
+      "first_line": 493,
+      "last_line": 494
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "stage_condition",
+      "first_line": 824,
+      "last_line": 828
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "build_command",
+      "first_line": 976,
+      "last_line": 1016
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "codex_public_config",
+      "first_line": 1068,
+      "last_line": 1071
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "codex_public_config_sha256",
+      "first_line": 1074,
+      "last_line": 1075
+    },
+    {
+      "file": "scripts/qd_ed_final_runner.py",
+      "name": "stage_overrides",
+      "first_line": 1078,
+      "last_line": 1113
+    },
+    {
+      "file": "core/codex_stage_policy.py",
+      "name": "_DISABLED_FEATURES",
+      "first_line": 7,
+      "last_line": 12
+    },
+    {
+      "file": "core/codex_stage_policy.py",
+      "name": "_DEVELOPER_INSTRUCTIONS",
+      "first_line": 13,
+      "last_line": 20
+    },
+    {
+      "file": "core/codex_stage_policy.py",
+      "name": "_REMOVED_ENVIRONMENT",
+      "first_line": 23,
+      "last_line": 29
+    },
+    {
+      "file": "core/codex_stage_policy.py",
+      "name": "_MAX_EVENTS_BYTES",
+      "first_line": 30,
+      "last_line": 30
+    },
+    {
+      "file": "core/codex_stage_policy.py",
+      "name": "_COUNTER_FIELDS",
+      "first_line": 31,
+      "last_line": 35
+    },
+    {
+      "file": "core/codex_stage_policy.py",
+      "name": "public_invocation_policy",
+      "first_line": 38,
+      "last_line": 74
+    },
+    {
+      "file": "core/codex_stage_policy.py",
+      "name": "policy_sha256",
+      "first_line": 77,
+      "last_line": 78
+    },
+    {
+      "file": "scripts/qd_ed_n4e1_plan.py",
+      "name": "ORIGINAL_PROTOCOL",
+      "first_line": 22,
+      "last_line": 22
+    },
+    {
+      "file": "scripts/qd_ed_n4e1_plan.py",
+      "name": "PROTOCOL",
+      "first_line": 23,
+      "last_line": 23
+    },
+    {
+      "file": "scripts/qd_ed_n4e1_plan.py",
+      "name": "PREREQUISITE",
+      "first_line": 27,
+      "last_line": 27
+    },
+    {
+      "file": "scripts/qd_ed_n4e1_plan.py",
+      "name": "FROZEN_DOCS",
+      "first_line": 32,
+      "last_line": 34
+    },
+    {
+      "file": "scripts/qd_ed_n4e1_plan.py",
+      "name": "CONDITION_ID",
+      "first_line": 35,
+      "last_line": 35
+    },
+    {
+      "file": "scripts/qd_ed_n4e1_plan.py",
+      "name": "STAGE_CONDITION",
+      "first_line": 36,
+      "last_line": 36
+    },
+    {
+      "file": "scripts/qd_ed_n4e1_plan.py",
+      "name": "engineering_condition",
+      "first_line": 500,
+      "last_line": 504
+    },
+    {
+      "file": "core/qd_actuator_clipped_rbf.py",
+      "name": "MODE",
+      "first_line": 9,
+      "last_line": 9
+    },
+    {
+      "file": "core/qd_clean_output_rbf.py",
+      "name": "CLEAN_SOURCE",
+      "first_line": 7,
+      "last_line": 7
+    },
+    {
+      "file": "core/qd_feasible_ray_rbf.py",
+      "name": "LEGACY",
+      "first_line": 8,
+      "last_line": 8
+    },
+    {
+      "file": "core/qd_feasible_ray_rbf.py",
+      "name": "MODE",
+      "first_line": 9,
+      "last_line": 9
+    },
+    {
+      "file": "core/qd_feasible_ray_rbf.py",
+      "name": "validate_update_option",
+      "first_line": 13,
+      "last_line": 26
+    },
+    {
+      "file": "scripts/qd_ed_n25_contract.py",
+      "name": "expand_candidate",
+      "first_line": 382,
+      "last_line": 396
+    },
+    {
+      "file": "scripts/qd_ed_n26_contract.py",
+      "name": "expand_candidate",
+      "first_line": 366,
+      "last_line": 380
+    },
+    {
+      "file": "scripts/qd_ed_n27_contract.py",
+      "name": "expand_candidate",
+      "first_line": 328,
+      "last_line": 341
+    }
+  ],
+  "complete_argv_count": 4,
+  "model_api_sim_gpu_calls": 0,
+  "torch_imported": false,
+  "main_imported": false,
+  "production_modules_imported": false,
+  "dynamic_resolution": "No custom resolver registered/executed. Full config structural comparison uses resolve=False; interpolation-free EDS uses resolve=True.",
+  "actual_runtime_metadata_read": false,
+  "source_adoption_authorized": false,
+  "experiment_restart_authorized": false
+}

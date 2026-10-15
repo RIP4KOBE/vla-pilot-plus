@@ -1,0 +1,42 @@
+{
+  "schema": "n28-disabled-template-v1",
+  "executable": false,
+  "root_authorized": false,
+  "target_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/arithmetic-preflight-source-review-v1.json",
+  "missing_required": [
+    "independent root source/runtime acceptance"
+  ],
+  "source_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/source-manifest-execution-v1.json",
+    "sha256": "a26a52fa413c43778a341d72b85e570892a13933954c4fa0b78c5a6357c1ef12"
+  },
+  "record": {
+    "schema": "n28-arithmetic-source-review-v1",
+    "accepted": false,
+    "source": null,
+    "runtime": null,
+    "source_bridge": null,
+    "phase_b_protocol": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/execution-integration-cpu-scope-v1.md",
+      "sha256": "ab228f33e752a5634103c6294cabcf126640e7ff88e90694c625f741fe96e5db"
+    },
+    "arithmetic_protocol": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/independent-arithmetic-protocol-v1.md",
+      "sha256": "16b0f573ae909b51e074e0958c975bab25f85c1c8d8123d7a96096aa1bb823ad"
+    },
+    "predecessor": null,
+    "budget_reuse": null,
+    "limits": {
+      "resource_processes": 1,
+      "episode_attempts": 0,
+      "model_calls": 0,
+      "api_calls": 0,
+      "simulation_steps": 0,
+      "timeout_seconds": 80,
+      "cleanup_seconds": 40,
+      "physical_gpu": 7,
+      "health_gpu_hours_bucket": "recovery"
+    },
+    "gpu_release": false
+  }
+}

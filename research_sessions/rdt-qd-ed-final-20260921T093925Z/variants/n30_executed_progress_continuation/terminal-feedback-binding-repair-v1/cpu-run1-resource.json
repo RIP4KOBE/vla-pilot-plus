@@ -1,0 +1,21 @@
+{
+  "schema": "n30-terminal-feedback-repair-cpu-resource-v1",
+  "run": "run1",
+  "pytest_exit": 0,
+  "process_cpu_seconds": 26.965223932,
+  "wall_seconds": 18.18730166798923,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "denied": [],
+  "guard_clean": true,
+  "test_args": [
+    "-q",
+    "tests/test_n30_terminal_feedback_repair.py"
+  ],
+  "peak_rss_kib": 992308
+}

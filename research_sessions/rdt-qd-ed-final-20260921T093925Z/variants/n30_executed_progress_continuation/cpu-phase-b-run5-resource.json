@@ -1,0 +1,24 @@
+{
+  "schema": "n30-cpu-resource-v1",
+  "run": "phase-b-run5",
+  "pytest_exit": 0,
+  "process_cpu_seconds": 13.924670665999999,
+  "wall_seconds": 10.588961952948011,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "denied": [],
+  "guard_clean": true,
+  "test_args": [
+    "tests/test_n30_native.py",
+    "tests/test_n30_worker.py",
+    "-k",
+    "full_replay or mask_and_independent or real_recorder_unguided or same_process_worker",
+    "-q"
+  ],
+  "peak_rss_kib": 743968
+}

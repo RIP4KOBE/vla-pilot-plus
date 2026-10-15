@@ -1,0 +1,109 @@
+{
+  "schema": "n30-handoff-decoder-preparation-resource-v1",
+  "scope_cpu_seconds": 300,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads_environment": 2,
+  "measured_static_reads_cpu_seconds": 0.011162569,
+  "measured_static_syntax_cpu_seconds": 0.037041437999999996,
+  "packaging_cpu_seconds_to_record": 0.0033842380000000012,
+  "unmetered_short_display_and_source_authoring_commands": "not individually timed; conservative budget debit below, not claimed as an exact total",
+  "conservative_extra_cpu_budget_debit_seconds": 60,
+  "preparation_reader_runs": 0,
+  "payload_opens": 0,
+  "payload_hash_measurements": 0,
+  "payload_decodes": 0,
+  "torch_numpy_production_imports": 0,
+  "scientific_tests": 0,
+  "network_gpu_api_model_sim_calls": 0,
+  "errors": [
+    "One static input-name FileNotFoundError; retained in preparation-error-v1.txt."
+  ],
+  "source_input_read_set": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241,
+      "windows": [
+        [
+          1,
+          85
+        ],
+        [
+          176,
+          206
+        ],
+        [
+          231,
+          272
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_executed_progress.py",
+      "sha256": "7aead7c81424a2b247e4d74ae211947e0b78a47cf6fa1a8a97fb112a9739d9c0",
+      "bytes": 11581,
+      "windows": [
+        [
+          23,
+          38
+        ],
+        [
+          119,
+          226
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962,
+      "windows": [
+        [
+          1680,
+          1735
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/scripts/qd_ed_n30_native.py",
+      "sha256": "c7d8c779f977aaae61976b33d9b52cec5fb068913896f6b09a0d8abecf8067c0",
+      "bytes": 19175,
+      "windows": [
+        [
+          24,
+          63
+        ],
+        [
+          109,
+          195
+        ]
+      ]
+    }
+  ],
+  "prior_reader_and_metadata_read_set": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/decoder-source-manifest-v1.json",
+      "sha256": "7905260c9cac6c2c3fae0814392d33909f30d78fefa724533d598c2cdabc6fe8",
+      "bytes": 4012
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/command.disabled.v1.json",
+      "sha256": "cd311a975bf613d2754d91b4a5b171360838218cdbefd9f9e8fc9bcb2c4a91af",
+      "bytes": 1800
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/handoff-bindings.disabled.v1.json",
+      "sha256": "a0e91ccb47a312a37e46b9c9ac9d6dcf8c3ec211d2cbb07a8084b6f8b6ad4345",
+      "bytes": 1456252
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/minimum-evidence-proposal.disabled.v1.json",
+      "sha256": "b3d1ce66d932f517be84100cecc33f2a2e669efb47eeb4c41199ab86f4e05e97",
+      "bytes": 6370
+    }
+  ],
+  "read_count_note": "Old reader was displayed once in failed lookup, read for framework extraction, read for static parity, and read for manifest hash; no original event/index/payload rereads. Own new source and manifests read for editing/packaging. Root scope one initial read plus manifest hash."
+}

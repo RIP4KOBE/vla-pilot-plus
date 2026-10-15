@@ -1,0 +1,3 @@
+Source-only manifest packaging stopped after writing source-manifest-v1.json and source-composition-bridge-v1.json.
+TypeError: unsupported operand type(s) for |: dict and set
+Cause: packaging command attempted sorted(allowed | shared) where allowed was a dict. Resume uses set(allowed) | shared; no source/test/runtime change or data access. Existing outputs preserved.

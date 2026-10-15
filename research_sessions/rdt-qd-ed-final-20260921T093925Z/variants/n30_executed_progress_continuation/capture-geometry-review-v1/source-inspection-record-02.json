@@ -1,0 +1,43 @@
+{
+  "read_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160,
+      "windows": [
+        [
+          1,
+          85
+        ],
+        [
+          180,
+          340
+        ],
+        [
+          740,
+          810
+        ],
+        [
+          1635,
+          1710
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962,
+      "windows": [
+        [
+          7800,
+          7880
+        ]
+      ]
+    }
+  ],
+  "cpu_seconds": 0.005151336999999999,
+  "affinity": [
+    0,
+    1
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "sources": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py",
+      "sha256": "5209b0ac07362e1df85bf2fd842e57d4786e24c0a625ee5b9e49bee48f528f93",
+      "bytes": 108959,
+      "windows": [
+        [
+          1489,
+          1508
+        ],
+        [
+          1582,
+          1601
+        ],
+        [
+          2126,
+          2145
+        ],
+        [
+          2134,
+          2153
+        ],
+        [
+          2194,
+          2213
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/utils/vis_utils.py",
+      "sha256": "6e256ca29aabcb8ffeb852e56c732ec56885394bb8e4e8ca2fd0957e989289b8",
+      "bytes": 31179,
+      "windows": [
+        [
+          484,
+          510
+        ],
+        [
+          656,
+          777
+        ]
+      ]
+    }
+  ],
+  "ffmpeg": "/usr/bin/ffmpeg",
+  "ffprobe": "/usr/bin/ffprobe",
+  "cpu_seconds": 0.0031600210000000024,
+  "wall_seconds": 0.0033161500468850136,
+  "affinity": [
+    0,
+    1
+  ],
+  "production_imports": false
+}

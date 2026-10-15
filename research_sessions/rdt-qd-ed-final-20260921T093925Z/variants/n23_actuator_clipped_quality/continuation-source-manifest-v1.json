@@ -1,0 +1,43 @@
+{
+  "root": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/continuation_implementation",
+  "commit": "dd27e77edd5e8d67aba998c1d0441c2b8e48713c",
+  "files": [
+    {
+      "path": "continuation/activation-v1.md",
+      "sha256": "90659d372f3b92b5b22b303aa52ed1975577270f6a8afbce4b7c2a9288b5df8d"
+    },
+    {
+      "path": "continuation/legacy-metric-continuation-engineering-exception-v1.md",
+      "sha256": "ee6750ae41cad78d9e4cbf1fa471267c53cd8fee690d526f1029dc545c56f606"
+    },
+    {
+      "path": "continuation/n23_continuation_contract.py",
+      "sha256": "fe1d0af73e3146886d4860e760426059764acdae02e5c9a1da73f72b85f9c072"
+    },
+    {
+      "path": "continuation/n23_continuation_report.py",
+      "sha256": "93143e94b06802f2f681380f040b7e52b66b2c675c4fe3e3d3955fc441c0ec12"
+    },
+    {
+      "path": "continuation/n23_continuation_supervise.py",
+      "sha256": "be35d91770fe741725d761de21eacbaf3eaf4d0416c3e57a63adf65a8b70e3b4"
+    },
+    {
+      "path": "continuation/n23_n7_metrics_adapter.py",
+      "sha256": "fc98d401fb6095fb0a4311fa2de5e04d9940b6f5406e96078ba3b350168821c5"
+    },
+    {
+      "path": "tests/test_n23_continuation.py",
+      "sha256": "463efcdca04a53b4a0d8181bbb352eab911ce5a1ae66f78d5d1d8f4876e8b5ff"
+    },
+    {
+      "path": "tests/test_n23_n7_metrics_adapter.py",
+      "sha256": "ae17ad2f9dd48c4a51caeae7b86000737b8b35ee7a1c2ebb6dfbcc9b61010f18"
+    }
+  ],
+  "sha256": "93e4ccd83fb10f63fe4e0d1dbfc7d9a107ecbffc4ecb556955c3b3eee94d202b",
+  "imported_writer": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/summarize_cohort_cpu_v2.py",
+    "sha256": "d9918d9f52e4bb37c9f71e7be09af880a7b6f4723ed9a68566bfda38b363224c"
+  }
+}

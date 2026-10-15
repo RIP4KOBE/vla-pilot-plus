@@ -1,0 +1,168 @@
+{
+  "schema": "n29-task-relevance-source-index-v1",
+  "source_commit": "d855cfd690482e018bb40ce98edec80fad9700e0",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241,
+      "ranges": [
+        [
+          20,
+          80
+        ],
+        [
+          105,
+          163
+        ],
+        [
+          260,
+          305
+        ],
+        [
+          163,
+          183
+        ],
+        [
+          192,
+          262
+        ]
+      ],
+      "matched_lines": []
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py",
+      "sha256": "a46be1babfde66a07729c06d4e37b51575def4e27f05970dfaa852ae4db4afd7",
+      "bytes": 106688,
+      "ranges": [
+        [
+          1395,
+          1457
+        ],
+        [
+          1680,
+          1730
+        ],
+        [
+          238,
+          261
+        ],
+        [
+          261,
+          270
+        ],
+        [
+          1620,
+          1667
+        ],
+        [
+          1910,
+          1967
+        ]
+      ],
+      "matched_lines": []
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "861509f3a491e28390a901623bc48523795a34ddacf25ccb839f122a13fce3a7",
+      "bytes": 410174,
+      "ranges": [
+        [
+          3291,
+          3348
+        ],
+        [
+          3370,
+          3502
+        ],
+        [
+          3500,
+          3610
+        ],
+        [
+          5440,
+          5475
+        ],
+        [
+          7268,
+          7312
+        ],
+        [
+          7395,
+          7430
+        ],
+        [
+          3346,
+          3374
+        ],
+        [
+          3387,
+          3450
+        ],
+        [
+          4438,
+          4464
+        ],
+        [
+          5448,
+          5471
+        ],
+        [
+          3450,
+          3487
+        ],
+        [
+          3499,
+          3536
+        ]
+      ],
+      "matched_lines": [
+        1422,
+        1454,
+        1457,
+        1652,
+        3394
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/eds_eval_metrics.py",
+      "sha256": "3b3861870ff9645edbff1b64c2274d99889e9ee16e421976ae0b19366e6a5974",
+      "bytes": 37637,
+      "ranges": [
+        [
+          325,
+          425
+        ],
+        [
+          470,
+          605
+        ],
+        [
+          225,
+          308
+        ]
+      ],
+      "matched_lines": []
+    }
+  ],
+  "control_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/result-v1.json",
+      "bytes": 707924,
+      "sha256": "9bd468a592d9f218bdb572b84b23c214daf4a0f6bde7d2db6be9d0412dd14a25"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/root-terminal-review-v1.json",
+      "bytes": 6208,
+      "sha256": "9905c0a5b2ab7c27c599597a5cbc3dde83a643bd337820cfd7dba37afe866fb4"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/source-manifest-execution-v1.json",
+      "bytes": 63529,
+      "sha256": "9a31cdab710e5b14771be8f4c41d230db3ba537bf552e8903be85851d72b46cf"
+    }
+  ],
+  "release_sha256": "44c8b257068a8907265b8d71487e6fda4165a9e667cc24782a3992c6d0a1dec6",
+  "scope_sha256": "7ae7cf32f12ebe846f2a8e8a9f2c92d9370d9d31e59371d41b52a3e46db34168",
+  "no_production_import": true
+}

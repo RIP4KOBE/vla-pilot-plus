@@ -1,0 +1,55 @@
+{
+  "schema": "n30-fixed-handoff-video-inputs-v1",
+  "scope_sha256": "acd771687dfc3b1222a552f79cc4cf97a9fbf452e678c2c2837bf5e7636ec639",
+  "videos": [
+    {
+      "task_id": 0,
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/attempts/rdt-qd-ed-final-20260921T093925Z__n30_r2_dev_t00_n30_20261003__4300bcf89485/episode_1/episode_1_fail_agentview.mp4",
+      "bytes": 7355396,
+      "sha256": "ca42c542cac6dd274380037104aaa4edcd09b9f9f1ba78f7b66f31f5bb69e305",
+      "stat_identity": {
+        "device": 2065,
+        "inode": 237471032,
+        "mtime_ns": 1791067733154334340
+      },
+      "full_encoded_hash_passes": 1
+    },
+    {
+      "task_id": 1,
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/attempts/rdt-qd-ed-final-20260921T093925Z__n30_r2_dev_t01_n30_20261003__1e52b07e1725/episode_1/episode_1_fail_agentview.mp4",
+      "bytes": 5976528,
+      "sha256": "6cf7247c7afead3ee5d2dbe07cc497c4b01d812ec2d7fc9616930fa5def04ab3",
+      "stat_identity": {
+        "device": 2065,
+        "inode": 237512269,
+        "mtime_ns": 1791068695251908544
+      },
+      "full_encoded_hash_passes": 1
+    }
+  ],
+  "zero_based_frames": [
+    16,
+    20,
+    24,
+    28,
+    32,
+    40
+  ],
+  "planned_decoder_invocations_per_video": 1,
+  "header_probe_per_video": 1,
+  "whole_encoded_input_hash_bytes": 13331924,
+  "runtime": [
+    {
+      "path": "/usr/bin/ffmpeg",
+      "sha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "bytes": 342488
+    },
+    {
+      "path": "/usr/bin/ffprobe",
+      "sha256": "272f6ebc634a63d9c8b4ca68e964119d980f25154e5aa2c35e5487da48e9a58f",
+      "bytes": 191888
+    }
+  ],
+  "freeze_before_decode": true,
+  "new_algorithm_authorized": false
+}

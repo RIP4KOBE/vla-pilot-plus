@@ -1,0 +1,11 @@
+backend:
+  backend: libero
+  libero:
+    task_ids_filter:
+    - 8
+main:
+  episode_num: 1
+  episode_seed_schedule:
+  - 991
+  require_task_cache_identity: true
+seed: 993

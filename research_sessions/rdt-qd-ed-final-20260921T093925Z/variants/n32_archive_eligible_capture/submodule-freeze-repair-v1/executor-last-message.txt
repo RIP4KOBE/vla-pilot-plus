@@ -1,0 +1,12 @@
+Committed `289a7dc2df93a015bd559d3bf2eba962054ccdb7`.
+
+- Strict pinned-gitlink freezing implemented; gitlink unchanged.
+- 33 focused tests passed.
+- Post-commit 549-file source roundtrip passed.
+- No scientific success or GPU authorization claimed; old attempt/accounting unchanged.
+
+Root review, complete runtime materialization, and separate prospective identity/accounting/freeze remain required.
+
+[Report](../submodule-freeze-repair-v1/report-v1.md) · [Result](../submodule-freeze-repair-v1/result-v1.json)
+
+Applied [Arbor executor skill](/home/hynx/.codex/skills/arbor-agent-executor/SKILL.md).

@@ -1,0 +1,13 @@
+# N21 private-budget amendment for audit
+
+Approval requested for a new N21 cohort after its CPU implementation and native-evidence checks pass. N20 stopped after three task0 cells: C0/Q0/N20 all had valid simulator failures, but N20 failed native audit because Stage consumed lift-adjusted effective quality at three decisions instead of the matched raw provider reward. All three attempts remain charged. The frozen N20 result and audit will not be replaced or retried.
+
+The current approved private limits are 395 attempts/100 GPU hours with buckets baseline30, development125, validation180, formal40, recovery20. At the N20 stop snapshot, use is 213 attempts/28.842866326560607 GPU hours, baseline27, development119, validation60, formal0, recovery7, with no running attempt. Completing a fresh four-task C0/Q0/N21 matrix requires four baseline and eight development attempts; the remaining capacities are three and six.
+
+**Requested exact change:** total attempts395→398, baseline30→31, development125→127. Keep validation180, formal40, recovery20, the 100 GPU-hour cap and protected validation/formal hour reserves32/12 unchanged. This amendment grants three additional slots in total, with historical errors preserved. It does not affect another study's state or resources.
+
+N21 changes only the Stage metadata call to use the selected final canonical raw provider reward while retaining the archive spread used for scale. QD descriptor, archive, N5 selector, close-then-lift quality formula, model, Stage E2, seeds/init and176/11 canonical compute are fixed. See [the prospective protocol](variants/n21_stage_raw_reward_binding/protocol-v1.md), frozen SHA256 `2f737fd6ab9b45a88bd6f080ff6f4a3a6a49f3089bfa3ab732e10e6672e949cc` before the implementation change.
+
+If approved, freeze the new source/profile/plan/release and use only idle GPU7 with the existing UUID/EGL binding, one serial worker. Run task0 C0/Q0/N21 first. Stop and reject on any invalid/native-audit failure or a valid N21 task0 failure; only task0 success permits the remaining task3/6/9 nine cells. Maximum12 dispatches/6 GPU hours, timeout1800 seconds per episode plus40 seconds cleanup, no automatic retry. This prospective early-stop rule avoids spending the remaining nine cells once the mandatory task0 gate fails.
+
+Promotion still requires all12 audited valid cells, task0 success, N21≥3/4 and strictly above both controls, positive quality/ranking activity and exact176/11. Validation and formal are not released by this amendment; their existing prospective gates remain. If this amendment is not approved, no N21 GPU attempt is permitted. CPU preparation and read-only diagnosis may continue within the existing user authorization.

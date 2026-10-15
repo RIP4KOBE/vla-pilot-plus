@@ -1,0 +1,53 @@
+{
+  "cpu_limit_seconds": 60,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "calls": [
+    {
+      "phase": "scope_initial_read",
+      "cpu_seconds": 0.0
+    },
+    {
+      "phase": "metadata_binding_and_static_schema",
+      "cpu_seconds": 0.10426949700000002
+    },
+    {
+      "phase": "addenda_and_exact_tensor_schema",
+      "cpu_seconds": 0.000817476000000001
+    },
+    {
+      "phase": "reader_write_and_syntax_only",
+      "cpu_seconds": 0.004316265999999999
+    },
+    {
+      "phase": "packaging_checkpoint",
+      "cpu_seconds": 0.018973378000000003
+    },
+    {
+      "phase": "protocol_schema_and_reader_static_refinement",
+      "cpu_seconds": 0.023550696
+    },
+    {
+      "phase": "frozen_input_naming_and_sampling_clarification",
+      "cpu_seconds": 0.11191556000000001
+    },
+    {
+      "phase": "final_static_closure_and_report",
+      "cpu_seconds": 0.009894566
+    }
+  ],
+  "startup_allowance_seconds": 1.0,
+  "torch_numpy_production_imports": false,
+  "reader_executed": false,
+  "tensor_bytes_read": 0,
+  "measured_cpu_seconds": 0.273737439,
+  "accounted_cpu_seconds_including_startup_allowance": 1.273737439,
+  "json_bytes_read": 14864073,
+  "first_index_sidecars_read": 8,
+  "bundle_stat_bytes": 94315816,
+  "tests_run": 0,
+  "syntax_checks_only": true
+}

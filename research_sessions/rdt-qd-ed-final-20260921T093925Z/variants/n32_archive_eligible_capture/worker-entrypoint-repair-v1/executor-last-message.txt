@@ -1,0 +1,9 @@
+Committed repair: `6baa93058f96269ce3c6b0d225fd416f1b163307`. Worktree clean.
+
+- Verified the real `-m` inventory failure.
+- Added strict worker spec/origin/hash attestation and parent checks.
+- **16 focused CPU tests passed**, including tamper rejection.
+- N32R1 remains INVALID_STOP, zero accepted cells, with **1160.6758011629572 GPU seconds** charged.
+- No GPU dispatch, integration, or release.
+
+Wrote `delivery-v1.json` and `report-v1.md` in `worker-entrypoint-repair-v1` for coordinator review.

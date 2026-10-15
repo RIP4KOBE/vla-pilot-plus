@@ -1,0 +1,147 @@
+{
+  "schema": "n26-cache-integration-static-source-scope-v1",
+  "mode": "STATIC_DESIGN_ONLY",
+  "source_root": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation",
+  "expected_frozen_commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+  "git_identity_verified_in_this_task": false,
+  "source_files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_supervise.py",
+      "sha256": "57dfae9e54d0087d233f8554dd432bef12f6cf076728f28ee97f7e38c3cf7772",
+      "bytes": 7148
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_logical.py",
+      "sha256": "d5fde7a827c29a4e60789947701f4abb079e80399e45de69b6f1f1f877f6c7fe",
+      "bytes": 10489
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_backend.py",
+      "sha256": "53970bca912aa8d413fae17ca9e9df243e6f8538344d7448f5efab387b1e4062",
+      "bytes": 16059
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_bridge.py",
+      "sha256": "1a9354faecf3a182f27187666beaf22e8e560727a2d4e3666bce50be55283fc7",
+      "bytes": 6576
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_final_runner.py",
+      "sha256": "cff374a636a410579aaaff679c52f07eeda6fce9fb6cdf6b71773ab1f8f68806",
+      "bytes": 121745
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n26_contract.py",
+      "sha256": "e7a58c965f635062ba72a81acf2e84c26bcae735ca6b580862adae426d4d299f",
+      "bytes": 23923
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n25_cont_downstream.py",
+      "sha256": "60a27a867c4a0ed4921d7a86cdbd333a5439d2b0eb497eb503743adbf9427832",
+      "bytes": 25369
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n23_worker.py",
+      "sha256": "58ca3729fbb4d80aeac441a68d6b6a13c5d0b06ccce9a7329007a1731be59ce1",
+      "bytes": 21291
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n25_cont_bridge.py",
+      "sha256": "2a7a535ba0838dd10ff4dd2f3beab725ebeeea2936be918104ae8fbe241c0546",
+      "bytes": 3336
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n25_cont_terminal.py",
+      "sha256": "3f58a9e7e97453f65c5a184bb0b8597a4a5d1a365a63f69875a3e75981e04e41",
+      "bytes": 11950
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n25_cont_evidence.py",
+      "sha256": "9bf4b8ce97e0f36ced03343f475a2f61913e1da2dfcf8ce3249615b08680b657",
+      "bytes": 16564
+    }
+  ],
+  "component_files": [
+    {
+      "bytes": 3089,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/root-cpu-protocol-v1.md",
+      "sha256": "b10c15ef95393c3f0a38d98165b795736a2b278fed61937a0864b3c0904078a4"
+    },
+    {
+      "bytes": 6608,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/verified_immutable_cache.py",
+      "sha256": "f580ea88186b82364f14c4e8b2afbfa613e38a3a89683b0e2103fbe2e360675a"
+    },
+    {
+      "bytes": 8812,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/test_verified_immutable_cache.py",
+      "sha256": "35fd1c1b21f5d13711b911bf4d33035ba95ff14e39bb76f28718713728f46b55"
+    },
+    {
+      "bytes": 6181,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/run_cpu_checks.py",
+      "sha256": "d5a6b5b9175e2c69428e68cd4a25871731ad1eaa5e90d83bb80e609ed9af296d"
+    },
+    {
+      "bytes": 3855,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/cpu-checks.log",
+      "sha256": "c20e0abe51a1308aa289a28c5bf5ed3a81b74b694c32dad8ac9570c0419fb209"
+    },
+    {
+      "bytes": 7057,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/report.md",
+      "sha256": "68c54279463d61a32bc4787b96def66f4f87199e5b5c8ad284169b5c7a45e302"
+    }
+  ],
+  "control_and_narrative_files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-integration-design-v1/root-static-protocol-v1.md",
+      "bytes": 2586,
+      "sha256": "da474be0c6899eacbc4fcfa868c87549a1e761ee4251548f10081f52d0dfe972"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-static-review-v1/source-scope-v1.json",
+      "bytes": 4832,
+      "sha256": "cfb947d09a905b485ff7b66c21f19d4481e74b9812e7c8747b39d7e942fbca5e"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-static-review-v1/report.md",
+      "bytes": 10254,
+      "sha256": "a95e4a3dcdb468620aae9a509dd7927b52fced20735b5af2f917cb07ba7f61a3"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/manifest.json",
+      "bytes": 6663,
+      "sha256": "ebbce85ec4f11af772f6e3179c163e6594c6d37c026856866c317774cc6baf1a"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/root-cpu-review-v1.json",
+      "bytes": 1488,
+      "sha256": "59c0cac1c575a2957b778e180d79532e66d81e6d414dfa8b69d9d816ba157a76"
+    }
+  ],
+  "source_files_verified": 11,
+  "source_bytes_verified": 264450,
+  "component_directory_files_authorized": 8,
+  "component_directory_bytes_verified": 43753,
+  "limits": {
+    "source_files_exact": 11,
+    "source_bytes": 2097152,
+    "output_regular_files": 3,
+    "output_total_bytes": 262144,
+    "production_imports_or_execution": 0,
+    "tests": 0,
+    "git_history_reads": 0,
+    "actual_experiment_record_reads": 0,
+    "proc_reads": 0,
+    "network_gpu_api_model_simulator_calls": 0
+  },
+  "all_listed_source_hashes_verified_before_semantic_inspection": true,
+  "outputs": [
+    "root-static-protocol-v1.md",
+    "source-scope-v1.json",
+    "design.md"
+  ],
+  "implementation_authorized": false,
+  "current_integration_authorized": false
+}

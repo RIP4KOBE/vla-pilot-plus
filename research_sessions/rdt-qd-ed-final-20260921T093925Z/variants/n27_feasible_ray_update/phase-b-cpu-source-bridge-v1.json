@@ -1,0 +1,23 @@
+{
+  "schema": "n27-cpu-reverse-bridge-v1",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/phase-b-source-manifest-v1.json",
+    "sha256": "16a0278124ccde14b852828981a75c1527546a5d3eb605f59f59349d076972b1"
+  },
+  "base_commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+  "original_files": 315,
+  "unchanged_original_files": 312,
+  "restored": {
+    "core/rdt_policy_steer.py": "b72e4ee10d8dbf614eb45a1662d41e80e76ebb239dea2e4a49b8b3a1c5dd09d6",
+    "scripts/qd_ed_final_runner.py": "cff374a636a410579aaaff679c52f07eeda6fce9fb6cdf6b71773ab1f8f68806",
+    "scripts/qd_ed_n23_worker.py": "58ca3729fbb4d80aeac441a68d6b6a13c5d0b06ccce9a7329007a1731be59ce1"
+  },
+  "phase_a_unchanged": {
+    "core/qd_feasible_ray_update.py": "146163977866af87d2c643b0446be9ebac12f83cf9337d534b736874c623203e",
+    "docs/n27-feasible-ray-cpu-note.md": "c6d5b3a2673085e75836295cd6d5325fb3f695906b86b32325991b4908f64f2e",
+    "tests/test_n27_feasible_ray_update.py": "f15a54c25a502ad9c6aa966e02b438abcc2ef02979d219fdf506952e3de86c31"
+  },
+  "runtime_proof_read": false,
+  "actual_bridge_created": false,
+  "gpu_release": false
+}

@@ -1,0 +1,5 @@
+# Motion-gated N11 survivor lane: reject before GPU
+
+The proposed N14 would enable N11's four exact parent survivors only after an immediately preceding guided chunk in the same Stage showed a valid, same-instance target displacement of at least 1 cm while the gripper remained open. The prerequisite signal exists, but on the exposed matched N7 paths the gate is absent for failed task 0 and task 9. With exact N7 behavior until activation, those paths would remain unchanged in a deterministic replay; even if both other tasks succeeded, the four-task development gate would reach at most 2/4 on those paths. This is a reachability screen, not a predicted online success rate: Stage outputs can vary on a rerun.
+
+The N11 parent-survivor implementation also used more reward scoring than N7 in the matched task-3 episode: 364 reward evaluations and 26 score batches per guided chunk versus N7's 256 and 16, while both retained the same 176-candidate/11-batch canonical QD accounting. N11's additional auxiliary scoring matters for compute comparability. A strict fixed-cost candidate cannot directly reuse that implementation unchanged. No GPU attempt was dispatched for N14.

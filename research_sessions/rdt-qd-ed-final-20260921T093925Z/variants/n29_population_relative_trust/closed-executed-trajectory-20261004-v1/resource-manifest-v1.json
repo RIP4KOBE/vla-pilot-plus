@@ -1,0 +1,14 @@
+{
+  "cpu_seconds": 6.3382399650000005,
+  "wall_seconds": 6.59169530402869,
+  "metadata_bytes": 301426776,
+  "native_stat_bytes": 811841103,
+  "index_files": 24,
+  "denied": [],
+  "error": null,
+  "tensor_reads": 0,
+  "affinity": [
+    0,
+    1
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "n23-root-inactive-memory-source-review-v1",
+  "recorded_at": "2026-09-30T13:41:33.950422+00:00",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+    "sha256": "0e490bd0313b5264a20154cbc0226881e574945abfe97cb5d2e901df09336a23",
+    "commit": "51104470983cdbafd08feb87f2f39b7553779405"
+  },
+  "scope": "Read-only source interpretation; no native result expansion, successor selection, algorithm modification or execution release.",
+  "findings": [
+    {
+      "lines": [
+        3298,
+        3450
+      ],
+      "finding": "Existing warm_start_mix selects several previous final-population members by k-center using old costs, shifts tails, renoises and denoises again, and separately scores fresh and adapted pools before a reward-quantile acceptance gate. It is not a one-selected-plan carryover mechanism, and its additional work cannot be assumed equal to the frozen 176-candidate/11-batch contract."
+    },
+    {
+      "lines": [
+        3337,
+        3353,
+        7208,
+        7215
+      ],
+      "finding": "The inspected memory payload contains population, costs, Stage and global_step. It does not itself bind tracked target identity/generation or an exact eight-action completion. These would require explicit design and evidence for any new stateful mechanism."
+    },
+    {
+      "lines": [
+        8204,
+        8208,
+        8224,
+        8230
+      ],
+      "finding": "Current N5/N7-compatible configuration guards require fresh population and zero chunk memory. Toggling the existing warm-start option is not an admissible in-place change to the active cohort."
+    }
+  ],
+  "interpretation": "This is an implementation constraint inventory only. Observed differences from unexecuted model tails do not establish physical regression or memory efficacy; no new candidate is selected.",
+  "new_api_gpu_simulator_calls": 0,
+  "active_cohort_changed": false
+}

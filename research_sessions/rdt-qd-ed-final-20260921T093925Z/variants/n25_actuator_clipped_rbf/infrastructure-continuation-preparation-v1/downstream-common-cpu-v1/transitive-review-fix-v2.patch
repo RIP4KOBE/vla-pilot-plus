@@ -1,0 +1,107 @@
+diff --git a/experiments/qd_ed_n25_continuation_downstream/evidence-contract-v1.md b/experiments/qd_ed_n25_continuation_downstream/evidence-contract-v1.md
+index 45f1995..9120bd5 100644
+--- a/experiments/qd_ed_n25_continuation_downstream/evidence-contract-v1.md
++++ b/experiments/qd_ed_n25_continuation_downstream/evidence-contract-v1.md
+@@ -6,7 +6,7 @@ This implements only the common evidence layer under protocol0e4ce396. No valida
+ 
+ Run the future adapter only after the continuation closes, its controller dies and root independently reviews the immutable terminal under6f. Then root may integrate these additive files into the owning study. `ROOT` must resolve to the approved `study_worktree`; the continuation control directory must be its parent/variants/n25_actuator_clipped_rbf/infrastructure-continuation-v1. The imported c/e/terminal/bridge/worker/report modules must resolve to owning scripts. `c.rows(seal)` reads the fixed `c.SEAL` path: the inventory's seal must be that same resolved file. Production does not replace globals or clone functions. Synthetic tests bind isolated fixture paths through ordinary monkeypatch fixtures only.
+ 
+-Historical source records remain5a(257) and6f(271), irrespective of current HEAD. Immutable Git objects are separately allowlisted: bootstrap only6f's tracked original-source-v1.json; then exact257+271 paths. Every object is hash-checked,16MiB/file and128MiB total.255 files and exact two-file/four-function whole-byte reverse bridge are verified. The currently reused eight continuation modules, original N25 report/backend/reference/UUID helper remain identical to6f. The worker's four pure metadata primitives are AST-byte-bound, allowing a future separately reviewed administrative route insertion without pretending old HEAD is current. Actual numerical arithmetic is never executed. Root must separately approve every future downstream source delta.
++Historical source records remain5a(257) and6f(271), irrespective of current HEAD. Immutable Git objects are separately allowlisted: bootstrap only6f's tracked original-source-v1.json; then exact257+271 paths. Every object is hash-checked,16MiB/file and128MiB total.255 files and exact two-file/four-function whole-byte reverse bridge are verified. The currently reused eight continuation modules, original N25 contract/report/backend/reference/UUID helper remain identical to6f. The backend contract must be the same original-contract module as c.old, and contract/reference/UUID imports must resolve to owning scripts. The worker's four pure metadata primitives are AST-byte-bound, allowing a future separately reviewed administrative route insertion without pretending old HEAD is current. Actual numerical arithmetic is never executed. Root must separately approve every future downstream source delta.
+ 
+ ## Input envelope and bounds
+ 
+diff --git a/scripts/qd_ed_n25_cont_downstream.py b/scripts/qd_ed_n25_cont_downstream.py
+index 39c3aa5..9feeeba 100644
+--- a/scripts/qd_ed_n25_cont_downstream.py
++++ b/scripts/qd_ed_n25_cont_downstream.py
+@@ -75,7 +75,7 @@ def historical_sources(old,new,objects):
+     # Current pure reader/helper modules must still have their exact historical bytes.
+     # Current runner/worker HEAD is not required to be historical; their relevant
+     # primitive function bodies, rather than administrative routes, are bound below.
+-    for path in bridge.MODULES|{'scripts/qd_ed_n25_backend.py','scripts/qd_ed_n25_reference.py','scripts/qd_ed_audit_backend.py','scripts/qd_ed_n25_report.py'}:
++    for path in bridge.MODULES|{'scripts/qd_ed_n25_backend.py','scripts/qd_ed_n25_reference.py','scripts/qd_ed_audit_backend.py','scripts/qd_ed_n25_report.py','scripts/qd_ed_n25_contract.py'}:
+         e.require((ROOT/path).read_bytes()==objects(HISTORICAL,path),'current continuation helper drift')
+     worker='scripts/qd_ed_n23_worker.py'
+     oldfunc=bridge.functions(objects(HISTORICAL,worker).decode());current=bridge.functions((ROOT/worker).read_text())
+@@ -125,8 +125,10 @@ def cost_summary(attempts,fields):
+ 
+ 
+ def settled_resource(reader,reference,source,runtime,resource_projection):
+-    from scripts import qd_ed_n25_backend as backend
+-    e.require(Path(backend.__file__).resolve()==ROOT/'scripts/qd_ed_n25_backend.py','historical proof helper shadowing')
++    from scripts import qd_ed_n25_backend as backend,qd_ed_audit_backend as audit_backend,qd_ed_n25_reference as arithmetic_reference
++    e.require(backend.c is c.old and backend.w is terminal.w,'historical proof shared helper identity differs')
++    for module in (backend,backend.c,audit_backend,arithmetic_reference):
++        e.require(Path(module.__file__).resolve()==ROOT/'scripts'/Path(module.__file__).name,'historical proof helper shadowing')
+     proof=reader.json(reference)
+     e.require(set(proof)=={'schema','accepted','source','runtime','plan','report','process','terminal'}
+         and proof['schema']=='n25-metered-tensor-proof-v1' and proof['accepted'] is True
+@@ -155,7 +157,7 @@ def build(data,*,objects=None,cleanup=e.process_cleanup):
+     owner=Path(data['owning_root']).resolve()
+     e.require(owner==ROOT.resolve() and owner.name=='study_worktree' and c.SEAL.resolve().parent==c.RUN_DIR.resolve()
+         and c.RUN_DIR.resolve()==owner.parent/'variants/n25_actuator_clipped_rbf/infrastructure-continuation-v1', 'same approved owning study path required')
+-    for module in (c,e,terminal,bridge,terminal.w,terminal.report,terminal.report.old_report):
++    for module in (c,c.old,e,terminal,bridge,terminal.w,terminal.report,terminal.report.old_report):
+         e.require(Path(module.__file__).resolve()==owner/'scripts'/Path(module.__file__).name,'historical helper imports must come from owning study')
+     reader=MetadataReader(data['files']);refs=data['references'];get=lambda key:reader.json(refs[key])
+     same(refs['seal'],e.ref_from_inventory(reader,c.SEAL));same(refs['plan'],e.ref_from_inventory(reader,c.PLAN))
+diff --git a/tests/n25_downstream_fixtures.py b/tests/n25_downstream_fixtures.py
+index 2307c17..bb4382a 100644
+--- a/tests/n25_downstream_fixtures.py
++++ b/tests/n25_downstream_fixtures.py
+@@ -104,7 +104,7 @@ def historical_fixture(tmp,monkeypatch):
+ 
+ from scripts import qd_ed_n25_cont_downstream as d,qd_ed_n25_cont_bridge as bridge
+ from scripts import qd_ed_n25_cont_seal as sealer,qd_ed_n25_cont_report as reporting,qd_ed_n25_cont_terminal as terminal
+-from scripts import qd_ed_n25_backend as backend,qd_ed_n23_worker as w
++from scripts import qd_ed_n25_backend as backend,qd_ed_n23_worker as w,qd_ed_audit_backend as audit_backend,qd_ed_n25_reference as reference
+ from n25_cont_fixtures import fake_cleanup,new_events,materialize_new
+ import ast,difflib
+ ACTUAL=Path(__file__).resolve().parents[1]
+@@ -122,7 +122,7 @@ def source_fixture(root):
+     wb='\n\n'.join(worker[k] for k in ('require','sha','canonical_sha','read_ref'))+'\n\ndef validate_context():\n    return "old"\n'
+     rb='\n\n'.join(f'def {n}():\n    return "old"' for n in sorted(bridge.ROUTES['scripts/qd_ed_final_runner.py']))+'\n'
+     old={'scripts/qd_ed_n23_worker.py':wb.encode(),'scripts/qd_ed_final_runner.py':rb.encode()}
+-    for name in ('qd_ed_n25_backend','qd_ed_n25_reference','qd_ed_audit_backend','qd_ed_n25_report'):old['scripts/'+name+'.py']=(ACTUAL/'scripts'/ (name+'.py')).read_bytes()
++    for name in ('qd_ed_n25_backend','qd_ed_n25_reference','qd_ed_audit_backend','qd_ed_n25_report','qd_ed_n25_contract'):old['scripts/'+name+'.py']=(ACTUAL/'scripts'/ (name+'.py')).read_bytes()
+     for i in range(257-len(old)):old[f'fake_source_{i:03}.py']=f'n={i}\n'.encode()
+     files=[{'path':p,'sha256':d.digest(b)} for p,b in sorted(old.items())]
+     source={'commit':e.BASE,'files':files,'sha256':e.canonical(files)};new=dict(old)
+@@ -172,7 +172,7 @@ def complete_fixture(tmp,monkeypatch,disposition='promotion'):
+         if commit==d.HISTORICAL:p=root/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b)
+     target=root/d.DOC/'protocol-v1.md';target.parent.mkdir(parents=True);target.write_bytes((ACTUAL/d.DOC/'protocol-v1.md').read_bytes())
+     monkeypatch.setattr(d,'ROOT',root)
+-    for module in (c,e,terminal,bridge,terminal.w,terminal.report,terminal.report.old_report,backend):monkeypatch.setattr(module,'__file__',str(root/'scripts'/Path(module.__file__).name))
++    for module in (c,c.old,e,terminal,bridge,terminal.w,terminal.report,terminal.report.old_report,backend,audit_backend,reference):monkeypatch.setattr(module,'__file__',str(root/'scripts'/Path(module.__file__).name))
+     run=root.parent/'variants/n25_actuator_clipped_rbf/infrastructure-continuation-v1';monkeypatch.setattr(c,'RUN_DIR',run)
+     for name,file in (('SEAL','seal.json'),('PLAN','plan.json'),('PROTOCOL','protocol.md')):monkeypatch.setattr(c,name,run/file)
+     c.PROTOCOL.parent.mkdir(parents=True,exist_ok=True);c.PROTOCOL.write_bytes((ACTUAL/'experiments/qd_ed_n25_continuation/protocol-v1.md').read_bytes())
+diff --git a/tests/test_qd_ed_n25_cont_downstream.py b/tests/test_qd_ed_n25_cont_downstream.py
+index e093864..075df15 100644
+--- a/tests/test_qd_ed_n25_cont_downstream.py
++++ b/tests/test_qd_ed_n25_cont_downstream.py
+@@ -157,3 +157,23 @@ def test_imported_helper_identity_is_owning_source(tmp_path,monkeypatch,which):
+ def test_raw_stage_index_or_full_ledger_inventory_rejected_without_read(tmp_path,name):
+     with pytest.raises(ValueError,match='forbidden'):
+         d.MetadataReader([{'path':str(tmp_path/name),'sha256':'a'*64}])
++
++
++@pytest.mark.parametrize('which',['qd_ed_n25_contract','qd_ed_audit_backend','qd_ed_n25_reference'])
++def test_transitive_proof_helper_bytes_bound(tmp_path,monkeypatch,which):
++    data,objects=complete_fixture(tmp_path,monkeypatch)
++    (d.ROOT/'scripts'/(which+'.py')).write_text('changed helper')
++    with pytest.raises(ValueError,match='helper drift'):d.build(data,objects=objects,cleanup=fake_cleanup)
++
++
++@pytest.mark.parametrize('which',['original_contract','backend_contract_identity','audit_backend','reference'])
++def test_transitive_proof_helper_imports_owned(tmp_path,monkeypatch,which):
++    from types import SimpleNamespace
++    from scripts import qd_ed_n25_backend as backend,qd_ed_audit_backend as audit_backend,qd_ed_n25_reference as reference
++    data,objects=complete_fixture(tmp_path,monkeypatch)
++    if which=='backend_contract_identity':
++        monkeypatch.setattr(backend,'c',SimpleNamespace(__file__=d.c.old.__file__))
++    else:
++        module={'original_contract':d.c.old,'audit_backend':audit_backend,'reference':reference}[which]
++        monkeypatch.setattr(module,'__file__',str(tmp_path/'shadow.py'))
++    with pytest.raises(ValueError,match='owning study|shadowing|helper identity'):d.build(data,objects=objects,cleanup=fake_cleanup)

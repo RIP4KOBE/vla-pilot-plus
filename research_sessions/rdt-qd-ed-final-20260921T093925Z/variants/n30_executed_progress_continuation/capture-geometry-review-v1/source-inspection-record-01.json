@@ -1,0 +1,20 @@
+{
+  "read_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/handoff-visual-check-v1/root-visual-observations-v1.md",
+      "sha256": "bdc0226aacc78a6c8336a94c8fd01b71b406196c5d340fbd0c397cd8daeb3d23",
+      "bytes": 2458
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/handoff-visual-check-v1/root-terminal-review-v1.json",
+      "sha256": "d57be83f24292da5074401bcd241fdf899bd4993487fac36d636d558a3c65641",
+      "bytes": 2517
+    }
+  ],
+  "cpu_seconds": 0.004947959999999998,
+  "child_cpu_seconds": 2.433065,
+  "affinity": [
+    0,
+    1
+  ]
+}

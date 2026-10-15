@@ -1,0 +1,5 @@
+Updating 6baa930..1065f38
+Fast-forward
+ scripts/qd_ed_n32_contract.py |  4 ++--
+ tests/test_n32r1_identity.py  | 35 ++++++++++++++++++++---------------
+ 2 files changed, 22 insertions(+), 17 deletions(-)

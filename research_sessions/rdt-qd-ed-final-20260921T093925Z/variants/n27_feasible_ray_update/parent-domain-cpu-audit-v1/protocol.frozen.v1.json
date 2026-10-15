@@ -1,0 +1,84 @@
+{
+  "schema": "n27-parent-domain-cpu-audit-protocol-v1",
+  "frozen_at": "2026-10-01T11:02:42.638799+00:00",
+  "phase": "COLLECT_TARGETED_EVIDENCE",
+  "authorization_basis": "Existing autonomous research scope permits bounded offline diagnostics; no new environment branches or GPU experiments.",
+  "availability_report": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/conditional-operator-placement-review-v1/parent-evidence-availability-v1.md",
+    "sha256": "226e3cecbe2615cb2169dd9ec29ab8e53c2763f2a00dd21e9826c20a88f609dc"
+  },
+  "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n27_screen_t00_n27_20261001_hydra1__30a35187b503",
+  "source_commit": "e21d48ab33dbd3aca017349b6004c2ba7d981493",
+  "decision_id": "e0:d1:s0",
+  "global_step": 0,
+  "iterations": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "index": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n27_screen_t00_n27_20261001_hydra1__30a35187b503/eds_eval/decision_evidence/episode_000/events.jsonl",
+    "first_line_only": true,
+    "max_bytes": 1048576,
+    "sha256": "523f7808afe9bfbbd56ac5a5ad0e4c77ba0a49248be58d3cccef48c58b3a802f"
+  },
+  "payload": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n27_screen_t00_n27_20261001_hydra1__30a35187b503/eds_eval/decision_evidence/episode_000/bundle_000001.pt",
+    "expected_bytes": 12060933,
+    "max_input_bytes": 13631488,
+    "sha256": "b9ba0f873f0c2b5bb3c81c22df087400952f95cb9ca1d82b1394bf7c7f56f466",
+    "entire_container_deserialization_authorized": true,
+    "co_resident_events": "Present but unrelated quality, provider-return and selection numerical fields must not be exported or analyzed.",
+    "max_zip_uncompressed_bytes": 67108864,
+    "max_distinct_decoded_storage_bytes": 67108864,
+    "max_cpu_decodes": 1,
+    "weights_only": true,
+    "map_location": "cpu"
+  },
+  "resources": {
+    "cpu_affinity_count": 2,
+    "threads": 2,
+    "cpu_seconds": 60,
+    "wall_seconds": 60,
+    "rlimit_as_bytes": 8589934592,
+    "cuda_visible_devices": "",
+    "cuda_initialized_allowed": false,
+    "model_calls": 0,
+    "api_calls": 0,
+    "simulation_steps": 0,
+    "gpu_work": 0,
+    "network": false
+  },
+  "measurements": [
+    "Verify ten unique iter_idx=0..9 parent events and paired archive allocation identities, elite_count=0, source_population 16x64x128 and 16 valid parent slots.",
+    "For each reconstructed offspring pool: whole-action byte-duplicate groups, raw and clipped 8x3 translation-prefix duplicates, strict-interior/boundary/outside support.",
+    "Only if uniquely associated origins exist in this same decision: one CPU hypothetical clipped-RBF plus feasible-ray update per round, original native dtype, same clip/projector formula/sign/global normalization/scale20. Report nonzero operand and assigned delta, alpha and unchanged-coordinate invariants."
+  ],
+  "origin_interpretation": "Origin captured by the existing first active rollout witness is used under the explicit static assumption that the environment/current end-effector state stays fixed inside this decision. It is not a new pre-renoise origin measurement.",
+  "no_origin_fallback": true,
+  "extra_noise_or_jitter": false,
+  "new_scale_choice": false,
+  "interpretation_limits": [
+    "CPU exploratory arithmetic is not CUDA bitwise equivalence.",
+    "Activity is not model-transmission or task-success evidence.",
+    "No repeated model calls or same-state branch simulation.",
+    "No inferential claim beyond this fixed first guided decision."
+  ],
+  "if_missing_or_limit_exceeded": "Record incomplete/Unknown without reading another bundle, decoding again or escalating resources.",
+  "outputs": [
+    "audit.py",
+    "result-v1.json",
+    "report-v1.md",
+    "execution-metadata-v1.json"
+  ],
+  "frozen_science_code_changes": false,
+  "gpu_budget_changes": false,
+  "new_candidate_registered": false
+}

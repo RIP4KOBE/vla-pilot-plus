@@ -1,0 +1,1862 @@
+diff --git a/scripts/qd_ed_final_runner.py b/scripts/qd_ed_final_runner.py
+index 17c51be6a300e36609ec12a9e462d274c0583610..3c930734f3c20831bc923acefcced97b4b01f202 100644
+--- a/scripts/qd_ed_final_runner.py
++++ b/scripts/qd_ed_final_runner.py
+@@ -1020,7 +1020,10 @@ def validate_runtime_inputs(plan, runtime, manifest, root, state, *, require_fro
+             require(type(row[seed_field]) is int and 0 <= row[seed_field] < 2**31, f'invalid {seed_field}')
+         require(row['init_index'] == 0 and type(row['init_index']) is int, 'single-episode backend currently requires init_index=0')
+         require(row['budget_bucket'] in BUCKETS, 'unknown budget bucket')
+-        if not row.get('retry_of'):
++        if plan.get('schema') == 'n32r3-released-plan-v1' and row['budget_bucket'] == 'recovery':
++            from scripts.qd_ed_n32r3_contract import require_recovery_row
++            require_recovery_row(plan, row)
++        elif not row.get('retry_of'):
+             require((row['split'] == 'dev' and row['budget_bucket'] in {'baseline', 'development'}) or row['split'] == row['budget_bucket'], 'split/budget mismatch')
+         else:
+             require(row['budget_bucket'] == 'recovery', 'retry must consume recovery reserve')
+diff --git a/scripts/qd_ed_n32r3_bridge.py b/scripts/qd_ed_n32r3_bridge.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..98a76f6b44cbafdadf296be983e28c19fb2aef9a
+--- /dev/null
++++ b/scripts/qd_ed_n32r3_bridge.py
+@@ -0,0 +1,77 @@
++"""Exact new command composition with separate operational/scientific source."""
++import hashlib
++import json
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w, qd_ed_n32_bridge as old
++from scripts import qd_ed_n32r3_contract as c
++
++ROOT, profiles, attest_loaded = old.ROOT, old.profiles, old.attest_loaded
++RUNTIME_SOURCES, runner = old.RUNTIME_SOURCES, old.runner
++
++
++def source_paths(root=ROOT):
++    return old.source_paths(root) | {str(p.relative_to(root)) for pattern in
++                                   ('scripts/qd_ed_n32r3_*.py', 'tests/test_n32r3*.py') for p in Path(root).glob(pattern)}
++
++
++def command(plan, runtime, row):
++    # Only the scientific runtime binding retains the original scientific commit.
++    # The manifest/worker/release separately attest the actual operational commit.
++    argv, output = old.command({**plan, 'source': plan['scientific_source']}, runtime, row)
++    candidates = c.read_ref(plan['command_candidates'])
++    matches = [x for x in candidates['commands'] if x['new_attempt_id'] == row['episode_key']]
++    w.require(len(matches) == 1, 'exact command candidate')
++    candidate = matches[0]
++    parent = c.read_ref(candidate['parent_expected_manifest'])
++    w.require(candidate['old_argv'] == parent['argv'] and len(argv) == len(parent['argv']), 'parent command anchor')
++    changes = [{'index': i, 'old': a, 'new': b} for i, (a,b) in enumerate(zip(parent['argv'], argv)) if a != b]
++    allowed = {'hydra.run.dir', 'main.eds_eval.output_dir', 'main.eds_eval.job_id',
++               'main.eds_mechanism_pretest.output_dir', 'main.eds_mechanism_pretest.run_id', 'main.eds_config.n32_runtime_binding'}
++    w.require(changes == candidate['exact_changes'] and argv == candidate['proposed_argv']
++              and str(output) == candidate['proposed_output_dir']
++              and all(x['old'].split('=',1)[0] == x['new'].split('=',1)[0] in allowed for x in changes), 'non-identity command change')
++    return argv, output
++
++
++def manifest(plan, runtime, row):
++    task = runtime['tasks'][str(row['task_id'])]
++    files = {v['path']: v['sha256'] for v in runtime['files']}
++    w.require(task['task_id'] == row['task_id'] and task['init_index'] == row['init_index']
++              and files[task['init_path']] == row['init_file_sha256'] and files[task['bddl_path']] == row['bddl_sha256'], 'runtime task hashes')
++    argv, output = command(plan, runtime, row)
++    config, resolved = old.compose_launch(argv, plan['worktree'])
++    w.require(config['backend']['libero']['max_episode_steps'] == 720
++              and config['policy']['rdt']['control_frequency'] == 20
++              and config['policy']['rdt']['action_chunk_horizon'] == 8, 'frozen episode schedule')
++    index = {x['path']: x['sha256'] for x in plan['scientific_source']['files']}
++    expected = None
++    if row['profile'] == 'N32':
++        expected = {'binding': resolved['n32_runtime_binding'],
++                    'config_sha256': hashlib.sha256(json.dumps(resolved, sort_keys=True, allow_nan=False).encode()).hexdigest(),
++                    'source_hashes': {**{name: index['core/'+name] for name in RUNTIME_SOURCES}, 'main.py': index['main.py']}}
++    result = {'schema': 'n32r3-external-runtime-v1', 'row': row, 'source': plan['source'],
++              'runtime': plan['runtime'], 'argv': argv, 'output_dir': str(output),
++              'composed_config_sha256': w.canonical_sha(config), 'resolved_config': resolved,
++              'expected_runtime': expected, 'continuation': c.commitments(plan, row)}
++    return result
++
++
++def verify_manifest(reference, plan, runtime, row):
++    w.verify_source(plan['worktree'], plan['source'])
++    w.require(source_paths(Path(plan['worktree'])) <= {v['path'] for v in plan['source']['files']}, 'complete continuation source')
++    w.require(w.read_ref(plan['runtime']) == runtime, 'runtime changed')
++    actual = w.read_ref(reference)
++    w.require(actual == json.loads(json.dumps(manifest(plan, runtime, row))), 'external manifest/config/task/source differs')
++    return actual
++
++
++def semantic_key(plan, manifest):
++    """Exact command normalization, after command() has checked bound substitutions."""
++    row = manifest['row']
++    candidates = c.read_ref(plan['command_candidates'])['commands']
++    candidate = next(x for x in candidates if x['new_attempt_id'] == row['episode_key'])
++    parent = c.read_ref(candidate['parent_expected_manifest'])
++    return w.canonical_sha({'row': {k: row[k] for k in c.SEMANTIC_FIELDS},
++                            'scientific_source': plan['scientific_source'],
++                            'parent_runtime': parent['runtime'], 'normalized_argv': parent['argv'],
++                            'normalized_config_sha256': parent['composed_config_sha256']})
+diff --git a/scripts/qd_ed_n32r3_contract.py b/scripts/qd_ed_n32r3_contract.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..c2c2729dcfc113d0151243aba29413ecf600f58e
+--- /dev/null
++++ b/scripts/qd_ed_n32r3_contract.py
+@@ -0,0 +1,93 @@
++"""N32R3 operational continuation, separate from the immutable N32R2 contract."""
++import datetime as dt
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w, qd_ed_n32_contract as parent
++
++ROOT = parent.ROOT
++ARMS = parent.ARMS
++DEADLINE = parent.DEADLINE
++GPU_UUID = parent.GPU_UUID
++COHORT = 'N32R3_ARCHIVE_ELIGIBLE_CAPTURE_CONTINUATION_DEV_20261008'
++OLD_INVALID = 'n32r2_dev_t04_n32_20261004'
++RECOVERY = 'n32r3_recovery_t04_n32_20261008'
++BASE_SOURCE = '1065f38122379a515b60a9a424f574330405b66f'
++LIMITS = {'new_attempts': 16, 'baseline': 5, 'development': 10, 'recovery': 1,
++          'automatic_recoveries': 0, 'continuation_gpu_seconds': 30600,
++          'episode_seconds': 1800, 'cleanup_seconds': 40, 'physical_gpu': 7, 'gpu_uuid': GPU_UUID}
++WORKER_CONTRACT = {**parent.WORKER_CONTRACT, 'schema': 'n32r3-same-process-audit-v1'}
++PROMOTION = {'all_valid_cells': 30, 'n32_min_successes': 5, 'matched_controls_required': True}
++SEMANTIC_FIELDS = ('task_id', 'profile', 'split', 'seed_block', 'env_seed', 'policy_seed',
++                   'init_index', 'init_row_sha256', 'init_file_sha256', 'bddl_sha256')
++ref, finite, stop_path = parent.ref, parent.finite, parent.stop_path
++
++
++def read_ref(reference):
++    """Preparation references may additionally commit exact byte length."""
++    w.require(isinstance(reference, dict) and set(reference) in
++              ({'path', 'sha256'}, {'path', 'sha256', 'bytes'}), 'reference fields')
++    result = w.read_ref({k: reference[k] for k in ('path', 'sha256')})
++    if 'bytes' in reference:
++        w.require(type(reference['bytes']) is int and Path(reference['path']).stat().st_size == reference['bytes'], 'reference length')
++    return result
++
++
++def same_ref(a, b):
++    return all(a[k] == b[k] for k in ('path', 'sha256'))
++
++
++def expected_rows(root=ROOT):
++    rows = []
++    for old in parent.expected_rows(root)[14:]:
++        recovery = old['episode_key'] == OLD_INVALID
++        rows.append({**old, 'iteration': COHORT,
++                     'episode_key': RECOVERY if recovery else f'n32r3_dev_t{old["task_id"]:02d}_{old["profile"].lower()}_20261008',
++                     'budget_bucket': 'recovery' if recovery else old['budget_bucket']})
++    return rows
++
++
++def recovery_of(row):
++    return OLD_INVALID if row['episode_key'] == RECOVERY else None
++
++
++def require_recovery_row(plan, row):
++    w.require(plan['schema'] == 'n32r3-released-plan-v1' and plan['episodes'] == expected_rows(plan['worktree'])
++              and row == plan['episodes'][0] and row['episode_key'] == RECOVERY
++              and not row.get('retry_of'), 'exact versioned explicit recovery')
++
++
++def commitments(plan, row):
++    w.require(row in expected_rows(plan['worktree']), 'continuation row')
++    return {**{k: plan[k] for k in ('parent_plan', 'parent_release', 'parent_review', 'carry_forward_map',
++                                   'command_candidates', 'source_continuity', 'scientific_source', 'preparation_review')},
++            'semantic_row': {k: row[k] for k in SEMANTIC_FIELDS},
++            'recovery_of': recovery_of(row), 'retry_of': None}
++
++
++def require_release(_):
++    raise ValueError('N32R3 requires a separately adopted plan and detached root release')
++
++
++def pre_dispatch(row, allowance, *, now, stop_path):
++    w.require(not Path(stop_path).exists() and not Path(stop_path).is_symlink(), 'STOP pre-dispatch')
++    w.require(now.tzinfo is not None, 'timezone-aware admission time')
++    starts = dt.datetime.fromisoformat(allowance['authority_starts_at'].replace('Z', '+00:00'))
++    ends = min(dt.datetime.fromisoformat(x.replace('Z', '+00:00')) for x in (allowance['authority_ends_at'], DEADLINE))
++    w.require(starts <= now and now + dt.timedelta(seconds=1840) <= ends, 'deadline/authority full1840s unavailable')
++    w.require(row in expected_rows(), 'exact continuation identity')
++    w.require(allowance['private_budget'] is True and allowance['gpu_idle'] is True
++              and allowance['physical_gpu'] == 7 and allowance['gpu_uuid'] == GPU_UUID
++              and allowance['live_handles'] == [] and allowance['unsettled_reservations'] == 0, 'private idle settled GPU')
++    for key in ('global_seconds_remaining', 'private_seconds_remaining', 'cohort_seconds_remaining'):
++        w.require(finite(allowance[key], key) >= 1840, key + ' insufficient')
++    w.require(allowance['cohort_seconds_remaining'] <= 30600, 'continuation seconds ceiling')
++    w.require(allowance['global_seconds_remaining'] - finite(allowance['protected_seconds_remaining'], 'protected seconds') >= 1840, 'protected seconds')
++    for key in ('global_attempts_remaining', 'cohort_attempts_remaining', 'protected_attempts_remaining'):
++        w.require(type(allowance[key]) is int and allowance[key] >= 0, 'unknown attempt balance')
++    w.require(1 <= allowance['cohort_attempts_remaining'] <= 16 and
++              allowance['global_attempts_remaining'] - allowance['protected_attempts_remaining'] >= 1, 'attempt reserve/cap')
++    bucket = row['budget_bucket']
++    for field in ('bucket_attempts_remaining', 'local_bucket_attempts_remaining'):
++        value = allowance[field][bucket]
++        w.require(type(value) is int and value >= 1, 'bucket exhausted/unknown')
++    w.require(allowance['local_bucket_attempts_remaining'][bucket] <= LIMITS[bucket], 'local bucket cap')
++    return 1840
+diff --git a/scripts/qd_ed_n32r3_history.py b/scripts/qd_ed_n32r3_history.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..fb604793fc6f512a40cedee6eb4e2455f7e4b9d9
+--- /dev/null
++++ b/scripts/qd_ed_n32r3_history.py
+@@ -0,0 +1,146 @@
++"""Bounded original metadata verification; never relabel receipts or replay tensors.
++
++Trust terminates at the caller's detached root release, which commits the exact
++preparation map and the independently reviewed original receipt closure.
++"""
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w, qd_ed_n32_contract as old
++from scripts import qd_ed_n32_supervise as old_supervisor, qd_ed_n32_release as old_release
++from scripts import qd_ed_n32r3_contract as c
++
++
++def validate_mapping(plan):
++    mapping = c.read_ref(plan['carry_forward_map'])
++    verify_preparation_anchor(plan)
++    parent = c.read_ref(plan['parent_plan'])
++    old_release.validate_plan(parent)  # Original schema/matrix contract, unchanged.
++    w.require(c.same_ref(mapping['parent_plan'], plan['parent_plan'])
++              and parent['source'] == plan['scientific_source']
++              and parent['source']['commit'] == c.BASE_SOURCE, 'immutable parent/source')
++    released = c.read_ref(plan['parent_release'])
++    expected = {'schema': 'n32-execution-release-v1', 'approved': True, 'plan': plan['parent_plan'],
++                **{k: parent[k] for k in ('authority', 'protocol', 'source', 'runtime', 'limits', 'phase_authorization')}}
++    w.require(released == {**expected, 'root_review': plan['parent_review']}, 'original detached release')
++    w.require(c.read_ref(plan['parent_review']) == {**expected, 'schema': 'n32-root-production-review-v1', 'decision': 'APPROVED'}, 'original root review')
++    evidence = c.read_ref(mapping['continuity_evidence'])
++    w.require(c.same_ref(evidence['inputs']['plan.frozen.v1.json'], plan['parent_plan'])
++              and c.same_ref(evidence['inputs']['execution-release-v1.json'], plan['parent_release'])
++              and c.same_ref(evidence['inputs']['root-production-review-v1.json'], plan['parent_review']), 'parent evidence commitments')
++    c.read_ref(mapping['terminal_review'])
++    w.require(mapping['schema'] == 'n32r3-carry-forward-map-v1' and mapping['continuity_failures'] == []
++              and mapping['release_enabled'] is False and mapping['pooling_authorized'] is False
++              and mapping['command_candidates'] == plan['command_candidates'], 'immutable preparation map')
++    accepted, proposed = mapping['accepted_cells'], mapping['proposed_cells']
++    w.require(len(accepted) == 14 and len(proposed) == 16, '14+16 exact map')
++    for entry, row in zip(accepted, parent['episodes'][:14]):
++        w.require(entry['original_row'] == row and
++                  entry['old_attempt_id'] == entry['new_attempt_id'] == entry['attempt_id'] == row['episode_key']
++                  and entry['semantic_cell'] == {k: row[k] for k in c.SEMANTIC_FIELDS}
++                  and entry['expected_manifest'] == parent['expected_manifests'][row['episode_key']]
++                  and entry['source_commit'] == c.BASE_SOURCE and entry['runtime'] == parent['runtime']
++                  and entry['denominator_eligible'] is True and entry['replay_permitted'] is False, 'carry-forward identity')
++    invalid = mapping['old_invalid_cell']
++    w.require(invalid['original_row'] == parent['episodes'][14] and invalid['attempt_id'] == c.OLD_INVALID
++              and invalid['denominator_eligible'] is False and invalid['new_attempt_id'] is None
++              and invalid['proposed_recovery_attempt_id'] == c.RECOVERY, 'unique invalid linkage')
++    for entry, old_row, row in zip(proposed, parent['episodes'][14:], c.expected_rows(plan['worktree'])):
++        w.require(entry['old_row'] == old_row and entry['proposed_row'] == row
++                  and entry['old_attempt_id'] == old_row['episode_key'] and entry['new_attempt_id'] == row['episode_key']
++                  and entry['semantic_continuity'] == {k: v for k, v in old_row.items() if k not in ('iteration', 'episode_key', 'budget_bucket')}
++                  and entry['parent_expected_manifest'] == parent['expected_manifests'][old_row['episode_key']]
++                  and entry['recovery_of'] == c.recovery_of(row) and entry['retry_of'] is None
++                  and entry['native_receipt'] is None and entry['generic_audit'] is None
++                  and entry['release_enabled'] is False, 'proposed semantic/execution identity')
++    return mapping, parent
++
++
++def verify_cell(entry, plan, parent, *, valid=True):
++    """Verify exact reviewed metadata bytes and their cross-artifact identities.
++
++    This is deliberately not a replacement native/generic audit. Original audit
++    evidence remains committed by the original receipts and root review.
++    """
++    data = {k: c.read_ref(entry[k]) for k in ('terminal_receipt', 'native_receipt', 'generic_audit',
++                                            'context', 'command_receipt', 'process_receipt', 'expected_manifest')}
++    stage = entry['stage_events']
++    path = Path(stage['path'])
++    w.require(path.is_file() and not path.is_symlink() and w.sha(path) == stage['sha256']
++              and path.stat().st_size == stage['bytes'], 'Stage metadata digest')
++    terminal, native, context, process, manifest = (data[k] for k in ('terminal_receipt', 'native_receipt', 'context', 'process_receipt', 'expected_manifest'))
++    row = entry['original_row']; key = row['episode_key']
++    output = Path(manifest['output_dir'])
++    paths = {'terminal_receipt': 'attempt-result.json', 'native_receipt': 'eds_eval/n32-worker-receipt.json',
++             'generic_audit': 'eds_eval/decision-evidence-audit.json', 'context': 'n32-worker-context.json',
++             'command_receipt': 'command.json', 'process_receipt': 'process.json', 'stage_events': 'eds_eval/stage_events.jsonl'}
++    w.require(all(entry[k]['path'] == str(output / v) for k,v in paths.items()), 'original receipt paths')
++    w.require(context == {'schema': 'n32-worker-context-v1', 'plan': plan['parent_plan'],
++              'release': plan['parent_release'], 'expected_manifest': entry['expected_manifest'],
++              'episode_key': key, 'attempt_id': key, 'main_argv': manifest['argv'][1:], 'worker_contract': old.WORKER_CONTRACT}, 'original context binding')
++    w.require(manifest['row'] == row and manifest['source'] == parent['source'] and manifest['runtime'] == parent['runtime'], 'original manifest identity')
++    w.require(process['attempt_id'] == key and process['context'] == entry['context'] and process['release'] == plan['parent_release'], 'original process binding')
++    identity = {k: process[k] for k in ('pid', 'proc_start_ticks', 'boot_id')}
++    w.require(native['process'] == identity and native['context'] == entry['context'] and native['plan'] == plan['parent_plan']
++              and native['row'] == row and native['source'] == parent['source'] and native['expected_manifest'] == entry['expected_manifest']
++              and native['attempt_id'] == key and c.same_ref(native['audit_report'], entry['generic_audit'])
++              and native['native_counts'] == entry['native_counts'] and native['accepted'] is True
++              and native['process_unchanged'] is True and native['main_exit_code'] == 0, 'original native binding')
++    report = data['generic_audit']
++    w.require(report['accepted'] is True and report['evidence_complete'] is True, 'original generic invalid')
++    command = data['command_receipt']
++    w.require(command == {'argv': [manifest['argv'][0], '-m', 'scripts.qd_ed_n32_worker', '--context', entry['context']['path'], '--context-sha256', entry['context']['sha256']],
++                         'main_argv': manifest['argv'], 'context': entry['context']}, 'original command binding')
++    w.require(terminal['identity'] == old_supervisor.c_identity(row) and terminal['attempt_id'] == terminal['episode_key'] == key
++              and terminal['source_commit'] == parent['source']['commit'] and terminal['plan_sha256'] == plan['parent_plan']['sha256']
++              and terminal['release'] == plan['parent_release'] and terminal['context'] == entry['context']
++              and terminal['runtime_manifest_sha256'] == parent['runtime']['sha256']
++              and terminal['runtime_inventory_sha256'] == parent['runtime_inventory_sha256']
++              and terminal['budget_bucket'] == row['budget_bucket'] and terminal['init_row_sha256'] == row['init_row_sha256']
++              and terminal['physical_gpu'] == 7 and terminal['output_dir'] == str(output), 'original terminal identity')
++    elapsed = c.finite(terminal['gpu_process_wall_seconds'], 'original charge')
++    w.require(elapsed / 3600 == entry['gpu_hours_retained'] and entry['budget_bucket_retained'] == row['budget_bucket'], 'retained charge differs')
++    if valid:
++        w.require(c.same_ref(terminal['n32_worker_receipt'], entry['native_receipt']), 'original terminal native receipt')
++        w.require(terminal['event'] == 'valid' and terminal['outcome_valid'] is True
++                  and terminal['required_cost_telemetry_complete'] is True and type(terminal['success']) is bool
++                  and terminal['success'] == entry['success'], 'original terminal invalid')
++    else:
++        w.require(terminal['event'] == 'aborted' and terminal['outcome_valid'] is False and terminal['success'] is None, 'old invalid must remain invalid')
++    return terminal
++
++
++def verified_parent(plan, events):
++    from scripts.qd_ed_n32r3_release import verify_continuity
++    verify_continuity(plan)
++    w.verify_source(plan['worktree'], plan['source'])
++    mapping, parent = validate_mapping(plan)
++    outcomes = []
++    historical_ids = {x['attempt_id'] for x in mapping['accepted_cells']} | {c.OLD_INVALID}
++    w.require(all(e['attempt_id'] in historical_ids for e in events
++                  if e.get('identity', {}).get('iteration') == old.COHORT), 'parent cohort changed after reviewed prefix')
++    for entry in mapping['accepted_cells'] + [mapping['old_invalid_cell']]:
++        valid = entry is not mapping['old_invalid_cell']
++        terminal = verify_cell(entry, plan, parent, valid=valid)
++        group = [e for e in events if e['attempt_id'] == entry['attempt_id']]
++        w.require([e['event'] for e in group] == ['reserved', 'dispatched', terminal['event']]
++                  and group[-1] == terminal, 'original journal/receipt lifecycle differs')
++        immutable = ('attempt_id','episode_key','identity','plan_sha256','release','source_commit','runtime_manifest_sha256',
++                     'runtime_inventory_sha256','init_row_sha256','output_dir','physical_gpu','context','ledger_prefix','budget_bucket')
++        w.require(all(all(k in e and e[k] == terminal[k] for k in immutable) and e.get('retry_of') is None
++                      and e.get('recovery_of') is None for e in group), 'parent lifecycle drift')
++        if valid:
++            outcomes.append({'task_id': entry['original_row']['task_id'], 'profile': entry['original_row']['profile'],
++                             'success': terminal['success'], 'attempt_id': terminal['attempt_id']})
++    return outcomes
++
++
++def verify_preparation_anchor(plan):
++    """The existing independent bounded review is evidence, never new authority."""
++    w.require(plan['preparation_review']['sha256'] == '8666822f801c4e04aece1e7e9bb48c245ec206e69a8d73f8821a9022fbc91428', 'independent preparation review anchor')
++    review = c.read_ref(plan['preparation_review'])
++    w.require(review['status'] == 'PASS_FOR_BOUNDED_CPU_IMPLEMENTATION_ONLY' and review['source'] == c.BASE_SOURCE
++              and review['accepted_historical_cells'] == 14 and review['proposed_cells'] == 16, 'preparation review scope')
++    index = c.read_ref(review['artifact_index'])
++    for key in ('carry_forward_map', 'command_candidates'):
++        matches = [x for x in index['artifacts'] if c.same_ref(x, plan[key])]
++        w.require(len(matches) == 1, 'map/commands not independently reviewed')
++        c.read_ref(matches[0])
+diff --git a/scripts/qd_ed_n32r3_prepare.py b/scripts/qd_ed_n32r3_prepare.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..b5deeb105b62688ca2d7e7a6210c52c9482007ca
+--- /dev/null
++++ b/scripts/qd_ed_n32r3_prepare.py
+@@ -0,0 +1,45 @@
++"""CPU manifest composition only. Never creates/adopts a release or runs a worker."""
++import argparse
++import json
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w, qd_ed_n32r3_bridge as b
++from scripts import qd_ed_n32r3_contract as c, qd_ed_n32r3_release as release
++from scripts.qd_ed_n32r3_history import validate_mapping
++
++
++def compose(plan_ref, destination):
++    plan = w.read_ref(plan_ref)
++    # A separate operational source approval precedes composition. The input is
++    # still disabled; manifests alone cannot grant execution authority.
++    w.require(plan['schema'] == 'n32r3-composition-input-v1' and plan['release_enabled'] is False
++              and plan['episodes'] == c.expected_rows(plan['worktree']), 'disabled composition input required')
++    validate_mapping(plan)
++    release.verify_continuity(plan)
++    w.verify_source(plan['worktree'], plan['source'])
++    runtime = w.read_ref(plan['runtime'])
++    destination = Path(destination).resolve()
++    b.runner.owned(destination, plan['artifact_root'])
++    w.require(not destination.exists(), 'manifest destination exists')
++    # Compose everything before writing, and never reuse old config digests.
++    manifests = [b.manifest(plan, runtime, row) for row in plan['episodes']]
++    refs = {}
++    for manifest in manifests:
++        key = manifest['row']['episode_key']
++        path = destination / (key + '.json')
++        w.atomic_json(path, manifest)
++        refs[key] = c.ref(path)
++    w.atomic_json(destination / 'manifest-index.json', {'schema': 'n32r3-manifest-index-v1',
++                  'plan': plan_ref, 'release_enabled': False, 'expected_manifests': refs})
++    return refs
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    for name in ('plan', 'plan-sha256', 'destination'):
++        parser.add_argument('--'+name, required=True)
++    args = parser.parse_args()
++    print(json.dumps(compose({'path': str(Path(args.plan).resolve()), 'sha256': args.plan_sha256}, args.destination)))
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/scripts/qd_ed_n32r3_release.py b/scripts/qd_ed_n32r3_release.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..2b0f903e7dcdfee191de2aaf7cb37327b0834899
+--- /dev/null
++++ b/scripts/qd_ed_n32r3_release.py
+@@ -0,0 +1,197 @@
++"""Prospective, externally anchored N32 release validation. Creates no authority.
++
++DAG: inputs -> plan -> review -> detached release -> context/receipt. A plan
++never contains its review/release hash. The caller supplies the release digest.
++"""
++from pathlib import Path
++from scripts import qd_ed_final_runner as r, qd_ed_n23_worker as w
++from scripts import qd_ed_n32r3_contract as c, qd_ed_n32r3_bridge as b
++
++COORDINATOR_END = '2026-10-11T11:13:13Z'
++
++
++def validate_plan(plan):
++    w.require(plan['schema'] == 'n32r3-released-plan-v1' and plan['frozen'] is True
++              and plan['release_enabled'] is True and plan['episodes'] == c.expected_rows(plan['worktree'])
++              and plan['limits'] == c.LIMITS and plan['worker_contract'] == c.WORKER_CONTRACT
++              and plan['deadline'] == c.DEADLINE and plan['stop_path'] == c.stop_path(plan['worktree'])
++              and plan['phase_authorization'] == {'dev': True, 'validation': False, 'formal': False}
++              and not any(k in plan for k in ('root_review', 'execution_release'))
++              and plan['attempt_identity'] == 'episode_key', 'released plan contract')
++    w.require(plan['scientific_source']['commit'] == c.BASE_SOURCE and plan['source']['commit'] != c.BASE_SOURCE, 'new operational source required')
++    w.require(set(plan['expected_manifests']) == {x['episode_key'] for x in plan['episodes']}, 'all16 manifests')
++
++
++def validate_release(plan_ref, release_ref):
++    plan, release = w.read_ref(plan_ref), w.read_ref(release_ref)
++    validate_plan(plan)
++    expected = {'schema': 'n32r3-execution-release-v1', 'approved': True, 'plan': plan_ref,
++                'authority': plan['authority'], 'protocol': plan['protocol'],
++                'source': plan['source'], 'runtime': plan['runtime'], 'limits': c.LIMITS,
++                'phase_authorization': plan['phase_authorization'],
++                'continuation': c.commitments(plan, plan['episodes'][0])}
++    w.require(set(release) == set(expected) | {'root_review'} and all(release[k] == v for k, v in expected.items()), 'external release differs')
++    review = w.read_ref(release['root_review'])
++    w.require(review == {**expected, 'schema': 'n32r3-root-production-review-v1', 'decision': 'APPROVED'}, 'root review differs')
++    from scripts.qd_ed_n32r3_history import validate_mapping
++    validate_mapping(plan)
++    verify_continuity(plan)
++    protocol = w.read_ref(plan['protocol'])
++    w.require(protocol == {'schema': 'n32r3-production-protocol-v1', 'cohort': c.COHORT,
++              'episodes': plan['episodes'], 'limits': c.LIMITS, 'worker_contract': c.WORKER_CONTRACT,
++              'attempt_identity': 'episode_key', 'deadline': c.DEADLINE,
++              'promotion': {'all_valid_cells': 30, 'n32_min_successes': 5, 'matched_controls_required': True},
++              'futility': 'complete_valid_triples_only', 'validation_authorized': False, 'formal_authorized': False}, 'protocol differs')
++    authority = w.read_ref(plan['authority'])
++    caps = authority['caps']
++    w.require(authority['schema'] == 'n32r3-budget-authority-v1' and authority['approved'] is True
++              and authority['cohort'] == c.COHORT and authority['limits'] == c.LIMITS
++              and authority['validation_authorized'] is False and authority['formal_authorized'] is False
++              and authority['coordinator_ends_at'] == COORDINATOR_END
++              and authority['weekly_window']['ends_at'] == c.DEADLINE
++              and caps['buckets'] == {'baseline': 400, 'development': 1120, 'validation': 180, 'formal': 40, 'recovery': 60}
++              and caps['attempts'] == 1800 and caps['gpu_hours'] == 224.
++              and caps['protected_gpu_hours'] == {'validation': 32., 'formal': 12.}, 'finite root budget authority')
++    w.require(authority['parent_authority'] == w.read_ref(plan['parent_plan'])['authority']
++              and authority['accounting_amendment'] == plan['accounting_amendment'], 'authority parent/amendment')
++    parent_authority = c.read_ref(authority['parent_authority'])
++    w.require(authority['caps'] == parent_authority['caps']
++              and authority['weekly_window'] == parent_authority['weekly_window'], 'global/weekly caps changed')
++    w.require(authority['preparation_review'] == plan['preparation_review'], 'accounting preparation basis')
++    w.require(isinstance(authority['continuation_resource_ids'], list)
++              and len(set(authority['continuation_resource_ids'])) == len(authority['continuation_resource_ids']), 'resource attribution IDs')
++    amendment = c.read_ref(plan['accounting_amendment'])
++    w.require(amendment == {'schema': 'n32r3-adopted-accounting-v1', 'approved': True,
++              'parent_authority': authority['parent_authority'], 'limits': c.LIMITS,
++              'ledger_prefixes': authority['ledger_prefixes'], 'amendment': authority['amendment'],
++              'continuation_resource_ids': authority['continuation_resource_ids'],
++              'historical_charges_retained': True, 'original_cohort_closed': True}, 'approved accounting amendment')
++    # The approval basis is an external artifact, not a generated string/hash.
++    w.read_ref(authority['approval_basis'])
++    for name in ('origin_gpu_hours', 'increment_gpu_hours'):
++        c.finite(authority['weekly_window'][name], name)
++    w.require(authority['weekly_window']['increment_gpu_hours'] <= 168., 'weekly ceiling')
++    w.require(Path(plan['worktree']).resolve() == b.ROOT.resolve(), 'actual imported checkout differs')
++    w.verify_source(plan['worktree'], plan['source'])
++    b.attest_loaded(plan['worktree'], plan['source'])
++    w.require(b.source_paths(plan['worktree']) <= {x['path'] for x in plan['source']['files']}, 'source inventory incomplete')
++    runtime = w.read_ref(plan['runtime'])
++    w.require(runtime['schema'] == 'qd-ed-runtime-setup-v1'
++              and Path(runtime['worktree']).resolve() == Path(plan['worktree']).resolve()
++              and runtime['gpu_mapping']['uuid'] == c.GPU_UUID and r.runtime_gpu(runtime) == 7
++              and runtime['gpu_mapping']['egl_device_index'] == 4
++              and runtime['cuda_egl_verified'] is True and runtime['provider_ready'] is True
++              and runtime['stage_recovered_error_condition'] == r.E2_STAGE_CONDITION
++              and runtime['frozen_stage_provider']['backend'] == 'codex_cli', 'runtime checkout/device/provider')
++    parent_runtime = c.read_ref(w.read_ref(plan['parent_plan'])['runtime'])
++    w.require({k:v for k,v in runtime.items() if k != 'worktree'} ==
++              {k:v for k,v in parent_runtime.items() if k != 'worktree'}, 'runtime/provider scientific condition changed')
++    r.stage_overrides(runtime)
++    r.owned(plan['artifact_root'], runtime['artifact_root'])
++    w.require(Path(plan['artifact_root']).resolve() != Path(runtime['artifact_root']).resolve(), 'distinct N32 artifact directory required')
++    # Use the same inventory/checkpoint/task/seed validators as the generic runner.
++    state_view = {'artifacts': runtime['artifact_root']}
++    # The runtime worktree alias was checked above to resolve to this checkout.
++    # Preserve its frozen lexical paths while retaining both containment checks.
++    r.verify_files(runtime['files'], allowed_roots=(plan['worktree'], runtime['worktree'], runtime['artifact_root']))
++    fingerprints = {str(Path(x['path']).resolve()) for x in runtime['files']}
++    for task in runtime['tasks'].values():
++        cache = Path(task['cache_dir'])
++        actual = {str(p.resolve()) for p in cache.rglob('*') if p.is_file()}
++        w.require(actual and actual <= fingerprints, 'task cache inventory incomplete')
++    r.validate_runtime_inputs(plan, runtime, b.profiles(plan['worktree']), Path(plan['worktree']), state_view)
++    for row in plan['episodes']:
++        b.verify_manifest(plan['expected_manifests'][row['episode_key']], plan, runtime, row)
++    return plan, runtime, authority
++
++
++def prefix(path, expected):
++    import hashlib
++    path = Path(path)
++    w.require(not path.is_symlink() and path.is_file(), 'ledger prefix path')
++    with path.open('rb') as stream:
++        data = stream.read(expected['bytes'])
++    w.require(len(data) == expected['bytes'] and hashlib.sha256(data).hexdigest() == expected['sha256'], 'historical ledger prefix changed')
++
++
++def admission(plan, authority, state, events, resources, reservations, row, *, now, gpu_idle):
++    """Caller holds normal runner/state locks; all balances come from journals."""
++    caps, budget = authority['caps'], state['budget']
++    w.require(state.get('n32r3_budget_authority') == plan['authority'] and r.authorized_gpu(state) == 7
++              and budget['max_episode_attempts'] == caps['attempts'] and budget['max_gpu_hours'] == caps['gpu_hours']
++              and budget['reserved'] == caps['buckets'] and budget['gpu_hour_reservations'] == caps['protected_gpu_hours']
++              and budget['amendment'] == authority['amendment'], 'adopted state authority differs')
++    isolation = state.get('resource_isolation', {})
++    w.require(isolation.get('status') == 'ACTIVE' and isolation.get('validation_status') == 'PASS'
++              and isolation.get('private_budget') is True
++              and state.get('max_concurrent_gpu_workers') == 1
++              and not state.get('external_resource_hold', {}).get('do_not_auto_resume', False), 'private resource admission')
++    # Generic accounting deliberately preserves unknown durations as errors.
++    snap = r.budget_snapshot(events, resources)
++    groups = r.event_groups(events)
++    w.require(all(g[-1]['event'] in r.TERMINAL for g in groups.values()), 'unsettled reservation or live process')
++    timeout = r.check_budget_limits(state, snap, row, reservations, bucket_caps=caps['buckets'], amendment=budget['amendment'])
++    w.require(timeout == 1800, 'full1840s admission')
++    window = authority['weekly_window']
++    from scripts.qd_ed_n31_contract import effective_hours
++    effective = effective_hours(authority)
++    effective_state = {**state, 'budget': {**budget, 'max_gpu_hours': effective}}
++    w.require(r.check_budget_limits(effective_state, snap, row, reservations,
++              bucket_caps=caps['buckets'], amendment=budget['amendment']) == 1800, 'weekly full1840s admission')
++    protected = sum(max(0., h - snap['gpu_hours_by_bucket'][k]) for k, h in caps['protected_gpu_hours'].items())
++    local = [e for e in events if e.get('identity', {}).get('iteration') == c.COHORT]
++    declared = set(authority['continuation_resource_ids'])
++    local_ids = {e['resource_id'] for e in resources if e.get('cohort') == c.COHORT
++                 or e.get('kind') == 'n32r3_resource_preparation_v1'}
++    w.require(local_ids <= declared, 'unattributed continuation resource charge')
++    local_resources = [e for e in resources if e['resource_id'] in declared]
++    w.require(all(e.get('cohort') == c.COHORT and e.get('kind') == 'n32r3_resource_preparation_v1'
++                  for e in local_resources), 'resource attribution changed/foreign')
++    cohort = r.budget_snapshot(local, local_resources)
++    allowance = {'authority_starts_at': authority['starts_at'],
++                 'authority_ends_at': min(authority['coordinator_ends_at'], window['ends_at']),
++                 'private_budget': True, 'gpu_idle': gpu_idle, 'physical_gpu': 7, 'gpu_uuid': c.GPU_UUID,
++                 'live_handles': [], 'unsettled_reservations': 0,
++                 'global_seconds_remaining': (effective - snap['gpu_hours_consumed']) * 3600,
++                 'private_seconds_remaining': (caps['gpu_hours'] - snap['gpu_hours_consumed']) * 3600,
++                 'protected_seconds_remaining': protected * 3600,
++                 'cohort_seconds_remaining': 30600 - cohort['gpu_hours_consumed'] * 3600,
++                 'bucket_attempts_remaining': {k: v - snap['by_bucket'][k] for k, v in caps['buckets'].items()},
++                 'global_attempts_remaining': caps['attempts'] - snap['dispatched'],
++                 'protected_attempts_remaining': sum(max(0, caps['buckets'][k] - snap['by_bucket'][k]) for k in ('validation', 'formal')),
++                 'cohort_attempts_remaining': 16 - cohort['dispatched']}
++    allowance['local_bucket_attempts_remaining'] = {k: c.LIMITS[k] - cohort['by_bucket'][k] for k in ('baseline', 'development', 'recovery')}
++    w.require(cohort['gpu_healthcheck_inflight'] == 0, 'unsettled continuation preparation')
++    c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'])
++    return snap
++
++
++def verify_continuity(plan):
++    """Root attests an exact new operational delta; all old science stays frozen."""
++    import hashlib
++    import subprocess
++    root = Path(plan['worktree'])
++    old, new = plan['scientific_source'], plan['source']
++    w.require(old['commit'] == c.BASE_SOURCE and new['commit'] != old['commit'], 'operational commit cannot impersonate scientific commit')
++    old_files = {x['path']: x['sha256'] for x in old['files']}
++    new_files = {x['path']: x['sha256'] for x in new['files']}
++    w.require(len(old_files) == len(old['files']) and len(new_files) == len(new['files']) and old_files.keys() <= new_files.keys(), 'source closure removed/duplicated')
++    shared = 'scripts/qd_ed_final_runner.py'
++    w.require(all(new_files[k] == v for k,v in old_files.items() if k != shared), 'immutable scientific/audit source changed')
++    changed = subprocess.check_output(['git', '--no-replace-objects', 'diff', '--name-only', old['commit'], new['commit'], '--'], cwd=root,
++                                     env={**__import__('os').environ, 'GIT_NO_LAZY_FETCH': '1'}).decode().splitlines()
++    w.require(changed and all(p == shared or (p.startswith('scripts/qd_ed_n32r3_') and p.endswith('.py'))
++                             or (p.startswith('tests/test_n32r3') and p.endswith('.py')) for p in changed), 'unapproved operational/scientific delta')
++    w.require(set(changed) <= new_files.keys(), 'delta omitted from source freeze')
++    # The sole shared change must be exactly the explicit recovery routing block.
++    original = w._committed_source(root, old['commit'], shared).decode()
++    before = "        if not row.get('retry_of'):\n            require((row['split'] == 'dev' and row['budget_bucket'] in {'baseline', 'development'}) or row['split'] == row['budget_bucket'], 'split/budget mismatch')"
++    after = "        if plan.get('schema') == 'n32r3-released-plan-v1' and row['budget_bucket'] == 'recovery':\n            from scripts.qd_ed_n32r3_contract import require_recovery_row\n            require_recovery_row(plan, row)\n        elif not row.get('retry_of'):\n            require((row['split'] == 'dev' and row['budget_bucket'] in {'baseline', 'development'}) or row['split'] == row['budget_bucket'], 'split/budget mismatch')"
++    w.require(original.count(before) == 1 and hashlib.sha256(original.replace(before, after).encode()).hexdigest() == new_files[shared], 'shared audit/runtime relaxation')
++    attestation = c.read_ref(plan['source_continuity'])
++    w.require(attestation == {'schema': 'n32r3-source-continuity-review-v1', 'approved': True,
++              'parent_plan': plan['parent_plan'], 'parent_release': plan['parent_release'],
++              'carry_forward_map': plan['carry_forward_map'], 'command_candidates': plan['command_candidates'],
++              'scientific_source': old, 'operational_source': new,
++              'changed_files': {p: new_files[p] for p in sorted(changed)},
++              'scientific_changes': [], 'audit_changes': [], 'shared_routing': [shared]}, 'detached source continuity approval')
+diff --git a/scripts/qd_ed_n32r3_runner.py b/scripts/qd_ed_n32r3_runner.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..feaa8476a92e26c135d0e8c6d9890feb7660a192
+--- /dev/null
++++ b/scripts/qd_ed_n32r3_runner.py
+@@ -0,0 +1,186 @@
++"""Root-invoked N32 production adapter. No authority creation or automatic recovery."""
++import argparse
++import datetime as dt
++from pathlib import Path
++import subprocess
++import time
++
++from scripts import qd_ed_final_runner as r, qd_ed_n23_worker as w
++from scripts import qd_ed_n32r3_contract as c, qd_ed_n32r3_bridge as b
++from scripts import qd_ed_n32r3_release as release, qd_ed_n32r3_supervise as supervisor
++from scripts import qd_ed_n32r3_worker as worker
++
++
++from scripts.qd_ed_n32_runner import (process_identity, cleanup_owned, wait_worker,
++                                      journal_prefix, device_check, check_probe)
++
++
++def snapshot(root, authority):
++    reviewed = c.read_ref(authority['preparation_review'])
++    for field, name in (('ledger_prefix', 'attempt-ledger.jsonl'), ('health_prefix', 'gpu-healthcheck-ledger.jsonl')):
++        release.prefix(root / 'data' / name, reviewed[field])
++    for name, anchor in authority['ledger_prefixes'].items():
++        w.require(name in {'attempt-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl', 'gpu-hour-reservation-ledger.jsonl'}, 'unexpected ledger anchor')
++        release.prefix(root / 'data' / name, anchor)
++    w.require({'attempt-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl'} <= set(authority['ledger_prefixes']), 'historical charge anchors missing')
++    events = r.read_events(root / 'data/attempt-ledger.jsonl')
++    resources = r.read_events(root / 'data/gpu-healthcheck-ledger.jsonl')
++    reservations = r.read_events(root / 'data/gpu-hour-reservation-ledger.jsonl')
++    return r.read_state(root / 'research-state.yaml'), events, resources, reservations
++
++
++def existing_handles(plan, events):
++    """Read only N32 output identities; never signal or infer a new PID owner."""
++    groups = r.event_groups(events)
++    unsettled = []
++    for row in plan['episodes']:
++        output = Path(w.read_ref(plan['expected_manifests'][row['episode_key']])['output_dir'])
++        if not output.exists() and not output.is_symlink():
++            continue
++        group = groups.get(row['episode_key'])
++        if not group or group[-1]['event'] not in r.TERMINAL:
++            unsettled.append({'episode_key': row['episode_key'], 'status': 'ORPHAN_OR_UNSETTLED'})
++            continue
++        try:
++            record = r.read_json(output / 'process.json')
++            expected = {k: record[k] for k in ('pid', 'boot_id', 'proc_start_ticks')}
++            try:
++                actual = process_identity(record['pid'])
++            except FileNotFoundError:
++                continue
++            if actual == expected:
++                unsettled.append({'episode_key': row['episode_key'], 'status': 'LIVE'})
++        except (OSError, ValueError, KeyError, TypeError, r.GateError):
++            unsettled.append({'episode_key': row['episode_key'], 'status': 'UNKNOWN'})
++    return unsettled
++
++
++def continuation_handles(plan, events):
++    parent = c.read_ref(plan['parent_plan'])
++    return existing_handles(plan, events) + existing_handles({**parent, 'episodes': parent['episodes'][:15]}, events)
++
++
++def execute_one(plan_ref, release_ref):
++    """One primary, or a read-only reconciled stop. All writes require release."""
++    plan, runtime, authority = release.validate_release(plan_ref, release_ref)
++    root = Path(plan['worktree']).resolve()
++    with r.locked(root / 'data/qd-ed-runner.lock', nonblocking=True):
++        with r.locked(root / 'data/qd-ed-state.lock'):
++            plan, runtime, authority = release.validate_release(plan_ref, release_ref)
++            state, events, resources, reservations = snapshot(root, authority)
++            w.require(state['run_name'] == plan['run_name'] and Path(state['artifacts']).resolve() == Path(runtime['artifact_root']).resolve(), 'owning run identity')
++            def verify_existing(row, final):
++                release.prefix(root / 'data/attempt-ledger.jsonl', final['ledger_prefix'])
++                recorded = w.read_ref(c.ref(Path(final['output_dir']) / 'attempt-result.json'))
++                w.require(recorded == final, 'terminal artifact/journal differs')
++                return worker.verify_terminal(plan_ref, row, final, release_ref)
++            reconciled = supervisor.reconcile(plan, events, verify_existing, live_handles=continuation_handles(plan, events))
++            if reconciled['next_row'] is None:
++                return reconciled
++            row = reconciled['next_row']
++            # Reject every foreign or unknown unsettled handle, including reservations.
++            w.require(all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(events).values()), 'unsettled/live ledger')
++            # STOP/time/accounting checked before even probing the device.
++            release.admission(plan, authority, state, events, resources, reservations, row,
++                              now=dt.datetime.now(dt.timezone.utc), gpu_idle=True)
++            check_probe(runtime, resources, root)
++            admission = device_check()
++            env = r.child_environment(runtime)
++            r.verify_provider(runtime, env, root=root)
++            r.runtime_gpu(runtime, state)
++            plan, runtime, authority = release.validate_release(plan_ref, release_ref)
++            new_state, current, new_resources, new_reservations = snapshot(root, authority)
++            w.require((new_state, current, new_resources, new_reservations) == (state, events, resources, reservations), 'journal/state changed under locks')
++            admission = device_check()
++            release.admission(plan, authority, state, current, resources, reservations, row,
++                              now=dt.datetime.now(dt.timezone.utc), gpu_idle=True)
++            manifest = w.read_ref(plan['expected_manifests'][row['episode_key']])
++            output = Path(manifest['output_dir'])
++            r.owned(output, plan['artifact_root'])
++            w.require(not output.exists() and not output.is_symlink(), 'output exists: no replay')
++            # A deterministic key is unique across the entire journal, not just N32.
++            w.require(not any(e['attempt_id'] == row['episode_key'] or e.get('episode_key') == row['episode_key'] for e in events), 'global attempt replay')
++            output.mkdir(parents=True)
++            context_path = output / 'n32-worker-context.json'
++            w.atomic_json(context_path, worker.context_for(plan_ref, row, release_ref))
++            context_ref = c.ref(context_path)
++            command = [manifest['argv'][0], '-m', 'scripts.qd_ed_n32r3_worker', '--context', str(context_path), '--context-sha256', context_ref['sha256']]
++            base = {'attempt_id': row['episode_key'], 'episode_key': row['episode_key'], 'identity': supervisor.c_identity(row),
++                    'budget_bucket': row['budget_bucket'], 'plan_sha256': plan_ref['sha256'], 'release': release_ref,
++                    'source_commit': plan['source']['commit'], 'runtime_manifest_sha256': plan['runtime']['sha256'],
++                    'runtime_inventory_sha256': plan['runtime_inventory_sha256'], 'init_row_sha256': row['init_row_sha256'],
++                    'output_dir': str(output), 'physical_gpu': 7, 'retry_of': None, 'recovery_of': c.recovery_of(row),
++                    'schema': 'n32r3-lifecycle-v1', 'continuation': c.commitments(plan, row),
++                    'semantic_key': b.semantic_key(plan, manifest),
++                    'ledger_prefix': journal_prefix(root / 'data/attempt-ledger.jsonl'), 'context': context_ref,
++                    'stage_backend': 'codex_cli', 'stage_model': 'gpt-6-astra', 'stage_condition': r.stage_condition(runtime)}
++            r.append_event_locked(root, {**base, 'event': 'reserved', 'time_unix': time.time(), 'admission': admission})
++            w.atomic_json(output / 'command.json', {'argv': command, 'main_argv': manifest['argv'], 'context': context_ref})
++            # Recheck STOP after durable reservation. Rejection leaves an unsettled
++            # primary for root review, never a retryable/zero-charge synthetic outcome.
++            w.require(not Path(plan['stop_path']).exists() and not Path(plan['stop_path']).is_symlink(), 'STOP after reservation')
++            end = min(dt.datetime.fromisoformat(x.replace('Z', '+00:00')) for x in
++                      (c.DEADLINE, authority['coordinator_ends_at'], authority['weekly_window']['ends_at']))
++            w.require(dt.datetime.now(dt.timezone.utc) + dt.timedelta(seconds=1840) <= end, 'deadline after reservation')
++            r.append_event_locked(root, {**base, 'event': 'dispatched', 'time_unix': time.time(), 'timeout_seconds': 1800})
++        started = time.monotonic()
++        process = None
++        process_finished = None
++        identity = None
++        outcome = None
++        try:
++            with (output / 'runner.log').open('w') as log:
++                process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.PIPE, stdout=log,
++                                           stderr=subprocess.STDOUT, start_new_session=True)
++                identity = process_identity(process.pid)
++                record = {**identity, 'attempt_id': row['episode_key'], 'context': context_ref, 'release': release_ref}
++                w.atomic_json(output / 'process.json', record)
++                process.stdin.write(b'G'); process.stdin.flush(); process.stdin.close()
++                code = wait_worker(process, started, identity)
++                process_finished = time.monotonic()
++                w.require(code == 0, 'worker exit not zero')
++            outcome = r.validate_result(output, row, b.profiles(root)['profiles'][row['profile']], runtime)
++            outcome['n32_worker_receipt'] = c.ref(output / 'eds_eval/n32-worker-receipt.json')
++            terminal = {**base, **outcome, 'event': 'valid', 'time_unix': time.time(),
++                        'gpu_process_wall_seconds': (process_finished or time.monotonic()) - started}
++            worker.verify_terminal(plan_ref, row, terminal, release_ref)
++        except BaseException as exc:
++            if isinstance(exc, subprocess.TimeoutExpired) and exc.cmd == 'owned episode' and process is not None:
++                w.require(identity is not None, 'missing owned child identity; leave unsettled')
++                cleanup_owned(process, identity)
++                process_finished = time.monotonic()
++            # An unknown/live process stays dispatched and blocks every new launch.
++            # Root reconciles its eventual cost; STOP/interrupt never kills it.
++            if process is not None and process.poll() is None:
++                raise
++            _, outcome = r.failed_outcome(exc, output, row, launch_failed=process is None, runtime=runtime)
++            outcome.update(outcome_valid=False, success=None, task_failure=False, retryable_infrastructure=False,
++                           classification='INVALID', required_cost_telemetry_complete=False)
++            terminal = {**base, **outcome, 'event': 'aborted', 'time_unix': time.time(),
++                        'gpu_process_wall_seconds': (process_finished or time.monotonic()) - started}
++        terminal['gpu_time_measurement'] = 'exclusive GPU7 process wall-time upper bound including audits and cleanup'
++        with r.locked(root / 'data/qd-ed-state.lock'):
++            r.append_event_locked(root, terminal)
++            w.atomic_json(output / 'attempt-result.json', terminal)
++        return {'status': 'VALID' if terminal['outcome_valid'] is True else 'INVALID_STOP', 'terminal': terminal}
++
++
++def launch(plan_ref, release_ref):
++    while True:
++        result = execute_one(plan_ref, release_ref)
++        if result['status'] != 'VALID':
++            return result
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    for name in ('plan', 'plan-sha256', 'release', 'release-sha256'):
++        parser.add_argument('--' + name, required=True)
++    args = parser.parse_args()
++    result = launch({'path': str(Path(args.plan).resolve()), 'sha256': args.plan_sha256},
++                    {'path': str(Path(args.release).resolve()), 'sha256': args.release_sha256})
++    print(result['status'])
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/scripts/qd_ed_n32r3_supervise.py b/scripts/qd_ed_n32r3_supervise.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..d8186f58d00b6933acc8c6b30ca53db218539670
+--- /dev/null
++++ b/scripts/qd_ed_n32r3_supervise.py
+@@ -0,0 +1,69 @@
++"""Strict 14 original + 16 prospective reconciliation; no scientific evaluation."""
++from scripts import qd_ed_n23_worker as w, qd_ed_n32r3_contract as c
++from scripts.qd_ed_n32_supervise import c_identity
++from scripts.qd_ed_n32r3_history import verified_parent
++
++
++def progress(outcomes):
++    keys = [(x['task_id'], x['profile']) for x in outcomes]
++    w.require(len(keys) == len(set(keys)) and keys == [(t,a) for t in range(10) for a in c.ARMS][:len(keys)]
++              and all(type(x['success']) is bool for x in outcomes), 'complete valid semantic prefix')
++    triples = len(outcomes)//3
++    successes = sum(x['success'] for x in outcomes[:triples*3] if x['profile'] == 'N32')
++    controls = {arm: sum(x['success'] for x in outcomes if x['profile'] == arm) for arm in c.ARMS}
++    return {'complete_valid_triples': triples, 'n32_successes': successes,
++            'futile': successes + 10 - triples < 5,
++            'prospective_dev_necessary_gate_met': len(outcomes) == 30 and successes >= 5
++                 and successes >= max(controls['C0'], controls['Q0']),
++            'scientific_promotion': False, 'http_counters': 'Unknown'}
++
++
++def reconcile(plan, events, verify_terminal, *, live_handles=()):
++    w.require(plan['episodes'] == c.expected_rows(plan['worktree']), 'exact continuation matrix')
++    outcomes = verified_parent(plan, events)
++    w.require(len(outcomes) == 14, 'missing original controls')
++    local = [e for e in events if e.get('identity', {}).get('iteration') == c.COHORT]
++    groups = []
++    for event in local:
++        if not groups or event['attempt_id'] != groups[-1][0]['attempt_id']:
++            groups.append([])
++        groups[-1].append(event)
++    ids = [g[0]['attempt_id'] for g in groups]
++    w.require(len(ids) == len(set(ids)) and len(ids) <= 16, 'duplicate recovery/attempt')
++    # An alias under a different iteration cannot hide a replay/recovery.
++    expected_ids = {x['episode_key'] for x in plan['episodes']}
++    w.require(all(e in local for e in events if e['attempt_id'] in expected_ids or e.get('recovery_of') == c.OLD_INVALID), 'foreign iteration alias/recovery')
++    def result(status, row=None):
++        return {'status': status, 'next_row': row, 'outcomes': outcomes, 'charged_events': events, **progress(outcomes)}
++    for index, group in enumerate(groups):
++        row = plan['episodes'][index]
++        binding = c.commitments(plan, row)
++        w.require(all(e['attempt_id'] == e['episode_key'] == row['episode_key'] and e['identity'] == c_identity(row)
++                      and e.get('schema') == 'n32r3-lifecycle-v1' and e.get('continuation') == binding
++                      and e.get('retry_of') is None and e.get('recovery_of') == c.recovery_of(row) for e in group), 'execution/mapping identity')
++        immutable = ('attempt_id','identity','episode_key','budget_bucket','plan_sha256','release','source_commit',
++                     'runtime_manifest_sha256','runtime_inventory_sha256','init_row_sha256','output_dir','physical_gpu','ledger_prefix','context','continuation','semantic_key')
++        w.require(all(all(k in e and e[k] == group[0][k] for k in immutable) for e in group), 'lifecycle binding changed')
++        kinds = [e['event'] for e in group]
++        if kinds in (['reserved'], ['reserved','dispatched']):
++            w.require(index == len(groups)-1, 'dispatch after unsettled')
++            return result('LIVE_OR_UNSETTLED')
++        if kinds != ['reserved','dispatched','valid']:
++            w.require(index == len(groups)-1, 'dispatch after invalid')
++            return result('INVALID_STOP')
++        final = group[-1]
++        try:
++            w.require(final['outcome_valid'] is True and final['required_cost_telemetry_complete'] is True
++                      and type(final['success']) is bool, 'invalid Stage/terminal')
++            verify_terminal(row, final)
++        except (ValueError, KeyError, TypeError, OSError, RuntimeError):
++            w.require(index == len(groups)-1, 'dispatch after invalid audit')
++            return result('INVALID_STOP')
++        outcomes.append({'task_id': row['task_id'], 'profile': row['profile'], 'success': final['success'], 'attempt_id': final['attempt_id']})
++        if len(outcomes)%3 == 0 and progress(outcomes)['futile']:
++            w.require(index == len(groups)-1, 'dispatch after futility')
++            return result('NUMERIC_FUTILITY')
++    if live_handles:
++        return result('LIVE_OR_UNSETTLED')
++    return result('COMPLETE' if len(outcomes) == 30 else 'READY_FOR_ROOT_RELEASE',
++                  None if len(outcomes) == 30 else plan['episodes'][len(groups)])
+diff --git a/scripts/qd_ed_n32r3_worker.py b/scripts/qd_ed_n32r3_worker.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..de5b9430ddaebc627baa7a1f8a21e34a50416876
+--- /dev/null
++++ b/scripts/qd_ed_n32r3_worker.py
+@@ -0,0 +1,277 @@
++"""N32 metered worker and hash-only parent receipt verification.
++
++The public launch requires a detached root release. Draft contexts remain closed.
++`_run_in_process` provides the same-PID implementation tested on synthetic CPU data.
++"""
++import os
++from pathlib import Path
++import runpy
++import sys
++import time
++
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n32r3_bridge as b, qd_ed_n32r3_contract as c
++from scripts import qd_ed_n32_native as n32, qd_ed_n31_native as controls
++from scripts import audit_decision_evidence as generic
++from scripts.qd_ed_audit_backend import create_backend, assigned_cuda_identity, canonical_cuda_uuid
++
++
++def attest_worker_loaded(root, source):
++    """Bind the executing worker, including Python's -m __main__, to frozen bytes.
++
++    Do not import a second worker or register an alias: attest this function's
++    actual module. Main's temporary __main__ is restored by runpy before the
++    post-run inventory. This is source attestation, not bytecode attestation.
++    """
++    loaded = b.attest_loaded(root, source)
++    canonical = 'scripts.qd_ed_n32r3_worker'
++    relative = 'scripts/qd_ed_n32r3_worker.py'
++    module = sys.modules.get(__name__)
++    spec = getattr(module, '__spec__', None)
++    w.require(module is not None and vars(module) is globals()
++              and __name__ in ('__main__', canonical)
++              and getattr(spec, 'name', None) == canonical
++              and getattr(spec, 'has_location', False), 'worker module spec differs')
++    expected = Path(root).resolve() / relative
++    file, origin = getattr(module, '__file__', None), getattr(spec, 'origin', None)
++    w.require(file and origin and expected.is_file() and not expected.is_symlink()
++              and Path(file).resolve() == expected and Path(origin).resolve() == expected,
++              'worker module origin differs')
++    actual = w.sha(expected)
++    index = {v['path']: v['sha256'] for v in source['files']}
++    w.require(index.get(relative) == actual, 'worker source not frozen')
++    record = {'path': relative, 'sha256': actual, 'module_name': __name__,
++              'spec_name': spec.name, 'origin': str(expected)}
++    # Any separately imported canonical copy must already pass the generic
++    # origin/hash checks and agree with this executing module's source.
++    if canonical in loaded:
++        w.require(loaded[canonical] == {'path': relative, 'sha256': actual},
++                  'worker canonical source differs')
++    loaded[canonical] = record
++    return loaded
++
++
++def validate_context(reference):
++    context = w.read_ref(reference)
++    w.require(set(context) == {'schema', 'plan', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract', 'continuation', 'semantic_key'} | ({'release'} if 'release' in context else set()), 'worker context fields')
++    w.require(context['schema'] == 'n32r3-worker-context-v1' and context['worker_contract'] == c.WORKER_CONTRACT, 'worker contract')
++    plan = w.read_ref(context['plan'])
++    if 'release' in context:
++        from scripts import qd_ed_n32r3_release as release
++        released, _, _ = release.validate_release(context['plan'], context['release'])
++        w.require(released == plan, 'released worker plan differs')
++    else:
++        c.require_release(plan)
++    rows = [r for r in plan['episodes'] if r['episode_key'] == context['episode_key']]
++    w.require(len(rows) == 1 and context['attempt_id'] == context['episode_key'], 'exact primary attempt')
++    row = rows[0]
++    w.require(context['expected_manifest'] == plan['expected_manifests'][row['episode_key']], 'plan/command external anchor')
++    runtime = w.read_ref(plan['runtime'])
++    manifest = b.verify_manifest(context['expected_manifest'], plan, runtime, row)
++    w.require(context['continuation'] == c.commitments(plan, row)
++              and context['semantic_key'] == b.semantic_key(plan, manifest), 'worker semantic/parent mapping')
++    w.require(context['main_argv'] == manifest['argv'][1:], 'exact candidate command')
++    w.require(runtime['gpu_mapping']['physical_gpu'] == 7 and runtime['gpu_mapping']['uuid'] == c.GPU_UUID, 'assigned GPU mapping')
++    return context, plan, runtime, row, manifest
++
++
++def context_for(plan_ref, row, release_ref=None):
++    plan = w.read_ref(plan_ref)
++    manifest_ref = plan['expected_manifests'][row['episode_key']]
++    manifest = w.read_ref(manifest_ref)
++    w.require(row in plan['episodes'] and manifest['row'] == row, 'context row')
++    return {'schema': 'n32r3-worker-context-v1', 'plan': plan_ref, 'expected_manifest': manifest_ref,
++            'episode_key': row['episode_key'], 'attempt_id': row['episode_key'],
++            'main_argv': manifest['argv'][1:], 'worker_contract': c.WORKER_CONTRACT,
++            'continuation': c.commitments(plan, row), 'semantic_key': b.semantic_key(plan, manifest),
++            **({'release': release_ref} if release_ref is not None else {})}
++
++
++from scripts.qd_ed_n32_worker import native_counts, evidence
++
++
++def verify_dispatch_record(context_ref, context, output, identity):
++    """A released child must match the parent's durable record before Main."""
++    record = w.read_ref(c.ref(Path(output) / 'process.json'))
++    w.require({k: record[k] for k in ('pid', 'proc_start_ticks', 'boot_id')} == identity
++              and record['attempt_id'] == context['attempt_id']
++              and record['context'] == context_ref and record['release'] == context['release'],
++              'parent dispatch process/context/release differs')
++
++
++def _run_in_process(context_ref):
++    """Internal implementation, to be called only by a root-released bounded runner."""
++    context, plan, runtime, row, manifest = validate_context(context_ref)
++    root, output = Path(plan['worktree']), Path(manifest['output_dir'])
++    identity = w.process_identity()
++    if 'release' in context:
++        verify_dispatch_record(context_ref, context, output, identity)
++    started = time.perf_counter()
++    receipt_path = output / 'eds_eval/n32-worker-receipt.json'
++    start_path = output / 'eds_eval/n32-worker-start.json'
++    report_path = output / 'eds_eval/decision-evidence-audit.json'
++    w.require(not any(p.exists() for p in (receipt_path, start_path, report_path)), 'replay/duplicate worker artifacts')
++    w.atomic_json(start_path, {'context': context_ref, 'process': identity})
++    receipt = {'schema': 'n32r3-worker-receipt-v1', 'context': context_ref, 'plan': context['plan'],
++               'expected_manifest': context['expected_manifest'], 'source': plan['source'], 'row': row,
++               'attempt_id': context['attempt_id'], 'process': identity, 'accepted': False,
++               'main_exit_code': None, 'http_counters': 'Unknown',
++               'continuation': context['continuation'], 'semantic_key': context['semantic_key']}
++    old_argv, old_cwd = sys.argv, Path.cwd()
++    try:
++        receipt['loaded_before'] = attest_worker_loaded(root, plan['source'])
++        sys.argv = context['main_argv']
++        os.chdir(root)
++        try:
++            runpy.run_path(sys.argv[0], run_name='__main__')
++        except SystemExit as exc:
++            w.require(exc.code is None or type(exc.code) is int and exc.code == 0, 'main nonzero exit')
++        receipt['main_exit_code'] = 0
++        validate_context(context_ref)
++        w.require(w.process_identity() == identity, 'worker process changed')
++        receipt['loaded_after'] = attest_worker_loaded(root, plan['source'])
++        receipt['worker_cuda'] = assigned_cuda_identity(w.cuda_binding(runtime))
++        backend = create_backend('cpu')
++        before = evidence(output)
++        audit_started = time.perf_counter()
++        report = generic.audit_episode(output / 'eds_eval/decision_evidence/episode_000',
++                                       output / 'eds_eval/episode_compute.jsonl',
++                                       arithmetic_backend=backend, n31_empty_provider_search=True)
++        w.require(report.get('accepted') is True and report.get('evidence_complete') is True, 'generic evidence INVALID')
++        if row['profile'] == 'N32':
++            report = n32.audit_output('N32', output, report, backend, expected_runtime=manifest['expected_runtime'])
++        else:
++            report = controls.audit_output(row['profile'], output, report, backend)
++        counts, auxiliary = native_counts(row['profile'], output, report, manifest['expected_runtime'])
++        w.require(before == evidence(output), 'evidence changed during audit')
++        validate_context(context_ref)
++        receipt.update(audit_seconds=time.perf_counter() - audit_started, native_counts=counts, auxiliary=auxiliary,
++                       evidence=before, audit_backend=backend.report())
++        w.atomic_json(report_path, report)
++        receipt.update(audit_report=c.ref(report_path), accepted=True)
++    except BaseException as exc:
++        receipt.update(accepted=False, classification='INVALID', error_type=type(exc).__name__, error=str(exc))
++    finally:
++        sys.argv = old_argv
++        os.chdir(old_cwd)
++        receipt.update(worker_wall_seconds=time.perf_counter() - started, process_unchanged=w.process_identity() == identity)
++        w.atomic_json(receipt_path, receipt)
++    return 0 if receipt['accepted'] and receipt['process_unchanged'] else 2
++
++
++def verify_receipt(context_ref, receipt_ref, process_record):
++    context, plan, runtime, row, manifest = validate_context(context_ref)
++    output = Path(manifest['output_dir'])
++    receipt = w.read_ref(receipt_ref)
++    w.require(receipt_ref['path'] == str(output / 'eds_eval/n32-worker-receipt.json'), 'receipt path')
++    process = {key: process_record[key] for key in ('pid', 'proc_start_ticks', 'boot_id')}
++    w.require(process_record['attempt_id'] == context['attempt_id'] and receipt.get('process') == process
++              and receipt.get('process_unchanged') is True and receipt.get('accepted') is True
++              and receipt.get('main_exit_code') == 0 and receipt.get('schema') == 'n32r3-worker-receipt-v1', 'receipt process/outcome')
++    for key, expected in {'context': context_ref, 'plan': context['plan'], 'expected_manifest': context['expected_manifest'],
++                          'source': plan['source'], 'row': row, 'attempt_id': context['attempt_id'], 'evidence': evidence(output),
++                          'continuation': context['continuation'], 'semantic_key': context['semantic_key']}.items():
++        w.require(receipt.get(key) == expected, 'receipt binding ' + key)
++    w.require(w.read_ref(c.ref(output / 'eds_eval/n32-worker-start.json')) == {'context': context_ref, 'process': process}, 'start identity')
++    cuda = receipt['worker_cuda']
++    w.require(cuda['physical_gpu'] == 7 and cuda['uuid'] == c.GPU_UUID and cuda['logical_device'] == 'cuda:0'
++              and cuda['physical_uuid'] == canonical_cuda_uuid(c.GPU_UUID)
++              and canonical_cuda_uuid(cuda['actual_uuid']) == canonical_cuda_uuid(c.GPU_UUID), 'worker device attestation')
++    expected_hex = canonical_cuda_uuid(c.GPU_UUID)[4:].replace('-', '')
++    w.require((cuda.get('actual_uuid_type') == 'builtins.str' and cuda.get('actual_uuid_bytes_hex') is None)
++              or (cuda.get('actual_uuid_type') == 'torch._C._CUuuid' and cuda.get('actual_uuid_bytes_hex') == expected_hex),
++              'native UUID serialization')
++    w.require(receipt['audit_backend']['kind'] == 'cpu' and receipt['audit_backend']['logical_device'] == 'cpu', 'CPU audit backend')
++    for phase in ('loaded_before', 'loaded_after'):
++        inventory = receipt[phase]
++        required = {'scripts.qd_ed_n32r3_worker', 'scripts.qd_ed_n32r3_bridge', 'scripts.qd_ed_n32r3_contract',
++                    'scripts.qd_ed_n23_worker', 'scripts.audit_decision_evidence',
++                    'scripts.qd_ed_n32_native', 'scripts.qd_ed_n31_native'}
++        if phase == 'loaded_after':
++            required |= {'core.' + name.removesuffix('.py') for name in b.RUNTIME_SOURCES}
++        w.require(isinstance(inventory, dict) and required <= set(inventory), 'loaded source attestation absent')
++        index = {v['path']: v['sha256'] for v in plan['source']['files']}
++        w.require(all(index.get(v['path']) == v['sha256'] for v in inventory.values()), 'loaded source receipt mismatch')
++        worker = inventory['scripts.qd_ed_n32r3_worker']
++        w.require(worker == {'path': 'scripts/qd_ed_n32r3_worker.py',
++                            'sha256': index.get('scripts/qd_ed_n32r3_worker.py'),
++                            'module_name': worker.get('module_name'),
++                            'spec_name': 'scripts.qd_ed_n32r3_worker',
++                            'origin': str(Path(plan['worktree']).resolve() / 'scripts/qd_ed_n32r3_worker.py')}
++                  and worker.get('module_name') in ('__main__', 'scripts.qd_ed_n32r3_worker'),
++                  'worker source receipt identity differs')
++    w.require(receipt['loaded_before']['scripts.qd_ed_n32r3_worker']
++              == receipt['loaded_after']['scripts.qd_ed_n32r3_worker'], 'worker source identity changed')
++    w.require(receipt['audit_report']['path'] == str(output / 'eds_eval/decision-evidence-audit.json'), 'audit path')
++    report = w.read_ref(receipt['audit_report'])
++    w.require(report.get('n23_arithmetic_backend') == receipt['audit_backend'], 'generic backend receipt')
++    counts, auxiliary = native_counts(row['profile'], output, report, manifest['expected_runtime'])
++    w.require((counts, auxiliary) == (receipt['native_counts'], receipt['auxiliary']), 'native receipt mismatch')
++    for key in ('worker_wall_seconds', 'audit_seconds'):
++        c.finite(receipt[key], key)
++    return report
++
++
++def verify_terminal(plan_ref, row, terminal, release_ref=None):
++    """Parent binds generic terminal identity and telemetry to the metered receipt."""
++    from scripts import qd_ed_n32r3_supervise as s
++    plan = w.read_ref(plan_ref)
++    manifest = w.read_ref(plan['expected_manifests'][row['episode_key']])
++    output = Path(manifest['output_dir'])
++    w.require(terminal.get('schema') == 'n32r3-lifecycle-v1'
++              and terminal.get('continuation') == c.commitments(plan, row)
++              and terminal.get('semantic_key') == b.semantic_key(plan, manifest)
++              and terminal.get('recovery_of') == c.recovery_of(row) and terminal.get('retry_of') is None, 'terminal parent/mapping binding')
++    w.require(terminal['identity'] == s.c_identity(row) and terminal['episode_key'] == row['episode_key']
++              and terminal['attempt_id'] == row['episode_key'] and terminal['source_commit'] == plan['source']['commit']
++              and terminal['plan_sha256'] == plan_ref['sha256'] and terminal['runtime_manifest_sha256'] == plan['runtime']['sha256']
++              and terminal['init_row_sha256'] == row['init_row_sha256'] and terminal['physical_gpu'] == 7
++              and terminal['output_dir'] == str(output) and terminal['outcome_valid'] is True
++              and terminal['required_cost_telemetry_complete'] is True and type(terminal['success']) is bool,
++              'generic terminal identity/cost differs')
++    c.finite(terminal['gpu_process_wall_seconds'], 'terminal charge')
++    context_ref = c.ref(output / 'n32-worker-context.json')
++    context = w.read_ref(context_ref)
++    w.require(context['plan'] == plan_ref and context['episode_key'] == row['episode_key'], 'terminal context binding')
++    if release_ref is not None:
++        w.require(context.get('release') == release_ref and terminal.get('release') == release_ref
++                  and terminal.get('context') == context_ref
++                  and terminal.get('runtime_inventory_sha256') == plan['runtime_inventory_sha256'], 'terminal release binding')
++        record = w.read_ref(c.ref(output / 'process.json'))
++        w.require(record.get('context') == context_ref and record.get('release') == release_ref, 'process context/release binding')
++    command = w.read_ref(c.ref(output / 'command.json'))
++    w.require(command == {'argv': [manifest['argv'][0], '-m', 'scripts.qd_ed_n32r3_worker',
++              '--context', context_ref['path'], '--context-sha256', context_ref['sha256']],
++              'main_argv': manifest['argv'], 'context': context_ref}, 'worker command receipt differs')
++    report = verify_receipt(context_ref, terminal['n32_worker_receipt'], w.read_ref(c.ref(output / 'process.json')))
++    native_counts(row['profile'], output, report, manifest['expected_runtime'], terminal['guided_chunks'])
++    # Retain the original generic result/video/Stage/token/counter gates. A receipt
++    # is necessary, not sufficient to classify an episode as valid.
++    generic_outcome = b.runner.validate_result(output, row, b.profiles(plan['worktree'])['profiles'][row['profile']],
++                                                w.read_ref(plan['runtime']))
++    w.require(all(key in terminal and terminal[key] == value for key, value in generic_outcome.items()),
++              'terminal generic result/cost telemetry differs')
++    return report
++
++
++def run_worker(context_ref):
++    context = w.read_ref(context_ref)
++    if 'release' not in context:
++        c.require_release(w.read_ref(context['plan']))
++    validate_context(context_ref)
++    return _run_in_process(context_ref)
++
++
++def main():
++    import argparse
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--context', required=True)
++    parser.add_argument('--context-sha256', required=True)
++    args = parser.parse_args()
++    # The parent durably records PID/boot/start identity before opening this gate.
++    w.require(sys.stdin.buffer.read(1) == b'G', 'parent dispatch gate absent')
++    return run_worker({'path': args.context, 'sha256': args.context_sha256})
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+diff --git a/tests/test_n32r3_continuation.py b/tests/test_n32r3_continuation.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..0e1ebfa6eac7250d56e9dba05937fb8c1bdbce6c
+--- /dev/null
++++ b/tests/test_n32r3_continuation.py
+@@ -0,0 +1,271 @@
++"""CPU-only bounded metadata/lifecycle tests. No models, tensors or GPU calls."""
++import copy
++import datetime as dt
++import json
++from pathlib import Path
++import pytest
++from scripts import qd_ed_n23_worker as w, qd_ed_n32_contract as old
++from scripts import qd_ed_n32r3_contract as c, qd_ed_n32r3_supervise as s
++from scripts import qd_ed_n32r3_history as history, qd_ed_n32r3_release as release
++from scripts import qd_ed_n32r3_bridge as bridge, qd_ed_n32r3_worker as worker
++from scripts import qd_ed_final_runner as generic
++
++
++def write(path, value):
++    path.parent.mkdir(parents=True, exist_ok=True)
++    path.write_text(json.dumps(value, sort_keys=True))
++    return c.ref(path)
++
++
++def dummy_ref(tmp, name):
++    return write(tmp / name, {})
++
++
++@pytest.fixture
++def fixture(tmp_path, monkeypatch):
++    """Tiny synthetic original artifacts with real digest and identity checks."""
++    root = str(c.ROOT)
++    source = {'commit': c.BASE_SOURCE, 'files': [], 'sha256': w.canonical_sha([])}
++    runtime = dummy_ref(tmp_path, 'runtime.json')
++    parent = {'schema': 'n32-released-plan-v1', 'frozen': True, 'release_enabled': True,
++              'worktree': root, 'episodes': old.expected_rows(), 'limits': old.LIMITS,
++              'worker_contract': old.WORKER_CONTRACT, 'deadline': old.DEADLINE, 'stop_path': old.stop_path(),
++              'phase_authorization': {'dev': True, 'validation': False, 'formal': False}, 'attempt_identity': 'episode_key',
++              'expected_manifests': {}, 'source': source, 'runtime': runtime,
++              'authority': dummy_ref(tmp_path, 'old-authority.json'), 'protocol': dummy_ref(tmp_path, 'old-protocol.json'),
++              'runtime_inventory_sha256': 'inventory'}
++    for row in parent['episodes']:
++        key = row['episode_key']; output = tmp_path / 'old' / key
++        parent['expected_manifests'][key] = write(tmp_path / 'manifests' / (key+'.json'),
++            {'row': row, 'source': source, 'runtime': runtime, 'output_dir': str(output),
++             'argv': ['python','main.py','seed='+str(row['policy_seed'])], 'composed_config_sha256': 'config'})
++    parent_ref = write(tmp_path/'parent.json', parent)
++    expected = {'schema': 'n32-execution-release-v1', 'approved': True, 'plan': parent_ref,
++                **{k: parent[k] for k in ('authority','protocol','source','runtime','limits','phase_authorization')}}
++    review_ref = write(tmp_path/'old-review.json', {**expected,'schema':'n32-root-production-review-v1','decision':'APPROVED'})
++    release_ref = write(tmp_path/'old-release.json', {**expected,'root_review':review_ref})
++    plan = {'schema':'n32r3-released-plan-v1','worktree':root,'episodes':c.expected_rows(),
++            'parent_plan':parent_ref,'parent_release':release_ref,'parent_review':review_ref,'scientific_source':source,
++            'source_continuity':dummy_ref(tmp_path,'source-review.json'),
++            'preparation_review':dummy_ref(tmp_path,'preparation-review.json'),
++            'command_candidates':dummy_ref(tmp_path,'commands.json')}
++    mapping = {'schema':'n32r3-carry-forward-map-v1','parent_plan':parent_ref,'release_enabled':False,
++               'pooling_authorized':False,'continuity_failures':[], 'command_candidates':plan['command_candidates'],
++               'accepted_cells':[], 'proposed_cells':[], 'terminal_review':dummy_ref(tmp_path,'terminal-review.json'),
++               'continuity_evidence':write(tmp_path/'continuity.json', {'inputs':{
++                    'plan.frozen.v1.json':parent_ref,'execution-release-v1.json':release_ref,
++                    'root-production-review-v1.json':review_ref}})}
++    events = []
++    for index,row in enumerate(parent['episodes'][:15]):
++        valid = index < 14; key = row['episode_key']
++        manifest_ref = parent['expected_manifests'][key]; manifest = w.read_ref(manifest_ref)
++        output = Path(manifest['output_dir'])
++        context = {'schema':'n32-worker-context-v1','plan':parent_ref,'release':release_ref,'expected_manifest':manifest_ref,
++                   'episode_key':key,'attempt_id':key,'main_argv':manifest['argv'][1:],'worker_contract':old.WORKER_CONTRACT}
++        context_ref = write(output/'n32-worker-context.json', context)
++        identity = {'pid':123,'proc_start_ticks':'1','boot_id':'synthetic'}
++        process_ref = write(output/'process.json', {**identity,'attempt_id':key,'context':context_ref,'release':release_ref})
++        command_ref = write(output/'command.json', {'argv':['python','-m','scripts.qd_ed_n32_worker','--context',context_ref['path'],'--context-sha256',context_ref['sha256']],
++                                                  'main_argv':manifest['argv'],'context':context_ref})
++        report_ref = write(output/'eds_eval/decision-evidence-audit.json', {'accepted':True,'evidence_complete':True})
++        native_ref = write(output/'eds_eval/n32-worker-receipt.json', {'process':identity,'context':context_ref,'plan':parent_ref,
++            'row':row,'source':source,'expected_manifest':manifest_ref,'attempt_id':key,'audit_report':report_ref,
++            'native_counts':{},'accepted':True,'process_unchanged':True,'main_exit_code':0})
++        stage_ref = write(output/'eds_eval/stage_events.jsonl', {'synthetic':True})
++        stage_ref['bytes'] = Path(stage_ref['path']).stat().st_size
++        base = {'attempt_id':key,'episode_key':key,'identity':s.c_identity(row),'source_commit':source['commit'],
++                'plan_sha256':parent_ref['sha256'],'release':release_ref,'context':context_ref,
++                'runtime_manifest_sha256':runtime['sha256'],'runtime_inventory_sha256':'inventory','budget_bucket':row['budget_bucket'],
++                'init_row_sha256':row['init_row_sha256'],'physical_gpu':7,'output_dir':str(output),'ledger_prefix':{},'retry_of':None,'recovery_of':None}
++        terminal = {**base,'event':'valid' if valid else 'aborted','outcome_valid':valid,'required_cost_telemetry_complete':valid,
++                    'success':False if valid else None,'gpu_process_wall_seconds':10.0}
++        if valid: terminal['n32_worker_receipt']=native_ref
++        terminal_ref = write(output/'attempt-result.json', terminal)
++        entry = {'original_row':row,'attempt_id':key,'old_attempt_id':key,'new_attempt_id':key if valid else None,
++            'semantic_cell':{k:row[k] for k in c.SEMANTIC_FIELDS},'expected_manifest':manifest_ref,'source_commit':c.BASE_SOURCE,
++            'runtime':runtime,'denominator_eligible':valid,'replay_permitted':False,'terminal_receipt':terminal_ref,
++            'native_receipt':native_ref,'generic_audit':report_ref,'context':context_ref,'command_receipt':command_ref,
++            'process_receipt':process_ref,'stage_events':stage_ref,'native_counts':{},'gpu_hours_retained':10/3600,
++            'budget_bucket_retained':row['budget_bucket'],'success':terminal['success']}
++        if valid: mapping['accepted_cells'].append(entry)
++        else: mapping['old_invalid_cell']={**entry,'proposed_recovery_attempt_id':c.RECOVERY}
++        events.extend([{**base,'event':'reserved'}, {**base,'event':'dispatched'},terminal])
++    for old_row,row in zip(parent['episodes'][14:],plan['episodes']):
++        mapping['proposed_cells'].append({'old_row':old_row,'proposed_row':row,'old_attempt_id':old_row['episode_key'],
++            'new_attempt_id':row['episode_key'],'semantic_continuity':{k:v for k,v in old_row.items() if k not in ('iteration','episode_key','budget_bucket')},
++            'parent_expected_manifest':parent['expected_manifests'][old_row['episode_key']], 'recovery_of':c.recovery_of(row),
++            'retry_of':None,'native_receipt':None,'generic_audit':None,'release_enabled':False})
++    plan['carry_forward_map']=write(tmp_path/'map.json',mapping)
++    # Fixture models the independently reviewed hash root; production cannot bypass it.
++    monkeypatch.setattr(history,'verify_preparation_anchor',lambda p: None)
++    monkeypatch.setattr(release,'verify_continuity',lambda p: None)
++    monkeypatch.setattr(w,'verify_source',lambda *args: None)
++    plan['source']={'commit':'b'*40}
++    return plan,events,mapping,parent
++
++
++def journal(plan, count, wins=()):
++    result=[]
++    for index,row in enumerate(plan['episodes'][:count]):
++        base={'schema':'n32r3-lifecycle-v1','attempt_id':row['episode_key'],'episode_key':row['episode_key'],
++              'identity':s.c_identity(row),'budget_bucket':row['budget_bucket'],'plan_sha256':'plan','release':{},
++              'source_commit':'new','runtime_manifest_sha256':'runtime','runtime_inventory_sha256':'inventory',
++              'init_row_sha256':row['init_row_sha256'],'output_dir':'synthetic/'+row['episode_key'],'physical_gpu':7,
++              'ledger_prefix':{},'context':{},'continuation':c.commitments(plan,row),'semantic_key':str(index),
++              'retry_of':None,'recovery_of':c.recovery_of(row)}
++        result += [{**base,'event':event,**({'outcome_valid':True,'required_cost_telemetry_complete':True,
++                       'success':index in wins,'gpu_process_wall_seconds':10.0} if event=='valid' else {})}
++                   for event in ('reserved','dispatched','valid')]
++    return result
++
++
++def test_positive_original_plus_recovery(fixture):
++    plan,events,_,_=fixture
++    result=s.reconcile(plan,events+journal(plan,1),lambda *args:None)
++    assert result['complete_valid_triples']==5 and len(result['outcomes'])==15
++    assert result['next_row']==plan['episodes'][1] and not result['futile']
++    snap=generic.budget_snapshot(result['charged_events'])
++    assert snap['dispatched']==16 and snap['aborted']==1 and snap['by_bucket']['recovery']==1
++    assert snap['gpu_hours_consumed']==pytest.approx(160/3600)
++    assert result['http_counters']=='Unknown' and not result['scientific_promotion']
++
++
++@pytest.mark.parametrize('fault',['duplicate','reorder','alias','recovery','old_accepted','invalid_stage','missing_control','live','continuation','semantic','receipt'])
++def test_lifecycle_attacks(fixture,fault):
++    plan,events,_,_=fixture; new=journal(plan,2); verify=lambda *args:None
++    if fault=='duplicate': new+=new[:3]
++    if fault=='reorder': new=new[3:]+new[:3]
++    if fault=='alias': new[0]['identity']['iteration']='other'
++    if fault=='recovery': new[3]['recovery_of']=c.OLD_INVALID
++    if fault=='old_accepted': new[0]['attempt_id']=events[0]['attempt_id']
++    if fault=='invalid_stage': new=new[:3];new[-1]['outcome_valid']=False
++    if fault=='missing_control': events=events[:-6]+events[-3:]
++    if fault=='live': new=new[:2]
++    if fault=='continuation': new[0]['continuation']={}
++    if fault=='semantic': new[-1]['semantic_key']='different'
++    if fault=='receipt':
++        new=new[:3]
++        def verify(*args): raise ValueError('audit digest differs')
++    if fault in ('invalid_stage','live','receipt'):
++        result=s.reconcile(plan,events+new,verify)
++        assert result['next_row'] is None and len(result['outcomes'])==14
++        assert result['status']==('LIVE_OR_UNSETTLED' if fault=='live' else 'INVALID_STOP')
++    else:
++        with pytest.raises((ValueError,KeyError)):s.reconcile(plan,events+new,verify)
++
++
++@pytest.mark.parametrize('field',['native_receipt','generic_audit','context','command_receipt','terminal_receipt','process_receipt','expected_manifest'])
++@pytest.mark.parametrize('attack',['byte','other_digest','rehashed_identity'])
++def test_historical_receipt_tamper(fixture,field,attack):
++    plan,_,mapping,parent=fixture;entry=copy.deepcopy(mapping['accepted_cells'][0])
++    reference=entry[field];path=Path(reference['path'])
++    if attack=='byte':path.write_bytes(path.read_bytes()+b' ')
++    elif attack=='other_digest':entry[field]=mapping['accepted_cells'][1][field]
++    else:
++        data=json.loads(path.read_text())
++        if field=='generic_audit':data['accepted']=False
++        elif field=='context':data['plan']=plan['parent_release']
++        elif field=='command_receipt':data['main_argv']=['mutated']
++        elif field=='expected_manifest':data['row']['profile']='Q0'
++        elif field=='process_receipt':data['pid']=999
++        elif field=='terminal_receipt':data['identity']['profile']='Q0'
++        else:data['row']['profile']='Q0'
++        entry[field]=write(path,data)
++    with pytest.raises((ValueError,KeyError)):history.verify_cell(entry,plan,parent)
++
++
++@pytest.mark.parametrize('fault',['duplicate','swap_profile','seed','init','recovery_alias','recovery_bucket'])
++def test_map_attacks(fixture,fault):
++    plan,_,mapping,_=fixture
++    if fault=='duplicate':mapping['accepted_cells'][1]=mapping['accepted_cells'][0]
++    if fault=='swap_profile':mapping['accepted_cells'][1]['expected_manifest']=mapping['accepted_cells'][2]['expected_manifest']
++    if fault=='seed':mapping['proposed_cells'][0]['proposed_row']['policy_seed']+=1
++    if fault=='init':mapping['accepted_cells'][0]['semantic_cell']['init_row_sha256']='other'
++    if fault=='recovery_alias':mapping['proposed_cells'][1]['recovery_of']=c.OLD_INVALID
++    if fault=='recovery_bucket':mapping['proposed_cells'][0]['proposed_row']['budget_bucket']='development'
++    plan['carry_forward_map']=write(Path(plan['carry_forward_map']['path']),mapping)
++    with pytest.raises(ValueError):history.validate_mapping(plan)
++
++
++def test_thresholds_and_29_cells(fixture):
++    plan,events,_,_=fixture
++    result=s.reconcile(plan,events+journal(plan,1),lambda *args:None)
++    assert not result['futile']  # 0 + 5 == 5
++    result=s.reconcile(plan,events+journal(plan,4),lambda *args:None)
++    assert result['status']=='NUMERIC_FUTILITY' and result['complete_valid_triples']==6
++    result=s.reconcile(plan,events+journal(plan,15,wins=(0,3,6,9,12)),lambda *args:None)
++    assert len(result['outcomes'])==29 and not result['prospective_dev_necessary_gate_met']
++    result=s.reconcile(plan,events+journal(plan,16,wins=(0,3,6,9,12)),lambda *args:None)
++    assert result['status']=='COMPLETE' and result['prospective_dev_necessary_gate_met']
++    with pytest.raises(ValueError):s.progress([{'task_id':4,'profile':'N32','success':True}])
++
++
++def allowance():
++    return {'authority_starts_at':'2026-10-04T00:00:00Z','authority_ends_at':c.DEADLINE,
++            'private_budget':True,'gpu_idle':True,'physical_gpu':7,'gpu_uuid':c.GPU_UUID,
++            'live_handles':[],'unsettled_reservations':0,'global_seconds_remaining':500000,
++            'private_seconds_remaining':500000,'cohort_seconds_remaining':30600,'protected_seconds_remaining':44*3600,
++            'global_attempts_remaining':1000,'protected_attempts_remaining':160,'cohort_attempts_remaining':16,
++            'bucket_attempts_remaining':{'baseline':300,'development':800,'recovery':40},
++            'local_bucket_attempts_remaining':{'baseline':5,'development':10,'recovery':1}}
++
++
++@pytest.mark.parametrize('fault',['none','stop','dangling','deadline','private','uuid','idle','live','unsettled','reserve','nan','unknown','seconds','local_bucket','bucket','attempts'])
++def test_admission(fault,tmp_path):
++    a=allowance();now=dt.datetime(2026,10,8,11,tzinfo=dt.timezone.utc);stop=tmp_path/'STOP'
++    if fault=='stop':stop.touch()
++    if fault=='dangling':stop.symlink_to(tmp_path/'missing')
++    if fault=='deadline':now=dt.datetime.fromisoformat(c.DEADLINE.replace('Z','+00:00'))-dt.timedelta(seconds=1839)
++    if fault=='private':a['private_budget']=False
++    if fault=='uuid':a['gpu_uuid']='foreign'
++    if fault=='idle':a['gpu_idle']=False
++    if fault=='live':a['live_handles']=['owner']
++    if fault=='unsettled':a['unsettled_reservations']=1
++    if fault=='reserve':a['global_seconds_remaining']=a['protected_seconds_remaining']+1839
++    if fault=='nan':a['cohort_seconds_remaining']=float('nan')
++    if fault=='unknown':a['private_seconds_remaining']='Unknown'
++    if fault=='seconds':a['cohort_seconds_remaining']=1839
++    if fault=='local_bucket':a['local_bucket_attempts_remaining']['recovery']=0
++    if fault=='bucket':a['bucket_attempts_remaining']['recovery']=0
++    if fault=='attempts':a['cohort_attempts_remaining']=17
++    if fault=='none':assert c.pre_dispatch(c.expected_rows()[0],a,now=now,stop_path=stop)==1840
++    else:
++        with pytest.raises(ValueError):c.pre_dispatch(c.expected_rows()[0],a,now=now,stop_path=stop)
++
++
++def test_unknown_charge_never_zero(fixture):
++    _,events,_,_=fixture;events[-1]['gpu_process_wall_seconds']='Unknown'
++    with pytest.raises(generic.GateError):generic.budget_snapshot(events)
++    assert 438+16==454
++    assert 61.35722319715016+8.5==69.85722319715016
++
++
++def test_disabled_release_and_old_contract_unchanged(fixture,tmp_path):
++    plan,_,_,_=fixture
++    for schema in ('n32r3-plan-candidate-NONEXECUTABLE-v1','n32r3-released-plan-v1'):
++        ref=write(tmp_path/'disabled.json',{**plan,'schema':schema,'frozen':False,'release_enabled':False})
++        with pytest.raises(ValueError):release.validate_release(ref,dummy_ref(tmp_path,'disabled-release.json'))
++    assert old.LIMITS['cohort_gpu_seconds']==18000 and len(old.expected_rows())==30
++    with pytest.raises(ValueError):old.pre_dispatch(c.expected_rows()[0],allowance(),now=dt.datetime.now(dt.timezone.utc),stop_path=tmp_path/'STOP')
++    with pytest.raises(ValueError):c.require_recovery_row({'schema':'n32-released-plan-v1',**plan,'episodes':[]},c.expected_rows()[0])
++
++
++def test_independent_review_not_replaceable(fixture,monkeypatch):
++    # Reload only this guard's original function without performing any external reads.
++    import runpy
++    guard=runpy.run_path(str(c.ROOT/'scripts/qd_ed_n32r3_history.py'))['verify_preparation_anchor']
++    with pytest.raises(ValueError,match='review anchor'):guard(fixture[0])
++
++
++def test_new_parent_cohort_result_blocks_semantic_replay(fixture):
++    plan,events,_,parent=fixture
++    row=parent['episodes'][15]
++    events.append({'attempt_id':row['episode_key'],'event':'reserved','identity':s.c_identity(row)})
++    with pytest.raises(ValueError,match='parent cohort changed'):s.reconcile(plan,events,lambda *args:None)
++
++
++def test_worker_reuses_scientific_audit_functions():
++    from scripts import qd_ed_n32_worker as parent_worker
++    assert worker.native_counts is parent_worker.native_counts
++    assert worker.evidence is parent_worker.evidence
++    assert worker.generic is parent_worker.generic and worker.n32 is parent_worker.n32
+diff --git a/tests/test_n32r3_execution.py b/tests/test_n32r3_execution.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..a1bce4d438b0d3317bcac2ff6168d7fd04dfb952
+--- /dev/null
++++ b/tests/test_n32r3_execution.py
+@@ -0,0 +1,351 @@
++"""CPU-only runner transaction, accounting and command/release negative fixtures."""
++import copy
++import datetime as dt
++import json
++from pathlib import Path
++import sys
++import pytest
++import yaml
++from scripts import qd_ed_n32r3_contract as c, qd_ed_n32r3_release as release
++from scripts import qd_ed_n32r3_runner as adapter, qd_ed_n32r3_bridge as bridge
++from scripts import qd_ed_n23_worker as w, qd_ed_final_runner as r
++from test_n32r3_continuation import fixture, write, dummy_ref
++
++CAPS={'attempts':1800,'gpu_hours':224.,'buckets':{'baseline':400,'development':1120,'validation':180,'formal':40,'recovery':60},
++      'protected_gpu_hours':{'validation':32.,'formal':12.}}
++NOW=dt.datetime(2026,10,8,11,tzinfo=dt.timezone.utc)
++
++
++def budget_fixture(tmp,events,resources=()):
++    authority={'caps':copy.deepcopy(CAPS),'amendment':{'synthetic':True},'starts_at':'2026-10-04T00:00:00Z',
++        'coordinator_ends_at':release.COORDINATOR_END,'continuation_resource_ids':[],
++        'weekly_window':{'origin_gpu_hours':53.08404692669838,'increment_gpu_hours':168.,'ends_at':c.DEADLINE}}
++    ref=write(tmp/'authority.json',authority)
++    plan={'authority':ref,'stop_path':str(tmp/'STOP')}
++    state={'gpu_pool':[7],'max_concurrent_gpu_workers':1,'n32r3_budget_authority':ref,
++        'resource_isolation':{'status':'ACTIVE','validation_status':'PASS','private_budget':True},
++        'budget':{**r.budget_snapshot(events,resources),'max_episode_attempts':1800,'max_gpu_hours':224.,
++            'reserved':copy.deepcopy(CAPS['buckets']),'gpu_hour_reservations':copy.deepcopy(CAPS['protected_gpu_hours']),
++            'amendment':authority['amendment']}}
++    reservations=[{'event':'gpu_hour_reservations_changed','gpu_hour_reservations':CAPS['protected_gpu_hours'],
++                   'rationale':'synthetic CPU fixture','time_unix':1}]
++    return plan,authority,state,reservations
++
++
++@pytest.fixture
++def lifecycle(fixture,tmp_path,monkeypatch):
++    plan,events,mapping,parent=fixture
++    root=tmp_path/'study_worktree';root.mkdir();(root/'data').mkdir()
++    rows=c.expected_rows()
++    monkeypatch.setattr(c,'expected_rows',lambda root=None:copy.deepcopy(rows))
++    budget,authority,state,reservations=budget_fixture(root,events)
++    plan.update(budget,worktree=str(root),artifact_root=str(root/'artifacts/n32r3'),run_name='synthetic',
++                source={'commit':'b'*40},runtime_inventory_sha256='inventory',expected_manifests={})
++    commands=[]
++    for row,entry in zip(rows,mapping['proposed_cells']):
++        plan['expected_manifests'][row['episode_key']]=write(root/'manifests'/(row['episode_key']+'.json'),
++            {'row':row,'argv':[sys.executable,'main.py'],'output_dir':str(Path(plan['artifact_root'])/'attempts'/row['episode_key'])})
++        commands.append({'new_attempt_id':row['episode_key'],'parent_expected_manifest':entry['parent_expected_manifest']})
++    plan['command_candidates']=write(root/'commands.json',{'commands':commands})
++    mapping['command_candidates']=plan['command_candidates']
++    plan['carry_forward_map']=write(Path(plan['carry_forward_map']['path']),mapping)
++    state.update(run_name='synthetic',artifacts=str(root/'artifacts'))
++    runtime={'artifact_root':state['artifacts'],'gpu_mapping':{'physical_gpu':7,'uuid':c.GPU_UUID,'egl_device_index':4},
++             'frozen_stage_provider':{'backend':'codex_cli'}}
++    plan['runtime']=write(root/'runtime.json',runtime)
++    (root/'data/attempt-ledger.jsonl').write_text(''.join(json.dumps(e)+'\n' for e in events))
++    (root/'data/gpu-healthcheck-ledger.jsonl').write_text('')
++    (root/'data/gpu-hour-reservation-ledger.jsonl').write_text(json.dumps(reservations[0])+'\n')
++    (root/'research-state.yaml').write_text(yaml.safe_dump(state))
++    authority['ledger_prefixes']={name:adapter.journal_prefix(root/'data'/name) for name in ('attempt-ledger.jsonl','gpu-healthcheck-ledger.jsonl')}
++    authority['preparation_review']=write(root/'prep.json',{'ledger_prefix':authority['ledger_prefixes']['attempt-ledger.jsonl'],
++                                                         'health_prefix':authority['ledger_prefixes']['gpu-healthcheck-ledger.jsonl']})
++    plan_ref=write(root/'plan.json',plan);release_ref=write(root/'release.json',{'synthetic_only':True})
++    monkeypatch.setattr(release,'validate_release',lambda *args:(plan,runtime,authority))
++    monkeypatch.setattr(adapter,'device_check',lambda:{'synthetic_only':True})
++    monkeypatch.setattr(adapter,'check_probe',lambda *args:None)
++    monkeypatch.setattr(r,'child_environment',lambda *_:{})
++    monkeypatch.setattr(r,'verify_provider',lambda *args,**kwargs:None)
++    monkeypatch.setattr(r,'stage_condition',lambda *_:'synthetic')
++    monkeypatch.setattr(bridge,'profiles',lambda *_:{'profiles':{arm:{} for arm in c.ARMS}})
++    monkeypatch.setattr(r,'validate_result',lambda *args:{'outcome_valid':True,'required_cost_telemetry_complete':True,'success':False})
++    monkeypatch.setattr(adapter.worker,'verify_terminal',lambda *args:None)
++    created=[]
++    class FakeProcess:
++        pid=90001
++        def __init__(self,command,**kwargs):
++            self.returncode=None;self.command=command;self.stdin=self;created.append(self)
++        def write(self,data):assert data==b'G'
++        def flush(self):pass
++        def close(self):pass
++        def poll(self):return self.returncode
++    monkeypatch.setattr(adapter.subprocess,'Popen',FakeProcess)
++    def identity(pid):
++        if pid==123 or (created and created[-1].returncode is not None):raise FileNotFoundError('synthetic exited')
++        return {'pid':pid,'proc_start_ticks':'1','boot_id':'synthetic'}
++    monkeypatch.setattr(adapter,'process_identity',identity)
++    def wait(process,*args):
++        context=w.read_ref({'path':process.command[-3],'sha256':process.command[-1]})
++        row=next(x for x in rows if x['episode_key']==context['episode_key'])
++        assert context['continuation']==c.commitments(plan,row)
++        output=Path(w.read_ref(plan['expected_manifests'][row['episode_key']])['output_dir'])
++        record=json.loads((output/'process.json').read_text())
++        assert record['release']==context['release']==release_ref
++        write(output/'eds_eval/n32-worker-receipt.json',{'synthetic_only':True})
++        process.returncode=0
++        return 0
++    monkeypatch.setattr(adapter,'wait_worker',wait)
++    return root,plan,plan_ref,release_ref,events,authority
++
++
++def test_full_runner_transaction_recovery_then_task5(lifecycle):
++    root,plan,plan_ref,release_ref,old_events,_=lifecycle
++    first=adapter.execute_one(plan_ref,release_ref)
++    assert first['status']=='VALID' and first['terminal']['recovery_of']==c.OLD_INVALID
++    assert first['terminal']['continuation']==c.commitments(plan,plan['episodes'][0])
++    assert first['terminal']['source_commit']!=c.BASE_SOURCE
++    assert adapter.execute_one(plan_ref,release_ref)['terminal']['attempt_id']==plan['episodes'][1]['episode_key']
++    events=r.read_events(root/'data/attempt-ledger.jsonl')
++    assert events[:len(old_events)]==old_events and len(events)==len(old_events)+6
++    assert r.read_state(root/'research-state.yaml')['budget']['dispatched']==17
++    assert not (root/'driver.lock').exists() and not (root/'coordinator.lease').exists()
++
++
++@pytest.mark.parametrize('fault',['invalid','interrupt','stop_before','stop_after','journal','foreign_live','output_replay'])
++def test_runner_fail_closed_no_retry_or_foreign_signal(lifecycle,monkeypatch,fault):
++    root,plan,plan_ref,release_ref,events,_=lifecycle
++    def fail(*args,**kwargs):raise ValueError('synthetic Stage/receipt invalid')
++    monkeypatch.setattr(adapter,'cleanup_owned',lambda *a:pytest.fail('no timeout: never signal'))
++    if fault=='invalid':monkeypatch.setattr(adapter.worker,'verify_terminal',fail)
++    if fault=='interrupt':
++        def interrupt(*args):raise KeyboardInterrupt('synthetic owner interruption')
++        monkeypatch.setattr(adapter,'wait_worker',interrupt)
++    if fault=='stop_before':
++        Path(plan['stop_path']).touch()
++        monkeypatch.setattr(adapter,'device_check',lambda:pytest.fail('STOP before GPU query'))
++    if fault=='stop_after':
++        original=r.append_event_locked
++        def append(root,event):
++            original(root,event)
++            if event['event']=='reserved':Path(plan['stop_path']).touch()
++        monkeypatch.setattr(r,'append_event_locked',append)
++    if fault=='journal':
++        original=adapter.snapshot;calls=[]
++        def snapshot(*args):
++            result=original(*args);calls.append(1)
++            if len(calls)>1:result[2].append({'changed':True})
++            return result
++        monkeypatch.setattr(adapter,'snapshot',snapshot)
++    if fault=='foreign_live':monkeypatch.setattr(adapter,'continuation_handles',lambda *a:[{'status':'LIVE'}])
++    if fault=='output_replay':
++        output=Path(w.read_ref(plan['expected_manifests'][plan['episodes'][0]['episode_key']])['output_dir']);output.mkdir(parents=True)
++    if fault in ('stop_before','stop_after','journal'):
++        with pytest.raises(ValueError):adapter.execute_one(plan_ref,release_ref)
++    elif fault=='interrupt':
++        with pytest.raises(KeyboardInterrupt):adapter.execute_one(plan_ref,release_ref)
++        Path(plan['stop_path']).touch()
++        assert adapter.execute_one(plan_ref,release_ref)['status']=='LIVE_OR_UNSETTLED'
++    elif fault=='invalid':
++        result=adapter.execute_one(plan_ref,release_ref)
++        assert result['status']=='INVALID_STOP' and result['terminal']['gpu_process_wall_seconds']>0
++        assert adapter.execute_one(plan_ref,release_ref)['status']=='INVALID_STOP'
++    else:assert adapter.execute_one(plan_ref,release_ref)['status']=='LIVE_OR_UNSETTLED'
++    after=r.read_events(root/'data/attempt-ledger.jsonl')
++    assert after[:len(events)]==events
++    if fault=='stop_after':assert [x['event'] for x in after[len(events):]]==['reserved']
++
++
++@pytest.mark.parametrize('fault',['none','unknown','old_cap','recovery','baseline','development','reserves','private','workers','health','unattributed'])
++def test_journal_accounting(tmp_path,fault):
++    def event(key,bucket,iteration,seconds):
++        base={'attempt_id':key,'identity':{'iteration':iteration},'budget_bucket':bucket}
++        return [{**base,'event':kind,**({'outcome_valid':False,'gpu_process_wall_seconds':seconds} if kind=='aborted' else {})}
++                for kind in ('reserved','dispatched','aborted')]
++    events=event('old-invalid','development','old',1329.648039327003)
++    resources=[{'resource_id':'old-health','event':kind,'cohort':'old','gpu_process_wall_seconds':100.}
++               for kind in ('reserved','dispatched','completed')]
++    row=c.expected_rows()[0]
++    if fault in ('recovery','baseline','development'):
++        count=c.LIMITS[fault]
++        for i in range(count):events+=event('new'+str(i),fault,c.COHORT,1.)
++        row=next(x for x in c.expected_rows() if x['budget_bucket']==fault)
++    if fault=='old_cap':events+=event('new','baseline',c.COHORT,30600-1839)
++    if fault=='health':resources+=[{'resource_id':'new-health','event':'reserved','cohort':c.COHORT,'kind':'n32r3_resource_preparation_v1'}]
++    if fault=='unattributed':resources+=[{'resource_id':'new-health','event':kind,'cohort':c.COHORT,'kind':'n32r3_resource_preparation_v1','gpu_process_wall_seconds':1} for kind in ('reserved','dispatched','completed')]
++    plan,authority,state,reservations=budget_fixture(tmp_path,events,resources)
++    if fault=='unknown':events[-1]['gpu_process_wall_seconds']='Unknown'
++    if fault=='reserves':reservations=[]
++    if fault=='private':state['resource_isolation']['private_budget']=False
++    if fault=='workers':state['max_concurrent_gpu_workers']=2
++    if fault=='none':
++        snap=release.admission(plan,authority,state,events,resources,reservations,row,now=NOW,gpu_idle=True)
++        assert snap['gpu_hours_consumed']==pytest.approx((1329.648039327003+100)/3600)
++        assert snap['by_bucket']['development']==1 and snap['gpu_healthcheck_hours']==100/3600
++    else:
++        with pytest.raises((ValueError,r.GateError)):release.admission(plan,authority,state,events,resources,reservations,row,now=NOW,gpu_idle=True)
++
++
++@pytest.mark.parametrize('fault',['none','seed','provider','auth','model','condition','binding','unbound_output','old_digest'])
++def test_bound_command_changes_only(tmp_path,monkeypatch,fault):
++    row=c.expected_rows()[0]
++    old_argv=['python','main.py','seed=1','perception.gemini.backend=codex_cli','perception.gemini.auth_mode=chatgpt',
++              'perception.gemini.model=gpt-6-astra','condition=frozen','main.eds_config.n32_runtime_binding={source_commit:old,run_id:old}',
++              'hydra.run.dir=/old']
++    new_argv=old_argv[:-1]+['hydra.run.dir=/new']
++    ref=write(tmp_path/'old.json',{'argv':old_argv})
++    changes=[{'index':8,'old':old_argv[8],'new':new_argv[8]}]
++    candidates=write(tmp_path/'commands.json',{'commands':[{'new_attempt_id':row['episode_key'],
++        'parent_expected_manifest':ref,'old_argv':old_argv,'proposed_argv':new_argv,'exact_changes':changes,'proposed_output_dir':'/new'}]})
++    plan={'command_candidates':candidates,'scientific_source':{'commit':c.BASE_SOURCE}}
++    actual=list(new_argv)
++    if fault in ('seed','provider','auth','model','condition','binding'):
++        index={'seed':2,'provider':3,'auth':4,'model':5,'condition':6,'binding':7}[fault];actual[index]+='changed'
++    if fault=='unbound_output':actual[-1]='hydra.run.dir=/other'
++    if fault=='old_digest':Path(ref['path']).write_text('{}')
++    monkeypatch.setattr(bridge.old,'command',lambda *args:(actual,Path('/new')))
++    if fault=='none':assert bridge.command(plan,{},row)[0]==new_argv
++    else:
++        with pytest.raises(ValueError):bridge.command(plan,{},row)
++
++
++@pytest.fixture
++def release_chain(fixture,tmp_path,monkeypatch):
++    """Exercise full detached DAG; spy expensive filesystem/runtime gates only."""
++    plan,events,mapping,parent=fixture
++    plan.update(frozen=True,release_enabled=True,limits=c.LIMITS,worker_contract=c.WORKER_CONTRACT,
++        deadline=c.DEADLINE,stop_path=c.stop_path(),attempt_identity='episode_key',
++        phase_authorization={'dev':True,'validation':False,'formal':False},source={'commit':'b'*40,'files':[]},
++        expected_manifests={row['episode_key']:dummy_ref(tmp_path,row['episode_key']+'.json') for row in plan['episodes']},
++        artifact_root=str(tmp_path/'new-artifacts'))
++    _,authority,_,_=budget_fixture(tmp_path,events)
++    # Retain the synthetic parent's own caps/window, and rebind its approved DAG.
++    parent_authority={'caps':authority['caps'],'weekly_window':authority['weekly_window']}
++    parent['authority']=write(Path(parent['authority']['path']),parent_authority)
++    plan['parent_plan']=write(Path(plan['parent_plan']['path']),parent)
++    expected_old={'schema':'n32-execution-release-v1','approved':True,'plan':plan['parent_plan'],
++                  **{k:parent[k] for k in ('authority','protocol','source','runtime','limits','phase_authorization')}}
++    plan['parent_review']=write(Path(plan['parent_review']['path']),{**expected_old,'schema':'n32-root-production-review-v1','decision':'APPROVED'})
++    plan['parent_release']=write(Path(plan['parent_release']['path']),{**expected_old,'root_review':plan['parent_review']})
++    # validate_mapping is tested independently with real digest-bound metadata.
++    from scripts import qd_ed_n32r3_history as history
++    monkeypatch.setattr(history,'validate_mapping',lambda *_:None)
++    seen=[]
++    monkeypatch.setattr(release,'verify_continuity',lambda *_:seen.append('continuity'))
++    runtime={'schema':'qd-ed-runtime-setup-v1','worktree':plan['worktree'],'artifact_root':str(tmp_path),
++        'gpu_mapping':{'physical_gpu':7,'uuid':c.GPU_UUID,'egl_device_index':4},'cuda_egl_verified':True,'provider_ready':True,
++        'stage_recovered_error_condition':r.E2_STAGE_CONDITION,'frozen_stage_provider':{'backend':'codex_cli'},'files':[],'tasks':{}}
++    parent['runtime']=write(Path(parent['runtime']['path']),runtime)
++    plan['parent_plan']=write(Path(plan['parent_plan']['path']),parent)
++    plan['runtime']=write(tmp_path/'new-runtime.json',runtime)
++    protocol={'schema':'n32r3-production-protocol-v1','cohort':c.COHORT,'episodes':plan['episodes'],'limits':c.LIMITS,
++        'worker_contract':c.WORKER_CONTRACT,'attempt_identity':'episode_key','deadline':c.DEADLINE,'promotion':c.PROMOTION,
++        'futility':'complete_valid_triples_only','validation_authorized':False,'formal_authorized':False}
++    plan['protocol']=write(tmp_path/'new-protocol.json',protocol)
++    authority.update(schema='n32r3-budget-authority-v1',approved=True,cohort=c.COHORT,limits=c.LIMITS,
++        validation_authorized=False,formal_authorized=False,parent_authority=parent['authority'],ledger_prefixes={},
++        preparation_review=plan['preparation_review'],approval_basis=dummy_ref(tmp_path,'approval.json'))
++    amendment={'schema':'n32r3-adopted-accounting-v1','approved':True,'parent_authority':parent['authority'],'limits':c.LIMITS,
++        'ledger_prefixes':{},'amendment':authority['amendment'],'continuation_resource_ids':[],
++        'historical_charges_retained':True,'original_cohort_closed':True}
++    plan['accounting_amendment']=write(tmp_path/'adopted.json',amendment)
++    authority['accounting_amendment']=plan['accounting_amendment']
++    plan['authority']=write(tmp_path/'new-authority.json',authority)
++    plan_ref=write(tmp_path/'new-plan.json',plan)
++    expected={'schema':'n32r3-execution-release-v1','approved':True,'plan':plan_ref,
++        **{k:plan[k] for k in ('authority','protocol','source','runtime','limits','phase_authorization')},
++        'continuation':c.commitments(plan,plan['episodes'][0])}
++    review=write(tmp_path/'new-review.json',{**expected,'schema':'n32r3-root-production-review-v1','decision':'APPROVED'})
++    release_ref=write(tmp_path/'new-release.json',{**expected,'root_review':review})
++    monkeypatch.setattr(w,'verify_source',lambda *args:seen.append('source'))
++    monkeypatch.setattr(bridge,'attest_loaded',lambda *args:seen.append('loaded'))
++    monkeypatch.setattr(bridge,'source_paths',lambda *args:set())
++    monkeypatch.setattr(r,'stage_overrides',lambda *args:seen.append('provider'))
++    monkeypatch.setattr(r,'verify_files',lambda *args,**kwargs:seen.append('files'))
++    monkeypatch.setattr(r,'validate_runtime_inputs',lambda *args:seen.append('generic-runtime'))
++    monkeypatch.setattr(bridge,'verify_manifest',lambda ref,p,rt,row:seen.append(row['episode_key']))
++    return plan,plan_ref,release_ref,seen
++
++
++def test_release_dag_calls_every_existing_gate_and_all16(release_chain):
++    plan,plan_ref,release_ref,seen=release_chain
++    assert release.validate_release(plan_ref,release_ref)[0]==plan
++    assert seen==['continuity','source','loaded','provider','files','generic-runtime']+[x['episode_key'] for x in plan['episodes']]
++
++
++@pytest.mark.parametrize('fault',['release_hash','plan_bytes','review_bytes','review_plan','disabled','schema','source','manifest',
++                                  'runtime','protocol','authority','amendment','missing_manifest','phase'])
++def test_detached_release_negatives(release_chain,monkeypatch,fault):
++    plan,plan_ref,ref,_=release_chain;released=w.read_ref(ref)
++    if fault=='release_hash':ref['sha256']='0'*64
++    elif fault=='plan_bytes':Path(plan_ref['path']).write_text('{}')
++    elif fault=='review_bytes':Path(released['root_review']['path']).write_text('{}')
++    elif fault=='review_plan':
++        review=w.read_ref(released['root_review']);review['plan']=plan['runtime']
++        released['root_review']=write(Path(released['root_review']['path']),review)
++        ref=write(Path(ref['path']),released)
++    elif fault=='disabled':released['approved']=False;ref=write(Path(ref['path']),released)
++    elif fault in ('schema','missing_manifest','phase'):
++        if fault=='schema':plan['schema']='n32-released-plan-v1'
++        if fault=='missing_manifest':plan['expected_manifests'].pop(next(iter(plan['expected_manifests'])))
++        if fault=='phase':plan['phase_authorization']['formal']=True
++        with pytest.raises(ValueError):release.validate_plan(plan)
++        return
++    elif fault in ('runtime','protocol','authority','amendment'):
++        key='accounting_amendment' if fault=='amendment' else fault
++        Path(plan[key]['path']).write_text('{}')
++    else:
++        def fail(*a,**kw):raise ValueError('synthetic required gate rejected')
++        monkeypatch.setattr(w if fault=='source' else bridge,'verify_source' if fault=='source' else 'verify_manifest',fail)
++    with pytest.raises((ValueError,KeyError)):release.validate_release(plan_ref,ref)
++
++
++@pytest.mark.parametrize('fault',['none','mapping','parent','semantic','command','manifest','no_release','attempt'])
++def test_worker_context_explicit_binding(lifecycle,monkeypatch,fault):
++    root,plan,plan_ref,release_ref,_,_=lifecycle
++    row=plan['episodes'][0]
++    context=adapter.worker.context_for(plan_ref,row,release_ref)
++    monkeypatch.setattr(bridge,'verify_manifest',lambda reference,*args:w.read_ref(reference))
++    if fault=='mapping':context['continuation']['carry_forward_map']=plan['parent_plan']
++    if fault=='parent':context['continuation']['parent_release']=plan['parent_plan']
++    if fault=='semantic':context['semantic_key']='forged'
++    if fault=='command':context['main_argv']=['mutated']
++    if fault=='manifest':context['expected_manifest']=plan['parent_plan']
++    if fault=='no_release':context.pop('release')
++    if fault=='attempt':context['attempt_id']='alias'
++    ref=write(root/'context-test.json',context)
++    if fault=='none':assert adapter.worker.validate_context(ref)[3]==row
++    else:
++        with pytest.raises(ValueError):adapter.worker.validate_context(ref)
++
++
++def test_pooling_requires_operational_source_approval(fixture,monkeypatch):
++    from scripts import qd_ed_n32r3_supervise as supervisor
++    plan,events,_,_=fixture
++    def fail(*args):raise ValueError('source review required')
++    monkeypatch.setattr(release,'verify_continuity',fail)
++    with pytest.raises(ValueError,match='source review required'):supervisor.reconcile(plan,events,lambda *args:None)
++
++
++def test_native_success_never_repairs_generic_stage_invalid(lifecycle,monkeypatch):
++    # Run a synthetic transaction, then use the actual terminal verifier, with
++    # only expensive native arithmetic mocked. Generic disagreement must reject.
++    import runpy
++    actual=runpy.run_path(str(c.ROOT/'scripts/qd_ed_n32r3_worker.py'))['verify_terminal']
++    root,plan,plan_ref,release_ref,_,_=lifecycle
++    result=adapter.execute_one(plan_ref,release_ref)
++    row=plan['episodes'][0];terminal=result['terminal'];terminal['guided_chunks']=1
++    manifest_ref=plan['expected_manifests'][row['episode_key']]
++    manifest=w.read_ref(manifest_ref);manifest['expected_runtime']=None
++    # The verifier reads the new synthetic manifest and its matching plan bytes.
++    plan['expected_manifests'][row['episode_key']]=write(Path(manifest_ref['path']),manifest)
++    new_ref=write(Path(plan_ref['path']),plan);terminal['plan_sha256']=new_ref['sha256']
++    output=Path(terminal['output_dir']);context=w.read_ref(terminal['context'])
++    context['plan']=new_ref
++    context_ref=write(output/'n32-worker-context.json',context);terminal['context']=context_ref
++    record=json.loads((output/'process.json').read_text());record['context']=context_ref;write(output/'process.json',record)
++    write(output/'command.json',{'argv':[manifest['argv'][0],'-m','scripts.qd_ed_n32r3_worker','--context',context_ref['path'],'--context-sha256',context_ref['sha256']],
++          'main_argv':manifest['argv'],'context':context_ref})
++    actual.__globals__['verify_receipt']=lambda *args:{'accepted':True}
++    actual.__globals__['native_counts']=lambda *args:({}, {})
++    monkeypatch.setattr(r,'validate_result',lambda *args:{'outcome_valid':False,'required_cost_telemetry_complete':False,'success':None})
++    with pytest.raises(ValueError,match='generic result/cost telemetry'):actual(new_ref,row,terminal,release_ref)
+diff --git a/tests/test_n32r3_source.py b/tests/test_n32r3_source.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..5c2167c34af4e6aa3644ec55097e67c5f6e6f2b1
+--- /dev/null
++++ b/tests/test_n32r3_source.py
+@@ -0,0 +1,68 @@
++"""Strict operational delta and fresh composed hashes, using tiny CPU fixtures."""
++import hashlib
++import json
++from pathlib import Path
++import subprocess
++import pytest
++from scripts import qd_ed_n32r3_release as release, qd_ed_n32r3_contract as c
++from scripts import qd_ed_n32r3_bridge as b, qd_ed_n23_worker as w
++from test_n32r3_continuation import write, dummy_ref
++
++
++@pytest.mark.parametrize('fault',['none','old_commit','science','shared_audit','foreign_file','missing_inventory','missing_approval','wrong_parent','old_source_digest'])
++def test_source_attestation(tmp_path,monkeypatch,fault):
++    shared='scripts/qd_ed_final_runner.py';added='scripts/qd_ed_n32r3_contract.py'
++    original=subprocess.check_output(['git','show',c.BASE_SOURCE+':'+shared],cwd=c.ROOT)
++    shared_hash=w.sha(c.ROOT/shared)
++    old={'commit':c.BASE_SOURCE,'files':[{'path':shared,'sha256':hashlib.sha256(original).hexdigest()},
++                                     {'path':'core/science.py','sha256':'science'}]}
++    new={'commit':'b'*40,'files':[{'path':shared,'sha256':shared_hash},{'path':'core/science.py','sha256':'science'},
++                                {'path':added,'sha256':'added'}]}
++    changed=[shared,added]
++    plan={'worktree':str(c.ROOT),'scientific_source':old,'source':new,
++          **{k:dummy_ref(tmp_path,k+'.json') for k in ('parent_plan','parent_release','carry_forward_map','command_candidates')}}
++    review={'schema':'n32r3-source-continuity-review-v1','approved':True,
++        **{k:plan[k] for k in ('parent_plan','parent_release','carry_forward_map','command_candidates')},
++        'scientific_source':old,'operational_source':new,'changed_files':{shared:shared_hash,added:'added'},
++        'scientific_changes':[],'audit_changes':[],'shared_routing':[shared]}
++    plan['source_continuity']=write(tmp_path/'review.json',review)
++    if fault=='old_commit':new['commit']=c.BASE_SOURCE
++    if fault=='science':new['files'][1]['sha256']='changed'
++    if fault=='shared_audit':new['files'][0]['sha256']='changed'
++    if fault=='foreign_file':changed.append('core/another.py')
++    if fault=='missing_inventory':new['files'].pop()
++    if fault=='missing_approval':Path(plan['source_continuity']['path']).unlink()
++    if fault=='wrong_parent':plan['parent_release']=plan['parent_plan']
++    if fault=='old_source_digest':new['files'][0]['sha256']=old['files'][0]['sha256']
++    monkeypatch.setattr(release.subprocess if hasattr(release,'subprocess') else subprocess,'check_output',lambda *args,**kwargs:('\n'.join(changed)+'\n').encode())
++    monkeypatch.setattr(w,'_committed_source',lambda *args:original)
++    if fault=='none':release.verify_continuity(plan)
++    else:
++        with pytest.raises(ValueError):release.verify_continuity(plan)
++
++
++def test_fresh_config_hashes_and_scientific_source_binding(tmp_path,monkeypatch):
++    row=c.expected_rows()[0]
++    scientific={'commit':c.BASE_SOURCE,'files':[{'path':'core/'+name,'sha256':'science'} for name in b.RUNTIME_SOURCES]+[{'path':'main.py','sha256':'main'}]}
++    plan={'worktree':str(c.ROOT),'episodes':c.expected_rows(),'source':{'commit':'b'*40},'scientific_source':scientific,
++          **{k:dummy_ref(tmp_path,k+'.json') for k in ('runtime','parent_plan','parent_release','parent_review','carry_forward_map','command_candidates','source_continuity','preparation_review')}}
++    runtime={'tasks':{'4':{'task_id':4,'init_index':0,'init_path':'init','bddl_path':'bddl'}},
++             'files':[{'path':'init','sha256':row['init_file_sha256']},{'path':'bddl','sha256':row['bddl_sha256']}]}
++    monkeypatch.setattr(b,'command',lambda *args:(['python','main.py','new_run_id'],tmp_path/'new'))
++    config={'backend':{'libero':{'max_episode_steps':720}},'policy':{'rdt':{'control_frequency':20,'action_chunk_horizon':8}},'run_id':row['episode_key']}
++    resolved={'n32_runtime_binding':{'source_commit':c.BASE_SOURCE,'run_id':row['episode_key'],'task_id':4},'scientific_value':123}
++    calls=[]
++    def compose(*args):calls.append(args);return config,resolved
++    monkeypatch.setattr(b.old,'compose_launch',compose)
++    result=b.manifest(plan,runtime,row)
++    assert calls and result['source']['commit']=='b'*40
++    assert result['expected_runtime']['binding']['source_commit']==c.BASE_SOURCE
++    assert result['composed_config_sha256']==w.canonical_sha(config)
++    assert result['expected_runtime']['config_sha256']==hashlib.sha256(json.dumps(resolved,sort_keys=True,allow_nan=False).encode()).hexdigest()
++    monkeypatch.setattr(w,'verify_source',lambda *args:None)
++    monkeypatch.setattr(b,'source_paths',lambda *args:set())
++    plan['source']['files']=[]
++    plan['runtime']=write(Path(plan['runtime']['path']),runtime)
++    result=b.manifest(plan,runtime,row)
++    result['composed_config_sha256']='old_digest'
++    with pytest.raises(ValueError):b.verify_manifest(write(tmp_path/'manifest.json',result),plan,runtime,row)

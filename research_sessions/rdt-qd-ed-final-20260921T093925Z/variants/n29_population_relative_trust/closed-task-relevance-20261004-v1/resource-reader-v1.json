@@ -1,0 +1,24 @@
+{
+  "schema": "n29-task-relevance-resource-v1",
+  "reader_cpu_seconds": 6.00859404,
+  "reader_wall_seconds": 6.018819525954314,
+  "metadata_bytes": 446245086,
+  "affinity": [
+    0,
+    1
+  ],
+  "thread_environment": {
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2"
+  },
+  "address_space_limit_bytes": 8589934592,
+  "peak_rss_kib": 148096,
+  "cuda_visible_devices": "",
+  "torch_imported": false,
+  "denied": [],
+  "error": null,
+  "completed_attempts": 24,
+  "gpu_model_api_sim_calls": 0,
+  "tensor_payload_reads": 0
+}

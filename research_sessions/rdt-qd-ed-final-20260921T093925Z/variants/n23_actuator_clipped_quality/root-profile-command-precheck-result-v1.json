@@ -1,0 +1,261 @@
+{
+  "baseline_profiles_unchanged": true,
+  "commands": [
+    {
+      "argc": 158,
+      "argv_sha256": "57bf136d2403f388da3290af2e289235fbf6ce79574e63656307d64562f24478",
+      "profile": "C0",
+      "task_id": 0
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "7228d16211f0a1594463d6d695c55d4530458a5f6877739581fc9485984a6b33",
+      "profile": "Q0",
+      "task_id": 0
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "b7cb040e115da26def9245426e0253cdfdb3bee92281044872b92d68afd790ea",
+      "profile": "N7",
+      "task_id": 0
+    },
+    {
+      "argc": 159,
+      "argv_sha256": "e16831369eb0fa10f6cb286654330c2d06a1fa690748dcdf0811db427ab4c8c9",
+      "profile": "N23",
+      "task_id": 0
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "3051a10cec5f50d7af8293e5871176670bbc355aab110676dd2578dba96f49af",
+      "profile": "C0",
+      "task_id": 1
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "915816817ae65a9e36592283ed7310dee739fc38e2a179646bddf05e536a541e",
+      "profile": "Q0",
+      "task_id": 1
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "679a9c0726e6b6821a69f59bcdd3f2fb5aab70137237e50794ca6d5acbc7ff5c",
+      "profile": "N7",
+      "task_id": 1
+    },
+    {
+      "argc": 159,
+      "argv_sha256": "ac2bf698145526f3fd11e471796fd86739e616ad45641f40525162af7867ccfb",
+      "profile": "N23",
+      "task_id": 1
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "e77fc1f23d56823afa6e5274e645f98385a4382f5cedb0d650f5ae792d6863e1",
+      "profile": "C0",
+      "task_id": 2
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "ee4a0fa887740e6233902ec71e969089fc9679f53d06019bdf8ab8ea0fa2f7d9",
+      "profile": "Q0",
+      "task_id": 2
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "d5cf886a69f0d3ea5ac34d0cb21baf3f0fc712b51a18699f9f6f4eef8d89ff1c",
+      "profile": "N7",
+      "task_id": 2
+    },
+    {
+      "argc": 159,
+      "argv_sha256": "2f503f588637d0a321b5373504208eb5720383d6ac68e721eb881898d8380a38",
+      "profile": "N23",
+      "task_id": 2
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "7b4aa8e4ba5d25569357d2b388a6c328b508a5abbcfa87c23d4195d293375810",
+      "profile": "C0",
+      "task_id": 3
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "2e983caba51c43b737c65020ae0c09d9a0e98a1fa3e83439f5459f95b0156e4a",
+      "profile": "Q0",
+      "task_id": 3
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "97c2c3dbbc423d44ec04e4ea66d8de2aa4c931b285d50cf28daba212f9a0f62a",
+      "profile": "N7",
+      "task_id": 3
+    },
+    {
+      "argc": 159,
+      "argv_sha256": "821ba798c997c8edf3b102c6861a060b281ea5ef591524a1175264f480057afc",
+      "profile": "N23",
+      "task_id": 3
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "932e10a2706cbc5413c34c926a3534590067b7b1d108924794b892443078f3e9",
+      "profile": "C0",
+      "task_id": 4
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "b9c5b8e10678c8fb5695340c3b50a0ffaa7efcfe08c126350fc3d9f3aeaf1dcb",
+      "profile": "Q0",
+      "task_id": 4
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "85b1f85cf921355e823ee58c78840db687e1c77023314c90449dd1b8c2ae9dc7",
+      "profile": "N7",
+      "task_id": 4
+    },
+    {
+      "argc": 159,
+      "argv_sha256": "458f056aaaf95fa8175ef8410509d2489006fa025f98c5eb3eae83ea71288537",
+      "profile": "N23",
+      "task_id": 4
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "c5a59a106bc1754310dad155e0cc75ef3b0d1ee8e08bb2ee619d353460c2cf64",
+      "profile": "C0",
+      "task_id": 5
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "bcecaa20590f03ab647f3fe47b63303289bc4c3fcb6ca051cda4dadc6f40e527",
+      "profile": "Q0",
+      "task_id": 5
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "127f3289034ad89296bb12e243f8849e088270fa11ebc55fb11715f77dd7dcc3",
+      "profile": "N7",
+      "task_id": 5
+    },
+    {
+      "argc": 159,
+      "argv_sha256": "e74ae6a7b36df8a77c01349fbe12342cbf18465e514eca9e17ed4848c8bdf03d",
+      "profile": "N23",
+      "task_id": 5
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "37fe4fb4acf8262c73e7e890bcd017ba21001ac3189920c59361d8366c13a20a",
+      "profile": "C0",
+      "task_id": 6
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "346ee4c33ab9bcacfe9e2a988ac57faf7720a7a8f251e1c132c70fe04fa5e808",
+      "profile": "Q0",
+      "task_id": 6
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "fd4a950fff5011fdf738cd5e73fc4d4004dbbf1101b5d349c3062b6bdf2e43a9",
+      "profile": "N7",
+      "task_id": 6
+    },
+    {
+      "argc": 159,
+      "argv_sha256": "651097a8ba9d37b054c57ff8ef3d9f34ce05dbf6814b3fde83854664d3e35cf2",
+      "profile": "N23",
+      "task_id": 6
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "67ceb86ad9901089feee1dc442844395a303ccde5c14edac86bffb47e53fdaf8",
+      "profile": "C0",
+      "task_id": 7
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "7dbcd9ee5923bc46ae7b0851854d70e4c056fb8fdd08b9c4913d955f9d9d933c",
+      "profile": "Q0",
+      "task_id": 7
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "4c5a96a56ef6d8573f253aa15640d2cd99f6ea5511851157a30593f8824b44cd",
+      "profile": "N7",
+      "task_id": 7
+    },
+    {
+      "argc": 159,
+      "argv_sha256": "d2ca98593d33c8f342bc15f99c37aee5ff89d4a320d60851981d02244a494614",
+      "profile": "N23",
+      "task_id": 7
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "eb805d329677ced47136d626ac448b6b9c626a82d49adf0e9cd386d7aedd0bc9",
+      "profile": "C0",
+      "task_id": 8
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "32142b7a77315a541be3632f4a250b0e226ec5f8cf967fae91fb7a4a4b72ea6a",
+      "profile": "Q0",
+      "task_id": 8
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "4cfc643631c0d5a8af1e24c46e1ca25ed35915bb0e9aa499637e789145ce5890",
+      "profile": "N7",
+      "task_id": 8
+    },
+    {
+      "argc": 159,
+      "argv_sha256": "e74ec6d8b51df2595290a7d451afe7d1f23b22eabc9ec33ada31db8782d4ae5e",
+      "profile": "N23",
+      "task_id": 8
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "ce31a85784dda3433789d3dfaf8e13799e9564a92ca99b07d41f94a912ef6432",
+      "profile": "C0",
+      "task_id": 9
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "e44b1084dc9a4ab4c4e36bb5c9a09013da9c23c978f95349437fd509003d2c20",
+      "profile": "Q0",
+      "task_id": 9
+    },
+    {
+      "argc": 158,
+      "argv_sha256": "13e0564a5ee5464caad5bac3c48a119df5ab8888cdc4bc6f514c052988452217",
+      "profile": "N7",
+      "task_id": 9
+    },
+    {
+      "argc": 159,
+      "argv_sha256": "c617dd7ca4941c310935efe9953dce90df41a8c45f30c00ba48379d490c5eb53",
+      "profile": "N23",
+      "task_id": 9
+    }
+  ],
+  "cuda_initialized": false,
+  "dispatched": false,
+  "draft": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/plan.dev.draft-v2.json",
+    "sha256": "9b591d7e1925493dff73a03736c39c38829007bc1e7a64be45d3441351013e53"
+  },
+  "exact_N7_to_N23_delta": {
+    "qd_quality_mode": "actuator_clipped_provider_v1"
+  },
+  "limit": "CPU composition of actual profile/input/argv only. Not a full owning-plan validation, Hydra execution, runtime admission or CUDA proof. Draft remains unfrozen with missing prerequisites; integration and actual backend preflight still required.",
+  "original_dev_matrix": true,
+  "reader_sha256": "5142cf5600a7f7d65a9044213a18d78757bf0f1f39b7930bb25d2f90037fc383",
+  "schema": "n23-root-real-profile-command-precheck-v1",
+  "source_commit": "1bcf888e88181580bfb854b2e7aa1834bf85df99",
+  "source_files": 192,
+  "source_manifest_sha256": "e97e9def65ae958d23caee724aa1697a98bd50a6b23790e5e42aa80562fb976e"
+}

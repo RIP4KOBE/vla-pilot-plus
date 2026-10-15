@@ -1,0 +1,42 @@
+{
+  "executable": false,
+  "root_authorized": false,
+  "actual_evidence_read": false,
+  "intended_future_location": "N26/source-equivalence-bridge.logical-v1.json",
+  "record": {
+    "schema": "n26-source-equivalence-bridge-logical-v1",
+    "new_source": null,
+    "runtime": {
+      "path": null,
+      "sha256": null
+    },
+    "composition": null,
+    "logical_predecessor": {
+      "path": null,
+      "sha256": null
+    },
+    "composition_protocol": {
+      "path": null,
+      "sha256": null
+    },
+    "phase_a_source": "8fd01eb77e2e83a100e54b21dc955c34bda9a3cc",
+    "unchanged_files": null,
+    "shared_route_functions": null,
+    "reverse_insertions": null,
+    "prior_backend_proof": {
+      "path": null,
+      "sha256": null
+    },
+    "phase_a_review": {
+      "path": null,
+      "sha256": null
+    },
+    "prior_n25_backend_proof": {
+      "path": null,
+      "sha256": null
+    },
+    "new_rbf_arithmetic_proof_required": true,
+    "old_proof_scope": "N23 quality and unchanged N25 control math only; not N26 clean-input wiring"
+  },
+  "notes": "Generate via qd_ed_n26_bridge.build under root-reviewed actual metadata; this template is not a proof."
+}

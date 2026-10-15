@@ -1,0 +1,113 @@
+{
+  "schema": "n30-jaw-pool-source-v1",
+  "executable_one_pass": true,
+  "source_commit": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "reader": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/calculate_pool_v1.py",
+    "sha256": "e3aa094a2843627fe0db95be75904882214305d47fd5857a2de4a9b8d76e5219",
+    "bytes": 22019
+  },
+  "input_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/input-manifest.frozen.v1.json",
+    "sha256": "5d56abae37a421420f203649ccbe0afe9268cc5fc369adb13e6a34ee686c6f64",
+    "bytes": 1409965
+  },
+  "measurement_declaration": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/jaw-alignment-pool-screen-v1/measurement-declaration-v1.json",
+    "sha256": "d32933fd83ddb3a5948219ce7efc1227e0c5b47a6e35b5c7bea6332de8d6d78c",
+    "bytes": 5017
+  },
+  "static_sources": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962,
+      "read_windows": [
+        [
+          1923,
+          1945
+        ],
+        [
+          5397,
+          5406
+        ],
+        [
+          7153,
+          7255
+        ],
+        [
+          7318,
+          7363
+        ],
+        [
+          7823,
+          7851
+        ]
+      ],
+      "mode": "static_only"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241,
+      "read_windows": [
+        [
+          136,
+          158
+        ],
+        [
+          208,
+          221
+        ]
+      ],
+      "mode": "static_only"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160,
+      "read_windows": [
+        [
+          1650,
+          1685
+        ]
+      ],
+      "mode": "static_only"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+      "bytes": 2380,
+      "read_windows": [
+        [
+          31,
+          42
+        ]
+      ],
+      "mode": "static_only"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_executed_progress.py",
+      "sha256": "7aead7c81424a2b247e4d74ae211947e0b78a47cf6fa1a8a97fb112a9739d9c0",
+      "bytes": 11581,
+      "read_windows": [
+        [
+          23,
+          38
+        ]
+      ],
+      "mode": "static_only"
+    }
+  ],
+  "reused_guard_source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/decode_cpu_v1.py",
+    "sha256": "4f11e72f7e15c81c5fe5094499e74ebbfed5113e05e467e2adae33f108497ed0",
+    "bytes": 36543
+  },
+  "geometry_reference": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/calculate_geometry_v1.py",
+    "sha256": "d3faa2fc6a02242dab6686b82c5d85f85b26bf2ea93658717bf05c005640b51d",
+    "bytes": 6830
+  },
+  "syntax_check": "ast.parse only; no code execution or tensor reads"
+}

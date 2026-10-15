@@ -1,0 +1,78 @@
+{
+  "read_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160,
+      "windows": [
+        [
+          81,
+          117
+        ],
+        [
+          1020,
+          1080
+        ],
+        [
+          1710,
+          1750
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_ed.py",
+      "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89",
+      "bytes": 46573,
+      "windows": [
+        [
+          89,
+          110
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py",
+      "sha256": "ba1728c637a30d1aeb42e257b8af5fea0248089c26aaf84c65f813fbd719928a",
+      "bytes": 415962,
+      "windows": [
+        [
+          1568,
+          1603
+        ],
+        [
+          4910,
+          4944
+        ]
+      ]
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/base.py",
+      "sha256": "a5d7bc8c7f317735b76347c0038d3c0888e592da0ee059d0f937eb9f1b272b34",
+      "bytes": 24667,
+      "line_filter": "def joints|self._joints|\"joints\""
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/mjcf_utils.py",
+      "sha256": "3c96c9722288b48b55a41fa0c400576e352d2f8f40eb1c6cbc126c070d79d348",
+      "bytes": 32489,
+      "line_filter": "def sort_elements|elements_dict|child in root|element_filter\\("
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/osc.py",
+      "sha256": "cfa62a0e719bc53ef0c701efa66f7b3e2272d4fca2150ec73c05bb145eba85cb",
+      "bytes": 20265,
+      "line_filter": "delta_ori|set_goal_orientation|scaled_delta|delta\\[3|def set_goal"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/control_utils.py",
+      "sha256": "1d0f1a063894b1e8289339e223665e14e8aec492c31e9e00f42edea8dc735f43",
+      "bytes": 10243,
+      "line_filter": "def set_goal_orientation|rotation_mat_error|quat2mat|rotation_mat_error|goal_orientation"
+    }
+  ],
+  "cpu_seconds": 0.00489202,
+  "affinity": [
+    0,
+    1
+  ]
+}

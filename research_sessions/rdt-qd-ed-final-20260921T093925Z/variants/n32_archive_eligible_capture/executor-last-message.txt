@@ -1,0 +1,5 @@
+Committed `148d1aae182500df04d0fa8b13fc54bc533e56a7`: CPU-only selector and synthetic tests. **75 tests passed**; worktree clean.
+
+Native integration/auditing remains incomplete. No Dev runtime launched; scientific score is null.
+
+Saved [report](../cpu-executor-report-v1.md) and [receipt](../cpu-executor-result-v1.json), including source hashes, measured CPU cost, integration design, and limitations.

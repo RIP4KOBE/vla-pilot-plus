@@ -1,0 +1,23 @@
+{
+  "schema": "n27-hydra-root-source-adoption-before-v1",
+  "time": "2026-10-01T09:24:53.042388+00:00",
+  "old_commit": "095cfeecd6af55477d2529441c307ab712e8a8da",
+  "new_commit": "e21d48ab33dbd3aca017349b6004c2ba7d981493",
+  "preserved_tracked": {
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/checkpoint.json": "4526c0f5b84a62a4a7a30df28f9f7bf93a305f76ff904245447e23656fca978e",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.json": "62ceff4e4ac9d5edd770428e3b63da5d067607e3ab61c4d6ebdf6b47904b627a",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.md": "7cff98130322725e321238e373a1bf8d683629b4039dad714f315c4cae9262aa",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/REPORT.md": "e1dbcbba595c6ee13360741c45a7e239fe7d003bc5db194f2b0382ee030884ae",
+    "data/attempt-ledger.jsonl": "714540906de9d9251f86ebd93be2509285cb4aaf98dd1ea25944766fb7ef9368",
+    "data/exposure-registry.jsonl": "b628db432f3536424a9c69157a39d522dc3ea9782f1b0d877b31a3a285013c71",
+    "data/gpu-healthcheck-ledger.jsonl": "036c8cfc913a5718951cc737722a9262f4d2b3b8e1fb137048a8b433079bbbee",
+    "data/gpu-hour-reservation-ledger.jsonl": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+    "docs/03_evidence/qd_ed_final/iteration-ledger.md": "8b853eb14ebfcc2d6968a2f22ae789dedaa1cd5dda0d02f03f648e86c74bc278",
+    "research-state.yaml": "092d99e2a8a78efcd832254343518dac055e89aac74f5b69f6f9cc0ac6bf1ba3",
+    "research_config.yaml": "71a77f36b1a2374690a6018db9cf3f51433ab0d1b531ef7b1e6c096dee538847"
+  },
+  "cpu_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/hydra-continuation-root-preparation-v1/root-cpu-review-v1.json",
+    "sha256": "a161a27fb65f7cdc811cd19416998c9e127039d999e2b2cda46654efe40aa5bc"
+  }
+}

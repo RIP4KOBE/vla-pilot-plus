@@ -1,0 +1,35 @@
+{
+  "schema": "n28-disabled-template-v1",
+  "executable": false,
+  "root_authorized": false,
+  "target_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/arithmetic-preflight/plan.frozen.v1.json",
+  "missing_required": [
+    "created exclusively inside metered backend.run only"
+  ],
+  "source_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/source-manifest-execution-v1.json",
+    "sha256": "a26a52fa413c43778a341d72b85e570892a13933954c4fa0b78c5a6357c1ef12"
+  },
+  "record": {
+    "schema": "n28-tensor-resource-plan-v1",
+    "frozen": false,
+    "resource_id": null,
+    "kind": "n28_tensor_arithmetic_v1",
+    "worktree": null,
+    "source": null,
+    "runtime": null,
+    "limits": {
+      "resource_processes": 1,
+      "episode_attempts": 0,
+      "model_calls": 0,
+      "api_calls": 0,
+      "simulation_steps": 0,
+      "timeout_seconds": 80,
+      "cleanup_seconds": 40,
+      "physical_gpu": 7,
+      "health_gpu_hours_bucket": "recovery"
+    },
+    "authority": null,
+    "output_dir": null
+  }
+}

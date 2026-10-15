@@ -1,0 +1,16 @@
+{
+  "schema": "n30-initial-observation-repair-reverse-v1",
+  "base_commit": "4ce2b95757c1c0d662696ba19d6a9a14d2e59b49",
+  "commit": "7c0d80d734fa8300173e56d9a8de03415bc55fe2",
+  "path": "main.py",
+  "old_sha256": "13085b64032cf8372af900223c2f4be3da2da2c8f6f5aee39147402c444eb74f",
+  "new_sha256": "5209b0ac07362e1df85bf2fd842e57d4786e24c0a625ee5b9e49bee48f528f93",
+  "remove_exact_once": "        if continuation_enabled:\n            # Raw cached reset observation; policy preprocessing removes robot_state.\n            obs = self.adapter.get_obs()\n",
+  "restored_bytes_exact": true,
+  "pinned_original_method_ast_matches_base": true,
+  "runtime_get_obs_source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/implementation/core/env_adapters/libero_adapter.py",
+    "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+    "bytes": 72160
+  }
+}

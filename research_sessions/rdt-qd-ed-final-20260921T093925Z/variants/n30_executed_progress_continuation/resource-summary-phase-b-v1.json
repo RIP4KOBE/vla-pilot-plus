@@ -1,0 +1,184 @@
+{
+  "schema": "n30-phase-b-cpu-summary-v1",
+  "source_commit": "4ce2b95757c1c0d662696ba19d6a9a14d2e59b49",
+  "phase_b_process_cpu_seconds": 93.31637751699999,
+  "phase_b_limit_seconds": 600,
+  "phase_a_separate_cpu_seconds": 42.680921496,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "runs": [
+    {
+      "schema": "n30-cpu-resource-v1",
+      "run": "phase-b-run1",
+      "pytest_exit": 1,
+      "process_cpu_seconds": 8.211743639,
+      "wall_seconds": 7.230360176996328,
+      "cpu_affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "cuda_visible_devices": "",
+      "cuda_initialized": false,
+      "denied": [],
+      "guard_clean": true,
+      "test_args": [
+        "tests/test_n30_native.py",
+        "-k",
+        "full_replay or zero_guided or serializer",
+        "-q"
+      ],
+      "peak_rss_kib": 653668
+    },
+    {
+      "schema": "n30-cpu-resource-v1",
+      "run": "phase-b-run2",
+      "pytest_exit": 1,
+      "process_cpu_seconds": 8.162051567,
+      "wall_seconds": 7.179680721950717,
+      "cpu_affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "cuda_visible_devices": "",
+      "cuda_initialized": false,
+      "denied": [],
+      "guard_clean": true,
+      "test_args": [
+        "tests/test_n30_native.py",
+        "-k",
+        "full_replay",
+        "-q"
+      ],
+      "peak_rss_kib": 650220
+    },
+    {
+      "schema": "n30-cpu-resource-v1",
+      "run": "phase-b-run3",
+      "pytest_exit": 1,
+      "process_cpu_seconds": 42.275184292,
+      "wall_seconds": 27.827441595029086,
+      "cpu_affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "cuda_visible_devices": "",
+      "cuda_initialized": false,
+      "denied": [],
+      "guard_clean": true,
+      "test_args": [
+        "tests/test_n30_native.py",
+        "tests/test_n30_controller.py",
+        "tests/test_n30_admission.py",
+        "-q"
+      ],
+      "peak_rss_kib": 824824
+    },
+    {
+      "schema": "n30-cpu-resource-v1",
+      "run": "phase-b-run4",
+      "pytest_exit": 1,
+      "process_cpu_seconds": 7.115481811,
+      "wall_seconds": 6.795280197984539,
+      "cpu_affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "cuda_visible_devices": "",
+      "cuda_initialized": false,
+      "denied": [],
+      "guard_clean": true,
+      "test_args": [
+        "tests/test_n30_native.py::test_cpu_future_qd_off_control_uses_real_no_archive_path",
+        "tests/test_n30_controller.py::test_full_three_of_four_and_controls",
+        "tests/test_n30_worker.py",
+        "-q"
+      ],
+      "peak_rss_kib": 612704
+    },
+    {
+      "schema": "n30-cpu-resource-v1",
+      "run": "phase-b-run5",
+      "pytest_exit": 0,
+      "process_cpu_seconds": 13.924670665999999,
+      "wall_seconds": 10.588961952948011,
+      "cpu_affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "cuda_visible_devices": "",
+      "cuda_initialized": false,
+      "denied": [],
+      "guard_clean": true,
+      "test_args": [
+        "tests/test_n30_native.py",
+        "tests/test_n30_worker.py",
+        "-k",
+        "full_replay or mask_and_independent or real_recorder_unguided or same_process_worker",
+        "-q"
+      ],
+      "peak_rss_kib": 743968
+    },
+    {
+      "schema": "n30-cpu-resource-v1",
+      "run": "phase-b-run6",
+      "pytest_exit": 0,
+      "process_cpu_seconds": 4.765060924,
+      "wall_seconds": 4.664318406023085,
+      "cpu_affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "cuda_visible_devices": "",
+      "cuda_initialized": false,
+      "denied": [],
+      "guard_clean": true,
+      "test_args": [
+        "tests/test_n30_source_contract.py",
+        "tests/test_n30_admission.py",
+        "-k",
+        "not all_three_real_hydra",
+        "-q"
+      ],
+      "peak_rss_kib": 499220
+    },
+    {
+      "schema": "n30-cpu-resource-v1",
+      "run": "phase-b-run7",
+      "pytest_exit": 0,
+      "process_cpu_seconds": 8.862184617999999,
+      "wall_seconds": 7.597548792953603,
+      "cpu_affinity": [
+        0,
+        1
+      ],
+      "threads": 2,
+      "cuda_visible_devices": "",
+      "cuda_initialized": false,
+      "denied": [],
+      "guard_clean": true,
+      "test_args": [
+        "tests/test_n30_executed_progress.py",
+        "-k",
+        "default_off_matches",
+        "-q"
+      ],
+      "peak_rss_kib": 608052
+    }
+  ],
+  "distinct_phase_b_final_passing_cases": 94,
+  "new_phase_b_distinct_cases": 92,
+  "phase_a_default_parity_rechecks": 2,
+  "historical_failures_retained": true,
+  "no_actual_model_provider_gpu_simulator_or_experiment_payload": true
+}

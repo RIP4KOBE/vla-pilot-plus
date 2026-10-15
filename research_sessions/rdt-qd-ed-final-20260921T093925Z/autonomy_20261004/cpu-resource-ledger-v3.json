@@ -1,0 +1,36 @@
+{
+  "schema": "autonomy-driver-cpu-resource-ledger-v3",
+  "cpu_limit_seconds": 120,
+  "test_total_cpu_seconds": 1.128068726,
+  "test_total_wall_seconds": 1.7363084919052199,
+  "resources": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v1.json",
+      "sha256": "1310424bd5a5d96ad2911f8e542ba011f05dd06e39e69a2b84359d39daf109ed"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v2.json",
+      "sha256": "57e0b4c4cb7c7882349c08ef7026463164d9c7a4cba4c6ab2c1a9ebeb1c5d111"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v3.json",
+      "sha256": "97db904bcece8cdb6c81bb781c0be3e8bffb578088eeac8ba870b2281614fcbd"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v4.json",
+      "sha256": "6d66ba1013b39b7206fbdc25142d4d686759420fe0d2c189f4b42edf106fb649"
+    }
+  ],
+  "final_driver": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_v1.py",
+    "sha256": "33d060651ce37f470b9752692db9598750c2c8b84a9f81d8d286fa0c36a4b000"
+  },
+  "run1_guard_clean": false,
+  "run2_16_tests_guard_clean": true,
+  "run3_6_targeted_tests_guard_clean": true,
+  "run4_ephemeral_command_test_guard_clean": true,
+  "distinct_tests": 17,
+  "official_model_calls": 0,
+  "driver_launched": false,
+  "gpu_api_env_sim_calls": 0
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "n24-cpu-startup-preflight-input-manifest-v1",
+  "frozen_at": "2026-09-30T18:21:58.586995+00:00",
+  "status": "FROZEN_BEFORE_SINGLE_STARTUP",
+  "scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-runtime-startup-preflight/read-scope-v1.json",
+    "sha256": "f670a3c2d90838356f2e90cc1481068a9546312293cd3165869537ed932b5de4"
+  },
+  "extractor": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-runtime-startup-preflight/startup_cpu_v1.py",
+    "sha256": "3f5603fd261dce70efc8c13ce400567ac1cd502675d7ed7512b14e5995b69063"
+  },
+  "inputs": "No research artifacts; scope/script/manifest plus trusted dependency files only",
+  "existing_tmp": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-runtime-startup-preflight/tmp",
+  "tmp_write_permission": false,
+  "limits": {
+    "processes": 1,
+    "seconds": 30,
+    "cpu_threads": 2,
+    "payload_reads": 0
+  },
+  "new_geometry_authorized": false
+}

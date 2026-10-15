@@ -1,0 +1,5 @@
+# N15 stalled-contact memory: insufficient task coverage
+
+The SHA-verified read-only screen uses the same matched N7 Dev paths. A trigger requires a guided chunk's selected projected EEF to reach within 6 cm of the tracked target, actual EEF displacement at least 2 cm, target displacement below 1 cm, stable tracker identity, and another guided decision in the same Stage. Thresholds match prior physical screens and are fixed before any candidate run.
+
+Trigger counts are task 0: seven, task 3: two, task 6: zero, task 9: zero. The rule could alter only two of four exposed task paths, including task 0; task 9's early selected reach is still 7.1 cm after a large 14.3 cm EEF move, so calling it stalled near contact would be unjustified. The absence of task-6 triggers preserves that observed success but does not create a third improvement path. Stage stochasticity means this is not an absolute outcome bound, but the evidence does not justify a full 12-attempt three-arm Dev cohort under the preregistered 3/4 gate. N15 is **not dispatched**. No validation or formal data were used.

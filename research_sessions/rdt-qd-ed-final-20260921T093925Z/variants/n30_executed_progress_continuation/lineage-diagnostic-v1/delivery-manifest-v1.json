@@ -1,0 +1,152 @@
+{
+  "schema": "n30-lineage-phase-a-delivery-v1",
+  "phase": "A_METADATA_ONLY_COMPLETE",
+  "executable": false,
+  "payload_decode_authorized": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/all-listed-payload-stat-v1.json",
+      "bytes": 3024610,
+      "sha256": "8f773027f70250a221e18af9b9d1f0ed460c76e8ed41b61b3c58adb63b32499b"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/control-shapes-v2.json",
+      "bytes": 10971,
+      "sha256": "61e704591ac8bb61e3931bf18bf57653beb4e0c657d56be3a5eb96950f31c75d"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/coverage-v1.csv",
+      "bytes": 266,
+      "sha256": "c3372896c844529ed0f2d05326b56047f8becc4acd66aca557ea9d7d9c4ec0fd"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/cpu-measurements-v1.json",
+      "bytes": 1427,
+      "sha256": "eedb78c824a976a9400b07dcb3d97d29203af86dc7bf64ce0e42ee4943d0ee0b"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-protocol.disabled.v1.md",
+      "bytes": 7041,
+      "sha256": "28dbfea28ca0a858ebbf29bb4bc4bc64a813a0cf892ed074ae037f911567eccb"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/episode-metadata-catalog-v1.json",
+      "bytes": 890898,
+      "sha256": "a34c384d5d44a7b915ec9ab32c5964b4be1aaf0bad6e90f6a480f6cd3a6011d8"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/index-run-v1.log",
+      "bytes": 1671,
+      "sha256": "37abcaac35e8aa2ae3bf0941148633c8c4a165ee067762f46d36aa881bde28ee"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/input-bindings.disabled.v1.json",
+      "bytes": 2494326,
+      "sha256": "192e4605fa42b834d99bb3083007283c08dbd84e990b94c7d5dd6207b1a9f1ce"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/input-read-manifest-v1.json",
+      "bytes": 13957,
+      "sha256": "d8ccc0d2c0538bd7518a1bdd7ad0498f57335777cd4f270bf571b37ff9013873"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/inventory_indexes_v1.py",
+      "bytes": 11865,
+      "sha256": "7993d668e29833e682d934ae57623e4de861e54aa30767c1e172d428417fdb01"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/inventory_metadata_v1.py",
+      "bytes": 7296,
+      "sha256": "51c0f6ab5576456535cc275a68bc2be6aa9a807a7c81b34ebd01de2a849a728d"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/inventory_metadata_v2.py",
+      "bytes": 7813,
+      "sha256": "5d1746d1e543c11d24bf1a0f4b6fc52738101059d7ca140fa180bb3c79d638fb"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/metadata-run-v1.log",
+      "bytes": 1563,
+      "sha256": "f754337bbc09c2efad0098a798c5bb2c484f95234073be570df69307eac570e2"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/metadata-run-v2.log",
+      "bytes": 30877,
+      "sha256": "9b442053a0a3aa74388e9c21ea82eb7f0c85add1d4e525276220ddfa25d130f9"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/preparation-read-record-v1.json",
+      "bytes": 1008,
+      "sha256": "6498cf73e8ffb86d752e740f48d0949f8e3e671a26507fd70a4868be0cc3b477"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/report-v1.md",
+      "bytes": 4903,
+      "sha256": "dd512b7222bd2868cd0fbcf453b6cfee8dd6e4defe51c30e5aae91c25ee874c2"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/resource-indexes-v1.json",
+      "bytes": 4951,
+      "sha256": "52473ea3c0000d091d575373d5f25896669144ba734792cb32d0be6c27e7e49a"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/resource-metadata-v1.json",
+      "bytes": 1885,
+      "sha256": "e23ae2be807405b659e13b947d1a674391114fadf3bbf32da9c67c592452019b"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/resource-metadata-v2.json",
+      "bytes": 10516,
+      "sha256": "270651d4b10796559e3f551d44c3b0d9e8b503a8c950c321f9ebc20edf6786d7"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/resource-v1.json",
+      "bytes": 1352,
+      "sha256": "6eaf7c348a01d985e5ffd4e2c94d752e8646f5544d44890b9b6725cba124f730"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/root-causal-interpretation-boundary-v1.md",
+      "bytes": 2127,
+      "sha256": "778be1c3d3c146e6db5bf6cccd656a63de13f2fb2e103466aacf975d60756fc3"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/root-inventory-registration-v1.json",
+      "bytes": 1048,
+      "sha256": "1a0f34dd299178d2e28ed304221ee686c85df7f2d53cb015bd62f03250f6a021"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/root-inventory-release-v1.json",
+      "bytes": 885,
+      "sha256": "dc829f1cc47e4310df5b9776f6000deafb8f4acbfaa8d8eede5bef8a1f231fde"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/root-inventory-scope-v1.md",
+      "bytes": 6156,
+      "sha256": "92d64df2b127de76f71c999dee1acf1c9a55910b91137a7fc34c3297c82a6cd1"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/source-binding-v1.json",
+      "bytes": 26685,
+      "sha256": "426338e33a9e15adc983335ead785ad9c235c401fe2b1b43367172b7ff2cd1e6"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/source-lineage-windows-v1.json",
+      "bytes": 42783,
+      "sha256": "7d902d704861991882c3a30ba918ec6896c43998e3af70d6fca31067ed7b5010"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/source-locator-record-v1.json",
+      "bytes": 1022,
+      "sha256": "24837f7341ee3c1c63a76d97df7f1f061cd1058a2a4110bc99e7e9097e22805c"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/source-schema-record-v1.json",
+      "bytes": 965,
+      "sha256": "ba86799c4e854daef84df211737c842d38eb70ee37cf22844d3c6583d555be27"
+    }
+  ],
+  "closure_packaging_cpu_seconds_before_write": 0.00865774,
+  "closure_packaging_bytes_hashed": 6610867,
+  "scope_changes": false,
+  "experiments_changed": false
+}

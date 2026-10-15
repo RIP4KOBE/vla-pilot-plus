@@ -1,0 +1,12 @@
+{
+  "schema": "n30-capture-decision-addendum-resource-v1",
+  "cpu_seconds_at_record": 0.0,
+  "affinity": [
+    0,
+    1
+  ],
+  "new_source_or_episode_input_reads": 0,
+  "new_calculations": 0,
+  "only_existing_output_manifest_read": true,
+  "root_message_used_as_attributed_evidence": true
+}

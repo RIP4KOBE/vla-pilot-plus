@@ -1,0 +1,103 @@
+{
+  "schema": "n24-root-phase-a-source-review-v1",
+  "recorded_at": "2026-09-30T15:50:35.258815+00:00",
+  "decision": "PASS_CPU_CONTROLLER_PREPARATION_ONLY",
+  "base_source": "51104470983cdbafd08feb87f2f39b7553779405",
+  "reviewed_source": "3f6db2dc3dcc8db45b66a649568b43248c8b5f0e",
+  "protocol": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/protocol-dev-v1.md",
+    "sha256": "77163171815bdade8d05a4010ff59aa24a4157d447d6d7fb430f3163a80c4b3b"
+  },
+  "changed_files": [
+    {
+      "path": "configs/config.yaml",
+      "sha256": "5a0bce959afd4aad5e32e27dc5a278b600f8f0705069e9b36415af5f62cef183"
+    },
+    {
+      "path": "configs/qd_ed_final/candidate_n24.json",
+      "sha256": "02e45be92c34ea61577d827b269d43d766ccf3917728faf7be620e4d0f976a51"
+    },
+    {
+      "path": "core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295"
+    },
+    {
+      "path": "core/eds_eval_metrics.py",
+      "sha256": "3b3861870ff9645edbff1b64c2274d99889e9ee16e421976ae0b19366e6a5974"
+    },
+    {
+      "path": "core/qd_gripper_parent_rescue.py",
+      "sha256": "95e58de7f33a3f365f3d7640206f9f040b821d1bcd3d44aea008dd3236a25e3f"
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "sha256": "aa91f6a0ce6a532c724fed559a93a08545241924028f621fe73101ee3bed3ea8"
+    },
+    {
+      "path": "experiments/qd_ed_n24/protocol-dev-v1.md",
+      "sha256": "77163171815bdade8d05a4010ff59aa24a4157d447d6d7fb430f3163a80c4b3b"
+    },
+    {
+      "path": "scripts/audit_decision_evidence.py",
+      "sha256": "df9b4294e02391f12f108671680072127054471a8c2eca02fed7b167a3a9addf"
+    },
+    {
+      "path": "scripts/audit_gripper_parent_rescue.py",
+      "sha256": "546ed6c7579b70fa6e99fb1525f144fb500b57ea9e3694af517434769f09ab68"
+    },
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "ecfe7130c2782aceca223e2c5ad3e45be145ed640f50caade52c0699db951490"
+    },
+    {
+      "path": "tests/test_n24_native_loop.py",
+      "sha256": "6bfb2a16a12060304c146aeb0b879afacc572e098a11256aed3fdac960aa89e8"
+    },
+    {
+      "path": "tests/test_qd_gripper_parent_rescue.py",
+      "sha256": "9d8f5c7aa0b8070e76dc89428c806b317a32a7dc73a180b1b20a0703ae7ccaf7"
+    }
+  ],
+  "byte_parity": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/scientific-byte-parity-v1.json",
+    "sha256": "b231e68ac104b4d8344b9c82525bad18d68ee98c05d18d0e55808e502971eced"
+  },
+  "validation_evidence": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-final-v1.log",
+      "sha256": "79f91fab3265a1bf340e9a6f33b0df77435ae9e7e7c94461ac0cdd6be50cee1b"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-final-v2.log",
+      "sha256": "2eca896d980ea36359abcc0f3469fcec1fee7c67ca976be5f52f7bfa148925f4"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-guard-v2.log",
+      "sha256": "23d05b365ea8b1847d5dea49a9a068e77f3c907018c66b6fd7d116ca81ad09f4"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/n24_cpu_guard_v2.py",
+      "sha256": "c84830ab99852fd2485c7ad50e861584b58e2e6261a08ce44d7b48cbaf26940f"
+    }
+  ],
+  "root_inspection": [
+    "Canonical cache contains prior scored native proposal only; earliest strict minimum; frozen context and search-local lifetime.",
+    "Original archive allocation independently replayed before first-worst one-slot substitution; final archive separately reconstructed.",
+    "Original15 parent entries unchanged, all16 refined, no extra score/model calls; FP32 archive/native BF16 pairing retained.",
+    "Default-off/inactive/instrumentation parity and native corruption tests reviewed; original scientific files independently compared with base git bytes.",
+    "No Stage/provider implementation or credentials changed."
+  ],
+  "phase_b_requirements": [
+    "Frozen N24 profile must mandate n24_gripper_parent_rescue_audit for each guided decision even if all markers are removed.",
+    "New prospective source-bound controller/runtime/capacity/immutable-result path must pass review before GPU.",
+    "Keep 478 attempts/100 GPUh and protected reserves; no new budget authority introduced."
+  ],
+  "phase_b_scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/executor-controller-scope-v1.md",
+    "sha256": "f39926545640449e07fd3f5776ec8f8eb6f9290749ae65a3661fce9e2c66e505"
+  },
+  "online_score": "Unknown/not-run",
+  "gpu_released": false,
+  "validation_authorized": false,
+  "formal_authorized": false
+}

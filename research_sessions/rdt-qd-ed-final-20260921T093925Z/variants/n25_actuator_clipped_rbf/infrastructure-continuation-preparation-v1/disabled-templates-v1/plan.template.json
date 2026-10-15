@@ -1,0 +1,27 @@
+{
+  "schema": "n25-disabled-cpu-template-v1",
+  "executable": false,
+  "gpu_authorized": false,
+  "root_review_required": true,
+  "target_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/infrastructure-continuation-v1/plan.frozen.v1.gpu7.json",
+  "unresolved": [
+    "Do not copy as plan. Use prepare.freeze only after actual metadata seal/source/resource/capacity/adoption checks. Exactly22 copied original indices18..39."
+  ],
+  "record": {
+    "frozen": false,
+    "source_commit": "6f796358aa84d53e9c8a04859f7d19352c9db7fe",
+    "episodes": [],
+    "phase_authorization": {
+      "dev": false,
+      "validation": false,
+      "formal": false
+    },
+    "n25_infrastructure_continuation": {
+      "schema": "n25-infrastructure-continuation-v1",
+      "executable": false,
+      "seal": null,
+      "authority": null,
+      "final_review": null
+    }
+  }
+}

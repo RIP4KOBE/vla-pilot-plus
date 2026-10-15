@@ -1,0 +1,144 @@
+{
+  "actual_source_or_history_reads": 0,
+  "aggregate_test_seconds": 0.5168208191171288,
+  "delivered_directory_bytes": 42265,
+  "delivered_regular_files": 7,
+  "files": [
+    {
+      "bytes": 3089,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/root-cpu-protocol-v1.md",
+      "sha256": "b10c15ef95393c3f0a38d98165b795736a2b278fed61937a0864b3c0904078a4"
+    },
+    {
+      "bytes": 6608,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/verified_immutable_cache.py",
+      "sha256": "f580ea88186b82364f14c4e8b2afbfa613e38a3a89683b0e2103fbe2e360675a"
+    },
+    {
+      "bytes": 8812,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/test_verified_immutable_cache.py",
+      "sha256": "35fd1c1b21f5d13711b911bf4d33035ba95ff14e39bb76f28718713728f46b55"
+    },
+    {
+      "bytes": 6181,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/run_cpu_checks.py",
+      "sha256": "d5a6b5b9175e2c69428e68cd4a25871731ad1eaa5e90d83bb80e609ed9af296d"
+    },
+    {
+      "bytes": 3855,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/cpu-checks.log",
+      "sha256": "c20e0abe51a1308aa289a28c5bf5ed3a81b74b694c32dad8ac9570c0419fb209"
+    },
+    {
+      "bytes": 7057,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/report.md",
+      "sha256": "68c54279463d61a32bc4787b96def66f4f87199e5b5c8ad284169b5c7a45e302"
+    }
+  ],
+  "gpu_api_model_simulator_calls": 0,
+  "integration_authorized": false,
+  "limits": {
+    "aggregate_test_seconds": 120,
+    "cpu_affinity": 2,
+    "directory_bytes": 1048576,
+    "regular_files": 8
+  },
+  "production_imports": 0,
+  "schema": "immutable-source-cache-cpu-delivery-v1",
+  "self_hash_excluded": true,
+  "status": "UNWIRED_CPU_PREPARATION_ONLY",
+  "test_runs": [
+    {
+      "aggregate_seconds": 0.10527556308079511,
+      "cpu_affinity_count": 2,
+      "cuda_visible_devices": "",
+      "denied_operations": [
+        {
+          "event": "open",
+          "target": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1"
+        },
+        {
+          "event": "open",
+          "target": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1"
+        }
+      ],
+      "elapsed_seconds": 0.10527556308079511,
+      "error": "PermissionError: CPU guard refused open: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1",
+      "guard_clean": false,
+      "inventory": {
+        "bytes": 24057,
+        "regular_files": 5
+      },
+      "pytest_exit_code": 1,
+      "torch_imported": false
+    },
+    {
+      "aggregate_seconds": 0.20947548106778413,
+      "cpu_affinity_count": 2,
+      "cuda_visible_devices": "",
+      "denied_operations": [
+        {
+          "event": "open",
+          "target": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1"
+        },
+        {
+          "event": "open",
+          "target": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1"
+        }
+      ],
+      "elapsed_seconds": 0.10419991798698902,
+      "error": "PermissionError: CPU guard refused open: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1",
+      "guard_clean": false,
+      "inventory": {
+        "bytes": 25268,
+        "regular_files": 5
+      },
+      "pytest_exit_code": 1,
+      "torch_imported": false
+    },
+    {
+      "aggregate_seconds": 0.3700552200898528,
+      "cpu_affinity_count": 2,
+      "cuda_visible_devices": "",
+      "denied_operations": [
+        {
+          "event": "open",
+          "target": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/__pycache__/test_verified_immutable_cache.cpython-312-pytest-9.0.3.pyc"
+        },
+        {
+          "event": "open",
+          "target": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/validation-cost-cache-preparation-v1/__pycache__/verified_immutable_cache.cpython-312.pyc"
+        },
+        {
+          "event": "os.chdir",
+          "target": "operation forbidden"
+        }
+      ],
+      "elapsed_seconds": 0.16057973902206868,
+      "error": "PermissionError: CPU guard refused os.chdir: operation forbidden",
+      "guard_clean": false,
+      "inventory": {
+        "bytes": 26484,
+        "regular_files": 5
+      },
+      "pytest_exit_code": 1,
+      "torch_imported": false
+    },
+    {
+      "aggregate_seconds": 0.5168208191171288,
+      "cpu_affinity_count": 2,
+      "cuda_visible_devices": "",
+      "denied_operations": [],
+      "elapsed_seconds": 0.14676559902727604,
+      "error": null,
+      "guard_clean": true,
+      "inventory": {
+        "bytes": 28207,
+        "regular_files": 5
+      },
+      "pytest_exit_code": 0,
+      "torch_imported": false
+    }
+  ],
+  "tests_passed_final": 49
+}

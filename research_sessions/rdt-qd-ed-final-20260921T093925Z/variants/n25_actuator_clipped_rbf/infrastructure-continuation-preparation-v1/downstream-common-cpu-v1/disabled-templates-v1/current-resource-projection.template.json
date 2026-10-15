@@ -1,0 +1,23 @@
+{
+  "schema": "n25-current-resource-projection-v1",
+  "executable": false,
+  "root_terminal_review": {
+    "path": null,
+    "sha256": null
+  },
+  "source_ledger": {
+    "path": null,
+    "sha256": null
+  },
+  "collector": {
+    "path": null,
+    "sha256": null
+  },
+  "collected_at": null,
+  "all_matching_events_included": false,
+  "protected_events_included": false,
+  "resource_id": null,
+  "resource_kind": null,
+  "events": [],
+  "event_count": null
+}

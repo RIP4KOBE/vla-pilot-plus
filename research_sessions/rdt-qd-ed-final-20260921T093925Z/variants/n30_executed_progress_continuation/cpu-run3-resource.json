@@ -1,0 +1,21 @@
+{
+  "schema": "n30-cpu-resource-v1",
+  "run": "run3",
+  "pytest_exit": 0,
+  "process_cpu_seconds": 16.997954643,
+  "wall_seconds": 12.720460609067231,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "denied": [],
+  "guard_clean": true,
+  "test_args": [
+    "-q",
+    "tests/test_n30_executed_progress.py"
+  ],
+  "peak_rss_kib": 983372
+}

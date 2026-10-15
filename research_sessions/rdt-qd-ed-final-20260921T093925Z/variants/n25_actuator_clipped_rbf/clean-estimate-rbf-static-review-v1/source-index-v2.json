@@ -1,0 +1,123 @@
+{
+  "schema": "n25-static-input-index-v2",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/core/rdt_policy_steer.py",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/core/rdt_policy_steer.py",
+      "sha256": "f3077a2edb79e2240e48ba8f08709412adbbf6a75d33e8b5370214f72ca89b82",
+      "bytes": 404108,
+      "kind": "source"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/core/qd_actuator_clipped_rbf.py",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/core/qd_actuator_clipped_rbf.py",
+      "sha256": "d305379cc6561c8b50a3d31820493be73cc7b253d490cf0dc6afe30db7bb5f33",
+      "bytes": 10324,
+      "kind": "source"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/core/rdt_libero_action_converter.py",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+      "bytes": 2380,
+      "kind": "source"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/configs/qd_ed_final/candidate_n25.json",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/configs/qd_ed_final/candidate_n25.json",
+      "sha256": "fb763b140add31341d8c7b68392e574153320071b414d0bbbf41a983cf215e20",
+      "bytes": 3793,
+      "kind": "source"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/configs/qd_ed_final/candidate_n23.json",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/configs/qd_ed_final/candidate_n23.json",
+      "sha256": "b6048a33d9259abd21a08ae8eca2d7fecebe16ac86b511fd7400b17caf0f2242",
+      "bytes": 3638,
+      "kind": "source"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/configs/qd_ed_final/baseline_profiles.json",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/configs/qd_ed_final/baseline_profiles.json",
+      "sha256": "75ba829fc29db71ae31669cd803c24fbe8ea96fe347160539a273f9d73551690",
+      "bytes": 55803,
+      "kind": "source"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/configs/config.yaml",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/configs/config.yaml",
+      "sha256": "5a0bce959afd4aad5e32e27dc5a278b600f8f0705069e9b36415af5f62cef183",
+      "bytes": 6574,
+      "kind": "source"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/diffusers/schedulers/scheduling_dpmsolver_multistep.py",
+      "resolved_path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/diffusers/schedulers/scheduling_dpmsolver_multistep.py",
+      "sha256": "9e56d0d9b01157e47e1e0b53c701278f2cd2660f6fadace488c877337d9771ea",
+      "bytes": 55638,
+      "kind": "source"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/diffusers/schedulers/scheduling_ddpm.py",
+      "resolved_path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/diffusers/schedulers/scheduling_ddpm.py",
+      "sha256": "83d2a70252df57150dd2e651714b0b9b049ef4c9a34ae63fc542339abf629ba8",
+      "bytes": 26019,
+      "kind": "source"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/optimization-taxonomy-20260928.md",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/optimization-taxonomy-20260928.md",
+      "sha256": "87d253add00950099c9b7af77160fc8cb4372df3f2b5a7944d59f3b4558a26c9",
+      "bytes": 15045,
+      "kind": "closed_narrative"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/outer-loop-review-v1/review-v1.md",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/outer-loop-review-v1/review-v1.md",
+      "sha256": "77f9036cdcf3c82473116bc558351b7b6aa20d4422867bc563533ab4624a2bf6",
+      "bytes": 13044,
+      "kind": "closed_narrative"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/docs/03_evidence/eds_init_pg_diverse_sampling/2026-08-03-p2-rollout-clean-tail-parameter-sweep-report.md",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/implementation/docs/03_evidence/eds_init_pg_diverse_sampling/2026-08-03-p2-rollout-clean-tail-parameter-sweep-report.md",
+      "sha256": "7eeb573ea941d7dbf5467c950d3201d59de2960dbe2c2ca32c0d01293f7cfd8c",
+      "bytes": 17791,
+      "kind": "closed_narrative"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/source-manifest-controller-v1.json",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/source-manifest-controller-v1.json",
+      "sha256": "fafcb0d881c95d567cb14a6690145d4ad933abc84a5e0175dfbe1512efd836ee",
+      "bytes": 40101,
+      "kind": "frozen_source_manifest"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/rdt/models/rdt_runner.py",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/rdt/models/rdt_runner.py",
+      "sha256": "b7d1aacec1a59df2de8b5bfbecf96e409abc18ca2db7442ae2d44fe5b647d953",
+      "bytes": 10942,
+      "kind": "source",
+      "authorization": "root exact3 static dependency message; frozen runtime/source config; no weights"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/rdt/scripts/maniskill_model.py",
+      "resolved_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/rdt/scripts/maniskill_model.py",
+      "sha256": "503644ff977704f212e007bc6cd05e4ea7ce84c66324bc31eccf36da31555bb0",
+      "bytes": 11614,
+      "kind": "source",
+      "authorization": "root exact3 static dependency message; frozen runtime/source config; no weights"
+    },
+    {
+      "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/config.json",
+      "resolved_path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/config.json",
+      "sha256": "3482cc79b3268ccfca9d8cc9b8e32f3925dc71c3bd60f5e6dfcaa564aecde835",
+      "bytes": 919,
+      "kind": "source",
+      "authorization": "root exact3 static dependency message; frozen runtime/source config; no weights"
+    }
+  ],
+  "source_files": 12,
+  "closed_narratives": 3,
+  "addendum": "Root authorizes exact rdtrunner,maniskill_model and checkpoint text config. Root static exist/stat search resolves config.json; runtime instance attributes remain unobserved."
+}

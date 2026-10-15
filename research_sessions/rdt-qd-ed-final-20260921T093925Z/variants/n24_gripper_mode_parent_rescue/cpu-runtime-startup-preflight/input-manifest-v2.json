@@ -1,0 +1,40 @@
+{
+  "schema": "n24-cpu-startup-preflight-input-manifest-v2",
+  "frozen_at": "2026-09-30T18:25:38.985389+00:00",
+  "status": "FROZEN_BEFORE_SINGLE_AMENDED_STARTUP",
+  "scope": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-runtime-startup-preflight/read-scope-v1.json",
+    "sha256": "f670a3c2d90838356f2e90cc1481068a9546312293cd3165869537ed932b5de4"
+  },
+  "extractor": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-runtime-startup-preflight/startup_cpu_v2.py",
+    "sha256": "fdeaa3d55133e316525d3749296474ed3acb511761efff67b1c93295736b99b2"
+  },
+  "amendment": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-runtime-startup-preflight/trusted-metadata-amendment-v1.json",
+    "sha256": "59fbdf54de44fca33f7a08a52c0b7089cc64aaaaf963b76b22f80c756d37d1e5"
+  },
+  "prior_failure_closure": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-runtime-startup-preflight/closure-result-v1.json",
+    "sha256": "1fe021ea8c0d71b415bc01a3cefc9d7126609312329f84f2bfc070e5c15f1c04"
+  },
+  "prior_failed_seconds": 1.1819649679819122,
+  "limits": {
+    "additional_process_runs": 1,
+    "remaining_seconds": 28.818035032018088,
+    "cumulative_startup_preflight_seconds": 30,
+    "cpu_threads": 2,
+    "payload_reads": 0,
+    "gpu_api_model_sim_calls": 0
+  },
+  "exact_additional_read_paths": [
+    "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/tqdm-4.67.3.dist-info",
+    "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/tqdm-4.67.3.dist-info/METADATA",
+    "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/tqdm-4.67.3.dist-info/PKG-INFO",
+    "/home/hynx/miniconda3/envs/vla-pilot/lib/python312.zip"
+  ],
+  "temporary_directory": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/cpu-runtime-startup-preflight/tmp",
+  "tmp_write_permission": false,
+  "old_geometry_scope_reopened": false,
+  "new_geometry_run_authorized": false
+}

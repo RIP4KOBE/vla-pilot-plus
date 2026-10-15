@@ -1,0 +1,22 @@
+{
+  "schema": "n29-root-plan-adoption-record-v1",
+  "recorded_at": "2026-10-01T16:45:27.308307+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/adoption-v1/authority.json",
+    "sha256": "ceb5e849811855079be23e7e72f3616eb4651ebe703826d94e905c7aea3a1028"
+  },
+  "plan": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/plan.frozen.v1.gpu7.json",
+    "sha256": "151ce8fdb088012676982703aad0cbc2a9952f1f656864bb3cea58d4ca223bc0"
+  },
+  "command_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/real-command-composition-review-v1.json",
+    "sha256": "b8168b6a6975a53262a727b1a7bab97460829d5b34121ac306f898abd2be6722"
+  },
+  "native_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/root-native-proof-review-v1.json",
+    "sha256": "ce9f131d69dd093e569e8d64093b6c5dea4032ae9a659cf58ddb5aee3f6b9abd"
+  },
+  "execution_release_created": false,
+  "gpu_dispatch": false
+}

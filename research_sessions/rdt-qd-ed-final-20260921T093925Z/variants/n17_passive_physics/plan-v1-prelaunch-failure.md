@@ -1,0 +1,3 @@
+# N17 plan v1 prelaunch rejection
+
+`plan.frozen.v1.json` was written during plan generation but rejected by the runner before any dispatch. The runner's E2 Stage transport gate had not yet listed the new N17 diagnostic cohort, even though N17 binds the same frozen E2 runtime and does not change Stage behavior. Source commit `d126b05` and the rejected plan are retained as prelaunch artifacts. The isolated source branch changed only the gate to recognize N17, plus plan/supervisor filenames; the corrected source was cherry-picked to study commit `5a26845`. `plan.frozen.v2.json` passed full runner validation and is the sole executable plan. The v1 failure consumed zero episode attempts and zero GPU time.

@@ -1,0 +1,14 @@
+{
+  "cpu_seconds_this_packaging": 0.0054693760000000015,
+  "reader_executions": 0,
+  "payload_reads": 0,
+  "tests": 0,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "all_static_commands_separately_metered": false,
+  "note": "Source inspections and editor processes were restricted to two CPUs/threads but not every short administrative command had its own CPU timer.",
+  "final_origin_edit_packaging_cpu_seconds": 0.015535408999999997
+}

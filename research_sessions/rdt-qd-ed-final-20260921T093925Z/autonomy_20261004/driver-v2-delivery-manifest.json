@@ -1,0 +1,58 @@
+{
+  "schema": "autonomy-driver-v2-cpu-delivery-v1",
+  "driver": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_v2.py",
+    "sha256": "69b1702dada3c60894a19a8386e05e5c6034e9e7769963e74e86fae906402944"
+  },
+  "base": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_v1.py",
+    "sha256": "33d060651ce37f470b9752692db9598750c2c8b84a9f81d8d286fa0c36a4b000"
+  },
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_v2.py",
+      "sha256": "69b1702dada3c60894a19a8386e05e5c6034e9e7769963e74e86fae906402944",
+      "bytes": 19017
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver-v1-to-v2.diff",
+      "sha256": "afa76de83665c261b448be1422e21a59f423e93c612a6684730b262c99714d70",
+      "bytes": 937
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver-v2-static-review.json",
+      "sha256": "be40f770f06a23342bd52a5606721ad504134207531ed6af049dd78d4b65015c",
+      "bytes": 578
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/test_driver_v2_threads.py",
+      "sha256": "73536ae130d1f770b82eb87aed5b1b9d6129bf3db015fdf779b259865a76e7a7",
+      "bytes": 1915
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/run_cpu_driver_v2_threads.py",
+      "sha256": "82fdcf3bef05ea4a94762661d680d0b2e4552b758f6b0f9466b48ddf0b8e8f8b",
+      "bytes": 2532
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-driver-v2-threads-resource.json",
+      "sha256": "47d27dd7fe734b853e49f0b172f23c8cccccd46f3d79959c4a051c0cf50252d1",
+      "bytes": 747
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-driver-v2-threads.log",
+      "sha256": "0173d1f802823ba15e67196ca8997a1f3e223133d8eaf508548d5ff7ec1015b3",
+      "bytes": 422
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver-v2-report.md",
+      "sha256": "85735d0192bbfc07bf6584244f8d4296a6dc1f65f6af3b26a534b461452fafba",
+      "bytes": 1135
+    }
+  ],
+  "tests": 3,
+  "guard_clean": true,
+  "cpu_seconds": 0.0493194,
+  "driver_launched": false,
+  "service_modified": false
+}

@@ -1,0 +1,37 @@
+{
+  "reader_sha256": "51c0f6ab5576456535cc275a68bc2be6aa9a807a7c81b34ebd01de2a849a728d",
+  "reads": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/feedback-repair-continuation-v1/root-terminal-review-v1.json",
+      "bytes": 26583,
+      "sha256": "0a840aebc3e63fd3f9940b0bd51b042fb471385e6522a74493c916b7b8c39f91",
+      "expected_sha256": "0a840aebc3e63fd3f9940b0bd51b042fb471385e6522a74493c916b7b8c39f91"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/feedback-repair-continuation-v1/conditional-next-hypothesis-v1/root-static-review-v1.json",
+      "bytes": 2744,
+      "sha256": "79e99569fd17f4e4d1a6ffabb0247271cb9d1607f7374d69173074bfb3b7614f",
+      "expected_sha256": "79e99569fd17f4e4d1a6ffabb0247271cb9d1607f7374d69173074bfb3b7614f"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/feedback-repair-continuation-v1/conditional-next-hypothesis-v1/review-v1.md",
+      "bytes": 8375,
+      "sha256": "b601ac5d4c6088ec8c9b73a5855f8f5420063616d1a64156efe844c7c621a351",
+      "expected_sha256": "b601ac5d4c6088ec8c9b73a5855f8f5420063616d1a64156efe844c7c621a351"
+    }
+  ],
+  "metadata_bytes_including_preparation": 169031,
+  "cpu_seconds": 0.0019005720000000031,
+  "wall_seconds": 0.0019145209807902575,
+  "affinity": [
+    0,
+    1
+  ],
+  "denied": [],
+  "error": {
+    "type": "JSONDecodeError",
+    "message": "Expecting value: line 1 column 1 (char 0)"
+  },
+  "tensor_opens": 0,
+  "production_imports": false
+}

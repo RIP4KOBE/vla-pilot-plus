@@ -1,0 +1,48 @@
+{
+  "schema": "n31-root-source-adoption-v1",
+  "recorded_at": "2026-10-04T04:37:02.089150+00:00",
+  "source_commit": "7428ce8a51f76c5f641537be9a7614631d82b0d9",
+  "previous_commit": "6292fc8cffad2eec0f789e023d835ad3c1df146a",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree",
+  "lexical_worktree_retained": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+  "delivery": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/delivery-manifest-phase-c-v1.json",
+    "sha256": "eced98a29e6fcb6ce99dffceadee9b6958f0378170e6291ee9924964cc9435d8",
+    "bytes": 21617
+  },
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/source-manifest-execution-v1.json",
+    "sha256": "5d547c7b3ffa87304b62afa29ab002fa607c9c9bfd69dbedd356219773d936e1",
+    "bytes": 78895
+  },
+  "source_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/root-phase-c-source-bytes-review-v1.json",
+    "sha256": "7ff925aa3b29e5ffc10ce3a4be49a6a8c897982b966c3652ccf576c99232ba00",
+    "bytes": 79884
+  },
+  "test_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/root-phase-c-test-resource-review-v1.json",
+    "sha256": "c30e1ebf20fd46cdde740db128e8cc263f3272011d1c666052f2c3d078f0a413",
+    "bytes": 17668
+  },
+  "delivery_entries_verified": 64,
+  "source_files_rehashed_in_owning_worktree": 511,
+  "operational_file_hashes_before_and_after": {
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/checkpoint.json": "4783383b3462849d6364dc1c8e3f679b23b1f372cb31a992bca6debcfc8d8481",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.json": "84b8019b06c1da4f1435ff153f3168fd6da7ec67758492043f7b4e9381f1a9ff",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.md": "84c88530c019e6c04297d94ce36c76f64843d19348a14004c801ef6de613acc5",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/REPORT.md": "450bd249aa7aae13d92b686bff853fa2d2367a3b5b43f0d11dd00efc929b3ff7",
+    "data/attempt-ledger.jsonl": "8d85a8535b172643dae07223e0f96e7560bcca79322543fb7ef4c0d56e30aa59",
+    "data/exposure-registry.jsonl": "b628db432f3536424a9c69157a39d522dc3ea9782f1b0d877b31a3a285013c71",
+    "data/gpu-healthcheck-ledger.jsonl": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7",
+    "data/gpu-hour-reservation-ledger.jsonl": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+    "docs/03_evidence/qd_ed_final/iteration-ledger.md": "5ff167ee794ee907888227899ced6f975ac4e02c2c98ee678b3026b4df4aca26",
+    "research-state.yaml": "a8041b5f94853dcb46c1f2f6cedc615418c1a5154217dafbe5890a26baf04433",
+    "research_config.yaml": "bf57edd90999c7aaf7c662166e4ffa5b450a73e3b9aca47a15993eba8f32449a"
+  },
+  "all_operational_files_preserved": true,
+  "budget_changed": false,
+  "gpu_authorized": false,
+  "target_achieved": false,
+  "merge_output": "Updating 6292fc8..7428ce8\nFast-forward\n configs/config.yaml                                |    1 +\n configs/qd_ed_final/candidate_n31.json             |   99 +\n configs/qd_ed_final/n31_dev_task_identities.json   |  141 ++\n core/qd_capture_dwell.py                           |  305 +++\n core/qd_capture_dwell_proposal.py                  |  127 ++\n core/rdt_policy_steer.py                           |   50 +\n docs/experiments/n31/base-plan-metadata-v1.json    | 2260 ++++++++++++++++++++\n docs/experiments/n31/base-source-v1.json           | 1926 +++++++++++++++++\n .../n31/historical-input-bindings-v1.json          |   18 +\n docs/experiments/n31/reverse-source-v1.json        |  801 +++++++\n docs/experiments/n31_capture_dwell_phase_a.md      |   41 +\n .../n31_capture_dwell_phase_a_protocol.md          |   65 +\n docs/experiments/n31_controller_native_contract.md |   36 +\n docs/experiments/n31_dev_protocol.md               |   35 +\n docs/experiments/n31_phase_b_integration.md        |   34 +\n docs/experiments/n31_phase_b_protocol.md           |   29 +\n docs/experiments/n31_phase_c_protocol.md           |   26 +\n main.py                                            |   14 +-\n scripts/audit_decision_evidence.py                 |   69 +-\n scripts/qd_ed_final_runner.py                      |   88 +-\n scripts/qd_ed_n23_worker.py                        |   23 +-\n scripts/qd_ed_n31_bridge.py                        |   79 +\n scripts/qd_ed_n31_contract.py                      |  402 ++++\n scripts/qd_ed_n31_native.py                        |  281 +++\n scripts/qd_ed_n31_prepare.py                       |   59 +\n scripts/qd_ed_n31_reference.py                     |   88 +\n scripts/qd_ed_n31_report.py                        |  124 ++\n scripts/qd_ed_n31_supervise.py                     |  102 +\n tests/n31_original_methods.json                    |   16 +\n tests/test_n31_admission.py                        |  102 +\n tests/test_n31_budget_reference.py                 |   71 +\n tests/test_n31_capture_dwell_integration.py        |  427 ++++\n tests/test_n31_controller.py                       |  142 ++\n tests/test_n31_native.py                           |  139 ++\n tests/test_n31_source_contract.py                  |   83 +\n tests/test_n31_worker.py                           |   60 +\n tests/test_qd_capture_dwell_proposal.py            |  172 ++\n 37 files changed, 8492 insertions(+), 43 deletions(-)\n create mode 100644 configs/qd_ed_final/candidate_n31.json\n create mode 100644 configs/qd_ed_final/n31_dev_task_identities.json\n create mode 100644 core/qd_capture_dwell.py\n create mode 100644 core/qd_capture_dwell_proposal.py\n create mode 100644 docs/experiments/n31/base-plan-metadata-v1.json\n create mode 100644 docs/experiments/n31/base-source-v1.json\n create mode 100644 docs/experiments/n31/historical-input-bindings-v1.json\n create mode 100644 docs/experiments/n31/reverse-source-v1.json\n create mode 100644 docs/experiments/n31_capture_dwell_phase_a.md\n create mode 100644 docs/experiments/n31_capture_dwell_phase_a_protocol.md\n create mode 100644 docs/experiments/n31_controller_native_contract.md\n create mode 100644 docs/experiments/n31_dev_protocol.md\n create mode 100644 docs/experiments/n31_phase_b_integration.md\n create mode 100644 docs/experiments/n31_phase_b_protocol.md\n create mode 100644 docs/experiments/n31_phase_c_protocol.md\n create mode 100644 scripts/qd_ed_n31_bridge.py\n create mode 100644 scripts/qd_ed_n31_contract.py\n create mode 100644 scripts/qd_ed_n31_native.py\n create mode 100644 scripts/qd_ed_n31_prepare.py\n create mode 100644 scripts/qd_ed_n31_reference.py\n create mode 100644 scripts/qd_ed_n31_report.py\n create mode 100644 scripts/qd_ed_n31_supervise.py\n create mode 100644 tests/n31_original_methods.json\n create mode 100644 tests/test_n31_admission.py\n create mode 100644 tests/test_n31_budget_reference.py\n create mode 100644 tests/test_n31_capture_dwell_integration.py\n create mode 100644 tests/test_n31_controller.py\n create mode 100644 tests/test_n31_native.py\n create mode 100644 tests/test_n31_source_contract.py\n create mode 100644 tests/test_n31_worker.py\n create mode 100644 tests/test_qd_capture_dwell_proposal.py\n"
+}

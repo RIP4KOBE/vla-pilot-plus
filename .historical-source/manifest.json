@@ -1,0 +1,598 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "exp/eds-qd-autoresearch-libero-swap-ood",
+  "original_commit": "a5b731f456aea446cbb6d689827b85ad1df0a171",
+  "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-02",
+  "snapshot_source_files_considered": 117363,
+  "changed_or_added_files": [],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "entries_key": "changed_or_added_files",
+  "entry_count": 114548,
+  "entry_shards": [
+    {
+      "path": ".historical-source/manifests/part-0000.json",
+      "entries": 1000,
+      "sha256": "726828b4e4a7f63ae68623fb04409979e7f34c450cd704c05dab67b2bdd20e76"
+    },
+    {
+      "path": ".historical-source/manifests/part-0001.json",
+      "entries": 1000,
+      "sha256": "892f38c55b4e40ea1aa8fc77614aa56607c4702bb789df1c6c089b0621f8ae11"
+    },
+    {
+      "path": ".historical-source/manifests/part-0002.json",
+      "entries": 1000,
+      "sha256": "8009531697069973ad73d09c0fc385e2278f74900bf85d39fe2a840f15d2a5c6"
+    },
+    {
+      "path": ".historical-source/manifests/part-0003.json",
+      "entries": 1000,
+      "sha256": "1c4e4f084db932dabb0f688491b2bd916d3b9300be608cdf86ec457ae162f8e0"
+    },
+    {
+      "path": ".historical-source/manifests/part-0004.json",
+      "entries": 1000,
+      "sha256": "611fd6b5c4acf348314dda722a70e209b5e52ee1ce0760b28c961cca913fdeb5"
+    },
+    {
+      "path": ".historical-source/manifests/part-0005.json",
+      "entries": 1000,
+      "sha256": "00b5a642b76a001875f63769ace8758b2489b1b7fe0cd955b4633b4f6bc810cf"
+    },
+    {
+      "path": ".historical-source/manifests/part-0006.json",
+      "entries": 1000,
+      "sha256": "d67f4b3688303d6c40c59ab2e283243e2b4b576e4643ee67bb338d2ed68f1849"
+    },
+    {
+      "path": ".historical-source/manifests/part-0007.json",
+      "entries": 1000,
+      "sha256": "0e3cfeb2b3be23f747618df53b07863d4873e0975fee21f6567ce4b7819e79de"
+    },
+    {
+      "path": ".historical-source/manifests/part-0008.json",
+      "entries": 1000,
+      "sha256": "8637333f85c2d4def46f9c649f2fa49c9d01df2afefb313e2f2badd02310895f"
+    },
+    {
+      "path": ".historical-source/manifests/part-0009.json",
+      "entries": 1000,
+      "sha256": "2bd7f46b4e244c649ca4b0bbda49b3bb074e2db591f1169f2795ee8793551c35"
+    },
+    {
+      "path": ".historical-source/manifests/part-0010.json",
+      "entries": 1000,
+      "sha256": "7d967a4a8737c81ad99ee6df6d92178ba0acb050f2617190de5467ecf3ca2c00"
+    },
+    {
+      "path": ".historical-source/manifests/part-0011.json",
+      "entries": 1000,
+      "sha256": "2c6e3db94860592c24171e14b66b49df1448aa58a626fc03c3cb37567384d34d"
+    },
+    {
+      "path": ".historical-source/manifests/part-0012.json",
+      "entries": 1000,
+      "sha256": "28a590ba7906224e2cddd3df960d1aa1fb4b7d80124056e0ef5256dd953b314f"
+    },
+    {
+      "path": ".historical-source/manifests/part-0013.json",
+      "entries": 1000,
+      "sha256": "e3aa0fa49a78be24f0074642b29be81b898b8f8059b93481552496b89e656970"
+    },
+    {
+      "path": ".historical-source/manifests/part-0014.json",
+      "entries": 1000,
+      "sha256": "4db2572a72b1f499cc998144dfdb1aa9a26ff2052f58fafd60d74492978142cb"
+    },
+    {
+      "path": ".historical-source/manifests/part-0015.json",
+      "entries": 1000,
+      "sha256": "7e7f7019aacb9db52d295c60610b1f208df5ee6668ed1ee2080a2210efdbfcba"
+    },
+    {
+      "path": ".historical-source/manifests/part-0016.json",
+      "entries": 1000,
+      "sha256": "e837f6db3e404f6c64d053ab71ccf2fd10101e1fc79851e75a4022b8bb97d934"
+    },
+    {
+      "path": ".historical-source/manifests/part-0017.json",
+      "entries": 1000,
+      "sha256": "0989cd92355ea6755c6b9ad7ef5eb8f48332816544662ecc79cd0672adf63c2e"
+    },
+    {
+      "path": ".historical-source/manifests/part-0018.json",
+      "entries": 1000,
+      "sha256": "6d6016ad8aeb9cb034342767acfffce6f55ae8ae0eae5324248f69da4cec08d7"
+    },
+    {
+      "path": ".historical-source/manifests/part-0019.json",
+      "entries": 1000,
+      "sha256": "153b89b2d7e15d1012715166f68d1774d07a50d586be00d6053fe44ecfb3b132"
+    },
+    {
+      "path": ".historical-source/manifests/part-0020.json",
+      "entries": 1000,
+      "sha256": "bfc830e32ba1333608979f70a803e0fbfd0b974a44d67e573f7a5a0342cab969"
+    },
+    {
+      "path": ".historical-source/manifests/part-0021.json",
+      "entries": 1000,
+      "sha256": "95206b49833f0121677864059f9f235ad5d2e2783e3d133987dcd170db74b2b5"
+    },
+    {
+      "path": ".historical-source/manifests/part-0022.json",
+      "entries": 1000,
+      "sha256": "7d700c6036540ec82c7cd3d89a6385dd24f5d76c7076ede2c59fdbb9de7be5d9"
+    },
+    {
+      "path": ".historical-source/manifests/part-0023.json",
+      "entries": 1000,
+      "sha256": "dce637aceec0897f62f0526d2c50037519bcac250a04ef831ad30a3fe93864e2"
+    },
+    {
+      "path": ".historical-source/manifests/part-0024.json",
+      "entries": 1000,
+      "sha256": "6e1e3b5caea3e95408422f73fb95c04d791028abb2de2c7c77b2c28b52702fb8"
+    },
+    {
+      "path": ".historical-source/manifests/part-0025.json",
+      "entries": 1000,
+      "sha256": "b2dd0ecc6c884018d059a8b26779f979d59d4e1250549d323477daa8322878d0"
+    },
+    {
+      "path": ".historical-source/manifests/part-0026.json",
+      "entries": 1000,
+      "sha256": "b5021f5b7e016829479391101c9f885186dba206f859b40ecca2e21cba67dc38"
+    },
+    {
+      "path": ".historical-source/manifests/part-0027.json",
+      "entries": 1000,
+      "sha256": "4bb16b65eea62e7e227db17ed69331f73a10f5de68d4511274b3be6dd85a1189"
+    },
+    {
+      "path": ".historical-source/manifests/part-0028.json",
+      "entries": 1000,
+      "sha256": "668a22472e3d0d07cd75708abe4ea7b61a5cd75bb16a89c4bb7056aade6bd659"
+    },
+    {
+      "path": ".historical-source/manifests/part-0029.json",
+      "entries": 1000,
+      "sha256": "c0cb11fba814fb2e49d68b85d8d3036470806027ffc93a1365d3d430c1884d9f"
+    },
+    {
+      "path": ".historical-source/manifests/part-0030.json",
+      "entries": 1000,
+      "sha256": "f26a612a205d8694db26ae645b165973d6c61a8e637469fe46ef166c6bce5461"
+    },
+    {
+      "path": ".historical-source/manifests/part-0031.json",
+      "entries": 1000,
+      "sha256": "63cf2016c3ad6b3d8b5c2a41598786a1a0c6527d200c797afafdb83f2e8aeff6"
+    },
+    {
+      "path": ".historical-source/manifests/part-0032.json",
+      "entries": 1000,
+      "sha256": "9b06f8b9907c38f94087e22d71d0d07aaccd1cdf9ea2ec599f358ee152dcdaa9"
+    },
+    {
+      "path": ".historical-source/manifests/part-0033.json",
+      "entries": 1000,
+      "sha256": "eb8a6bb1f3bf6b10b59b8adf314003fb8094a11ac8c3c41972ae4b5c1b3dabde"
+    },
+    {
+      "path": ".historical-source/manifests/part-0034.json",
+      "entries": 1000,
+      "sha256": "fde35cb4fddca1e4d6d0d5040652a34451f2233ba55dc3798c76c628384a5529"
+    },
+    {
+      "path": ".historical-source/manifests/part-0035.json",
+      "entries": 1000,
+      "sha256": "1bd81db9a53341fbb49ecbca0db63d885f88bbf451875683c3c95b54378e306a"
+    },
+    {
+      "path": ".historical-source/manifests/part-0036.json",
+      "entries": 1000,
+      "sha256": "1e202c154b5bba6df80df654da2922fb85d958c1f59bc162574c12eef97be51f"
+    },
+    {
+      "path": ".historical-source/manifests/part-0037.json",
+      "entries": 1000,
+      "sha256": "a922b1e08316807e86cec581384fd20cd8f810a91ba514ceeb8a4ea11f51708c"
+    },
+    {
+      "path": ".historical-source/manifests/part-0038.json",
+      "entries": 1000,
+      "sha256": "802d4a2dac6208f7b1a016e29fff616a613707969b075937f1fabc22f066bbda"
+    },
+    {
+      "path": ".historical-source/manifests/part-0039.json",
+      "entries": 1000,
+      "sha256": "51c45acec8375a9d868c66789f448b3c4c6e632f2a5b553f53620cd7778594b6"
+    },
+    {
+      "path": ".historical-source/manifests/part-0040.json",
+      "entries": 1000,
+      "sha256": "19758949cdfaf0e8e5e42e2101d2cd75a1eb48c32ceb7ff8f3b255c27fae7a51"
+    },
+    {
+      "path": ".historical-source/manifests/part-0041.json",
+      "entries": 1000,
+      "sha256": "27f530d055ab548ab5acc0a32648d0e96b78233537ac9431ed8cf13531b3ff09"
+    },
+    {
+      "path": ".historical-source/manifests/part-0042.json",
+      "entries": 1000,
+      "sha256": "03120de8df211470c11479d9bce4c5c312b5c119dfda1a5c6da3c3695eb4c600"
+    },
+    {
+      "path": ".historical-source/manifests/part-0043.json",
+      "entries": 1000,
+      "sha256": "aaed2add65182e8f55d09d5acbfb298bab5067a202b1478e8073cf03022203f2"
+    },
+    {
+      "path": ".historical-source/manifests/part-0044.json",
+      "entries": 1000,
+      "sha256": "aefcc6ddde1861dff494aaed75cbbba195cd4fa4cfa945ee610e11cb1b2da11c"
+    },
+    {
+      "path": ".historical-source/manifests/part-0045.json",
+      "entries": 1000,
+      "sha256": "2ed84cfc7bfbad125a58515b1e93e00d0e08b2912f40326b2edbdf2a5124cd8c"
+    },
+    {
+      "path": ".historical-source/manifests/part-0046.json",
+      "entries": 1000,
+      "sha256": "eecc21f065f68c190c88b4594dfefd1357488bb0450bb3f4f1bf77fee84d85a7"
+    },
+    {
+      "path": ".historical-source/manifests/part-0047.json",
+      "entries": 1000,
+      "sha256": "9d450cd41db5c49612b9f790d566f791ffe73cb7994fc8400d6fc73acf20a370"
+    },
+    {
+      "path": ".historical-source/manifests/part-0048.json",
+      "entries": 1000,
+      "sha256": "8eb5277fd158b49b1b2a63e617f8f112861fc90e65b8a9816e13ea8d935640e8"
+    },
+    {
+      "path": ".historical-source/manifests/part-0049.json",
+      "entries": 1000,
+      "sha256": "355eda973905143de722ef67b56f6c125e07ddb3b12f8934caf59878f1922b5d"
+    },
+    {
+      "path": ".historical-source/manifests/part-0050.json",
+      "entries": 1000,
+      "sha256": "4175c72ff60392715a77ebb73f0341b23e43e68f0af41e631fd356ea37cb9a97"
+    },
+    {
+      "path": ".historical-source/manifests/part-0051.json",
+      "entries": 1000,
+      "sha256": "cc3f37fddfbbe038846111ac26c2def37b8e1253543c94cd23a1c958897bcf91"
+    },
+    {
+      "path": ".historical-source/manifests/part-0052.json",
+      "entries": 1000,
+      "sha256": "45bf911ac895aa291e5735a9a31dcb3ea9d5f07c9c7f4c96bf89b02e1e284c7f"
+    },
+    {
+      "path": ".historical-source/manifests/part-0053.json",
+      "entries": 1000,
+      "sha256": "e78f1f380fe26e2d9eacbd812a5c943c40b6f7e712ad2cc8d05c63c91bfcf625"
+    },
+    {
+      "path": ".historical-source/manifests/part-0054.json",
+      "entries": 1000,
+      "sha256": "8acb81b712f561fbafb2808a2dc8a48e76b8d90ac018dfd857a39849572de652"
+    },
+    {
+      "path": ".historical-source/manifests/part-0055.json",
+      "entries": 1000,
+      "sha256": "dfe65a845add74dcb4aec9a9b55790778c8772ba46db919d649752bc5e8b959a"
+    },
+    {
+      "path": ".historical-source/manifests/part-0056.json",
+      "entries": 1000,
+      "sha256": "bcaa07625c0ec16148311a8517fa10b1cc6672f185df5dbd572cff16b23f6563"
+    },
+    {
+      "path": ".historical-source/manifests/part-0057.json",
+      "entries": 1000,
+      "sha256": "e65889ed5c81ec98fe2bbcdb003352f319864b292a423a54ce711e5cdf002354"
+    },
+    {
+      "path": ".historical-source/manifests/part-0058.json",
+      "entries": 1000,
+      "sha256": "4ac26e43fa4611ed29ca893153bfd5f4c787f31ea1ee2bbdb871698825274bca"
+    },
+    {
+      "path": ".historical-source/manifests/part-0059.json",
+      "entries": 1000,
+      "sha256": "2ee2b98d8fdea7e754c5ee6e6b186f8abfcb453f339cd8bf770bb707b229faec"
+    },
+    {
+      "path": ".historical-source/manifests/part-0060.json",
+      "entries": 1000,
+      "sha256": "240b4b8f9d621cf433eae748f13838bbb30922a390a30f7ff87e656039ffec23"
+    },
+    {
+      "path": ".historical-source/manifests/part-0061.json",
+      "entries": 1000,
+      "sha256": "2f46709a6ad498eac4daf5142cbe33189cce63c2a6ab0a6f57473934bcd9e452"
+    },
+    {
+      "path": ".historical-source/manifests/part-0062.json",
+      "entries": 1000,
+      "sha256": "beeef7afb0d71fa3cf0c88426575f926cf62a4e49d72a037036fe95afb2020e5"
+    },
+    {
+      "path": ".historical-source/manifests/part-0063.json",
+      "entries": 1000,
+      "sha256": "04797fcade22f9278a20b7e041a7765db406f8414c78c2f600b3329670fcb753"
+    },
+    {
+      "path": ".historical-source/manifests/part-0064.json",
+      "entries": 1000,
+      "sha256": "d973c3a255f5663af65a130f84e209bbb95d5d6a0e654ea8d564c7450b3168ff"
+    },
+    {
+      "path": ".historical-source/manifests/part-0065.json",
+      "entries": 1000,
+      "sha256": "ebe29b3febf051dc9f3ae0700ef9dc36c5d55d62225b66738b6a77f0f4777362"
+    },
+    {
+      "path": ".historical-source/manifests/part-0066.json",
+      "entries": 1000,
+      "sha256": "e9707190cfdf46699a40acb99627c5896e9d38b7274b2ab5620f4d0e941fc324"
+    },
+    {
+      "path": ".historical-source/manifests/part-0067.json",
+      "entries": 1000,
+      "sha256": "9b4d8fc6ac0560384f431527a27dbb09de9160d3caed77f02346fe46efb310ac"
+    },
+    {
+      "path": ".historical-source/manifests/part-0068.json",
+      "entries": 1000,
+      "sha256": "887e693098a5493da844db49deee8e4414fb65fcfb75eacb4a4f618c6bc4833d"
+    },
+    {
+      "path": ".historical-source/manifests/part-0069.json",
+      "entries": 1000,
+      "sha256": "b43ba56a3e30335bb82666d99cedb4d9d7e5406833ce02c0cdfa7afdd0ac6051"
+    },
+    {
+      "path": ".historical-source/manifests/part-0070.json",
+      "entries": 1000,
+      "sha256": "281c966464703e46fd80415356b574269d130d266fcd610dbc1bcecdca0efb9d"
+    },
+    {
+      "path": ".historical-source/manifests/part-0071.json",
+      "entries": 1000,
+      "sha256": "11a06f3e111474f9eb7f2a92681d1674256153d130dc3f2987ee3bc6b93ccdce"
+    },
+    {
+      "path": ".historical-source/manifests/part-0072.json",
+      "entries": 1000,
+      "sha256": "47ab46d37db4446dd26058a4066f8f4fed81c7b3d5e8f852cd0238239057dc7c"
+    },
+    {
+      "path": ".historical-source/manifests/part-0073.json",
+      "entries": 1000,
+      "sha256": "a0ff0dd14186840e85f67f536925c6a82b62bb8b45c064d87726e37a3fcfdf97"
+    },
+    {
+      "path": ".historical-source/manifests/part-0074.json",
+      "entries": 1000,
+      "sha256": "78200ee53cddf13a2b47b00bdf7e9343a9dc25b06ccc1d699879f6b24ae92742"
+    },
+    {
+      "path": ".historical-source/manifests/part-0075.json",
+      "entries": 1000,
+      "sha256": "9b2d6b8fdbb6c305082606596d2e10d6009ec5c09f468ffa5d368436dd3427d4"
+    },
+    {
+      "path": ".historical-source/manifests/part-0076.json",
+      "entries": 1000,
+      "sha256": "c482ac9bdcedbfa96c672d360ed42a8f12c2c6fd1272667b4ceb36eff4b7ab13"
+    },
+    {
+      "path": ".historical-source/manifests/part-0077.json",
+      "entries": 1000,
+      "sha256": "9f049dfcaf816449171de73a5ae02dbaa263a27a78d3694cd05f18cb32bd4bc6"
+    },
+    {
+      "path": ".historical-source/manifests/part-0078.json",
+      "entries": 1000,
+      "sha256": "61ee0a8e253bd7a6cb95405b181fbb8772392ee00f00f2a662429507a7e21554"
+    },
+    {
+      "path": ".historical-source/manifests/part-0079.json",
+      "entries": 1000,
+      "sha256": "410a2c1ea3ccf0621064d2f2c25194370f1019cd2b221990334c27648a1b95d8"
+    },
+    {
+      "path": ".historical-source/manifests/part-0080.json",
+      "entries": 1000,
+      "sha256": "5bf909ac4fcc13741246b2433697b44b50750afd47f86fd9a9ee780d19cd5ff0"
+    },
+    {
+      "path": ".historical-source/manifests/part-0081.json",
+      "entries": 1000,
+      "sha256": "956ed50373755edd55b99e3f2cf5fba7a969f3e047a1ee6b036b55d4b75de598"
+    },
+    {
+      "path": ".historical-source/manifests/part-0082.json",
+      "entries": 1000,
+      "sha256": "1e44fe8c29f7d2d498f3945dc554a095f2d452408444124835ee472cccd987b3"
+    },
+    {
+      "path": ".historical-source/manifests/part-0083.json",
+      "entries": 1000,
+      "sha256": "5dfe68b5a56a834eacd3a4573b5260cbe89c700d65272d0b6eff037a00f07baf"
+    },
+    {
+      "path": ".historical-source/manifests/part-0084.json",
+      "entries": 1000,
+      "sha256": "d41ddb6fa54a6fa0c0555979db2fc2f04971d8625603cd1d2e87117163ffe6e1"
+    },
+    {
+      "path": ".historical-source/manifests/part-0085.json",
+      "entries": 1000,
+      "sha256": "956f7de32f051131e851719286d538c332471fa3946b80f1bacbeb6d0a31fc37"
+    },
+    {
+      "path": ".historical-source/manifests/part-0086.json",
+      "entries": 1000,
+      "sha256": "5f0538ae4d26c2850bb69a458d19e7e1b7a47f7eee7d052f97a55904b70db936"
+    },
+    {
+      "path": ".historical-source/manifests/part-0087.json",
+      "entries": 1000,
+      "sha256": "7772acdd9397db19bf31530261b9958625d8be091d07f1fb4276bf0885399580"
+    },
+    {
+      "path": ".historical-source/manifests/part-0088.json",
+      "entries": 1000,
+      "sha256": "ca9aa9b3d0e11e572a2fce6c7e3c6102d5eff2691a4ae6689c8dfb6ed0d6b714"
+    },
+    {
+      "path": ".historical-source/manifests/part-0089.json",
+      "entries": 1000,
+      "sha256": "b1b455d2b2ebce967cca04b33bdd267dfd5401aaab633b64392314e616a3ad6b"
+    },
+    {
+      "path": ".historical-source/manifests/part-0090.json",
+      "entries": 1000,
+      "sha256": "f72423cebeab9bd3d3b9b229a55c383f326b460d06b1e9f1d15732216c65fce4"
+    },
+    {
+      "path": ".historical-source/manifests/part-0091.json",
+      "entries": 1000,
+      "sha256": "19e11a345a70dd3fc07d39157b187449edfa323c309e72946492368c30529895"
+    },
+    {
+      "path": ".historical-source/manifests/part-0092.json",
+      "entries": 1000,
+      "sha256": "a45704e75df81ebd3ef74fedd040ee9bb008184f918700787fbe8154053b9e64"
+    },
+    {
+      "path": ".historical-source/manifests/part-0093.json",
+      "entries": 1000,
+      "sha256": "87d89be128733b0037bc675d952231a02dac675d6fb775b257dbe564683837a5"
+    },
+    {
+      "path": ".historical-source/manifests/part-0094.json",
+      "entries": 1000,
+      "sha256": "981acfd5ba7df4b76bc7da17299d80254c9f1970935a12e4da7024e397c5d119"
+    },
+    {
+      "path": ".historical-source/manifests/part-0095.json",
+      "entries": 1000,
+      "sha256": "c8e84cfcb7d142d57f0ef91de3f3edd219acc01b57ff6439e5dda8ec553cd3b6"
+    },
+    {
+      "path": ".historical-source/manifests/part-0096.json",
+      "entries": 1000,
+      "sha256": "825c7ff8ae4581eb364a4f815a8a917fa9e85e3da82eea9278964d9719be33d9"
+    },
+    {
+      "path": ".historical-source/manifests/part-0097.json",
+      "entries": 1000,
+      "sha256": "baa0006d02012a17986149739dda0f37072b55667bc0969fdcdc0f6f2a068010"
+    },
+    {
+      "path": ".historical-source/manifests/part-0098.json",
+      "entries": 1000,
+      "sha256": "d831cdf19c30e09edee783b928eb4ea743adce55149538c2627e657618dc902e"
+    },
+    {
+      "path": ".historical-source/manifests/part-0099.json",
+      "entries": 1000,
+      "sha256": "0147a9f6d1626690b7ea663945c4f5eae0c1f9fdc36972b69f0dab0a47729e7a"
+    },
+    {
+      "path": ".historical-source/manifests/part-0100.json",
+      "entries": 1000,
+      "sha256": "8b813b43af9019fc1b75aac1940314df62ed1d0393fde198169e1eb8dd69c43e"
+    },
+    {
+      "path": ".historical-source/manifests/part-0101.json",
+      "entries": 1000,
+      "sha256": "0ea78c07a921ba7e30fd21ac820248178dd1227ffbad74b5ca48c8142fd5fb3c"
+    },
+    {
+      "path": ".historical-source/manifests/part-0102.json",
+      "entries": 1000,
+      "sha256": "b53f2daa5a59cd34b397b46010780d0db232035ad813fb0a15639527647473ea"
+    },
+    {
+      "path": ".historical-source/manifests/part-0103.json",
+      "entries": 1000,
+      "sha256": "266119a78c087275ccbace511682552140f1231768e4d104091d598a5985b647"
+    },
+    {
+      "path": ".historical-source/manifests/part-0104.json",
+      "entries": 1000,
+      "sha256": "00a6b8c513266a2daf971ecd97b73a058a90352a9f9b2d0d1711437c9dfad753"
+    },
+    {
+      "path": ".historical-source/manifests/part-0105.json",
+      "entries": 1000,
+      "sha256": "2ec43954f989b17489c8ec90451c6cc9a258fcb1756572a72bdee1a6b8ddf7f6"
+    },
+    {
+      "path": ".historical-source/manifests/part-0106.json",
+      "entries": 1000,
+      "sha256": "53364b978a9eb6ecf1da46e0d3079ecc9de135862140d522952adcf55740d42f"
+    },
+    {
+      "path": ".historical-source/manifests/part-0107.json",
+      "entries": 1000,
+      "sha256": "6a403a90cf04cb39b80adb243becd8fdbbeebc5c88211c81e78ba9b626abc8f4"
+    },
+    {
+      "path": ".historical-source/manifests/part-0108.json",
+      "entries": 1000,
+      "sha256": "c68bab729565da0b27bcf9655d2e3db687f92e1c6a123cd66d3016b7dda9a056"
+    },
+    {
+      "path": ".historical-source/manifests/part-0109.json",
+      "entries": 1000,
+      "sha256": "88b9c9dcad99efac8e6921a1ab14b93a74918907649b40211781583da08f358a"
+    },
+    {
+      "path": ".historical-source/manifests/part-0110.json",
+      "entries": 1000,
+      "sha256": "3ece03bc5d453a264ff0aa7df2e611f2fa3c2eb69fb222238174eb5a126d6785"
+    },
+    {
+      "path": ".historical-source/manifests/part-0111.json",
+      "entries": 1000,
+      "sha256": "9c1755aaa9195d63526576e2c0ecf104daad3c7ae2d640e9d65c31f43572900f"
+    },
+    {
+      "path": ".historical-source/manifests/part-0112.json",
+      "entries": 1000,
+      "sha256": "6206f72bd8d0ff982508fcaad36130ff718f3d78a12813d74c0be2ab0cb5a79d"
+    },
+    {
+      "path": ".historical-source/manifests/part-0113.json",
+      "entries": 1000,
+      "sha256": "a5aaeb76e32e8a226489163351f73493a0d3437466d8fb3e9cffc69cea3e1f67"
+    },
+    {
+      "path": ".historical-source/manifests/part-0114.json",
+      "entries": 548,
+      "sha256": "2b7b1b17bf87be41d04e1cb9d6c019d5db612cafa812d41aa095ec1357a5a0e7"
+    }
+  ],
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "9690f406f0bf3c80c5ae08224b135b7cbe7ba860",
+    "overlay_redacted_paths": 1
+  }
+}

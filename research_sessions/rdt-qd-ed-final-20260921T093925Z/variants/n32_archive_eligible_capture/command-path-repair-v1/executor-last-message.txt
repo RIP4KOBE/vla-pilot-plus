@@ -1,0 +1,9 @@
+Committed `04d1255016fa13a2d467995b9e37a6a829356a1c`.
+
+- Added hash-bound amendment support while preserving original anchors.
+- 156 focused tests passed; all 16 actual commands matched the disabled candidate exactly.
+- No GPU dispatch, production approval, or shared state changes.
+
+[Report](../command-path-repair-v1/report-v1.md) · [Implementation result](../command-path-repair-v1/implementation-result-v1.json)
+
+Root review and adoption remain pending. The research goal remains unmet.

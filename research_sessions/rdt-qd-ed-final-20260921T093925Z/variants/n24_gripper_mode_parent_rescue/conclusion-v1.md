@@ -1,0 +1,19 @@
+# N24 terminal conclusion — target not met
+
+The frozen development cohort stopped at its first complete quadruple satisfying numeric futility: 24 valid cells covering tasks 0–5. C0 achieved 1/6; Q0, N23 and N24 each achieved 0/6. The four unrun tasks are not failures. With zero wins and four tasks remaining, N24 cannot reach the preregistered 5/10 gate. Disposition is `REJECT_NUMERIC_FUTILITY`; validation and formal evaluation remain closed. No episode recovery or retry occurred.
+
+The implementation executed the intended mechanism. N24 had 159 guided decisions, 1,590 parent rounds, 1,749 canonical scoring batches and 27,984 canonical candidates. It performed 617 strict per-candidate cache improvements and 156 parent substitutions. The cache count is not a count of changed batches; the existing unit erratum remains applicable. Clipped-quality ranking changed in 1,439 batches. These activity counts establish execution, not physical benefit. The observed paired result is zero gains and one loss versus C0, and zero gains/losses versus either Q0 or N23.
+
+The closed task0 diagnostics narrow the interpretation. All 12 immediate children of rescued parents retained the full-eight-positive command mode. Of 14 final pools, seven had no full-eight candidate, two had such a candidate but an empty original eligibility set, and five selected an eligible full-eight candidate. The diagnostic does not establish physical grasp utility or later mutated genealogy. A separate bounded CPU clipped-geometry reference did not make the two empty eligibility sets nonempty; hypothetical CUDA membership remains unknown. Simple selector clipping alignment was therefore deprioritized, not generally disproved.
+
+Across all 24 cells, 481/481 logical Stage calls completed using `codex_cli` with the current managed `chatgpt` login, frozen `gpt-6-astra`/low/E2/180s settings. There were zero failed calls and no Poe transport. HTTP request counts, CLI internal retries and billing are not inferred from logical calls. All experiment workers used physical GPU7. C0/Q0 use the existing CPU evidence auditor inside that metered GPU worker; N23/N24 additionally require native CUDA arithmetic auditing. Total metered GPU-process duration was 11,119.596842521103 seconds (3.0887769007003064 hours), including startup and auditing.
+
+Root independently verified the immutable journal, all accepted-cell metadata references, all 230 frozen source files, source/process/device bindings, costs and futility arithmetic. Root reader v1 had incorrectly required a CUDA audit backend for C0/Q0; its error and source remain preserved under `execution/root-terminal-reader-error-v1.json`. Reader v2 corrected that assertion to the pre-existing profile-specific worker contract. No experiment, frozen source, outcome or scientific gate changed and no GPU audit was rerun.
+
+Authoritative artifacts:
+
+- `result-v1.json`, SHA256 `65eeb12e51f00bffdf307839448528dd478e1332602899a1d1a7d51cd1af5c96`.
+- `root-terminal-review-v2.json`, SHA256 `3b7576139b3b7be3210b123da7a5a3054626434e26714e0dcb7d9b2d04d29633`.
+- Frozen source commit `3b7afa02757eb3519d95547e4b6e6e939f7068f2`; original plans, receipts, failures and diagnostic closures remain immutable.
+
+Continue research with prospective N25 CPU/controller review. N25 changes initial and rollout RBF diversity geometry to actuator-clipped EEF trajectories while retaining N23 quality and disabling N24 rescue. Existing RBF already operates on EEF trajectories; this is not a latent-distance-to-EEF conversion. Actual noisy-call clipping activity, gradient effects and task benefit remain unknown until a separately admitted native proof and development experiment. Finite budget/source/runtime adoption and an explicit root release are still required; no N25 GPU run or protected-set exposure is authorized by this conclusion.

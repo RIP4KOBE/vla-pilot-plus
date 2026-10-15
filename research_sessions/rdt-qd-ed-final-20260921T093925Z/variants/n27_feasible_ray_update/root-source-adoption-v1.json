@@ -1,0 +1,25 @@
+{
+  "schema": "n27-root-source-adoption-v1",
+  "time": "2026-10-01T08:06:31.378695+00:00",
+  "base": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+  "adopted": "095cfeecd6af55477d2529441c307ab712e8a8da",
+  "root_cpu_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/root-phase-b-cpu-review-v1.json",
+    "sha256": "806419643d5023263fabef9d7a0f7efeec6e8aedebb759f512086dbae2488a12"
+  },
+  "method": "fast-forward while holding owning runner/state locks",
+  "mutable_tracked_files_preserved": {
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/checkpoint.json": "37de38c08af4c39fb96a4e59a3922df8b93f1feb3c440559cdbcc5e2b971618b",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.json": "127d37e2a1e35fbd3a1aa84a7bc17d5fdcefbcf3ff4cc26be8d9eb077af409d7",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.md": "7cff98130322725e321238e373a1bf8d683629b4039dad714f315c4cae9262aa",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/REPORT.md": "ca5fed064580a64e27b9ef87960f8bce944db3a550d6f5a36287a8e976c136db",
+    "data/attempt-ledger.jsonl": "629893dacd7dbc8bb44417df75a35281f1c5ec81f5e1faaf3c410ef77b8aa5a3",
+    "data/exposure-registry.jsonl": "b628db432f3536424a9c69157a39d522dc3ea9782f1b0d877b31a3a285013c71",
+    "data/gpu-healthcheck-ledger.jsonl": "9ebfddd4dbe812ad2cfed935d17a50b9fd9ad8d7fb7b85c0d9c2ca0bef10848c",
+    "data/gpu-hour-reservation-ledger.jsonl": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+    "docs/03_evidence/qd_ed_final/iteration-ledger.md": "8b853eb14ebfcc2d6968a2f22ae789dedaa1cd5dda0d02f03f648e86c74bc278",
+    "research-state.yaml": "93c6ddbe821fed96f12ec7131cf59526216c2ce916b0ee3b6b4d0c35898f9395",
+    "research_config.yaml": "71a77f36b1a2374690a6018db9cf3f51433ab0d1b531ef7b1e6c096dee538847"
+  },
+  "gpu_dispatched": false
+}

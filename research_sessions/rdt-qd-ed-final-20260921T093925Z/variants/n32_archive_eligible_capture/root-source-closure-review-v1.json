@@ -1,0 +1,21 @@
+{
+  "schema": "n32-source-closure-root-review-v1",
+  "at": "2026-10-04T17:46:38.419972+00:00",
+  "decision": "ACCEPT_INVENTORY_ONLY_SUBMODULE_FREEZE_REPAIR_REQUIRED",
+  "result": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/source-closure-repair-v1/result-v1.json",
+    "sha256": "94292d6d2e4e4cdf34a2431976a58cd4cfbd43cd6684e4ad48e16261c9d92588"
+  },
+  "commit": "79f7cd2790cc667726a7cbe872a0a7f349a0e5b4",
+  "review": "Reviewed exact two-file commit and all 10 focused test cases; verified changed-source and evidence hashes, parent and clean implementation checkout. Explicit RDT path closes known scripts.maniskill_model omission; attest_loaded unchanged. Static and synthetic tests do not establish full manifest validity. Existing source_record git-show traversal cannot cross gitlink.",
+  "source_adopted": false,
+  "gpu_authorized": false,
+  "scientific_gate_passed": false,
+  "remaining_prerequisites": [
+    "Root review and adoption of this inventory-only repair; no release or launch is authorized by this result.",
+    "Separately reviewed submodule-aware prospective freeze: bind the superproject gitlink to the pinned RDT commit, verify repository-local regular-file bytes against that commit, and retain strict drift/wrong-root rejection. Existing qd_ed_n23_worker.source_record uses git show <superproject-commit>:<path>, which cannot traverse a gitlink.",
+    "Materialize the pinned RDT source in the future isolated execution checkout. The implementation worktree currently has an empty third_party/rdt directory; do not use adjacent checkout module origins.",
+    "After the above integration work, validate a complete committed source record and prospective manifest using CPU checks before root adoption/release. This task tested representative frozen records, not a release-ready full source_record.",
+    "Any future execution requires a distinct prospective identity, new source/release binding, and an accounting amendment preserving the old terminal invalid attempt and its 706.4010170580586 seconds / 0.19622250473834962 GPU-hour charge. Never replay or relabel n32_dev_t00_c0_20261004."
+  ]
+}

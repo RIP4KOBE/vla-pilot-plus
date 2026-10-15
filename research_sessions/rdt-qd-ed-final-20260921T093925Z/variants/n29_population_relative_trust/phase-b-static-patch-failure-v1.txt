@@ -1,0 +1,1 @@
+Static in-memory route patch failed before any destination write: ast.parse line868: elf is_n28_plan(plan): SyntaxError invalid syntax. Cause: incorrect substring offset constructing elif. No tests or actual execution. Original target bytes unchanged; corrected patch composes full existing if line to elif. CPU accounted in preparation allowance.

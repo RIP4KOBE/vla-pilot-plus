@@ -1,0 +1,35 @@
+{
+  "run": "2",
+  "pytest_exit": 0,
+  "cpu_seconds": 14.445591903,
+  "cumulative_cpu_seconds": 22.562573067000002,
+  "wall_seconds": 11.59637829696294,
+  "affinity": [
+    0,
+    1
+  ],
+  "thread_limit": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "blocked": [
+    [
+      "os.scandir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/vlm_query",
+      "read"
+    ],
+    [
+      "os.scandir",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/implementation/vlm_query",
+      "read"
+    ]
+  ],
+  "dependency_exceptions": [
+    "/proc/36802/maps",
+    "dev_null_sink"
+  ],
+  "guard_sha256": "d1eea10d2918a4ad1863bc1a9d8d04bc0bff5a586b0504797e1aafa80ed0c748",
+  "test_argv": [
+    "tests/test_n28_parent_before_renoise.py"
+  ],
+  "peak_rss_kib": 632920
+}

@@ -1,0 +1,26 @@
+{
+  "schema": "n25-static-review-output-manifest-v1",
+  "executable": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/clean-estimate-rbf-static-review-v1/scope-v1.json",
+      "sha256": "20a282b3b5791d57854cc2e650389113e3ff6df1e31112d65d56a853bea4f3b8"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/clean-estimate-rbf-static-review-v1/source-index-v1.json",
+      "sha256": "cfc8a698d27fd31a9a2798dccbb0b44476c0eeec419aa27ae70e44d9dfd0ebe7"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/clean-estimate-rbf-static-review-v1/source-index-v2.json",
+      "sha256": "969f3f21737e6031ca84956a57a11dd2a9ffe3934f71cf8ba580c535294b8bdc"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/clean-estimate-rbf-static-review-v1/report-v1.md",
+      "sha256": "a3dde0b261ae49311b8b3f74d6fd0c7b657734d35b60efd5ebdb1314c46c6807"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/clean-estimate-rbf-static-review-v1/scope-closure-v1.json",
+      "sha256": "d70af053e133aabf153ee416255dfb22eae1ccb645f8cd84f871af850cb76ec2"
+    }
+  ]
+}

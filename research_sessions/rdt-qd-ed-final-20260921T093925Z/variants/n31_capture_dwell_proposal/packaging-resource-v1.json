@@ -1,0 +1,11 @@
+{
+  "cpu_seconds_before_hash_manifest": 0.009881206999999996,
+  "threads": 2,
+  "affinity": [
+    0,
+    1
+  ],
+  "new_tests": 0,
+  "new_payload_reads": 0,
+  "source_commit": "d6de4b4fecc2784d1f7a6b4d4b93d451b09a79d0"
+}

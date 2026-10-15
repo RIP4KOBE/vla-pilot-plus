@@ -1,0 +1,1139 @@
+diff --git a/configs/config.yaml b/configs/config.yaml
+index 9f143f3..952ecb2 100644
+--- a/configs/config.yaml
++++ b/configs/config.yaml
+@@ -124,6 +124,7 @@ main:
+     qd_descriptor: target_relative_endpoint_xy
+     # Optional executed_prefix_v1 (N2) / executed_feedback_v1 (N3); default unchanged.
+     qd_quality_mode: provider
++    qd_gripper_rescue_mode: none
+     # N4 changes only the final QD consumer; default archive selection is unchanged.
+     qd_final_selection_mode: archive_global_best
+     qd_grid_shape: [4, 4]
+diff --git a/configs/qd_ed_final/candidate_n24.json b/configs/qd_ed_final/candidate_n24.json
+new file mode 100644
+index 0000000..f61fd2f
+--- /dev/null
++++ b/configs/qd_ed_final/candidate_n24.json
+@@ -0,0 +1,105 @@
++{
++  "action_chunk_horizon": 8,
++  "algorithm_contract": "n24_gripper_mode_parent_rescue_v1",
++  "baseline_provenance": {
++    "path": "configs/qd_ed_final/baseline_profiles.json",
++    "profile": "Q0.restored_profile",
++    "sha256": "75ba829fc29db71ae31669cd803c24fbe8ea96fe347160539a273f9d73551690"
++  },
++  "baseline_reference": "Q0",
++  "label": "N24",
++  "only_algorithm_change": {
++    "qd_gripper_rescue_mode": {
++      "before": "none",
++      "after": "canonical_full_close_v1"
++    }
++  },
++  "parent_candidate": {
++    "path": "configs/qd_ed_final/candidate_n23.json",
++    "sha256": "b6048a33d9259abd21a08ae8eca2d7fecebe16ac86b511fd7400b17caf0f2242"
++  },
++  "profile": {
++    "adaptive_early_stop_patience": 2,
++    "adaptive_min_cem_iters": 4,
++    "adaptive_reward_improvement_eps": 0.001,
++    "cem_iters": 10,
++    "chunk_memory_fraction": 0.0,
++    "chunk_memory_renoise_steps": 2,
++    "chunk_memory_reward_guard_quantile": 0.25,
++    "chunk_population_mode": "fresh",
++    "elite_carryover_count": 0,
++    "execution_contact_distance": 0.04,
++    "execution_horizon_contact": 2,
++    "execution_horizon_far": 8,
++    "execution_horizon_mode": "fixed",
++    "execution_horizon_near": 4,
++    "execution_near_distance": 0.08,
++    "gemini_grounding_enabled": false,
++    "initial_diversity_descriptor_mode": "absolute_eef",
++    "initial_diversity_scale": 20.0,
++    "initial_diversity_start_ratio": 0.8,
++    "initial_sampling_mode": "rbf_diverse_denoise",
++    "label": "eds_quality_diversity_sparse_primary",
++    "max_episode_steps": 720,
++    "method": "eds_quality_diversity_sparse_primary",
++    "num_elites": 16,
++    "p2_joblib_multiprocessing": false,
++    "p2_render_gpu_index": 7,
++    "parent_anchor_count": 0,
++    "parent_anchor_reward_quantile": 0.5,
++    "parent_coverage_mode": "none",
++    "parent_weighting_mode": "legacy_temperature",
++    "population_size": 16,
++    "qd_archive_mode": "grid_archive",
++    "qd_bounds_expand_fraction": 0.1,
++    "qd_bounds_quantiles": [
++      0.05,
++      0.95
++    ],
++    "qd_bounds_update_policy": "fixed_initial",
++    "qd_cell_capacity": 1,
++    "qd_degenerate_fallback_policy": "none",
++    "qd_descriptor": "target_xy_quadrant_signed_height_v1",
++    "qd_final_selection_mode": "terminal_grasp_proximity_v1",
++    "qd_global_quality_anchor_count": 0,
++    "qd_grid_shape": [
++      4,
++      4
++    ],
++    "qd_metrics_observer": true,
++    "qd_min_axis_span_m": 0.08,
++    "qd_overflow_policy": "clamp_edge",
++    "qd_parent_sampling": "sparse_priority",
++    "qd_secondary_lane_mode": "none",
++    "qd_sparse_exponent": 1.0,
++    "qd_tie_break": "stable_fingerprint",
++    "renoise_t_max": 3,
++    "renoise_t_min": 1,
++    "reward_mode": "normal",
++    "role": "sampling_attribution",
++    "rollout_diversity_band_ratio": 0.2,
++    "rollout_diversity_control_mode": "fixed",
++    "rollout_diversity_decay_floor": 0.25,
++    "rollout_diversity_descriptor_mode": "absolute_eef",
++    "rollout_diversity_iters": "all",
++    "rollout_diversity_scale": 20.0,
++    "rollout_diversity_scale_max": 20.0,
++    "rollout_diversity_scale_min": 0.0,
++    "rollout_diversity_skip_final_steps": 0,
++    "rollout_diversity_start_ratio": 0.6,
++    "rollout_diversity_target_ratio": 1.0,
++    "save_mechanism_trace_to_qualitative": true,
++    "search_schedule_mode": "legacy_linear",
++    "seed": 0,
++    "selection_beta_max": 100.0,
++    "selection_bisection_steps": 24,
++    "selection_ess_target_ratio": 0.6,
++    "stage_recognition_enabled": true,
++    "temperature": 0.1,
++    "truncated_rollout_mode": "rbf_diverse",
++    "use_cem": false,
++    "qd_quality_mode": "actuator_clipped_provider_v1",
++    "qd_gripper_rescue_mode": "canonical_full_close_v1"
++  },
++  "schema_version": "qd-ed-final-candidate-profile-v1"
++}
+diff --git a/core/decision_evidence.py b/core/decision_evidence.py
+index a035f8a..d83352d 100644
+--- a/core/decision_evidence.py
++++ b/core/decision_evidence.py
+@@ -156,7 +156,9 @@ class DecisionEvidence:
+                 frozen["source_fingerprints"] = fingerprints
+                 frozen["parent_fingerprints"] = [fingerprints[i] for i in indices]
+                 frozen["parent_source_occurrence_ids"] = [f"{frozen['source_pool_id']}:r{i}" for i in indices]
+-                frozen["source_identity_scope"] = "eligible pool slots, which QD has already allocated; not original archive occurrences"
++                frozen["source_identity_scope"] = ("actual parent pool after conditional N24 canonical rescue; not an archive membership claim"
++                    if frozen.get("gripper_rescue_mode") == "canonical_full_close_v1" else
++                    "eligible pool slots, which QD has already allocated; not original archive occurrences")
+                 frozen["original_archive_occurrences"] = None
+             elif event in ("final_selection", "policy_action_decode"):
+                 frozen["selected_canonical_fingerprint"] = _fingerprints(frozen["selected_latent"])[0]
+diff --git a/core/eds_eval_metrics.py b/core/eds_eval_metrics.py
+index 4f9ca69..1673615 100644
+--- a/core/eds_eval_metrics.py
++++ b/core/eds_eval_metrics.py
+@@ -433,6 +433,13 @@ class EDSChunkMetrics:
+     qd_final_selection_mode: str = "archive_global_best"
+     qd_terminal_population: dict = field(default_factory=dict)
+     qd_archive_reference: dict = field(default_factory=dict)
++    qd_gripper_rescue_mode: str = "none"
++    qd_gripper_rescue_checks: int = 0
++    qd_gripper_rescue_updates: int = 0
++    qd_gripper_rescue_substitutions: int = 0
++    qd_gripper_rescue_actual_cells_by_iter: list[list[int]] = field(default_factory=list)
++    qd_gripper_rescue_overhead_seconds: float = 0.0
++    qd_gripper_rescue_allocation_scope: str = "qd slot counts/weights/covered-cell ratio describe original archive allocation; actual cells/descriptors/unique-cell ratio/source counts include rescue"
+     qd_quality_mode: str = "provider"
+     qd_quality_applicable: bool = False
+     qd_quality_reason: str = "provider_mode"
+@@ -545,6 +552,10 @@ class EDSChunkMetrics:
+ 
+     def to_jsonable(self) -> dict[str, Any]:
+         payload = _to_json_safe(self)
++        if self.qd_gripper_rescue_mode == "none":
++            for key in list(payload):
++                if key.startswith("qd_gripper_rescue_"):
++                    payload.pop(key)
+         if self.qd_final_selection_mode == "archive_global_best":
+             for key in ("qd_final_selection_mode", "qd_terminal_population", "qd_archive_reference"):
+                 payload.pop(key)
+diff --git a/core/qd_gripper_parent_rescue.py b/core/qd_gripper_parent_rescue.py
+new file mode 100644
+index 0000000..4d1fe42
+--- /dev/null
++++ b/core/qd_gripper_parent_rescue.py
+@@ -0,0 +1,137 @@
++"""N24 search-local, already-scored canonical proposal rescue (default off).
++
++This module never scores, projects, decodes, inserts into the spatial archive,
++or samples randomness. Canonical birth order is independent of instrumentation.
++"""
++from dataclasses import dataclass
++import copy
++import hashlib
++
++import torch
++
++from core.qd_ed import fingerprint_action
++
++MODE = "canonical_full_close_v1"
++
++
++def native_identity(value):
++    value = value.detach().cpu().contiguous()
++    return {"dtype": str(value.dtype), "shape": list(value.shape),
++            "sha256": hashlib.sha256(value.view(torch.uint8).numpy().tobytes()).hexdigest()}
++
++
++def full_close(actions):
++    if (not torch.is_tensor(actions) or actions.ndim != 3
++            or actions.shape[1:] != (64, 128) or not actions.is_floating_point()
++            or not torch.isfinite(actions).all()):
++        raise ValueError("N24 invalid native action batch")
++    return (actions[:, :8, 10] >= 0).all(dim=1)
++
++
++@dataclass
++class ActualParents:
++    actions: torch.Tensor
++    costs: torch.Tensor
++    quality: torch.Tensor
++    raw: torch.Tensor
++    cells: torch.Tensor
++    descriptors: torch.Tensor
++    slot: int | None
++    witness: dict
++
++
++class CanonicalCloseCache:
++    def __init__(self, context, bounds):
++        self.context = copy.deepcopy(context)
++        self.bounds = tuple(x.detach().clone() for x in bounds)
++        self.next_iteration = -1
++        self.entry = None
++
++    def _context(self, context, bounds):
++        if (context != self.context or len(bounds) != 2
++                or any(a.dtype != b.dtype or a.shape != b.shape or not torch.equal(a, b)
++                       for a, b in zip(bounds, self.bounds))):
++            raise ValueError("N24 changed search context or descriptor bounds")
++
++    def observe(self, *, iteration, actions, costs, quality, raw, descriptors, cells,
++                context, bounds, canonical_sequence=None, scoring_batch_id=None, decision_id=None):
++        self._context(context, bounds)
++        if type(iteration) is not int or iteration != self.next_iteration or iteration > 9:
++            raise ValueError("N24 canonical birth order")
++        mask = full_close(actions)
++        if actions.shape != (16, 64, 128):
++            raise ValueError("N24 canonical population shape")
++        for name, value in (("cost", costs), ("quality", quality), ("raw", raw)):
++            if (not torch.is_tensor(value) or value.shape != (16,) or value.dtype != actions.dtype
++                    or value.device != actions.device or not torch.isfinite(value).all()):
++                raise ValueError("N24 native " + name + " association")
++        if not torch.equal(costs, -quality):
++            raise ValueError("N24 paired effective cost/quality mismatch")
++        if (descriptors.shape != (16, 2) or descriptors.dtype != torch.float32
++                or not torch.isfinite(descriptors).all() or cells.shape != (16,)
++                or cells.dtype != torch.int64 or not ((cells >= 0) & (cells < 16)).all()):
++            raise ValueError("N24 descriptor/cell association")
++        lo, hi = bounds
++        if lo.shape != (2,) or hi.shape != (2,) or not torch.isfinite(lo).all() or not torch.isfinite(hi).all() or not (hi > lo).all():
++            raise ValueError("N24 invalid descriptor bounds")
++        mapped = torch.floor((descriptors - lo) / (hi - lo) * 4).long().clamp(0, 3)
++        if not torch.equal(mapped[:, 1] * 4 + mapped[:, 0], cells):
++            raise ValueError("N24 descriptor/cell mismatch")
++        changed = False
++        update_count = 0
++        for row in torch.nonzero(mask, as_tuple=False).flatten().tolist():
++            cost = costs[row].item()
++            if self.entry is None or cost < self.entry["cost"].item():
++                # Strict comparison preserves the earliest (iteration,row) tie.
++                self.entry = {"iteration": iteration, "row": row,
++                    "action": actions[row].detach().clone(), "cost": costs[row].detach().clone(),
++                    "quality": quality[row].detach().clone(), "raw": raw[row].detach().clone(),
++                    "descriptor": descriptors[row].detach().clone(), "cell": int(cells[row].item()),
++                    "fingerprint": fingerprint_action(actions[row]),
++                    "canonical_sequence": canonical_sequence, "scoring_batch_id": scoring_batch_id,
++                    "occurrence_id": (f"{decision_id}:q{canonical_sequence}:r{row}"
++                                      if canonical_sequence is not None else None)}
++                changed = True
++                update_count += 1
++        self.next_iteration += 1
++        return {"iter_idx": iteration, "full_close_rows": torch.nonzero(mask).flatten(),
++                "updated": changed, "update_count": update_count, "cache": self.reference(), "context": copy.deepcopy(self.context)}
++
++    def reference(self):
++        if self.entry is None:
++            return None
++        return {k: v for k, v in self.entry.items() if k != "action"}
++
++    def supply(self, allocation, descriptors, *, iteration, context, bounds):
++        self._context(context, bounds)
++        if iteration != self.next_iteration or not 0 <= iteration < 10:
++            raise ValueError("N24 future or stale allocation")
++        original_mask = full_close(allocation.parent_actions)
++        if allocation.parent_actions.shape != (16, 64, 128):
++            raise ValueError("N24 parent shape")
++        for value in (allocation.parent_costs, allocation.parent_rewards, allocation.parent_raw_rewards):
++            if not torch.is_tensor(value) or value.shape != (16,) or value.dtype != torch.float32 or not torch.isfinite(value).all():
++                raise ValueError("N24 invalid allocated score association")
++        if not torch.equal(allocation.parent_costs, -allocation.parent_rewards):
++            raise ValueError("N24 allocated cost/quality mismatch")
++        if tuple(fingerprint_action(row) for row in allocation.parent_actions) != allocation.parent_fingerprints:
++            raise ValueError("N24 allocated fingerprint mismatch")
++        if descriptors.shape != (16, 2) or descriptors.dtype != torch.float32 or not torch.isfinite(descriptors).all():
++            raise ValueError("N24 allocated descriptor mismatch")
++        slot = None
++        values = [allocation.parent_actions, allocation.parent_costs, allocation.parent_rewards,
++                  allocation.parent_raw_rewards, allocation.parent_cell_ids, descriptors]
++        if self.entry is not None and not original_mask.any():
++            slot = int(torch.argmax(allocation.parent_costs).item())
++            values = [v.clone() for v in values]
++            entry = self.entry
++            if (entry["iteration"] >= iteration or not full_close(entry["action"].unsqueeze(0)).item()
++                    or fingerprint_action(entry["action"]) != entry["fingerprint"]):
++                raise ValueError("N24 corrupted cache identity")
++            for value, key in zip(values, ("action", "cost", "quality", "raw", "cell", "descriptor")):
++                value[slot] = entry[key]
++        witness = {"iter_idx": iteration, "mode": MODE, "context": copy.deepcopy(self.context),
++                   "cache": self.reference(), "original_full_close_mask": original_mask,
++                   "replacement_slot": slot, "exact_survivor": False,
++                   "original_is_archive_allocation": True, "actual_is_archive_allocation": slot is None}
++        return ActualParents(*values, slot, witness)
+diff --git a/core/rdt_policy_steer.py b/core/rdt_policy_steer.py
+index 854e1ee..949d8c8 100644
+--- a/core/rdt_policy_steer.py
++++ b/core/rdt_policy_steer.py
+@@ -53,6 +53,9 @@ from core.qd_contact_sweep import (
+     MODE as CONTACT_SWEEP_MODE, CONTACT_XY_M, CONTACT_HEIGHT_M,
+     MAX_REACH_LOSS_M, SWEEP_COST_PER_M, select_contact_sweep,
+ )
++from core.qd_gripper_parent_rescue import (
++    MODE as GRIPPER_RESCUE_MODE, CanonicalCloseCache, native_identity,
++)
+ from core.qd_ed import (
+     EXECUTION_INTENT_AXES,
+     EXECUTION_INTENT_DESCRIPTOR,
+@@ -157,6 +160,7 @@ class _EDSConfig:
+     adaptive_reward_improvement_eps: float = 1e-3
+     qd_archive_mode: str = "none"
+     qd_quality_mode: str = "provider"
++    qd_gripper_rescue_mode: str = "none"
+     qd_final_selection_mode: str = DEFAULT_FINAL_SELECTION_MODE
+     qd_degenerate_fallback_policy: str = "none"
+     qd_descriptor: str = "target_relative_endpoint_xy"
+@@ -5146,12 +5150,37 @@ class RDTSteer:
+                     raise RuntimeError("N2 canonical action/raw identity association changed")
+             return raw
+ 
++        rescue_cache = None
++        canonical_link = {}
++        def rescue_context():
++            return {"episode": int(getattr(self, "_eds_episode_index", 0)),
++                    "global_step": int(global_step), "stage": int(current_stage),
++                    "provider": dict(quality_contract.identity),
++                    "controller": dict(quality_contract.metadata["context"]),
++                    "keypoints": native_identity(keypoints)}
++
++        def observe_rescue(iteration, descriptors, cells):
++            if rescue_cache is None:
++                return
++            started = time.perf_counter()
++            witness = rescue_cache.observe(iteration=iteration, actions=population,
++                costs=population_scores, quality=population_rewards,
++                raw=original_rewards(population_info, population_rewards, population),
++                descriptors=descriptors, cells=cells, context=rescue_context(),
++                bounds=(qd_bounds.lo, qd_bounds.hi), **canonical_link)
++            metrics.qd_gripper_rescue_checks += 16
++            metrics.qd_gripper_rescue_updates += witness["update_count"]
++            evidence = getattr(self, "_decision_evidence", None)
++            if evidence is not None:
++                evidence.record("gripper_rescue_cache", **witness)
++            metrics.qd_gripper_rescue_overhead_seconds += time.perf_counter() - started
++
+         def record_shadow_qd_candidates(
+             iter_idx: int,
+             candidates: Tensor,
+             rewards: Tensor,
+         ) -> None:
+-            nonlocal terminal_canonical_sequence, terminal_scoring_batch_id
++            nonlocal terminal_canonical_sequence, terminal_scoring_batch_id, canonical_link
+             extra = {}
+             if quality_contract is not None:
+                 raw = original_rewards(population_info, rewards, candidates)
+@@ -5168,6 +5197,9 @@ class RDTSteer:
+             if evidence is not None:
+                 sequence = evidence.record("canonical_candidate_batch", iter_idx=int(iter_idx),
+                                 candidates=candidates, effective_quality=rewards, **extra)
++                if cfg.qd_gripper_rescue_mode == GRIPPER_RESCUE_MODE:
++                    canonical_link = {"canonical_sequence": sequence,
++                        "scoring_batch_id": evidence.scoring_batch_id, "decision_id": evidence.decision_id}
+                 if terminal_mode and iter_idx == 9:
+                     terminal_canonical_sequence = sequence
+                     terminal_scoring_batch_id = evidence.scoring_batch_id
+@@ -5221,6 +5253,16 @@ class RDTSteer:
+                     bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
+                     scoring_batch_id=self._decision_evidence.scoring_batch_id,
+                 )
++            if cfg.qd_gripper_rescue_mode == GRIPPER_RESCUE_MODE:
++                rescue_cache = CanonicalCloseCache(rescue_context(), (qd_bounds.lo, qd_bounds.hi))
++                metrics.qd_gripper_rescue_mode = GRIPPER_RESCUE_MODE
++                evidence = getattr(self, "_decision_evidence", None)
++                if evidence is not None:
++                    evidence.record("gripper_rescue_begin", mode=GRIPPER_RESCUE_MODE,
++                        context=rescue_context(), run_seed=cfg.shuffle_seed,
++                        sparse_exponent=cfg.qd_sparse_exponent,
++                        bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi)
++                observe_rescue(-1, initial_descriptors, initial_cell_ids)
+             qd_archive = QDArchive(
+                 grid_shape=cfg.qd_grid_shape,
+                 secondary_lane_mode=cfg.qd_secondary_lane_mode,
+@@ -5507,23 +5549,41 @@ class RDTSteer:
+                         global_quality_anchor_fingerprint=allocation.global_quality_anchor_fingerprint,
+                         original_archive_occurrences=None,
+                         identity_scope="actual allocation return; original insertion occurrences unavailable")
+-                population = allocation.parent_actions.to(
++                rescue_actual = None
++                if rescue_cache is not None:
++                    started = time.perf_counter()
++                    original_descriptors = torch.stack([
++                        qd_archive.entries[int(cell)].descriptor_xy_m
++                        for cell in allocation.parent_cell_ids.tolist()])
++                    rescue_actual = rescue_cache.supply(allocation, original_descriptors,
++                        iteration=i, context=rescue_context(), bounds=(qd_bounds.lo, qd_bounds.hi))
++                    metrics.qd_gripper_rescue_substitutions += int(rescue_actual.slot is not None)
++                    metrics.qd_gripper_rescue_actual_cells_by_iter.append(rescue_actual.cells.tolist())
++                    if evidence is not None:
++                        evidence.record("gripper_rescue_parents", **rescue_actual.witness,
++                            original_actions=allocation.parent_actions,
++                            original_descriptors=original_descriptors,
++                            actual_actions=rescue_actual.actions, actual_costs=rescue_actual.costs,
++                            actual_quality=rescue_actual.quality, actual_raw=rescue_actual.raw,
++                            actual_cells=rescue_actual.cells, actual_descriptors=rescue_actual.descriptors)
++                    metrics.qd_gripper_rescue_overhead_seconds += time.perf_counter() - started
++                population = (rescue_actual.actions if rescue_actual else allocation.parent_actions).to(
+                     device=x_t.device, dtype=x_t.dtype
+                 )
+-                population_scores = allocation.parent_costs.to(
++                population_scores = (rescue_actual.costs if rescue_actual else allocation.parent_costs).to(
+                     device=population.device
+                 )
+-                population_rewards = allocation.parent_rewards.to(
++                population_rewards = (rescue_actual.quality if rescue_actual else allocation.parent_rewards).to(
+                     device=population.device
+                 )
+-                qd_parent_cell_ids = allocation.parent_cell_ids.to(
++                qd_parent_cell_ids = (rescue_actual.cells if rescue_actual else allocation.parent_cell_ids).to(
+                     device=population.device
+                 )
+                 if non_xy_descriptor:
+-                    metrics.qd_parent_descriptor_values_by_iter.append([
++                    metrics.qd_parent_descriptor_values_by_iter.append(
++                        rescue_actual.descriptors.detach().float().cpu().tolist() if rescue_actual else [
+                         qd_archive.entries[int(cell)].descriptor_xy_m.detach().float().cpu().tolist()
+-                        for cell in allocation.parent_cell_ids.tolist()
+-                    ])
++                        for cell in allocation.parent_cell_ids.tolist()])
+                 anchor_count = allocation.global_quality_anchor_count
+                 lane_to_population_source = {
+                     "quality_anchor": "qd_global_quality_anchor",
+@@ -5534,6 +5594,10 @@ class RDTSteer:
+                     lane_to_population_source[lane]
+                     for lane in allocation.parent_lanes
+                 )
++                if rescue_actual is not None and rescue_actual.slot is not None:
++                    chunk_population_sources = tuple(
++                        "qd_gripper_rescue" if slot == rescue_actual.slot else source
++                        for slot, source in enumerate(chunk_population_sources))
+                 occupied_count = len(qd_archive.entries)
+                 covered_count = sum(
+                     int(count > 0) for count in allocation.slot_counts.values()
+@@ -5666,6 +5730,8 @@ class RDTSteer:
+                     )
+                     for lane in allocation.parent_lanes
+                 ]
++                if rescue_actual is not None and rescue_actual.slot is not None:
++                    parent_selection_kinds[rescue_actual.slot] = "qd_gripper_rescue"
+                 if survivor_slots:
+                     parent_selection_kinds = (
+                         ["qd_exact_parent_survivor"] * len(survivor_slots)
+@@ -5686,6 +5752,9 @@ class RDTSteer:
+                 qd_parent_count_by_source["qd_archive_offspring"] = (
+                     quality_count - len(survivor_slots)
+                 )
++                if rescue_actual is not None and rescue_actual.slot is not None:
++                    qd_parent_count_by_source["qd_archive_offspring"] -= 1
++                    qd_parent_count_by_source["qd_gripper_rescue_offspring"] = 1
+                 if allocation.secondary_parent_count:
+                     qd_parent_count_by_source["qd_secondary_lane_offspring"] = int(
+                         allocation.secondary_parent_count
+@@ -5757,7 +5826,10 @@ class RDTSteer:
+                                 source_quality=parent_source_rewards, source_costs=parent_source_scores,
+                                 parent_indices=full_parent_indices, elite_count=elite_count,
+                                 parent_cell_ids=qd_parent_cell_ids,
+-                                offspring_sources=plan.offspring_sources)
++                                offspring_sources=plan.offspring_sources,
++                                **({"gripper_rescue_mode": GRIPPER_RESCUE_MODE,
++                                    "source_raw_rewards": rescue_actual.raw}
++                                   if rescue_cache is not None else {}))
+             full_particle_sources = (
+                 ("elite",) * elite_count + plan.offspring_sources
+             )
+@@ -6260,6 +6332,7 @@ class RDTSteer:
+                         bounds_lo=qd_bounds.lo, bounds_hi=qd_bounds.hi,
+                         scoring_batch_id=self._decision_evidence.scoring_batch_id,
+                     )
++                observe_rescue(i, child_descriptors, child_cell_ids)
+                 if terminal_mode and i == 9:
+                     # Freeze the actual masked canonical batch before archive consumers can replace it.
+                     terminal_population = TerminalPopulation.capture(
+@@ -7027,6 +7100,7 @@ class RDTSteer:
+                 selected=metrics.qd_feedback_selected, reason=quality_contract.reason)
+         if evidence is not None:
+             evidence.record("final_selection", population=population, selected_latent=selected,
++                            **({"gripper_rescue_mode": GRIPPER_RESCUE_MODE} if rescue_cache is not None else {}),
+                             selected_index=best_idx, selected_quality=metrics.selected_reward,
+                             selected_cost=metrics.selected_cost,
+                             **({"quality_mode": cfg.qd_quality_mode,
+@@ -7923,6 +7997,7 @@ class RDTSteer:
+             ),
+             qd_archive_mode=str(cfg.get("qd_archive_mode", "none")),
+             qd_quality_mode=str(cfg.get("qd_quality_mode", "provider")),
++            qd_gripper_rescue_mode=str(cfg.get("qd_gripper_rescue_mode", "none")),
+             qd_final_selection_mode=str(cfg.get("qd_final_selection_mode", DEFAULT_FINAL_SELECTION_MODE)),
+             qd_degenerate_fallback_policy=str(
+                 cfg.get("qd_degenerate_fallback_policy", "none")
+@@ -8232,6 +8307,16 @@ class RDTSteer:
+             for name, expected in required_lift.items():
+                 if getattr(resolved, name) != expected:
+                     raise ValueError(f"N18 lift quality requires {name}={expected!r}")
++        if resolved.qd_gripper_rescue_mode not in {"none", GRIPPER_RESCUE_MODE}:
++            raise ValueError("Unsupported QD gripper rescue mode")
++        if resolved.qd_gripper_rescue_mode == GRIPPER_RESCUE_MODE:
++            required_rescue = {"qd_quality_mode": ACTUATOR_CLIPPED_MODE,
++                "qd_parent_survivor_count": 0, "qd_sparse_exponent": 1.0,
++                "qd_metrics_observer": True, "qd_tie_break": "stable_fingerprint",
++                "qd_overflow_policy": "clamp_edge"}
++            for field_name, expected in required_rescue.items():
++                if getattr(resolved, field_name) != expected:
++                    raise ValueError(f"N24 parent rescue requires {field_name}={expected!r}")
+         if resolved.qd_degenerate_fallback_policy not in {"none", "control_v1"}:
+             raise ValueError(
+                 "EDS qd_degenerate_fallback_policy must be none or control_v1"
+diff --git a/experiments/qd_ed_n24/protocol-dev-v1.md b/experiments/qd_ed_n24/protocol-dev-v1.md
+new file mode 100644
+index 0000000..98e21dc
+--- /dev/null
++++ b/experiments/qd_ed_n24/protocol-dev-v1.md
+@@ -0,0 +1,49 @@
++# N24 gripper-mode parent rescue: prospective Dev protocol
++
++Status: scientific design frozen before implementation. This document does not release GPU execution. CPU implementation, independent source/native-contract review, runtime admission and an exact source-bound execution release are still required. The ongoing user-authorized Arbor task continues; no new budget ceiling or protected-set permission is introduced.
++
++## Hypothesis and sole intervention
++
++The closed N23 result is REJECT by preregistered numeric futility, with24 accepted cells and N23 0/6 versus C0 1/6, Q0/N7 0/6. Its active clipping changed ranking but did not pass the task gate. Full-prefix command diagnostics show a different class of loss before actual parent supply. N24 tests that class. Positive gripper commands are command semantics, not proof of contact, closed fingers, grasp or utility.
++
++Direct parent is N23 at source `51104470983cdbafd08feb87f2f39b7553779405`; all N23 quality, N7 geometric descriptor/archive, N5 terminal selection, raw Stage binding and external providers remain byte/behavior-identical except minimal configuration/accounting/audit hooks for this intervention. N23 is a contemporaneous ablation, not a newly adopted best method. Historical-starting Q0 and P2/C0 remain controls.
++
++For each individual guided ED search:
++
++1. Create an empty local memory. After each already-scored canonical batch (initial iter=-1, then0..9), inspect native latent dimension10 at offsets0..7 using the existing decoder rule: value<0 maps to-1, otherwise+1. All eight positive is the fixed mode predicate. Nonfinite or identity mismatches fail closed. No fitted threshold or task/seed/label branch.
++2. Of mode-matching canonical candidates seen so far in this search, remember the smallest existing native effective cost and its full unmodified latent, descriptor/current frozen cell identity, paired quality/raw reward, source occurrence/fingerprint, source batch and context. Equal cost keeps the earliest canonical occurrence (batch order, then row); this is not a new score. Memory capacity is one canonical proposal, separate from and not inserted into the original spatial archive. No provider/projection/model re-evaluation is allowed to maintain it.
++3. Compute the original sixteen archive parents unchanged. If that actual allocated set already contains a mode-matching parent, or memory is empty, use the original set exactly. Otherwise substitute the remembered proposal at the first-index native maximum-cost allocated slot. Preserve order/identity of the other fifteen and update paired cost/quality/raw reward/cell/source metadata consistently. All other archive contents, replacement and sampling rules remain unchanged.
++4. Pass all sixteen actual parents through the original renoise/denoise/refinement path. There is no exact-survivor lane, candidate copying directly into the final scored population, forced gripper edit, extra proposal or guaranteed execution of the remembered action. RNG draw counts/order and model batch size remain the original ones. A remembered mode can still disappear during ED; this is measured, not hidden.
++5. After the final canonical batch, apply exactly the original N23/N5 final selection. Dispose of the local memory when the search returns or raises. It cannot cross a chunk, reset, Stage/target/source/guidance change or new observation. No new simulator/environment feedback is read.
++
++The memory never uses future candidates or an unexecuted action outcome. Canonical scoring of the current batch precedes an update that may affect only the following iteration. The spatial archive and original allocation must remain separately observable; do not relabel the substitution as an unmodified archive sample. Current N23 frozen descriptor bounds/context must be attested; store an existing descriptor/cell identity rather than compute an extra trajectory. Unsupported changing-bound/source contexts must fail closed, not silently reinterpret an old cache entry.
++
++## Fixed conditions and accounting
++
++Keep checkpoint, task definitions/success, init mappings, strict perturbation,720-step limit,20Hz,8-action execution, RDT decoder, images/observations, Stage/perception/prompt/caches and runtime fingerprints unchanged. Online Stage is exclusively current-account `codex_cli`, `auth_mode=chatgpt`, frozen `gpt-6-astra`/low/E2/180s. Never use Poe or a backend fallback; preserve existing Poe credentials without reading/copying them. Guidance and grounding retain frozen cached behavior. CLI-internal HTTP counts/retries remain Unknown, distinct from measured logical calls and token usage.
++
++Each complete guided search remains population16,10 refinement iterations,176 canonical candidate evaluations/11 score batches, with unchanged model/denoise/noise batch shapes and operations. Record memory checks, updates, substitutions, auxiliary wall time and all original model/reward/gradient/VLM/token/episode/GPU counters. No extra model/score batches, sampled probes, branch rollouts or learned components. Disabled and condition-inactive paths require exact parent/action/RNG parity with the parent.
++
++Native evidence must bind memory history to earlier canonical full latents, native costs/quality/raw rewards, fixed descriptor/cell context, fingerprints and every duplicate occurrence alias; prove the full8 predicate, earliest-minimum rule, actual pre-substitution parent mode absence, chosen first worst-cost slot, unchanged other15, and post-substitution parent-to-ED/terminal/decoded/executed/Stage accounting. A missing event or invalid source association is an invalid execution, not a mechanism success. Keep the pre-substitution archive allocation and post-substitution actual parent records distinct. Test synthetic corruption and default-off behavior; do not require an arbitrary minimum rescue count as a substitute for task performance.
++
++CPU preparation may use existing closed diagnostic JSON only for a labelled retrospective trigger screen after this rule is frozen. That screen may evaluate mode availability and substitution identities/costs, not new geometry, physical outcomes or an alternate success rate. It must include all139 decisions from the closed task0..3 summaries and disclose missing identities in the reused task0 summary; full raw decisions may be read only through a separately frozen minimal scope if needed. No task4/5 native expansion or protected data for implementation tuning.
++
++## Exact prospective comparison
++
++Forty primary cells, task-major0..9, arm order `C0,Q0,N23,N24`. Copy task/seed/init/science metadata from the original frozen N23 Dev plan `../n23_actuator_clipped_quality/plan.frozen.v2.gpu7.json` (acd2b2c639f7756cdc353b6a7eea8c93a4d735a8ce6ee25838d9502c938d07f0), change prospective cohort/attempt identities and profile-specific settings only. Use fresh attempts for all four contemporaneous arms; no old valid outcome is rerun into its old cell, replaced or pooled as an independent seed. This is exposed Dev reuse, not new-layout generalization. All C0/Q0 behavior must remain historical-parity controls; N23 must match its parent exactly.
++
++Promotion requires all40 accepted cells, N24 success>=5/10 and >=each contemporaneous C0,Q0,N23 total; valid runtime/data/selection/source/safety/QD/ED/compute evidence and complete required telemetry. Report per-task outcomes, gains/losses, all denominators/errors and costs before mechanism counters. A failure to outperform one task is not a posthoc veto; no task-specific subset is selected.
++
++After each complete audited quadruple only, stop for numeric futility if candidate successes + remaining tasks <5. Do not relabel a stopped prefix as a complete ten-task score. No valid task failure may be retried. Unsupported algorithm/numerical/safety/source/telemetry failures stop for INVALID/engineering review and remain charged.
++
++At most two whole-episode, same-science typed transport recoveries, at most one per cell, using the already frozen N23 sole-Codex-timeout classification: one call timed out with no completed turn/agent message, all other calls succeeded, complete explicitly chargeable failed-call telemetry and an accepted native audit. No favorable-response retry or fallback account/provider. Every old attempt/token/GPU cost remains. Recovery classification must be tested before release and cannot be widened after outcomes.
++
++## Finite resource envelope and gates
++
++No cumulative or bucket increase:478 attempts/100 GPUh, bucket caps baseline51/development187/validation180/formal40/recovery20. At N23 closure:261 used,37.30680221848908 GPUh, baseline39/development151/validation60/formal0/recovery11. Remaining baseline12/development36/recovery9 suffice for10 new baseline +30 new development +2 typed recoveries and, only if required by source review, one N24 native tensor preflight charged to recovery. Maximum43 dispatches including that one preflight;42 episode attempts maximum. No reuse/relaunch of the consumed N23 backend preflights.
++
++Local total GPU cap22h; episode timeout1800s plus40s cleanup; optional single native tensor preflight<=60s, no simulator/model/provider/Stage calls. CPU work uses2threads/CUDA-invisible guards until an explicit source-bound native preflight release. A failed native preflight is preserved and blocks the cohort; no automatic additional GPU preflight authorization. Remaining protected hours at closure are24.24082400243081 validation +12 formal, intact. Check all actual ledgers and live identities at admission; estimated spare capacity is not a reservation or permission to exceed ceilings. One private GPU7 worker at a time, existing UUID/boot/runtime admission and ACTIVE/PASS resource isolation; do not preempt another owner or modify its state.
++
++Validation and formal are closed. If Dev promotes, separately freeze a new untouched validation block pair using exposure identities,60 matched candidate/C0/Q0 episodes with candidate>=10/20 and>=controls, then the one fixed10-task formal candidate and compute-matched substantive-QD replacement ablation under unchanged goal/spec gates. Never tune on protected per-task outcomes. N23 conditional validation implementation remains inactive and cannot automatically authorize N24.
++
++Deliver source/config/protocol hashes, default-off tests, native source/accounting evidence, exact plans, immutable results and retained errors under this variant directory. Do not release GPU work from the CPU executor. Root reviews the concrete implementation and metered capacity, then issues the exact release within the existing user authorization.
+diff --git a/scripts/audit_decision_evidence.py b/scripts/audit_decision_evidence.py
+index 098763f..b91816b 100644
+--- a/scripts/audit_decision_evidence.py
++++ b/scripts/audit_decision_evidence.py
+@@ -431,7 +431,7 @@ def _audit_n7_direction_height_assignment(kinds, final_event):
+             "parent_slots_from_split_cells": parent_from_split}
+ 
+ 
+-def _audit_n4_terminal_population(kinds, context, final_event):
++def _audit_n4_terminal_population(kinds, context, final_event, n24_actual=None):
+     """Audit the actual N4 consumer; reference decoding is not a rollout.
+ 
+     Called after the generic audit has checked providers, event sequence and
+@@ -509,7 +509,7 @@ def _audit_n4_terminal_population(kinds, context, final_event):
+         require(source["sequence"] < aggregate["sequence"] < effective["sequence"] < row["sequence"], "n4_same_call_order")
+         if iteration >= 0:
+             allocation, parent = allocations[iteration], parents[iteration]
+-            av, pv = allocation["values"], parent["values"]
++            av, pv = (n24_actual[iteration] if n24_actual is not None else allocation["values"]), parent["values"]
+             require(all(prior["sequence"] < allocation["sequence"] < parent["sequence"] < source["sequence"]
+                         for prior in canonical if prior["values"]["iter_idx"] < iteration), "n4_parent_prior_only_order")
+             pa = native(pv["source_population"], (16, 64, 128), actions.dtype)
+@@ -744,7 +744,7 @@ def _audit_n4_terminal_population(kinds, context, final_event):
+     require(tensor(cells) and cells.dtype == torch.int64 and cells.shape == (16,)
+             and bool(((cells >= 0) & (cells < 16)).all()) and final["selected_cell"] == cells[selected_index].item(), "n4_selected_recorded_cell_mismatch")
+     parent_cells = terminal["parent_cell_ids"]
+-    expected_parent_cells = (parents[9]["values"]["parent_cell_ids"] if n11_mode
++    expected_parent_cells = (parents[9]["values"]["parent_cell_ids"] if n11_mode or n24_actual is not None
+                              else allocations[9]["values"]["parent_cell_ids"])
+     require(tensor(parent_cells) and parent_cells.dtype == torch.int64 and parent_cells.shape == (16,)
+             and same(parent_cells, expected_parent_cells)
+@@ -1069,7 +1069,20 @@ def audit_episode(episode_dir, episode_compute_file, *, arithmetic_backend=None)
+                 require(value["source_fingerprints"] == fps, "parent_source_mismatch")
+                 require(value["parent_fingerprints"] == [fps[i] for i in value["parent_indices"].tolist()], "parent_selection_mismatch")
+                 require(value["original_archive_occurrences"] is None, "unsupported_archive_occurrence_claim")
+-            archive_rows = {r["values"]["iter_idx"]: r["values"] for r in kinds["archive_parent_allocation"]}
++            n24_actual = None
++            n24_markers = bool(kinds["gripper_rescue_begin"] or kinds["gripper_rescue_cache"] or kinds["gripper_rescue_parents"]
++                or any(r["values"].get("gripper_rescue_mode") is not None
++                       for kind in ("parent_allocation", "final_selection") for r in kinds[kind]))
++            if n24_markers:
++                require(guided, "n24_unguided_markers")
++                from scripts.audit_gripper_parent_rescue import audit_rescue
++                n24_counts, n24_actual = audit_rescue(kinds, context, require, fingerprints)
++                gate = report.setdefault("n24_gripper_parent_rescue_audit", {
++                    "schema": "n24-native-gripper-parent-rescue-audit-v1",
++                    **{k: 0 for k in n24_counts}})
++                for key, value in n24_counts.items(): gate[key] += value
++            archive_rows = (n24_actual if n24_actual is not None else
++                {r["values"]["iter_idx"]: r["values"] for r in kinds["archive_parent_allocation"]})
+             for row in kinds["parent_allocation"]:
+                 value = row["values"]
+                 if value["iter_idx"] in archive_rows:
+@@ -1214,7 +1227,7 @@ def audit_episode(episode_dir, episode_compute_file, *, arithmetic_backend=None)
+                 final_event = one("final_selection")
+                 n9_mode = final_event["values"].get("qd_final_selection_mode") == "terminal_contact_sweep_v1"
+                 n5_mode = final_event["values"].get("qd_final_selection_mode") == "terminal_grasp_proximity_v1"
+-                n4 = _audit_n4_terminal_population(kinds, context, final_event)
++                n4 = _audit_n4_terminal_population(kinds, context, final_event, n24_actual=n24_actual)
+                 if kinds["qd_parent_survivor_selection"]:
+                     n11_gate = report.setdefault("n11_parent_survival_audit", {
+                         "schema":"n11-native-exact-parent-survival-audit-v1",
+diff --git a/scripts/audit_gripper_parent_rescue.py b/scripts/audit_gripper_parent_rescue.py
+new file mode 100644
+index 0000000..cf653ca
+--- /dev/null
++++ b/scripts/audit_gripper_parent_rescue.py
+@@ -0,0 +1,188 @@
++"""Independent N24 witness replay; no production cache/archive helper imports."""
++import hashlib
++import math
++
++import torch
++
++
++MODE = "canonical_full_close_v1"
++
++
++def audit_rescue(kinds, context, require, fingerprints):
++    def same(a, b):
++        return (torch.is_tensor(a) and torch.is_tensor(b) and a.dtype == b.dtype
++                and a.shape == b.shape and a.device.type == b.device.type == "cpu"
++                and torch.equal(a.contiguous().reshape(-1).view(torch.uint8), b.contiguous().reshape(-1).view(torch.uint8)))
++
++    def check(a, b, name):
++        if torch.is_tensor(b):
++            require(same(a, b), "n24_" + name)
++        else:
++            if type(b) in (bool, int, float, str, type(None)):
++                require(type(a) is type(b), "n24_type_" + name)
++            require(a == b, "n24_" + name)
++
++    def indexed(kind, iterations):
++        rows = kinds[kind]
++        require(len(rows) == len(iterations) and [r["values"].get("iter_idx") for r in rows] == iterations,
++                "n24_coverage_" + kind)
++        return {r["values"]["iter_idx"]: r for r in rows}
++
++    require(len(kinds["gripper_rescue_begin"]) == 1 and len(kinds["final_selection"]) == 1,
++            "n24_begin_final_coverage")
++    begin = kinds["gripper_rescue_begin"][0]; bv = begin["values"]
++    final = kinds["final_selection"][0]["values"]
++    require(bv.get("mode") == final.get("gripper_rescue_mode") == MODE
++            and final.get("quality_mode") == "actuator_clipped_provider_v1"
++            and bv.get("sparse_exponent") == 1.0 and type(bv.get("run_seed")) is int,
++            "n24_explicit_mode")
++    canonical = indexed("canonical_candidate_batch", list(range(-1, 10)))
++    assignments = indexed("qd_descriptor_assignment", list(range(-1, 10)))
++    updates = indexed("gripper_rescue_cache", list(range(-1, 10)))
++    overrides = indexed("gripper_rescue_parents", list(range(10)))
++    allocations = indexed("archive_parent_allocation", list(range(10)))
++    parents = indexed("parent_allocation", list(range(10)))
++    scoring = {r["sequence"]: r for r in kinds["scoring_inputs"]}
++    effective = {r["values"]["scoring_batch_id"]: r for r in kinds["effective_quality"]}
++    ctx = bv["context"]
++    require(ctx["episode"] == context["episode"] and ctx["global_step"] == context["global_step"]
++            and ctx["stage"] == context["values"]["stage"], "n24_context")
++    require(len(kinds["actuator_metadata_snapshot"]) == 1, "n24_actuator_context_missing")
++    check(ctx["controller"], kinds["actuator_metadata_snapshot"][0]["values"]["metadata"]["context"], "controller_context")
++    archive, visits, history, best = {}, [0] * 16, [], None
++    actual_allocations, substitutions, updated_count = {}, 0, 0
++    all_occurrences = set()
++
++    for iteration in range(-1, 10):
++        row = canonical[iteration]; cv = row["values"]
++        assignment = assignments[iteration]; dv = assignment["values"]
++        update = updates[iteration]; uv = update["values"]
++        sid = dv["scoring_batch_id"]
++        require(sid in scoring and sid in effective and row["sequence"] < assignment["sequence"] < update["sequence"],
++                "n24_canonical_order")
++        source, ev = scoring[sid]["values"], effective[sid]["values"]
++        for field in ("decision_id", "reset_sequence", "global_step", "episode"):
++            require(all(record[field] == context[field] for record in (row, assignment, update)), "n24_event_context")
++        points = source["keypoints"].contiguous()
++        check(ctx["keypoints"], {"dtype": str(points.dtype), "shape": list(points.shape),
++            "sha256": hashlib.sha256(points.view(torch.uint8).numpy().tobytes()).hexdigest()}, "target_identity")
++        check(ctx["provider"], ev["provider_identity"], "provider_identity")
++        check(uv["context"], ctx, "cache_context")
++        for name, key in (("bounds_lo", "bounds_lo"), ("bounds_hi", "bounds_hi")):
++            check(dv[name], bv[key], "fixed_bounds")
++        actions, quality, costs, raw = cv["candidates"], cv["effective_quality"], ev["costs"], cv["raw_provider_quality"]
++        require(actions.shape == (16,64,128) and actions.dtype in (torch.float32, torch.bfloat16)
++                and torch.isfinite(actions).all(), "n24_actions")
++        for value in (quality, costs, raw):
++            require(value.shape == (16,) and value.dtype == actions.dtype and torch.isfinite(value).all(), "n24_native_values")
++        check(costs, -quality, "cost_quality")
++        check(quality, ev["quality"], "quality_source")
++        check(raw, ev["raw_provider_quality"], "raw_source")
++        check(actions, source["samples"], "action_source")
++        fps = fingerprints(actions)
++        check(cv["canonical_fingerprints"], fps, "canonical_fingerprints")
++        ids = [f"{context['decision_id']}:q{row['sequence']}:r{i}" for i in range(16)]
++        check(cv["occurrence_ids"], ids, "occurrence_ids")
++        require(not all_occurrences.intersection(ids), "n24_duplicate_occurrences")
++        all_occurrences.update(ids)
++        mode = (actions[:, :8, 10] >= 0).all(dim=1)
++        check(uv["full_close_rows"], torch.nonzero(mode).flatten(), "full_close_predicate")
++        changed = False
++        update_count = 0
++        for index in range(16):
++            candidate = {"iteration": iteration, "row": index,
++                "action": actions[index], "cost": costs[index], "quality": quality[index], "raw": raw[index],
++                "descriptor": dv["descriptors"][index], "cell": int(dv["cell_ids"][index]),
++                "fingerprint": fps[index], "canonical_sequence": row["sequence"],
++                "scoring_batch_id": sid, "occurrence_id": ids[index]}
++            history.append(candidate)
++            if mode[index] and (best is None or float(candidate["cost"]) < float(best["cost"])):
++                best, changed = candidate, True
++                update_count += 1
++            cell = candidate["cell"]; visits[cell] += 1
++            old = archive.get(cell)
++            if old is None or (-float(candidate["quality"]), candidate["fingerprint"]) < (-float(old["quality"]), old["fingerprint"]):
++                archive[cell] = candidate
++        check(uv["updated"], changed, "cache_update")
++        check(uv["update_count"], update_count, "cache_update_count")
++        updated_count += update_count
++
++        def verify_reference(record):
++            if best is None:
++                check(record, None, "empty_cache")
++                return
++            require(isinstance(record, dict) and set(record) == set(best) - {"action"}, "n24_cache_reference_fields")
++            for name, value in best.items():
++                if name != "action": check(record[name], value, "cache_" + name)
++
++        verify_reference(uv["cache"])
++        if iteration == 9:
++            continue
++        i = iteration + 1
++        alloc, override, parent = allocations[i], overrides[i], parents[i]
++        av, ov, pv = alloc["values"], override["values"], parent["values"]
++        require(update["sequence"] < alloc["sequence"] < override["sequence"] < parent["sequence"]
++                < scoring[assignments[i]["values"]["scoring_batch_id"]]["sequence"], "n24_parent_causal_order")
++        for record in (alloc, override, parent):
++            require(all(record[field] == context[field] for field in ("decision_id","reset_sequence","global_step","episode")), "n24_parent_context")
++        # Independent reconstruction of unmodified fixed sparse allocation.
++        occupied = sorted(archive)
++        seed = int.from_bytes(hashlib.sha256(f"{bv['run_seed']}:{ctx['episode']}:{ctx['global_step']}:{i}".encode("ascii")).digest()[:8], "big") & ((1 << 63) - 1)
++        generator = torch.Generator(device="cpu").manual_seed(seed)
++        permutation = torch.randperm(len(occupied), generator=generator).tolist()
++        ranks = {occupied[offset]: rank for rank, offset in enumerate(permutation)}
++        weights = {cell: (float(visits[cell]) + 1.) ** -1.0 for cell in occupied}
++        total = sum(weights.values())
++        exact = {cell: 16 * weights[cell] / total for cell in occupied}
++        counts = {cell: math.floor(exact[cell]) for cell in occupied}
++        for cell in sorted(occupied, key=lambda c: (-(exact[c] - counts[c]), ranks[c]))[:16-sum(counts.values())]:
++            counts[cell] += 1
++        cells = [cell for cell in occupied for _ in range(counts[cell])]
++        entries = [archive[cell] for cell in cells]
++        original = torch.stack([item["action"] for item in entries])
++        descriptors = torch.stack([item["descriptor"] for item in entries])
++        vectors = {name: torch.tensor([float(item[key]) for item in entries], dtype=torch.float32)
++                   for name, key in (("parent_costs","cost"),("parent_rewards","quality"),("parent_raw_rewards","raw"))}
++        for name, value in vectors.items(): check(av[name], value, "original_" + name)
++        for name, value in (("parent_cell_ids",torch.tensor(cells)),("parent_fingerprints",[e["fingerprint"] for e in entries]),
++                ("parent_lanes",["quality"]*16),("slot_counts",{str(k):v for k,v in counts.items()}),
++                ("sparse_slot_counts",{str(k):v for k,v in counts.items()}),("weights",{str(k):v for k,v in weights.items()})):
++            check(av[name], value, "original_" + name)
++        require(av["global_quality_anchor_count"] == 0 and av["secondary_parent_count"] == 0, "n24_original_lanes")
++        check(ov["original_actions"], original, "original_actions")
++        check(ov["original_descriptors"], descriptors, "original_descriptors")
++        check(ov["context"], ctx, "supply_context"); verify_reference(ov["cache"])
++        mask = (original[:, :8, 10] >= 0).all(dim=1)
++        check(ov["original_full_close_mask"], mask, "original_predicate")
++        slot = int(torch.argmax(vectors["parent_costs"])) if best is not None and not mask.any() else None
++        check(ov["replacement_slot"], slot, "first_worst_slot")
++        require(ov["mode"] == pv.get("gripper_rescue_mode") == MODE and ov["exact_survivor"] is False
++                and ov["original_is_archive_allocation"] is True and ov["actual_is_archive_allocation"] == (slot is None), "n24_mode_or_archive_claim")
++        actual = original.clone(); actual_desc = descriptors.clone(); actual_cells = torch.tensor(cells)
++        if slot is not None:
++            actual[slot] = best["action"]; actual_desc[slot] = best["descriptor"]; actual_cells[slot] = best["cell"]
++            for name, key in (("parent_costs","cost"),("parent_rewards","quality"),("parent_raw_rewards","raw")):
++                vectors[name][slot] = best[key]
++        for name, value in (("actual_actions",actual),("actual_costs",vectors["parent_costs"]),
++                ("actual_quality",vectors["parent_rewards"]),("actual_raw",vectors["parent_raw_rewards"]),
++                ("actual_cells",actual_cells),("actual_descriptors",actual_desc)):
++            check(ov[name], value, name)
++        for name, value in (("source_population",actual),("source_costs",vectors["parent_costs"]),
++                ("source_quality",vectors["parent_rewards"]),("source_raw_rewards",vectors["parent_raw_rewards"]),
++                ("parent_cell_ids",actual_cells),("parent_indices",torch.arange(16))):
++            check(pv[name], value, "ed_" + name)
++        require(pv["elite_count"] == 0, "n24_no_exact_survivor")
++        check(pv["offspring_sources"], ["qd_gripper_rescue_offspring" if j == slot else "qd_archive_offspring" for j in range(16)], "ed_sources")
++        actual_allocations[i] = {**av, **vectors, "parent_cell_ids":actual_cells,
++                                "parent_fingerprints":fingerprints(actual)}
++        substitutions += int(slot is not None)
++    # The cache must never become an extra spatial-archive insertion, including
++    # after the last allocation where the next-round witness cannot expose it.
++    ar = final["archive_reference"]
++    ordered = [archive[cell] for cell in sorted(archive)]
++    check(ar["population"], torch.stack([item["action"] for item in ordered]), "final_archive_actions")
++    check(ar["cell_ids"], torch.tensor(sorted(archive)), "final_archive_cells")
++    check(ar["costs"], torch.tensor([float(item["cost"]) for item in ordered]), "final_archive_costs")
++    check(ar["rewards"], torch.tensor([float(item["quality"]) for item in ordered]), "final_archive_quality")
++    return {"checked_decisions":1,"canonical_batches_verified":11,"canonical_candidates_verified":176,
++            "parent_rounds_verified":10,"cache_updates":updated_count,"substitutions":substitutions}, actual_allocations
+diff --git a/scripts/qd_ed_final_runner.py b/scripts/qd_ed_final_runner.py
+index 0a17674..1afc677 100644
+--- a/scripts/qd_ed_final_runner.py
++++ b/scripts/qd_ed_final_runner.py
+@@ -328,6 +328,18 @@ def expand_candidate(candidate_id, candidate, baseline):
+                 and {k: v for k, v in profile.items() if k != field} == inherited
+                 and candidate.get('only_algorithm_change') == {field: {'before': 0, 'after': 4}},
+                 'N11 must change only exact parent survivor count')
++    elif contract == 'n24_gripper_mode_parent_rescue_v1':
++        require(candidate_id == 'N24', 'N24 contract requires N24 identity')
++        parent = candidate.get('parent_candidate')
++        require(isinstance(parent, dict) and parent.get('path') == 'configs/qd_ed_final/candidate_n23.json'
++                and parent.get('sha256') == digest(ROOT / parent['path']), 'N24 parent N23 identity differs')
++        inherited = read_json(ROOT / parent['path'])['profile']
++        field = 'qd_gripper_rescue_mode'
++        require(set(profile) == set(inherited) | {field}
++                and profile.get(field) == 'canonical_full_close_v1'
++                and {k: v for k, v in profile.items() if k != field} == inherited
++                and candidate.get('only_algorithm_change') == {field: {'before': 'none', 'after': 'canonical_full_close_v1'}},
++                'N24 must change only the search-local gripper parent rescue')
+     elif contract == 'n23_actuator_clipped_provider_quality_v1':
+         require(candidate_id == 'N23', 'N23 contract requires N23 identity')
+         parent = candidate.get('parent_candidate')
+@@ -381,7 +393,9 @@ def expand_candidate(candidate_id, candidate, baseline):
+     active = copy.deepcopy(baseline)
+     active['historical_label'] = str(candidate['label'])
+     active['restored_profile'] = copy.deepcopy(profile)
+-    fields = (('qd_descriptor', 'qd_final_selection_mode', 'qd_parent_survivor_count')
++    fields = (('qd_descriptor', 'qd_final_selection_mode', 'qd_quality_mode', 'qd_gripper_rescue_mode')
++              if candidate_id == 'N24' else
++              ('qd_descriptor', 'qd_final_selection_mode', 'qd_parent_survivor_count')
+               if candidate_id == 'N11' else
+               ('qd_descriptor', 'qd_final_selection_mode', 'qd_quality_mode')
+               if candidate_id in {'N18', 'N19', 'N20', 'N21', 'N22', 'N23'} else
+diff --git a/tests/test_n24_native_loop.py b/tests/test_n24_native_loop.py
+new file mode 100644
+index 0000000..b56dec3
+--- /dev/null
++++ b/tests/test_n24_native_loop.py
+@@ -0,0 +1,139 @@
++"""Full production CPU loops with synthetic model/controller/collector only."""
++import ast
++import copy
++import json
++from collections import defaultdict
++from pathlib import Path
++from types import MethodType, SimpleNamespace
++
++import numpy as np
++import pytest
++import torch
++
++from test_rdt_steer import (_patch_core_imports, stub_steer, stub_adapter,
++                            _rollout_cond, _n2_fixture_provider)
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++@pytest.mark.parametrize('scenario',['rescue','empty','present'])
++def test_full_n24_cpu_loop_and_source_audit(stub_steer,stub_adapter,monkeypatch,tmp_path,dtype,scenario):
++    from core.decision_evidence import DecisionEvidence
++    from core.rdt_libero_action_converter import decode_rdt_libero_action_chunk
++    from core.qd_ed import fingerprint_action
++    from scripts.audit_decision_evidence import audit_episode, fingerprints, require, AuditFailure
++    from scripts.audit_gripper_parent_rescue import audit_rescue
++    from scripts.qd_ed_audit_backend import create_backend
++    from test_qd_actuator_clipped_quality import static_adapter_fixture
++    root=Path(__file__).resolve().parents[1]
++    for name,value in vars(static_adapter_fixture()).items():
++        monkeypatch.setattr(stub_adapter,name,value,raising=False)
++    monkeypatch.setattr(stub_adapter,'get_ee_pose_world',lambda:SimpleNamespace(position=np.array([.12317,-.17312,.23141])),raising=False)
++    tree=ast.parse((root/'core/env_adapters/libero_adapter.py').read_text())
++    cls=next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=='LiberoAdapter')
++    node=next(n for n in cls.body if isinstance(n,ast.FunctionDef) and n.name=='delta_actions_to_ee_trajectory')
++    scope={'np':np,'torch':torch}
++    import __future__
++    exec(compile(ast.Module(body=[node],type_ignores=[]),'libero_adapter.py','exec',flags=__future__.annotations.compiler_flag),scope)
++    monkeypatch.setattr(stub_adapter,'delta_actions_to_ee_trajectory',MethodType(scope['delta_actions_to_ee_trajectory'],stub_adapter))
++    stub_steer.post_init(adapter=stub_adapter,postprocessor=lambda x:x,sample_batch_size=16,policy_config={'action_chunk_horizon':8})
++    provider=_n2_fixture_provider(index=0)
++    provider_path=tmp_path/'stage1_guidance.py';provider_path.write_text(provider._guidance_source_text)
++    provider._guidance_source_path=str(provider_path)
++    points=torch.tensor([[.1124,-.071,.3154],[.13,-.21,.39]],dtype=dtype)
++    initial=torch.zeros(16,64,128,dtype=dtype);initial[:,:,39:42]=1.2
++    initial[:,:,10]=-100 if scenario=='empty' else 100 if scenario=='present' else -1
++    if scenario=='rescue':
++        # Same geometry/native score/cell, losing fingerprint: guaranteed initial
++        # archive lacks the sole full-close proposal. This is a synthetic input,
++        # never a change to the real allocator or refinement algorithm.
++        negative=fingerprint_action(initial[1])
++        for value in range(1,1000):
++            initial[0,:8,10]=value/10
++            if fingerprint_action(initial[0])>negative:break
++        assert fingerprint_action(initial[0])>negative
++    monkeypatch.setattr(stub_steer,'_eds_initial_population',lambda **kw:initial.clone())
++    allruns=[]
++    for mode,instrumented in [('N23',True),('N24',True),('N24',False)]:
++        stub_steer.reset()
++        rec=DecisionEvidence(tmp_path/f'{mode}-{instrumented}',episode=0) if instrumented else None
++        stub_steer._decision_evidence=rec
++        monkeypatch.setattr(stub_adapter,'_decision_evidence',rec,raising=False)
++        if rec:rec.begin_decision(global_step=0,stage=1,use_guidance=True,keypoints=points,providers=[provider])
++        cfg=json.loads((root/f'configs/qd_ed_final/candidate_{mode.lower()}.json').read_text())['profile']
++        cfg=stub_steer._resolve_eds_config_with_reference_defaults(cfg)
++        torch.manual_seed(25191)
++        selected=stub_steer._eds_guided_denoise_loop(x_t=torch.zeros_like(initial),cond=_rollout_cond(stub_steer),
++            keypoints=points,guidance_fns=[provider],eds_config=cfg,verbose=False,global_step=0,current_stage=1)
++        metrics=stub_steer.get_last_eds_metrics();rng=torch.random.get_rng_state().clone()
++        assert metrics['search_evaluation_count']==176 and metrics['score_call_count']==11
++        result={'selected':selected.clone(),'rng':rng,'metrics':metrics,'compute':stub_steer.get_episode_compute_counters()}
++        if rec:
++            actions=decode_rdt_libero_action_chunk(selected.float(),8)
++            rec.record('policy_action_decode',selected_latent=selected.float(),action_chunk=actions)
++            rec.commit_decision(action_chunk=actions,execution_horizon=8)
++            for i in range(8):
++                rec.dispatch(global_step=i,execution_index=i+1)
++                rec.record('executed_action',action_numpy=actions[0,i].numpy())
++                rec.pre_reset_outcome({'robot0_eef_pos':np.zeros(3)},reward=0.,terminated=i==7,success=False)
++                rec.step_returned(terminated=i==7,truncated=False,success=False)
++            rec.finish()
++            compute=tmp_path/f'{mode}-{instrumented}'/'episode_compute.jsonl'
++            compute.write_text(json.dumps({'episode_id':0,'outcome':'completed','decision_evidence':rec.status()})+'\n')
++            report=audit_episode(rec.root,compute,arithmetic_backend=create_backend('cpu'))
++            (compute.parent/'audit.json').write_text(json.dumps(report,indent=2)+'\n')
++            assert report['accepted'],report['errors']
++            events=[e for p in sorted(rec.root.glob('bundle_*.pt')) for e in torch.load(p,map_location='cpu',weights_only=True)['events']]
++            result['parents']=[e['values']['source_fingerprints'] for e in events if e['event']=='parent_allocation']
++            if mode=='N24':
++                gate=report['n24_gripper_parent_rescue_audit']
++                assert gate['canonical_candidates_verified']==176 and gate['parent_rounds_verified']==10
++                assert gate['substitutions']==metrics['qd_gripper_rescue_substitutions']
++                assert (gate['substitutions']>0) if scenario=='rescue' else gate['substitutions']==0
++                kinds=defaultdict(list)
++                for e in events:kinds[e['event']].append(e)
++                context=kinds['decision_context'][0]
++                # Corrupt actual source evidence after a successful real-loop audit.
++                for fault in ('fingerprint','slot','predicate','cost','context','raw','descriptor','cell','missing','duplicate','future','final_archive','all_markers'):
++                    changed=copy.deepcopy(kinds)
++                    ov=changed['gripper_rescue_parents'][0]['values']
++                    if fault=='fingerprint':ov['actual_actions'][0,0,39]+=1
++                    elif fault=='slot':ov['replacement_slot']=15 if ov['replacement_slot']!=15 else 14
++                    elif fault=='predicate':ov['original_full_close_mask'][0]=~ov['original_full_close_mask'][0]
++                    elif fault=='cost':ov['actual_costs'][0]+=1
++                    elif fault=='context':ov['context']['stage']=99
++                    elif fault=='raw':ov['actual_raw'][0]+=1
++                    elif fault=='descriptor':ov['actual_descriptors'][0,0]+=1
++                    elif fault=='cell':ov['actual_cells'][0]=(int(ov['actual_cells'][0])+1)%16
++                    elif fault=='missing':changed['gripper_rescue_cache'].pop()
++                    elif fault=='duplicate':changed['gripper_rescue_parents'].append(changed['gripper_rescue_parents'][0])
++                    elif fault=='future':changed['gripper_rescue_cache'][0]['sequence']=changed['parent_allocation'][0]['sequence']+1
++                    elif fault=='final_archive':changed['final_selection'][0]['values']['archive_reference']['population'][0,0,10]+=1
++                    elif fault=='all_markers':
++                        for kind in ('gripper_rescue_begin','gripper_rescue_cache','gripper_rescue_parents'):changed[kind]=[]
++                        for row in changed['parent_allocation']+changed['final_selection']:row['values'].pop('gripper_rescue_mode',None)
++                    with pytest.raises(AuditFailure):audit_rescue(changed,context,require,fingerprints)
++        allruns.append(result)
++    assert torch.equal(allruns[1]['selected'],allruns[2]['selected'])
++    assert torch.equal(allruns[1]['rng'],allruns[2]['rng'])
++    assert allruns[0]['compute']==allruns[1]['compute']==allruns[2]['compute']
++    assert torch.equal(allruns[0]['rng'],allruns[1]['rng'])
++    if scenario!='rescue':
++        assert torch.equal(allruns[0]['selected'],allruns[1]['selected'])
++        assert allruns[0]['parents']==allruns[1]['parents']
++    assert not any(k.startswith('qd_gripper_rescue_') for k in allruns[0]['metrics'])
++    assert not torch.cuda.is_initialized()
++    (tmp_path/'summary.json').write_text(json.dumps({'dtype':str(dtype),'scenario':scenario,
++        'score':'Unknown/not-run','compute':allruns[1]['compute'],
++        'substitutions':allruns[1]['metrics']['qd_gripper_rescue_substitutions'],
++        'canonical_evaluations':176,'score_batches':11,'instrumentation_parity':True,
++        'inactive_parent_action_parity':scenario!='rescue','rng_parity':True},indent=2)+'\n')
++
++
++@pytest.mark.parametrize('change',[{'qd_gripper_rescue_mode':'other'},{'qd_quality_mode':'provider'},
++    {'qd_parent_survivor_count':4},{'qd_bounds_update_policy':'causal_envelope_v1'},
++    {'qd_sparse_exponent':2.},{'chunk_population_mode':'warm_start_mix'}])
++def test_config_closed(stub_steer,change):
++    root=Path(__file__).resolve().parents[1]
++    config=json.loads((root/'configs/qd_ed_final/candidate_n24.json').read_text())['profile']
++    config.update(change)
++    with pytest.raises(ValueError):stub_steer._resolve_eds_config_with_reference_defaults(config)
+diff --git a/tests/test_qd_gripper_parent_rescue.py b/tests/test_qd_gripper_parent_rescue.py
+new file mode 100644
+index 0000000..1559382
+--- /dev/null
++++ b/tests/test_qd_gripper_parent_rescue.py
+@@ -0,0 +1,113 @@
++import copy
++import json
++from dataclasses import replace
++from pathlib import Path
++
++import pytest
++import torch
++
++from core.qd_gripper_parent_rescue import CanonicalCloseCache, full_close, MODE
++from core.qd_ed import QDArchive, allocate_parent_slots, fingerprint_action
++
++
++def example(dtype=torch.float32):
++    actions = torch.zeros(16,64,128,dtype=dtype)
++    actions[:, :8, 10] = -1
++    actions[0, :8, 10] = 1
++    costs = torch.arange(16,dtype=dtype)
++    descriptors = torch.full((16,2), .25)
++    bounds = (torch.zeros(2),torch.ones(2))
++    return dict(iteration=-1,actions=actions,costs=costs,quality=-costs,raw=-costs-1,
++                descriptors=descriptors,cells=torch.full((16,),5,dtype=torch.long),
++                context={"stage":1,"reset":0,"target":"a"},bounds=bounds)
++
++
++def allocation(data):
++    archive = QDArchive(grid_shape=(4,4))
++    actions = data['actions'].clone(); actions[:, :8,10] = -1
++    archive.update(actions=actions,rewards=data['quality'],costs=data['costs'],
++        descriptors=data['descriptors'],cell_ids=data['cells'],raw_rewards=data['raw'],source_iter=-1)
++    a=allocate_parent_slots(archive,population_size=16,sampling='sparse_priority',sparse_exponent=1.,
++        run_seed=0,episode=0,global_step=0,iter_idx=0)
++    return a,torch.stack([archive.entries[int(c)].descriptor_xy_m for c in a.parent_cell_ids])
++
++
++@pytest.mark.parametrize('dtype',[torch.float32,torch.bfloat16])
++def test_rescue_exact_one_slot_native_dtype_and_no_rng(dtype):
++    data=example(dtype);cache=CanonicalCloseCache(data['context'],data['bounds'])
++    update=cache.observe(**data);assert update['cache']['row']==0
++    a,d=allocation(data);a=replace(a,parent_costs=a.parent_costs.clone(),parent_rewards=a.parent_rewards.clone())
++    a.parent_costs[3]=a.parent_costs[5]=8;a=replace(a,parent_rewards=-a.parent_costs)
++    state=torch.random.get_rng_state().clone()
++    out=cache.supply(a,d,iteration=0,context=data['context'],bounds=data['bounds'])
++    assert out.slot==3 and out.costs.dtype==torch.float32 and out.actions.dtype==dtype
++    assert torch.equal(out.actions[3],data['actions'][0]) and out.raw[3]==data['raw'][0]
++    for old,new in ((a.parent_actions,out.actions),(a.parent_costs,out.costs),(a.parent_rewards,out.quality),
++                    (a.parent_raw_rewards,out.raw),(a.parent_cell_ids,out.cells),(d,out.descriptors)):
++        keep=[i for i in range(16) if i!=3];assert torch.equal(old[keep],new[keep])
++    assert torch.equal(state,torch.random.get_rng_state())
++
++
++@pytest.mark.parametrize('kind',['empty','already_present'])
++def test_inactive_returns_original_objects(kind):
++    data=example();cache=CanonicalCloseCache(data['context'],data['bounds'])
++    if kind=='empty': data['actions'][:,:8,10]=-1
++    cache.observe(**data);a,d=allocation(data)
++    if kind=='already_present':
++        a.parent_actions[4,:8,10]=1
++        a=replace(a,parent_fingerprints=tuple(fingerprint_action(r) for r in a.parent_actions))
++    out=cache.supply(a,d,iteration=0,context=data['context'],bounds=data['bounds'])
++    assert out.slot is None and out.actions is a.parent_actions and out.costs is a.parent_costs
++    assert out.quality is a.parent_rewards and out.raw is a.parent_raw_rewards and out.cells is a.parent_cell_ids
++
++
++def test_earliest_birth_tie_and_no_recorder_dependency():
++    data=example();data['actions'][1,:8,10]=1;data['costs'][1]=data['costs'][0];data['quality']=-data['costs']
++    caches=[CanonicalCloseCache(data['context'],data['bounds']) for _ in range(2)]
++    for i,cache in enumerate(caches):
++        cache.observe(**data,**({'canonical_sequence':9,'scoring_batch_id':3,'decision_id':'d'} if i else {}))
++        cache.observe(**dict(data,iteration=0))
++        assert cache.entry['iteration']==-1 and cache.entry['row']==0
++    a,d=allocation(data)
++    left,right=[c.supply(a,d,iteration=1,context=data['context'],bounds=data['bounds']) for c in caches]
++    assert torch.equal(left.actions,right.actions)
++    assert CanonicalCloseCache(data['context'],data['bounds']).entry is None
++
++
++@pytest.mark.parametrize('fault',['future','duplicate','context_stage','context_reset','context_target','bounds',
++                                 'quality','raw_nan','cell','descriptor','nonfinite'])
++def test_invalid_source_fails_closed(fault):
++    data=example();cache=CanonicalCloseCache(data['context'],data['bounds'])
++    if fault=='future':data['iteration']=0
++    if fault=='duplicate':cache.observe(**data)
++    if fault.startswith('context_'):data['context']={**data['context'],fault[8:]:'changed'}
++    if fault=='bounds':data['bounds']=(torch.zeros(2),torch.ones(2)*2)
++    if fault=='quality':data['quality']=data['quality']+1
++    if fault=='raw_nan':data['raw'][0]=float('nan')
++    if fault=='cell':data['cells'][0]=4
++    if fault=='descriptor':data['descriptors'][0]=.9
++    if fault=='nonfinite':data['actions'][0,10,3]=float('nan')
++    with pytest.raises(ValueError):cache.observe(**data)
++
++
++def test_provider_default_omission_and_n24_profile_closure():
++    from core.eds_eval_metrics import EDSChunkMetrics
++    from scripts import qd_ed_final_runner as r
++    metrics=EDSChunkMetrics().to_jsonable()
++    assert 'qd_quality_mode' not in metrics and not any(k.startswith('qd_gripper_rescue_') for k in metrics)
++    root=Path(__file__).resolve().parents[1]
++    parent=json.loads((root/'configs/qd_ed_final/candidate_n23.json').read_text())
++    candidate=json.loads((root/'configs/qd_ed_final/candidate_n24.json').read_text())
++    assert {k:v for k,v in candidate['profile'].items() if k!='qd_gripper_rescue_mode'}==parent['profile']
++    assert candidate['profile']['qd_gripper_rescue_mode']==MODE
++    base=r.read_json(root/'configs/qd_ed_final/baseline_profiles.json')['profiles']['Q0']
++    old=r.expand_candidate('N23',parent,base)
++    new=r.expand_candidate('N24',candidate,base)
++    assert new['resolved_eds_config']=={**old['resolved_eds_config'],'qd_gripper_rescue_mode':MODE}
++    assert {k:v for k,v in new['static_override_values'].items() if k!='main.eds_config.qd_gripper_rescue_mode'}==old['static_override_values']
++    for fault in ('parent','mode','other'):
++        bad=copy.deepcopy(candidate)
++        if fault=='parent':bad['parent_candidate']['sha256']='0'*64
++        if fault=='mode':bad['profile']['qd_gripper_rescue_mode']='none'
++        if fault=='other':bad['profile']['temperature']=.2
++        with pytest.raises(r.GateError):r.expand_candidate('N24',bad,base)

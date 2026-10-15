@@ -1,0 +1,104 @@
+{
+  "schema": "n31-phase-a-delivery-v1",
+  "commit": "d6de4b4fecc2784d1f7a6b4d4b93d451b09a79d0",
+  "source_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/source-manifest-phase-a-v1.json",
+    "sha256": "f8c3548d104b8a59f4c5d1fce2d7f89539fc4983f5d9fb37270ef668864ad923",
+    "bytes": 2441
+  },
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/hypothesis-and-cpu-phase-a-v1.md",
+      "sha256": "921bd41d16141a5cd69314b8e28a354a126402daa9f410937c09aebe143609e5",
+      "bytes": 10719
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/executor-prompt-v1.md",
+      "sha256": "76d893056dac6aa81c5e4e9fe659baed7286e7f16b40e93a1d03aae487f89b21",
+      "bytes": 4148
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/source-manifest-phase-a-v1.json",
+      "sha256": "f8c3548d104b8a59f4c5d1fce2d7f89539fc4983f5d9fb37270ef668864ad923",
+      "bytes": 2441
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/phase-a-source.diff",
+      "sha256": "384f040fcc7c993c62a63795c7d34b510ee2ccf925a6a5966ab1eaea1d09f9eb",
+      "bytes": 34730
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/source-inspection-manifest-v1.json",
+      "sha256": "717b579f06057aa40f1a98a15f278a757fa521b3b2fd16c779527fa59382921c",
+      "bytes": 3259
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_guard_v1.py",
+      "sha256": "0a415e9eee5af1ad45cf958449168c1e57200e9bef67a07e1d765f5e1b7eb981",
+      "bytes": 4734
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu_guard_v2.py",
+      "sha256": "078b2bad26c9e5a5df3b8254cb3f0ae9e10cddc57e9a255639d320a5fa828989",
+      "bytes": 4772
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-run1.log",
+      "sha256": "6adbd847994908c88defd5bdb7bef714491fd981d50f8fb26f038cef19c876d7",
+      "bytes": 99
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-run1-external.json",
+      "sha256": "94733512ccaefb7c92eda9dbfbafb4f5cd2d176ab415b7124e764a8417ad86c0",
+      "bytes": 673
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-run1-resource.json",
+      "sha256": "26757510d0a7b21f205212a39a9614a6d18e0603c9babe68e2262260a2987e51",
+      "bytes": 172531
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-run2.log",
+      "sha256": "6adbd847994908c88defd5bdb7bef714491fd981d50f8fb26f038cef19c876d7",
+      "bytes": 99
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-run2-external.json",
+      "sha256": "adb40b5a4efcd73aff79fcfbec6a25d1d54f4e7e20fb3e07eeb4b65cdbc7a7f8",
+      "bytes": 674
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-run2-resource.json",
+      "sha256": "44b88f8eedb815388c9f1e876cf5caa7530269918305948d9d4d1d873f0a343e",
+      "bytes": 443125
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-resource-ledger-v1.json",
+      "sha256": "e4a8145ff7fff5d896a26553e664e1b22c0771a9b404841453f8ccf6a8b93644",
+      "bytes": 4107
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/preparation-resource-v1.json",
+      "sha256": "77b4d8a7bd4d51d723689cd0e04c8c81b17aac1a3399c063e7f37ac756596cf2",
+      "bytes": 436
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/git-whitespace-note-v1.txt",
+      "sha256": "6938bb8500b259b4e192f829efb27ae661bdcf3c4214b9d4b91896adc7518218",
+      "bytes": 292
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/cpu-phase-a-report-v1.md",
+      "sha256": "fe7a56f3d43ac68aacffe69b4f8a518bdf14c9262643025dbd50458d99aa0d4b",
+      "bytes": 3288
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/packaging-resource-v1.json",
+      "sha256": "92f6ce33204f87aab7325b14f2e935e63fb380ffe94afb33adeb5afc1f40e717",
+      "bytes": 220
+    }
+  ],
+  "production_integration": false,
+  "gpu_release": false,
+  "score": "Unknown"
+}

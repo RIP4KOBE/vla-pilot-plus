@@ -1,0 +1,22 @@
+{
+  "schema": "n32r3-operational-source-delta-candidate-v1",
+  "approved": false,
+  "release_enabled": false,
+  "scientific_parent_commit": "1065f38122379a515b60a9a424f574330405b66f",
+  "operational_commit": "36aac818c8ea0ec3ce18413e678963818bb5bb5d",
+  "branch": "exp/n32-archive-eligible-cpu-20261004",
+  "diff": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/continuation-implementation-v3/exact-diff-v1.patch",
+    "sha256": "e9be38b4dd3fe93461c865b720e50d86069df0d6a50a2d34d0b568931c1ca44b",
+    "bytes": 126540
+  },
+  "changed_files": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/continuation-implementation-v3/changed-files-v1.json",
+    "sha256": "7b74746a7b3286290f8374b1c7b6b9fdf6cfd6f38ac082d451e162e9692874b7",
+    "bytes": 3569
+  },
+  "scientific_files_changed": [],
+  "independent_source_continuity_review_required": true,
+  "native_runtime_binding": "Retains immutable scientific commit, with the exact new run_id from the command map; full operational source/commit is separately bound in plan, manifest, context and lifecycle receipts.",
+  "new_operational_source_must_not_be_represented_as_parent_digest": true
+}

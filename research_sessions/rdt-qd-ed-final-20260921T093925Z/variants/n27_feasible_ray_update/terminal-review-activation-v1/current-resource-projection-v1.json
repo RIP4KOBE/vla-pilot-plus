@@ -1,0 +1,81 @@
+{
+  "schema": "n27-current-terminal-resource-projection-v1",
+  "cohort_id": "N27_FEASIBLE_RAY_SCREEN_20261001",
+  "events": [
+    {
+      "admission": {
+        "external_compute_processes": 0,
+        "memory_used_mib": 197,
+        "physical_gpu": 7
+      },
+      "budget_bucket": "recovery",
+      "episode_attempts": 0,
+      "event": "reserved",
+      "kind": "n27_tensor_arithmetic_v1",
+      "output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/arithmetic-preflight/worker",
+      "physical_gpu": 7,
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/arithmetic-preflight/plan.frozen.v1.json",
+        "sha256": "76ee3e7dfa2a45345fdf6f473d6c19c97ef0dc83ad39ca8e30c4510c7bdeb939"
+      },
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__n27_tensor_arithmetic_v1",
+      "source_commit": "095cfeecd6af55477d2529441c307ab712e8a8da",
+      "time_unix": 1790842127.010501
+    },
+    {
+      "budget_bucket": "recovery",
+      "episode_attempts": 0,
+      "event": "dispatched",
+      "kind": "n27_tensor_arithmetic_v1",
+      "output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/arithmetic-preflight/worker",
+      "physical_gpu": 7,
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/arithmetic-preflight/plan.frozen.v1.json",
+        "sha256": "76ee3e7dfa2a45345fdf6f473d6c19c97ef0dc83ad39ca8e30c4510c7bdeb939"
+      },
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__n27_tensor_arithmetic_v1",
+      "source_commit": "095cfeecd6af55477d2529441c307ab712e8a8da",
+      "time_unix": 1790842129.9458535,
+      "timeout_seconds": 120
+    },
+    {
+      "budget_bucket": "recovery",
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "episode_attempts": 0,
+      "event": "completed",
+      "failure": null,
+      "gpu_process_wall_seconds": 16.414283487945795,
+      "kind": "n27_tensor_arithmetic_v1",
+      "measurement": "whole exclusive process wall including cleanup",
+      "output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/arithmetic-preflight/worker",
+      "physical_gpu": 7,
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/arithmetic-preflight/plan.frozen.v1.json",
+        "sha256": "76ee3e7dfa2a45345fdf6f473d6c19c97ef0dc83ad39ca8e30c4510c7bdeb939"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/arithmetic-preflight/worker/process.json",
+        "sha256": "42d4546ab49acd87f2b1f20b0a8dc64a60c0b6472561859445ccac16903cf556"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/arithmetic-preflight/worker/report.json",
+        "sha256": "12e04b7a93f4a30b4070e4d10595c0999a1d36aad03c545459ec46b1273748d3"
+      },
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__n27_tensor_arithmetic_v1",
+      "source_commit": "095cfeecd6af55477d2529441c307ab712e8a8da",
+      "time_unix": 1790842146.5915465
+    }
+  ],
+  "event_count": 3,
+  "all_matching_events": true,
+  "source_ledger": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+    "sha256": "036c8cfc913a5718951cc737722a9262f4d2b3b8e1fb137048a8b433079bbbee"
+  },
+  "collector": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n27_feasible_ray_update/terminal-review-activation-v1/root-collect-terminal-metadata-v1.py",
+    "sha256": "ea9ba7801943c3f5b73cf56d4be94535c0d9882ba00acff8174d3142cb501d60"
+  },
+  "collected_at": 1790844690.7284107
+}

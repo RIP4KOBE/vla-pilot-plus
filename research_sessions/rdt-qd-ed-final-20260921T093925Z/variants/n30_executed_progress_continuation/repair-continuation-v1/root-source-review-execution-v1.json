@@ -1,0 +1,47 @@
+{
+  "schema": "n30-r1-root-source-review-v1",
+  "at": "2026-10-03T21:32:13.180634+00:00",
+  "decision": "ACCEPT_SOURCE_BYTE_SCOPE",
+  "commit": "b2775fa2008a8a88e374c43a5753f8862485af1f",
+  "repair_base": "7c0d80d734fa8300173e56d9a8de03415bc55fe2",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/repair-continuation-v1/source-manifest-execution-v1.json",
+    "sha256": "5ecec50164559cd96f86140c481d78d41120be9a1a3da3802fc7774d7912c01f"
+  },
+  "source_files_rehashed_and_git_bound": 457,
+  "repair_base_files_independently_git_bound": 441,
+  "existing_source_files_unchanged": 439,
+  "existing_files_changed": [
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n23_worker.py"
+  ],
+  "added_files": [
+    "docs/experiments/n30/r1/base-source-v1.json",
+    "docs/experiments/n30/r1/controller-contract-v1.md",
+    "docs/experiments/n30/r1/cpu-integration-scope-v1.md",
+    "docs/experiments/n30/r1/original-source-v1.json",
+    "docs/experiments/n30/r1/reverse-source-v1.json",
+    "docs/experiments/n30/r1/root-cpu-integration-release-v1.json",
+    "scripts/qd_ed_n30_r1_bridge.py",
+    "scripts/qd_ed_n30_r1_contract.py",
+    "scripts/qd_ed_n30_r1_prepare.py",
+    "scripts/qd_ed_n30_r1_report.py",
+    "scripts/qd_ed_n30_r1_supervise.py",
+    "tests/n30_r1_synthetic.py",
+    "tests/test_n30_r1_admission.py",
+    "tests/test_n30_r1_bridge.py",
+    "tests/test_n30_r1_controller.py",
+    "tests/test_n30_r1_worker.py"
+  ],
+  "reverse_hunks_independently_reconstruct_full_original_bytes": true,
+  "main_byte_identical_to_accepted_repair": true,
+  "initial_repair_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/initial-observation-repair-v1/root-cpu-repair-review-v1.json",
+    "sha256": "6e5dc3c0a83236d463ed6d920d5f724f676094547c70189e7e4c224d10ba75fa"
+  },
+  "manual_review": "Root read all five new operational modules, both existing-file diffs and CPU regression cases; original algorithm/helper/native/provider/profile bytes unchanged.",
+  "scientific_candidate": "N30 unchanged",
+  "cpu_or_gpu_numerical_replay": false,
+  "gpu_release": false,
+  "goal_status": "TARGET_NOT_MET"
+}

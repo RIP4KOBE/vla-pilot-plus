@@ -1,0 +1,34 @@
+{
+  "schema": "n30-root-independent-source-review-v1",
+  "at": "2026-10-03T20:13:34.522929+00:00",
+  "decision": "ACCEPT_SOURCE_BYTE_SCOPE",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/source-manifest-execution-v1.json",
+    "sha256": "7f723ac3c412649214e53a64737fe9d6723df93016aecb7c161d9b44b82ab26a"
+  },
+  "commit": "4ce2b95757c1c0d662696ba19d6a9a14d2e59b49",
+  "files_verified": 439,
+  "files_verified_against_git_blobs": 439,
+  "old_files_unchanged": 405,
+  "changed_existing": [
+    "configs/config.yaml",
+    "core/eds_eval_metrics.py",
+    "core/rdt_policy_steer.py",
+    "main.py",
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n23_worker.py"
+  ],
+  "new_files": 28,
+  "reverse_verified_against_git_base": true,
+  "phase_a_progress_helper_unchanged_except_explicit_config_control": true,
+  "default_off_control_fixture_unchanged": true,
+  "candidate_profile_sole_delta": {
+    "executed_progress_continuation_mode": "executed_progress_continuation_v1"
+  },
+  "future_qd_off_control_dispatched": false,
+  "gpu_model_api_sim_calls": 0,
+  "tensor_payload_reads": 0,
+  "source_review_cpu_seconds": 0.090159457,
+  "gpu_dispatch_authorized": false,
+  "limitations": "Static source and committed byte identity; CPU integration tests and root operational admission are separate evidence. No efficacy claim."
+}

@@ -1,0 +1,7 @@
+Committed repair: `abbdb396439094f034cd859d2d88217072f209d3`.
+
+- Both supported layouts resolve correctly; unknown layouts fail closed.
+- Owning STOP files and symlinks block dispatch.
+- 160 focused CPU-only tests passed.
+- Owning records and disabled draft bytes preserved; no adoption or release performed.
+- Results written to `../stop-path-repair-v1/result-v1.json` and `report-v1.md`.

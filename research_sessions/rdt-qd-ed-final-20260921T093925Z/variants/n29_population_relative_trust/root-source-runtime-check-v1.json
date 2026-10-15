@@ -1,0 +1,81 @@
+{
+  "schema": "n29-root-current-source-runtime-check-v1",
+  "accepted": true,
+  "checked_at": "2026-10-01T16:37:04.868313+00:00",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/source-manifest-execution-v1.json",
+    "sha256": "9a31cdab710e5b14771be8f4c41d230db3ba537bf552e8903be85851d72b46cf"
+  },
+  "owning_worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree",
+  "source_commit": "d855cfd690482e018bb40ce98edec80fad9700e0",
+  "source_files_verified": 411,
+  "source_bridge": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/source-equivalence-bridge-v1.json",
+    "sha256": "27f3c1e494d322edb4f09e220f0c0072acb1f6e5d60a5e500d67bf45e8075011"
+  },
+  "runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260929/n18-close-then-lift-dev-v1/gpu7-rebind/runtime-manifest.gpu7.frozen.v3.json",
+    "sha256": "8b9aebb5af45ab355f4c03bf7669ed78c50b595185ff1e624ebc180dcca89dd7"
+  },
+  "inventory": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/runtime-inventory.json",
+    "sha256": "44d456203ca168eec9eddfb6834d54347153b2c859eb1b4fc0dea02c15138b83"
+  },
+  "checkpoint_and_encoder_bytes_verified": true,
+  "runtime_input_task_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "seed_init_bddl_bindings_verified": 40,
+  "protected_identity_payloads_decoded": false,
+  "provider": {
+    "backend": "codex_cli",
+    "auth_mode": "chatgpt",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "low",
+    "timeout_seconds": 180,
+    "cli_path": "/home/hynx/.codex/packages/standalone/releases/0.155.1-x86_64-unknown-linux-musl/bin/codex"
+  },
+  "login_status": "Logged in using ChatGPT",
+  "poe_allowed": false,
+  "credential_files_read_or_modified": false,
+  "budget_snapshot": {
+    "dispatched": 371,
+    "aborted": 7,
+    "valid": 348,
+    "invalid": 16,
+    "completed": 364,
+    "running": 0,
+    "gpu_hours_consumed": 49.99373352883483,
+    "by_bucket": {
+      "baseline": 66,
+      "development": 232,
+      "validation": 60,
+      "formal": 0,
+      "recovery": 13
+    },
+    "reserved_attempts": 371,
+    "gpu_hours_by_bucket": {
+      "baseline": 8.627115283731207,
+      "development": 32.0072278533669,
+      "validation": 7.7591759975691845,
+      "formal": 0.0,
+      "recovery": 1.600214394167521
+    },
+    "gpu_healthcheck_hours": 0.22868962042571578,
+    "gpu_healthcheck_inflight": 0
+  },
+  "native_proof_run": false,
+  "gpu_dispatch_authorized": false,
+  "root_gpu_model_api_sim_calls": 0,
+  "wall_seconds": 38.00257484195754,
+  "self_cpu_seconds": 35.658120515
+}

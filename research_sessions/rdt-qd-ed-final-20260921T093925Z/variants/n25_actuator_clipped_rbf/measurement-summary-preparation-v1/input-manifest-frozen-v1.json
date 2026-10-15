@@ -1,0 +1,162 @@
+{
+  "schema": "n25-measurement-input-manifest-v1",
+  "executable": true,
+  "source_commit": "5a65ef15968cc68c82314e8c0773b3365ad45fa0",
+  "plan_sha256": "1f0c94ccd3458a3a786acb9525728a1b64e3df439e4f920731f6566dd3a95eb3",
+  "root_attestation": {
+    "all_listed_cells_accepted_and_terminal": true,
+    "no_listed_cell_inflight": true,
+    "expected_cell_count": 4
+  },
+  "selection_rule": "ALL accepted N25 cells in original immutable cohort in task order; no outcome/activity selection; engineering INVALID remains INVALID; 4 cells are not a complete 10-cell cohort",
+  "root_review_ref": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n25_actuator_clipped_rbf/root-terminal-review-v1.json",
+    "sha256": "a0b225efd8e35c17b5c6e801c3188a63b178079b7d31274f8b189a5641c59052"
+  },
+  "cells": [
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n25_dev_t00_n25_20260930__98cad9a8d769",
+      "episode_key": "n25_dev_t00_n25_20260930",
+      "task_id": 0,
+      "profile": "N25",
+      "accepted_by_root": true,
+      "files": {
+        "metrics": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t00_n25_20260930__98cad9a8d769/eds_eval/eds_metrics.jsonl",
+          "present": true,
+          "sha256": "407f7592074fc6a7c174f2c7d51162cce9b0bc03782037db8ba9946829d06d69",
+          "required_basename": "eds_metrics.jsonl"
+        },
+        "compute": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t00_n25_20260930__98cad9a8d769/eds_eval/episode_compute.jsonl",
+          "present": true,
+          "sha256": "4750ac925d4163986655113b462d297224b9a8ae9ef31ca91ebc016648abfa54",
+          "required_basename": "episode_compute.jsonl"
+        },
+        "receipt": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t00_n25_20260930__98cad9a8d769/eds_eval/in-worker-audit-receipt.json",
+          "present": true,
+          "sha256": "12efca8f603232266c22feb143ce481a88ca0247287d8720c02fac434b0990e1",
+          "required_basename": "in-worker-audit-receipt.json"
+        },
+        "audit": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t00_n25_20260930__98cad9a8d769/eds_eval/decision-evidence-audit.json",
+          "present": true,
+          "sha256": "adcab414cf488a65255e0d1f447d82f41cbd77a0b17ffa5b052fad2ca8ef1aad",
+          "required_basename": "decision-evidence-audit.json"
+        }
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n25_dev_t01_n25_20260930__a649d34f9d41",
+      "episode_key": "n25_dev_t01_n25_20260930",
+      "task_id": 1,
+      "profile": "N25",
+      "accepted_by_root": true,
+      "files": {
+        "metrics": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t01_n25_20260930__a649d34f9d41/eds_eval/eds_metrics.jsonl",
+          "present": true,
+          "sha256": "8a937655229e789cdf10ffca2434c4137c06f48897ce32021018c89dc59a5b9a",
+          "required_basename": "eds_metrics.jsonl"
+        },
+        "compute": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t01_n25_20260930__a649d34f9d41/eds_eval/episode_compute.jsonl",
+          "present": true,
+          "sha256": "796dbd10fcdafab7d441b0191499b7df5cd28cc3835c40a7f26b2b8076984aec",
+          "required_basename": "episode_compute.jsonl"
+        },
+        "receipt": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t01_n25_20260930__a649d34f9d41/eds_eval/in-worker-audit-receipt.json",
+          "present": true,
+          "sha256": "e17b00b838540cbb6f0b2d9888a877636e27f3c455327c4a3c0767899b4383d8",
+          "required_basename": "in-worker-audit-receipt.json"
+        },
+        "audit": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t01_n25_20260930__a649d34f9d41/eds_eval/decision-evidence-audit.json",
+          "present": true,
+          "sha256": "20d89b9f6a89847ef38e9a628c07c52ecfaef1e8a332661f10163a0b2ac05aa7",
+          "required_basename": "decision-evidence-audit.json"
+        }
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n25_dev_t02_n25_20260930__5ca1e5d963e2",
+      "episode_key": "n25_dev_t02_n25_20260930",
+      "task_id": 2,
+      "profile": "N25",
+      "accepted_by_root": true,
+      "files": {
+        "metrics": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t02_n25_20260930__5ca1e5d963e2/eds_eval/eds_metrics.jsonl",
+          "present": true,
+          "sha256": "053bc8739a242e8dd424d12015decb30bcd7c5dba26d47af295300d834bb2e93",
+          "required_basename": "eds_metrics.jsonl"
+        },
+        "compute": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t02_n25_20260930__5ca1e5d963e2/eds_eval/episode_compute.jsonl",
+          "present": true,
+          "sha256": "33eda4531a66c60057965c35a87530d5d5b3c28ca546ad508f7ce0db0c9737f6",
+          "required_basename": "episode_compute.jsonl"
+        },
+        "receipt": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t02_n25_20260930__5ca1e5d963e2/eds_eval/in-worker-audit-receipt.json",
+          "present": true,
+          "sha256": "421da717033a16ad1d5f2b830c52a4a31951d1edc6d00abf43cc3f56f1752fc2",
+          "required_basename": "in-worker-audit-receipt.json"
+        },
+        "audit": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t02_n25_20260930__5ca1e5d963e2/eds_eval/decision-evidence-audit.json",
+          "present": true,
+          "sha256": "2006fccbcdf96de8d7f5a4bda45dad735fbc6eaacd6f5c947468d71fab5d2e92",
+          "required_basename": "decision-evidence-audit.json"
+        }
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n25_dev_t03_n25_20260930__373960a33145",
+      "episode_key": "n25_dev_t03_n25_20260930",
+      "task_id": 3,
+      "profile": "N25",
+      "accepted_by_root": true,
+      "files": {
+        "metrics": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t03_n25_20260930__373960a33145/eds_eval/eds_metrics.jsonl",
+          "present": true,
+          "sha256": "7aad328b4e0eb22f4f1745fb9caa5c4453ac9b8aaa4e800bc2d267bcec61603a",
+          "required_basename": "eds_metrics.jsonl"
+        },
+        "compute": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t03_n25_20260930__373960a33145/eds_eval/episode_compute.jsonl",
+          "present": true,
+          "sha256": "f57f71f1af29d7861aafe081a5bb377dd7f967a7208dd6fa0d2db5eeca3a3e2f",
+          "required_basename": "episode_compute.jsonl"
+        },
+        "receipt": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t03_n25_20260930__373960a33145/eds_eval/in-worker-audit-receipt.json",
+          "present": true,
+          "sha256": "0d7d6a7fb8f7d185f3589836d7b51621350918eb1f077b734d8a1af49fb91b36",
+          "required_basename": "in-worker-audit-receipt.json"
+        },
+        "audit": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n25_dev_t03_n25_20260930__373960a33145/eds_eval/decision-evidence-audit.json",
+          "present": true,
+          "sha256": "e9674bd9bff897da25d9b79b2e7528b1522c58f19bcdedec07f6b2646a91587a",
+          "required_basename": "decision-evidence-audit.json"
+        }
+      }
+    }
+  ],
+  "limits": {
+    "max_cells": 10,
+    "max_payload_files": 40,
+    "max_file_bytes": 16777216,
+    "max_total_bytes": 134217728,
+    "max_wall_seconds": 60,
+    "cpu_threads": 2,
+    "tensor_reads": 0
+  },
+  "real_input_authorized_now": true,
+  "original_cohort_disposition": "INVALID_OR_INTERRUPTED",
+  "recorded_at": "2026-09-30T22:59:58.566180+00:00"
+}

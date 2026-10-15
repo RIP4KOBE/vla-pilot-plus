@@ -1,0 +1,120 @@
+{
+  "schema": "n24-task0-rescue-survival-output-manifest-v1",
+  "native_read_scope_closed": true,
+  "source_commit": "3b7afa02757eb3519d95547e4b6e6e939f7068f2",
+  "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n24_dev_t00_n24_20260930__169d5a090d1b",
+  "new_algorithm_authorized": false,
+  "protected_execution_authorized": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/read-scope-v1.json",
+      "sha256": "d309ef966b8f18f8d66dbdbc2e670b8d70369ed23ec2b0d6552d6323ed64548b",
+      "bytes": 7621517
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/input-manifest-v1.json",
+      "sha256": "6d48d9550f01b0e3ac6d17efd09a410a6ec4beb2644f79b68a3067f57f1ba403",
+      "bytes": 13776
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/extract_cpu_v1.py",
+      "sha256": "191c7658685918d5cc8fb42dfc549acf7a28fc233b46c2d1f913293057ffbafb",
+      "bytes": 22188
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/run-v1.log",
+      "sha256": "66a0d4f847da51c0c9567ecce6a74cbe1ac6265003bfe7a8aaa9e3e527044121",
+      "bytes": 1529
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/result-v1.json",
+      "sha256": "a64c5dca8291ec2846e75fe25170e4b8da158294eebe2ee7b68fe0b543bdee4d",
+      "bytes": 2796700
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/all-decisions-v1.csv",
+      "sha256": "5fe2ca4648198c652790980f448dbd6e6b89202c87bd1ad4be072445a8c2c80d",
+      "bytes": 2367
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/all-substitutions-v1.csv",
+      "sha256": "153a11997445b56c3142caec64c6466bd516bdaf401dead15ac0b68d43930a89",
+      "bytes": 810
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/conclusion-v1.md",
+      "sha256": "6f9b58c9efa35c55b473c08283b0e3e6fff119f49031377669440bf4ef990cc1",
+      "bytes": 7198
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000000-v1.json",
+      "sha256": "7b06608e1aad9ed66ede5dc9120beb0aa062a51b802c7f05ff294589c9393e95",
+      "bytes": 195270
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000008-v1.json",
+      "sha256": "1affa7fa19997263b05234d4254f117530335fc794bcdbda7b7cf468d11e17f2",
+      "bytes": 194440
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000016-v1.json",
+      "sha256": "97500ae8fe574e9d0fe4511d6f508cb33c50d22953b16ca57d5e7dd43086263b",
+      "bytes": 194795
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000160-v1.json",
+      "sha256": "7630d3c62661515c0124c44f4db14fe4020e200f9da3d439d33fa91ed0e1515a",
+      "bytes": 197430
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000232-v1.json",
+      "sha256": "18afcbb293697fc1464c2d81af78d34096ccf79267afcb02b9fc7e2d157af535",
+      "bytes": 197776
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000240-v1.json",
+      "sha256": "14eca73539e5918c50d7a697c6717ef2e93face7ea0b2fdba98f3506b6526b25",
+      "bytes": 199175
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000304-v1.json",
+      "sha256": "67ad6e979876f40c5e296a4ee6a56c7b83060d888ad1b1c73102979dbf753d02",
+      "bytes": 210329
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000312-v1.json",
+      "sha256": "b3c1cc6f8db77b73b4a65b1e958a50092018bd26c0bccd6a892b11b57b4e4145",
+      "bytes": 199433
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000320-v1.json",
+      "sha256": "d8105586d02419f9d968b4fc47420e6d15241c9ad3de7705505cfacd5faaf741",
+      "bytes": 200323
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000328-v1.json",
+      "sha256": "0b9458bfa3abc53e9ae12f01e05b6508d298c78b7c464549285f9a632c2ca3e4",
+      "bytes": 200065
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000392-v1.json",
+      "sha256": "2b00cc463d9af500947bd389fb03a1568974c3c7591f7d3de5f472f5a6b1541c",
+      "bytes": 196497
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000400-v1.json",
+      "sha256": "6f3751582b69400a80db7ac4e1e2547bdeb3436617b1b7da8ea82319f0acc5db",
+      "bytes": 196420
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000408-v1.json",
+      "sha256": "489c1ac6159e776075f6d0f9ba38f90b5cebe1dc71c83280482874db526d142a",
+      "bytes": 203565
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/task0-rescue-survival-diagnostic/partial-decision-000416-v1.json",
+      "sha256": "ed0c315a899a814768c4003fea28f918c781667022fc69997347261cea04f8d3",
+      "bytes": 200793
+    }
+  ]
+}

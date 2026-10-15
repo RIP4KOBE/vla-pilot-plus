@@ -1,0 +1,5 @@
+Prepared 30 fresh N32R2 manifests and disabled release candidates; verified 551 source files and worker rejection of the unapproved release.
+
+Production remains blocked by 696 missing runtime dependency files and independent root approval. No source, owning state, or ledger changes; no GPU dispatch.
+
+[Report](../prospective-recovery-release-v2/report-v1.md) · [Delivery](../prospective-recovery-release-v2/delivery-v1.json)

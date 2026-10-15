@@ -1,0 +1,56 @@
+{
+  "schema": "n28-conditional-outer-loop-resource-v1",
+  "cpu_seconds": 0.01645499900000001,
+  "cpu_limit_seconds": 60,
+  "affinity": [
+    0,
+    1
+  ],
+  "thread_limit": 2,
+  "torch_imported": false,
+  "calls": [
+    {
+      "phase": "initial_scope_and_narratives",
+      "cpu_seconds": 0.0025064500000000003
+    },
+    {
+      "phase": "static_locators_and_bounded_early_history",
+      "cpu_seconds": 0.009814586000000004
+    },
+    {
+      "name": "bounded_parent_and_final_selection_source_windows",
+      "cpu_seconds": 0.0014270910000000019,
+      "threads": 2
+    },
+    {
+      "phase": "root_clarification_and_allocation_static_window",
+      "cpu_seconds": 0.0020555039999999997,
+      "threads": 2
+    },
+    {
+      "phase": "scope_delivery_requirement_recheck",
+      "cpu_seconds": 0.0005855190000000031,
+      "threads": 2
+    },
+    {
+      "phase": "final_report_and_provenance_write",
+      "cpu_seconds": 6.584899999999977e-05,
+      "threads": 2
+    }
+  ],
+  "forbidden_operations": [],
+  "measurement_scope": "Sum of measured stdlib parsing/writing blocks. The initial standalone scope inspection was not process-time instrumented; reserve 1 second for that small preliminary read and command startup/teardown, rather than claim an exact whole-session CPU measurement.",
+  "uninstrumented_preliminary_and_overhead_reserve_seconds": 1.0,
+  "accounted_cpu_seconds_including_reserve": 1.016454999,
+  "cpu_affinity_observed": [
+    0,
+    1
+  ],
+  "production_imports": false,
+  "tests_run": 0,
+  "gpu_api_model_simulator_calls": 0,
+  "new_agents": 0,
+  "experiment_source_state_budget_ledger_writes": 0,
+  "result": "READ_ONLY_PROSE_REVIEW_COMPLETED_WITH_DISCLOSED_INCIDENTAL_EXPOSURE",
+  "scope_not_blinded": true
+}

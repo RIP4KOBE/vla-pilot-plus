@@ -1,0 +1,37 @@
+budget:
+  aborted: 1
+  dispatched: 1
+  gpu_hours_consumed: 0.01
+  max_episode_attempts: 240
+  max_gpu_hours: 48.0
+  reserved:
+    baseline: 20
+    development: 100
+    formal: 40
+    recovery: 20
+    validation: 60
+  running: 0
+  valid: 0
+  invalid: 0
+  completed: 0
+gpu_pool:
+- 7
+max_concurrent_gpu_workers: 1
+runner:
+  by_bucket:
+    baseline: 1
+    development: 0
+    validation: 0
+    formal: 0
+    recovery: 0
+  reserved_attempts: 1
+  gpu_hours_by_bucket:
+    baseline: 0.01
+    development: 0.0
+    validation: 0.0
+    formal: 0.0
+    recovery: 0.0
+  gpu_healthcheck_hours: 0.0
+  gpu_healthcheck_inflight: 0
+  last_attempt_id: a
+  last_event: aborted

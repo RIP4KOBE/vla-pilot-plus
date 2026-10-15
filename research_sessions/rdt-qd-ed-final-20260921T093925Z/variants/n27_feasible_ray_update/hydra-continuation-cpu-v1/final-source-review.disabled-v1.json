@@ -1,0 +1,15 @@
+{
+  "schema": "n27-hydra-source-runtime-review-v1",
+  "accepted": false,
+  "source": null,
+  "runtime": null,
+  "protocol": null,
+  "seal": null,
+  "root_seal_review": null,
+  "source_bridge": null,
+  "historical_backend_proof": null,
+  "no_new_preflight": true,
+  "gpu_authorized": false,
+  "executable": false,
+  "reason": "CPU preparation only; actual root seal, source review, finite adoption and release absent"
+}

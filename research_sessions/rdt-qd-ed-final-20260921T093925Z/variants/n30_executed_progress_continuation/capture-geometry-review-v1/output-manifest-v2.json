@@ -1,0 +1,137 @@
+{
+  "schema": "n30-capture-geometry-output-manifest-v2",
+  "frozen": true,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/root-scope-v1.md",
+      "sha256": "2075ec00aac9637cba598c4cf4e31ff41e9f7c0ce1e0ad8c3e7d95e7ea887e54",
+      "bytes": 4741
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/measurement-declaration-v1.json",
+      "sha256": "ebe572077fe40173dffe7868e726ec7c9cf2c01bfd2106c55315c940f09b3f74",
+      "bytes": 2697
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/calculation-command-v1.json",
+      "sha256": "1afcb52a733eb08e56b814162a0fed1060df0bc355de5d02666cadede5065382",
+      "bytes": 897
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/calculate_geometry_v1.py",
+      "sha256": "d3faa2fc6a02242dab6686b82c5d85f85b26bf2ea93658717bf05c005640b51d",
+      "bytes": 6830
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/preparation-resource-v1.json",
+      "sha256": "7d438b2256b9ff04be9dabb1780e4be7dacba4c47d3b55469fc60ff75fa61957",
+      "bytes": 115
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/calculation-v1.log",
+      "sha256": "ce1cc296640e4617dec0102d1e345d946064c63babaad6a3f8ac024be5497683",
+      "bytes": 2918
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/external-execution-v1.json",
+      "sha256": "b7b9155eb7d9cea28763562e3da23dcd023b6bf120ba95f85f7ff07f31cb8297",
+      "bytes": 981
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/geometry-result-v1.json",
+      "sha256": "19e6e66a014851b727b716145371d0a3b1ff7ac1d4ccb0b05440b03c87278f0e",
+      "bytes": 48048
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/geometry-table-v1.csv",
+      "sha256": "67713a8744e9342574dbe21785e0f59b3809b62fb85c1be08d55a4ebb048a0fb",
+      "bytes": 14836
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/geometry-resource-v1.json",
+      "sha256": "9db42f636151d49e15831b22aed39bd4d1911a869b0dfd659bb60eeca6abc21f",
+      "bytes": 423
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/source-input-manifest-v1.json",
+      "sha256": "e274ec8369f408187b398cf593a47162c2a9451d4f14d95fea3d811752227bb7",
+      "bytes": 15759
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/source-contract-v1.md",
+      "sha256": "fd3b3905c5a64a52ee88d856a05e02c98ccb8eeb5d055f5a80aa7f6ea57d8393",
+      "bytes": 5481
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/mechanism-decision-v1.md",
+      "sha256": "e212dfd676fb2ca3a1dc7961d49d4d3df7f1da1bc91a2e51730ce1877d350b95",
+      "bytes": 4431
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/resource-summary-v1.json",
+      "sha256": "e1c45260970f9cb60f2fd5b1ac2ae2826410fbd6dee19327cd6e0847654d386b",
+      "bytes": 1011
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/source-inspection-record-01.json",
+      "sha256": "04be442f648762f456749bc9bc118fa959dd47c31e4ee6f7b3b95b161880db83",
+      "bytes": 858
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/source-inspection-record-02.json",
+      "sha256": "ab41dd219f1c489166f9b4f0a6fb16b891a946776f8454262623ba44f4044c01",
+      "bytes": 1028
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/source-inspection-record-03.json",
+      "sha256": "6ae4c408f033e5813156b1d639c591f236d88ef79a63f034c41f7a60fdf646a2",
+      "bytes": 3460
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/source-inspection-record-04.json",
+      "sha256": "d30bc3ad90a5740f4e3e09576b5e8a4f31822eba7ad06065a5ad2b76fbc59317",
+      "bytes": 2635
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/source-inspection-record-05.json",
+      "sha256": "74849a5648d0ebfc7d0773e1ac659b8c0f9cedd1dcf8400310c89f3503aa6582",
+      "bytes": 3112
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/source-inspection-record-06.json",
+      "sha256": "723603a02678f0cd9e0d6f1e077ef484615284c03e699e87d61fbe8741469a95",
+      "bytes": 2463
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/source-inspection-record-07.json",
+      "sha256": "1f28b27d40513fbb99eefb1544787703475d7fa992bc63edfd77910b905a9e8a",
+      "bytes": 2668
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/source-inspection-record-08.json",
+      "sha256": "8e3502f8af4bb4a426694eb474e0e80c37fa4e68ae8eea647661534dfb1e2ef0",
+      "bytes": 495
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/output-manifest-v1.json",
+      "sha256": "9aa23cc8539dbb9efbd1d214ceb2cec92a9e652a4af6c8003a846422f2a931f4",
+      "bytes": 8265
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/mechanism-decision-addendum-v1.md",
+      "sha256": "7c6357d8f4c0708c7dd169814164f65b867e77fe944bae02a865a5dc2e97aafc",
+      "bytes": 3570
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/resource-addendum-v1.json",
+      "sha256": "a941f64d882282a328e507f6044ca9d4ed62cac3714016bf00c67ad8dac20f5f",
+      "bytes": 291
+    }
+  ],
+  "manifest_self_excluded": true,
+  "prior_outputs_preserved": true,
+  "numerical_replays_after_v1": 0,
+  "nominated_mechanisms": 0,
+  "authoritative_decision": "mechanism-decision-v1.md with mechanism-decision-addendum-v1.md clarification",
+  "further_execution_authorized": false
+}

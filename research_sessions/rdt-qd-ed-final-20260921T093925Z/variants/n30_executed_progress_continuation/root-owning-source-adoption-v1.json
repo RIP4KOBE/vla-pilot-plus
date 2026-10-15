@@ -1,0 +1,22 @@
+{
+  "schema": "n30-root-source-adoption-v1",
+  "at": "2026-10-03T20:16:42.188592+00:00",
+  "commit": "4ce2b95757c1c0d662696ba19d6a9a14d2e59b49",
+  "source_files_verified": 439,
+  "operational_dirty_files_unchanged": {
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/checkpoint.json": "5787c9cc6f2ee0af38de51317372738b138a2db2bdd327b72097b7823466ef40",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.json": "4dd6b0c57a0d903d40b84c6cd2b6e36519c64adff307f0b431b256712bc0962c",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.md": "a63f97dbf129be8ea8e365bc046bb1fcf9e3ef7e00fc00a2b4a86ec059307d57",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/REPORT.md": "b5b7a70a92f1521ff55a153295f4af7d39649f6aa54ec902db56ab6dca716245",
+    "data/attempt-ledger.jsonl": "a02210fe8b4d6dd9b5cbc78ba7f224bb8ebf700d818fcfed4f63c6f7b5b715f6",
+    "data/exposure-registry.jsonl": "b628db432f3536424a9c69157a39d522dc3ea9782f1b0d877b31a3a285013c71",
+    "data/gpu-healthcheck-ledger.jsonl": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7",
+    "data/gpu-hour-reservation-ledger.jsonl": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+    "docs/03_evidence/qd_ed_final/iteration-ledger.md": "4b6644732bf70765de6c29165f983433bd894150079a59f8bdafca909dd2d978",
+    "research-state.yaml": "79bfa8a8fe59997eb4595643f16e3fe3256d6d3f65658806f11f4b68cfa7d57b",
+    "research_config.yaml": "bf57edd90999c7aaf7c662166e4ffa5b450a73e3b9aca47a15993eba8f32449a"
+  },
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree",
+  "gpu_dispatched": false,
+  "budget_changed": false
+}

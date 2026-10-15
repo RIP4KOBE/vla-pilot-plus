@@ -1,0 +1,86 @@
+{
+  "schema": "n26-current-terminal-resource-projection-v1",
+  "cohort_id": "N26_CLEAN_OUTPUT_RBF_DEV_20260930",
+  "events": [
+    {
+      "admission": {
+        "external_compute_processes": 0,
+        "memory_used_mib": 197,
+        "physical_gpu": 7
+      },
+      "budget_bucket": "recovery",
+      "episode_attempts": 0,
+      "event": "reserved",
+      "kind": "n26_tensor_arithmetic_v1",
+      "output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/arithmetic-preflight/worker",
+      "physical_gpu": 7,
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/arithmetic-preflight/plan.frozen.v1.json",
+        "sha256": "73f8883ffa13d8c5ad7fbcb51144574379e9edb8ae8b017a73102fc85c28b570"
+      },
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__n26_tensor_arithmetic_v1",
+      "source_commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "time_unix": 1790817629.6373186
+    },
+    {
+      "budget_bucket": "recovery",
+      "episode_attempts": 0,
+      "event": "dispatched",
+      "kind": "n26_tensor_arithmetic_v1",
+      "output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/arithmetic-preflight/worker",
+      "physical_gpu": 7,
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/arithmetic-preflight/plan.frozen.v1.json",
+        "sha256": "73f8883ffa13d8c5ad7fbcb51144574379e9edb8ae8b017a73102fc85c28b570"
+      },
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__n26_tensor_arithmetic_v1",
+      "source_commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "time_unix": 1790817632.5496073,
+      "timeout_seconds": 60
+    },
+    {
+      "budget_bucket": "recovery",
+      "cleanup_complete": true,
+      "cost_measurement_complete": true,
+      "episode_attempts": 0,
+      "event": "completed",
+      "failure": null,
+      "gpu_process_wall_seconds": 26.503966217045672,
+      "kind": "n26_tensor_arithmetic_v1",
+      "measurement": "whole exclusive process wall including cleanup",
+      "output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/arithmetic-preflight/worker",
+      "physical_gpu": 7,
+      "plan": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/arithmetic-preflight/plan.frozen.v1.json",
+        "sha256": "73f8883ffa13d8c5ad7fbcb51144574379e9edb8ae8b017a73102fc85c28b570"
+      },
+      "process": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/arithmetic-preflight/worker/process.json",
+        "sha256": "e44946ba29ac3b3c8fe1998197313ec2febd24570c56366b4dfe41b00e82f48a"
+      },
+      "report": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/arithmetic-preflight/worker/report.json",
+        "sha256": "e2708bb47ea85a2e41a81efac3cdd1481b9e6adabb3fa1dfa29a58004259016e"
+      },
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__n26_tensor_arithmetic_v1",
+      "source_commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+      "time_unix": 1790817659.267419
+    }
+  ],
+  "event_count": 3,
+  "all_matching_events": true,
+  "source_ledger": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+    "sha256": "9ebfddd4dbe812ad2cfed935d17a50b9fd9ad8d7fb7b85c0d9c2ca0bef10848c"
+  },
+  "source_ledger_stat": {
+    "size": 56487,
+    "mtime_ns": 1790817659320742461,
+    "inode": 27303627
+  },
+  "collected_at": 1790837441.4833384,
+  "collector": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/terminal-review-activation-v1/root-collect-terminal-metadata-v1.py",
+    "sha256": "c9006535bb9b47334b1fd7d07314f76bcec9ee7001c6d32d017554538b39805d"
+  }
+}

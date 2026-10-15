@@ -1,0 +1,7 @@
+Found **95 additional eligible opportunities among 808 global-best abstentions (11.76%)**. All 840 listed opportunities reconstructed; no missing or contradictory associations were found.
+
+Used 54.48 CPU seconds, 45.74 wall seconds, and 489 MiB peak RSS. Production and owning state remain unchanged.
+
+[Report](../archive-feasibility-v1/report-v1.md) · [Result JSON](../archive-feasibility-v1/result-v1.json) · [Script](../archive-feasibility-v1/analyze-v1.py) · [Output hashes](../archive-feasibility-v1/output-hashes-v1.json)
+
+Limitations: provider recognition is inherited from recorded evidence; these are counterfactual selections from factual N31 archives. Positive eligibility supports later integration/auditor review only—no efficacy claim, scientific promotion, or GPU release.

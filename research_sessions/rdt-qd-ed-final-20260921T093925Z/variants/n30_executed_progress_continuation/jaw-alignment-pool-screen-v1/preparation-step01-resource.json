@@ -1,0 +1,14 @@
+{
+  "cpu_seconds": 2.2333999999998855e-05,
+  "affinity": [
+    0,
+    1
+  ],
+  "read_refs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/capture-geometry-review-v1/measurement-declaration-v1.json",
+      "sha256": "ebe572077fe40173dffe7868e726ec7c9cf2c01bfd2106c55315c940f09b3f74",
+      "bytes": 2697
+    }
+  ]
+}

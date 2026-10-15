@@ -1,0 +1,7 @@
+# Fixed-pool screen: eligibility correction, weak observed ranking effect
+
+The preregistered hold condition removes19/33 positive-bonus candidates in the saved N20 task0 pools and39/120 in native-valid N17/N7 task0 pools. It changes the best candidate in1/176 and4/187 canonical batches respectively, with **zero final-population selection changes** in either saved path. Successful N17/N7 task9 has zero affected candidates. Source hashes and full records are in `offline-fixed-pool-rank-v1.json`.
+
+This establishes a semantic correction and limited search-score sensitivity, not a performance improvement or a closed-loop prediction. Archive/parent updates can diverge after intermediate ranking changes; the fixed pool screen does not reconstruct that rollout. It also cannot establish that alternate actions grasp an object. N20 remains audit-rejected for Stage binding.
+
+N22 CPU preparation continues because exact independent evidence tests are reusable, but GPU priority will be decided after N21 completes. A separate potentially stronger direction is to generate candidates with a continuous close suffix within the canonical proposal/search path, since merely removing lift credit leaves the selected release trajectory unchanged. That would be a distinct proposal mechanism, requiring its own prospective protocol, default-off tests, same compute and raw-action/Stage identity checks. No such source change or GPU dispatch is authorized by this screen itself.

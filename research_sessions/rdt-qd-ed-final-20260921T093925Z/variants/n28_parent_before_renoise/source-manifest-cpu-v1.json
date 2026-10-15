@@ -1,0 +1,137 @@
+{
+  "schema": "n28-cpu-source-manifest-v1",
+  "commit": "85154b4dcb43046a2fcf2df4e8179b45b58dd2b4",
+  "base_commit": "e21d48ab33dbd3aca017349b6004c2ba7d981493",
+  "scope": "all six changed/added files plus explicit unchanged critical dependency bytes; not a runtime release manifest",
+  "files": [
+    {
+      "path": "configs/config.yaml",
+      "sha256": "883a907cda4b8d062cf23f3e7ab99b0b33c8757c6e60aedd20a6ef1e65fa2b93",
+      "bytes": 6704,
+      "role": "changed_or_added"
+    },
+    {
+      "path": "configs/qd_ed_final/candidate_n27.json",
+      "sha256": "c066eac51a60390cab4eb2ba7f719701c2b8997a461ccf470105091f16333318",
+      "bytes": 3752,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "configs/qd_ed_final/candidate_n28.json",
+      "sha256": "c1b29682c8b381bd92e0ebf0f79ab0733b9eaceeb43b255e59bedbce928eb40c",
+      "bytes": 3829,
+      "role": "changed_or_added"
+    },
+    {
+      "path": "configs/qd_ed_final/n4_observed_baseline_profiles.json",
+      "sha256": "9ad91066bc0cf91bc8c79d9b02acbd4b83e5e5a45ae31072b0e92d2221baa54f",
+      "bytes": 56700,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/codex_stage_policy.py",
+      "sha256": "92f78a80651e97390a296e42850aae0b70217afb1c362e9b5d0b8a07b8cbe432",
+      "bytes": 5192,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "bytes": 16241,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/eds_eval_metrics.py",
+      "sha256": "3b3861870ff9645edbff1b64c2274d99889e9ee16e421976ae0b19366e6a5974",
+      "bytes": 37637,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/qd_actuator_clipped_rbf.py",
+      "sha256": "d0a516046f9d9efc8694916a9ff845c8b67868d8d7d2d01381894bcc05b89408",
+      "bytes": 10438,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/qd_clean_output_rbf.py",
+      "sha256": "f107f50e45c233e291e5f5799633b0f3005fe54dc0649506dec41a4c02bb789c",
+      "bytes": 3556,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/qd_ed.py",
+      "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89",
+      "bytes": 46573,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/qd_feasible_ray_rbf.py",
+      "sha256": "f2494d1a2c55f4899d848d5f7e8af03cc8518cd53749c8875a117c1ff15a3207",
+      "bytes": 4858,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/qd_feasible_ray_update.py",
+      "sha256": "146163977866af87d2c643b0446be9ebac12f83cf9337d534b736874c623203e",
+      "bytes": 2773,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/qd_parent_before_renoise.py",
+      "sha256": "42d614ca59ba68f45576720472203710ed14dab631d55b9c4dbcbea5951cc0ae",
+      "bytes": 6882,
+      "role": "changed_or_added"
+    },
+    {
+      "path": "core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+      "bytes": 2380,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "sha256": "ef6990557b1921ca8c2872ec15c9d3e17e00ff57091e4b21f4b5fca50afe05c5",
+      "bytes": 408685,
+      "role": "changed_or_added"
+    },
+    {
+      "path": "docs/01_specs/n28-parent-before-renoise-cpu-v1.md",
+      "sha256": "a2aafdd3d908fd57f4d7fd537abd562bfe916edaabeb83d1f4d7fd9317018a65",
+      "bytes": 5194,
+      "role": "changed_or_added"
+    },
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "sha256": "58599c3700ba8883530d4f4599346fca9acfd5edf7a3f74bd15d2f32ceda43af",
+      "bytes": 123387,
+      "role": "unchanged_critical",
+      "base_equal": true
+    },
+    {
+      "path": "tests/test_n28_parent_before_renoise.py",
+      "sha256": "71d5e7d8c1296b8006b0c1c75f51313f6bff8fd8f928bf4bb929d8c4b53917ad",
+      "bytes": 15893,
+      "role": "changed_or_added"
+    }
+  ],
+  "sha256": "25749f91dc9b575ee690c12c21a6a2fb8611c3440c9557d647e4fbe905ed5f10",
+  "unlisted_old_files": "unchanged by exact git diff; root must construct future full runtime/source release inventory"
+}

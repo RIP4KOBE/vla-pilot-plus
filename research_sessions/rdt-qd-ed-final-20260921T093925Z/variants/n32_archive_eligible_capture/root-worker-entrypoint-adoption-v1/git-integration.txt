@@ -1,0 +1,7 @@
+Updating 531477e..6baa930
+Fast-forward
+ scripts/qd_ed_n32_worker.py         |  49 +++++++++++++++-
+ tests/test_n32_release_worker.py    |  29 ++++++++-
+ tests/test_n32_worker_entrypoint.py | 113 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 188 insertions(+), 3 deletions(-)
+ create mode 100644 tests/test_n32_worker_entrypoint.py

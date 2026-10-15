@@ -1,0 +1,8 @@
+Committed as `531477e9dc1c95e78f1852d152811326a814da37`.
+
+- Updated the fixed cohort and episode keys to N32R1.
+- Added focused regressions: **10 passed**; diff check clean.
+- Old outcomes remain excluded; historical costs remain charged.
+- No GPU dispatch, root adoption, or owning-state changes.
+
+Exact diff and test details: [delivery-v1.json](../recovery-identity-v1/delivery-v1.json). Coordinator review remains pending.

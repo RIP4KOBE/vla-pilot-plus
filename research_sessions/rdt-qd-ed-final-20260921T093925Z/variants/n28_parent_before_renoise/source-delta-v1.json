@@ -1,0 +1,22 @@
+{
+  "schema": "n28-cpu-source-delta-v1",
+  "base_commit": "e21d48ab33dbd3aca017349b6004c2ba7d981493",
+  "unchanged_method_count": 117,
+  "changed_methods": [
+    "__init__",
+    "_eds_guided_denoise_loop",
+    "_eds_rbf_witness",
+    "_eds_rollout_diversity_step_mask",
+    "_resolve_eds_config_with_reference_defaults",
+    "reset"
+  ],
+  "preserved_methods": [
+    "_eds_rollout_rbf_diverse_reference",
+    "_eds_renoise_reference",
+    "_eds_initial_denoise_rbf_diverse"
+  ],
+  "base_policy_sha256": "768fd9d1072f1f2abc0e3a1f87f764facd69b99e102399c041b73167b6ef00fe",
+  "current_policy_sha256": "ef6990557b1921ca8c2872ec15c9d3e17e00ff57091e4b21f4b5fca50afe05c5",
+  "default_parity": "FP32/BF16 synthetic full loop compared against three actual e21 original functions; numerical/RNG/cost parity",
+  "new_scope": "CPU-only implementation; no source adoption, native proof, budget or dispatch authority"
+}

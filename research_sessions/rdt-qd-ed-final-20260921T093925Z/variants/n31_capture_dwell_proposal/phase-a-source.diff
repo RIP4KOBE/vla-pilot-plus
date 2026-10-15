@@ -1,0 +1,429 @@
+diff --git a/core/qd_capture_dwell_proposal.py b/core/qd_capture_dwell_proposal.py
+new file mode 100644
+index 0000000..9f239ef
+--- /dev/null
++++ b/core/qd_capture_dwell_proposal.py
+@@ -0,0 +1,127 @@
++"""N31 pure capture-dwell proposal; no policy hook or scoring is installed here.
++
++The caller must bind the native archive plan and its already computed canonical
++projection to the same decision, provider and target. This helper does not infer
++that provenance, predict capture, retain a candidate, or execute an action.
++"""
++from dataclasses import dataclass
++import math
++
++import torch
++from torch import Tensor
++
++
++@dataclass(frozen=True)
++class CaptureDwellProposal:
++    candidate: Tensor | None
++    arrival_index: int | None
++    reason: str
++
++    @property
++    def changed(self) -> bool:
++        return self.candidate is not None
++
++
++def _native(x: Tensor, shape: tuple[int, ...], name: str) -> Tensor:
++    if not isinstance(x, Tensor) or tuple(x.shape) != shape:
++        raise ValueError(f"{name}: expected tensor shape {shape}")
++    if x.dtype not in (torch.float32, torch.bfloat16):
++        raise ValueError(f"{name}: expected native FP32 or BF16")
++    if not bool(torch.isfinite(x).all()):
++        raise ValueError(f"{name}: nonfinite input")
++    return x
++
++
++def _geometry_vector(x: Tensor | None, size: int, name: str) -> list[float] | None:
++    if x is None:
++        return None
++    if not isinstance(x, Tensor) or tuple(x.shape) != (size,) or not x.is_floating_point():
++        raise ValueError(f"{name}: expected floating tensor shape {(size,)} or None")
++    if not bool(torch.isfinite(x).all()):
++        raise ValueError(f"{name}: nonfinite input")
++    return x.detach().to(device="cpu", dtype=torch.float64).tolist()
++
++
++def _same_native_bytes(a: Tensor, b: Tensor) -> bool:
++    av = a.detach().contiguous().reshape(-1).view(torch.uint8)
++    bv = b.detach().contiguous().reshape(-1).view(torch.uint8)
++    return bool(torch.equal(av, bv))
++
++
++@torch.no_grad()
++def capture_dwell_proposal(
++    base_plan: Tensor,
++    projected_outcomes: Tensor,
++    *,
++    target: Tensor | None,
++    hand_quaternion_xyzw: Tensor | None,
++    gripper_qpos: Tensor | None,
++    target_recognized: bool,
++) -> CaptureDwellProposal:
++    """Construct one competing proposal, or explicitly leave offspring unchanged.
++
++    ``projected_outcomes`` contains the original canonical outcome positions
++    1..8 (shape8x3), not action increments and not a newly clipped projection.
++    Geometry uses Python binary64 and the current observed fixed hand frame.
++    Native plan dtype/device and all unedited logical entries are preserved.
++
++    Malformed/nonfinite inputs raise ValueError; absent observation fields,
++    unrecognized target, empty jaw interval, no hit, or no byte change return a
++    candidate of None. The caller must not replace slot15 in these cases.
++    """
++    _native(base_plan, (64, 128), "base_plan")
++    _native(projected_outcomes, (8, 3), "projected_outcomes")
++    if projected_outcomes.dtype != base_plan.dtype:
++        raise ValueError("projection and base native dtypes differ")
++    if type(target_recognized) is not bool:
++        raise ValueError("target_recognized must be an explicit bool")
++    point = _geometry_vector(target, 3, "target")
++    quat = _geometry_vector(hand_quaternion_xyzw, 4, "hand_quaternion_xyzw")
++    jaw = _geometry_vector(gripper_qpos, 2, "gripper_qpos")
++    if not target_recognized:
++        return CaptureDwellProposal(None, None, "unrecognized_target")
++    if point is None:
++        return CaptureDwellProposal(None, None, "target_unavailable")
++    if quat is None or jaw is None:
++        return CaptureDwellProposal(None, None, "proprioception_unavailable")
++    try:
++        norm = math.sqrt(math.fsum(v * v for v in quat))
++    except (OverflowError, ValueError) as exc:
++        raise ValueError("invalid binary64 quaternion norm") from exc
++    if not math.isfinite(norm) or norm == 0.0:
++        raise ValueError("zero/nonfinite binary64 quaternion norm")
++    x, y, z, w = (v / norm for v in quat)
++    rotation = (
++        (1 - 2 * (y*y + z*z), 2 * (x*y - z*w), 2 * (x*z + y*w)),
++        (2 * (x*y + z*w), 1 - 2 * (x*x + z*z), 2 * (y*z - x*w)),
++        (2 * (x*z - y*w), 2 * (y*z + x*w), 1 - 2 * (x*x + y*y)),
++    )
++    lower, upper = jaw[1] + 0.0005, jaw[0] - 0.0005
++    if not all(math.isfinite(v) for v in (lower, upper)):
++        raise ValueError("nonfinite binary64 jaw interval")
++    if lower > upper:
++        return CaptureDwellProposal(None, None, "empty_inner_gap")
++    positions = projected_outcomes.detach().to(device="cpu", dtype=torch.float64).tolist()
++    arrival = None
++    for j, position in enumerate(positions):
++        delta = [point[k] - position[k] for k in range(3)]
++        if not all(math.isfinite(v) for v in delta):
++            raise ValueError("nonfinite binary64 target displacement")
++        try:
++            a = [math.fsum(rotation[k][axis] * delta[k] for k in range(3)) for axis in range(3)]
++        except (OverflowError, ValueError) as exc:
++            raise ValueError("invalid binary64 hand transform") from exc
++        if not all(math.isfinite(v) for v in a):
++            raise ValueError("nonfinite binary64 hand transform")
++        # Inclusive, literal source-calibrated prism: no epsilon or learned threshold.
++        if -0.008 <= a[0] <= 0.008 and lower <= a[1] <= upper and -0.0116 <= a[2] <= 0.0044:
++            arrival = j
++            break
++    if arrival is None:
++        return CaptureDwellProposal(None, None, "no_projected_entry")
++    proposal = base_plan.detach().clone()
++    proposal[arrival:8, 10] = 1
++    proposal[arrival + 1:8, 39:45] = 0
++    if _same_native_bytes(proposal, base_plan):
++        return CaptureDwellProposal(None, arrival, "no_native_change")
++    return CaptureDwellProposal(proposal, arrival, "capture_dwell_proposal")
+diff --git a/docs/experiments/n31_capture_dwell_phase_a.md b/docs/experiments/n31_capture_dwell_phase_a.md
+new file mode 100644
+index 0000000..d6e6b7f
+--- /dev/null
++++ b/docs/experiments/n31_capture_dwell_phase_a.md
+@@ -0,0 +1,41 @@
++# N31 pure proposal and future integration contract
++
++Phase A only. Base6292fc8cffad2eec0f789e023d835ad3c1df146a. The pure helper and synthetic tests are implemented; no production import, profile, policy/Main/adapter hook, observer, runner, native auditor or GPU release has been added. Score remains Unknown. Existing source files are unchanged, so default behavior is untouched by this commit; this is not a claim that future integrated parity has been tested.
++
++## Arithmetic and action semantics
++
++`capture_dwell_proposal(base_plan, projected_outcomes, *, target, hand_quaternion_xyzw, gripper_qpos, target_recognized)` consumes the exact native64×128 archive plan and its original canonical8×3 outcome positions, native FP32/BF16 with matching dtype. Geometry snapshots are finite floating tensors converted to CPU binary64; no projection is recomputed. Normalize the observed xyzw quaternion and use its local-to-world rotation R. For each outcome j0…7 compute a=Rᵀ(target−projected_outcome[j]); the first inclusive hit is x∈[−.008,.008], z∈[−.0116,.0044], y∈[q2+.0005,q1−.0005]. No epsilon, duration parameter, surrogate score or fitted threshold is present.
++
++Clone the base. Write native gripper10=+1 at j…7; write native39…44=+0 at j+1…7. Preserve the arrival pose increment itself, earlier actions, time8…63 and every other field, including signed zeros outside edited entries. Return a candidate only if native bytes differ. Otherwise return None with an explicit reason; do not replace ordinary offspring slot15. The helper never chooses that slot itself or forces retention/execution.
++
++Missing target/proprioception, unrecognized target, negative jaw gap, no hit and no changed native content are explicit skips. Supplied malformed tensor shapes/dtypes or nonfinite values raise ValueError rather than inventing input. A recognized, complete context must also have a finite nonzero binary64 quaternion norm; nonfinite derived displacement/transform is rejected. The future caller must bind provenance and action mask, not treat this pure helper as an admission validator.
++
++Zero pose increments mean approximate dwell, not absolute physical pose locking: root's current robosuite source review finds zero rotation preserves the prior goal orientation, while zero translation sets the current measured position as goal. +1 is a repeated close command; PandaGripper applies finite-speed incremental closure, not instantaneous closure. These are interpretation limits, not changes to the specified native assignments.
++
++The source-calibrated interval does not establish that the keypoint is an object center, that a raw canonical path is executable, that future hand orientation/aperture stays fixed, or that contact/capture occurs. At j7 only one close command is changed. A useful approach can be inhibited or a wrong snapshot can trigger a harmful dwell. No activity-count, smaller-motion or proxy-geometry gate replaces task outcomes.
++
++## Concrete production interface gap and minimal future placement
++
++The current outer call `rdt_policy_steer.py:6300–6316` returns an already scored offspring batch. Mutating after it would either leave stale quality or require another score and therefore violates the protocol. This cannot be implemented by an outer assignment alone.
++
++A future explicit opt-in pre-score proposal hook can preserve the frozen computation: the normal RBF rollout completes its denoiser/diversity/mask first; apply the prepared single candidate to row15 immediately before its existing score at4104–4111, and before binding final_population/rollout_final trace at4103/4156. The ordinary baseline/no-active-RBF path also scores internally at3749–3756, so the same narrow opt-in must reach that path and any existing fallback. Do not route into a different denoising algorithm to avoid that hook. All normal model and random operations still process all16 ordinary rows; only after them is row15 substituted. Initial16 at5320–5336 remains untouched. The no-survivor Q0 path reuses the returned rollout score at6478–6485; do not add full_population_rescore or accidentally duplicate auxiliary diagnostic scores.
++
++Prepare the candidate from the archive-global-best identity before each iteration, before that iteration's archive update. `qd_ed.py:648–655` defines the winner ordering; update stores its native action, source_iter and insert_sequence at603–614. Preserve normal parent allocation, ten renoise/rollout calls, descriptor/quality/archives/final selection. Replacing one slot changes the scientific candidate batch intentionally; it does not claim equal arithmetic or equal wall time. Primary176/11 and the existing Q0 auxiliary scoring/model/RBF schedule must remain unchanged, with zero added model/provider/RBF/random calls. Full production-cost equivalence is a later integration test obligation, not proved by these pure tests.
++
++## Current-decision cache and raw observation contract
++
++`_score_particles` already computes full_trajs at1919–1925 and records them at1928–1930. A future passive return/cache of that same object or an exact detached copy may capture first8 outcomes without a second projection or origin query. It must work with the recorder disabled; never read a debug artifact back into policy. Cache only canonical_initial(-1) and ten canonical_offspring calls, not auxiliary pretest or changed future rows. Keys must bind native dtype/shape/content, canonical occurrence, source iteration, current decision, provider/target and origin. At most176 canonical entries per decision are needed; discard the cache on new decision, target/provider/Stage/reset/episode. If same content has multiple occurrences, use archive provenance or demand agreeing stored projection/quality/origin; never choose a favorable occurrence.
++
++The caller must supply raw pre-decision quat/qpos and target snapshot from Main's already available observation/tracker data. Current N30 bridge atMain1645–1651/1831–1849 is an example of cached observation transport only; N31 requires its own opt-in packet with quat/qpos and does not enable N30 continuation. `LiberoAdapter.get_obs()` at1787–1791 returns _last_obs. **Do not use `_get_raw_obs()` at1141–1149: it performs an extra zero-action env.step.** No model, simulator, pose query, tracker generation change or observation acquisition is added. The existing N30 packet is insufficient as-is because it transports EEF position, not the required quat/qpos.
++
++The raw canonical projection originates from controller.ee_pos, whereas Main's observed position is grip_site. Keep source_origin, cast_origin and observed pose separately identified. No equality or physical-prediction claim may be silently imposed. Frozen geometry combines the original canonical positions with the current observed hand frame/aperture.
++
++## Minimal future passive evidence
++
++For each of10 proposal opportunities, record current decision/iteration, frozen archive-best source identity (cell/source_iter/insert_sequence/native fingerprint and matching canonical score/projection ref), snapshot identity, result reason/j, slot15, and native candidate identity if changed. An active event must bind original unmodified post-rollout row15, the new candidate, the actual scored batch and score reference. The other15 rows, initial population, tail/inactive fields and model/RNG call counts need independent full-path evidence. Label this a constructed capture-dwell proposal, not a model-output or exact survivor. Final selected_source strings alone do not establish survival; follow native content and occurrence identities. Record CPU copy/cache/observer overhead separately. Arithmetic and decisions must be identical with observer on/off. No such production observer is implemented in Phase A.
++
++## CPU evidence and remaining work
++
++37 distinct focused synthetic cases cover earliest/interior/last hit, exact face inclusion and one-binary64-value exclusion, rotated/scaled quaternion, negative/zero jaw gap, missing/unrecognized/no-hit, native no-change and signed-zero change, exact untouched prefix/tail/inactive fields, FP32/BF16, noncontiguous views, malformed/nonfinite input and unchanged CPU RNG. They do not run a model, scorer, environment or historical input. First invocation assertions passed but isolation failed on two blocked pycache read probes; the original log is retained. An owned empty pycache prefix fixed only the test loader boundary; the final invocation passed with zero denied accesses. No numerical helper adjustment was made to obtain those passes.
++
++Root review and a separately authorized production phase are still required for hook/capture/cache/native audit/config composition/default parity/full real call-chain tests and concrete budget/Dev release. No new hypothesis or protected evaluation is authorized by this helper commit.
+diff --git a/docs/experiments/n31_capture_dwell_phase_a_protocol.md b/docs/experiments/n31_capture_dwell_phase_a_protocol.md
+new file mode 100644
+index 0000000..6a7fc18
+--- /dev/null
++++ b/docs/experiments/n31_capture_dwell_phase_a_protocol.md
+@@ -0,0 +1,65 @@
++# N31 — capture-dwell competing proposal: hypothesis and CPU phase A
++
++Status: prospective algorithm hypothesis; CPU-only phase A. No GPU, new historical measurement, validation, formal, provider/API, training or budget expansion is authorized by this document.
++
++## Evidence and ideation gate
++
++TreeView constraints was read after the N30 pool closure and before this nomination, followed by Arbor ideation instructions. The original Goal remains NOT_MET.
++
++PROBE BLOCK
++Q1 First principles: wrong temporal action-space/completion assumption. Evidence 1: N30 task0 decision16 selected row9 is at point-prism distance0 at projected outcome1, then outside at outcomes2..8 despite eight close commands (accepted pool result SHA6f6ca60ea332919099b09886be750aa339aacf2f3c7a4f8dbbbedb1a82ee26b6). Evidence 2: accepted actual handoff H shows this guided prefix withdraws while measured fingers are still closing; fixed video has no sustained visible carry. Evidence 3: task1 decision16 all16 final archive proposals have no close command in first8; earlier search modes remain Unknown.
++Q2 Hidden assumption: a policy/QD proposal that briefly approaches a recognized point already contains a temporally usable closure sequence. Dropping it allows a structured competing completion proposal rather than only scalar reranking.
++Q3 Elephant: neither approximate point inclusion nor commanded closure establishes physical capture. Controller lag, arbitrary keypoint, future wrist/jaw geometry and contact remain uncertain; external Stage is frozen. We must test actual outcomes and preserve failures.
++Q4 Hamming: yes, temporal coordination directly addresses observed retreat during closure and missing close-mode choices. It is a plausible experiment, not an established cause or predicted success.
++
++All four idea moves:
++- Assumption inversion: construct a capture-dwell alternative within the existing candidate budget instead of assuming sampling already produced one.
++- Backward from success: a successful grasp needs useful pose persistence during actuation before later transport. No hidden grasp label is added.
++- Analogical transfer: an option/completion operator in sampling-based control supplies a structured short action alternative that still competes with model proposals.
++- Failure reverse engineering: task0 suggests avoiding immediate retreat during closure; task1 suggests supplying coordinated close actions when the final archive lacks them. One operator addresses both at predicted arrival.
++
++Other candidates considered and declined: minimum-point-prism reranking (directly unsupported by the closed pool screen); another positive-gripper/lift scalar bonus (too close to N18–N22 without new support); online fitted dynamics/scorer (new fitting assumptions and scope, and N3 already shows geometric prediction improvement alone is insufficient). No literature algorithm is represented as implemented.
++
++Five-field declaration:
++1. Assumption challenged: transient geometric approach in current candidates suffices for temporal grasp completion.
++2. Mechanism class: structured proposal construction at the QD–ED interface, a control/action-space intervention.
++3. Mechanism + hypothesis: a competing capture-dwell completion of the current archive best may keep a promising approach pose available during commanded closure; success means a valid prospective matched Dev task gain and then the original validation/formal gates, not proposal count.
++4. Orthogonality: N22 shapes scores of existing close/lift proposals; N24 retains existing closed content; N30 carries a previous-chunk tail; N31 synthesizes a within-current-search temporally altered pose/close proposal. It changes neither descriptor nor quality.
++5. Conflicts: N9's sweep penalty and N23–N29's projection/diversity revisions had weak outcomes. N31 does not claim that better proxy ranking or smaller RBF updates solves capture. Approximate arrival remains a material risk.
++
++Self-check: this is an explicit sequence-construction operator, not a scalar knob, prompt edit, larger search, old rerank or mandatory action override. One candidate only; no parameter sweep.
++
++## Frozen algorithm intent
++
++Base is original Q0, with all N4–N30 scientific toggles off. RDT checkpoint, Stage/cache/perception/prompt, external reward, quality semantics, descriptor, archive update/parents/final archive_global_best, 16 population, 10 iterations, execution8/20Hz/720 and task conditions remain baseline-identical.
++
++Initial16 fresh candidates are unchanged. For each of the10 subsequent canonical offspring batches:
++1. Before the iteration, bind the current archive-global-best clean native (64,128) plan and the original recorded/cached canonical first8 projection from the same current decision/provider/target. Use its actual archive identity and canonical source; do not choose a new base from future outcomes or unscored model rows.
++2. With the decision's currently observed right_hand xyzw rotation and measured gripper qpos held fixed, evaluate that base's original projected outcome positions1..8 against the previously source-calibrated point prism. Geometry uses CPU binary64 normalized rotation, x in[-.008,.008], z in[-.0116,.0044], y between q2+.0005 and q1-.0005, in meters. The current recognized target snapshot is used. This is an approximate point test, not an object/grasp predicate.
++3. Let j in0..7 be the earliest projected outcome inside the inclusive prism (distance exactly0 under the declared arithmetic). If no hit, negative inner gap, unrecognized provider/target, or unavailable valid current proprioception, leave the ordinary offspring unchanged with a reason; malformed/nonfinite data follows an explicit fail-closed contract, never silent fabricated input.
++4. Copy that base native plan. Preserve all entries before j. Set native gripper index10 to +1 for j..7. Set native translation/rotation indices39..44 to0 for j+1..7, preserving the arrival command at j. Preserve indices8..63 in time and all other native fields/mask. No change to actual executor, per-action timing or environment interface.
++5. If this creates different native content, substitute it into the fixed final offspring slot15 only AFTER the ordinary model rollout/diversity updates and BEFORE that batch's one canonical score. Other15 offspring, all model calls and random draws are unchanged. If no changed proposal exists, retain ordinary slot15.
++6. Score the resulting16 once using original Q0 quality and normal archive/parent/final selection. No forced retention, favorable tie rule or mandatory execution is added. This proposal can lose. It is available to later QD/ED evolution if naturally retained.
++
++One operator coordinates pose persistence and gripper closure. It is not two independently tuned modifications. No fitted duration: it uses the remaining part of the existing8-action chunk. No new distance threshold: the physical-source prism defines the geometric trigger. Fixed observed geometry deliberately does not forecast future jaw/wrist dynamics. The raw canonical trajectory remains controller-origin projection; do not call it realized motion.
++
++Preferred cache contract: capture/reuse each canonical batch's already computed original projected_xyz with exact native identity, bounded to the current decision. Do not add scorer, model, provider, RBF or simulator calls. Extra geometry/CPU copying and cache/observer overhead are separately counted. Never borrow a future projection or a previous episode/target. If the existing pipeline cannot support this placement without changing the frozen computation, document the concrete conflict before implementing a different algorithm.
++
++## CPU phase A authorized now
++
++Existing separated executor /root/n22_cpu_executor only. Create an isolated implementation worktree under this variant at implementation, branch codex/n31-capture-dwell, based on source6292fc8cffad2eec0f789e023d835ad3c1df146a. Preserve the owned study worktree and all its dirty/untracked files. No second experiment directory outside the unified umbrella.
++
++Implement the pure proposal helper and focused synthetic tests in that isolated worktree. Inspect production integration sites statically and write a precise integration/cache/observer contract; production hookup and GPU are a later stage after root review. Use only needed source and already accepted result/contracts; no new tensor/video/benchmark-data reads and no additional numerical analysis of exposed episodes.
++
++A bounded CPU test pass may cover earliest/last/no geometric entry, no-change proposal, open/close native signs, changed suffix vs untouched prefix/tail/inactive dimensions, empty/invalid geometry handling, source/dtype preservation, and no extra random draw. Tests must verify action semantics and failure handling rather than mirror implementation. CUDA hidden,2threads/affinity0,1, hard CPU600s and external wall900s for the synthetic suite. Ordinary static preparation separately meter/disclose. No model/scorer/environment import, network/API, simulator, CUDA work or training.
++
++Deliver module/tests, passing test receipt or preserved errors, exact changed-file manifest and commit, source-placement contract with lines, side effects/limitations, and a frozen CPU handoff report. Root owns study/tree/budget/controller state; executor must not edit those. Do not silently redesign the operator after a failed test; fix implementation errors within this protocol.
++
++## Prospective GPU comparison, not released
++
++Preferred Dev is a predeclared complete10-task exposed map, same-round C0/Q0/N31,30 cells in full task blocks. Candidate gate >=5/10 and >=both controls; mathematical futility may stop only after a full task block when successes+unrun<5. This is a new candidate protocol; it does not reopen or relax N30's closed3/4 gate. Valid failures are never rerun. Record every task, gain/loss, invalid, call/compute count and actual proposal/selection traces. No arbitrary activity-count veto; genuine QD/ED activity remains required.
++
++Current state has only2 baseline and8 development slots remaining. Full30-cell plan needs10 baseline+20 development, hence8 additional baseline+12 development slots before release. The100GPUh hard cap and protected reserves remain unchanged; no revision is adopted here. A finite budget request must be concrete and audited before any expanded spending. The pending week-wide224GPUh/1800attempt proposal is not approved.
++
++If subsequently released, protect full original validation20 per arm (candidate>=10 and>=C0/Q0), historical formal10 (candidate>=5 and>=controls), substantive QD/ED and compute-matched removal/replacement evidence. CPU success or exposed-Dev improvement never marks the Goal complete.
++
+diff --git a/tests/test_qd_capture_dwell_proposal.py b/tests/test_qd_capture_dwell_proposal.py
+new file mode 100644
+index 0000000..d49e750
+--- /dev/null
++++ b/tests/test_qd_capture_dwell_proposal.py
+@@ -0,0 +1,172 @@
++"""Synthetic action semantics for the pure N31 helper; no production imports."""
++import importlib.util
++from pathlib import Path
++import sys
++
++import pytest
++import torch
++
++PATH = Path(__file__).resolve().parents[1] / "core/qd_capture_dwell_proposal.py"
++SPEC = importlib.util.spec_from_file_location("n31_pure_helper", PATH)
++h = importlib.util.module_from_spec(SPEC)
++sys.modules[SPEC.name] = h
++SPEC.loader.exec_module(h)
++
++
++def raw(x):
++    return x.detach().contiguous().reshape(-1).view(torch.uint8).numpy().tobytes()
++
++
++def inputs(dtype=torch.float32, arrival=0):
++    # Deliberately nonzero values in inactive native fields make accidental masking visible.
++    base = (torch.arange(64*128).reshape(64, 128) % 23 - 11).to(dtype)
++    projected = torch.ones(8, 3, dtype=dtype)
++    if arrival is not None:
++        projected[arrival:] = 0
++    kw = dict(target=torch.zeros(3, dtype=torch.float64),
++              hand_quaternion_xyzw=torch.tensor([0., 0., 0., 1.], dtype=torch.float64),
++              gripper_qpos=torch.tensor([.02, -.02], dtype=torch.float64),
++              target_recognized=True)
++    return base, projected, kw
++
++
++@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
++@pytest.mark.parametrize("arrival", [0, 3, 7])
++def test_exact_arrival_prefix_tail_and_only_prescribed_fields(dtype, arrival):
++    base, projected, kw = inputs(dtype, arrival)
++    before, projection_before = raw(base), raw(projected)
++    result = h.capture_dwell_proposal(base, projected, **kw)
++    out = result.candidate
++    assert result.changed and result.arrival_index == arrival
++    assert out.dtype == base.dtype and out.device == base.device and out.shape == base.shape
++    assert raw(base) == before and raw(projected) == projection_before
++    assert out.data_ptr() != base.data_ptr()
++    assert raw(out[:arrival]) == raw(base[:arrival])
++    assert raw(out[8:]) == raw(base[8:])
++    assert raw(out[arrival, 39:45]) == raw(base[arrival, 39:45])  # Arrival command survives.
++    assert torch.equal(out[arrival:8, 10], torch.ones(8-arrival, dtype=dtype))
++    assert raw(out[arrival+1:8, 39:45]) == raw(torch.zeros_like(out[arrival+1:8, 39:45]))
++    inactive = [k for k in range(128) if k not in [10,39,40,41,42,43,44]]
++    assert raw(out[:, inactive]) == raw(base[:, inactive])
++
++
++def test_earliest_inclusive_entry_and_leave_later_reentry_unexamined():
++    base, xyz, kw = inputs(arrival=None)
++    xyz[2] = 0
++    xyz[5] = 0
++    assert h.capture_dwell_proposal(base, xyz, **kw).arrival_index == 2
++
++
++@pytest.mark.parametrize("axis,coordinate", [(0,-.008),(0,.008),(2,-.0116),(2,.0044),(1,-.0195),(1,.0195)])
++def test_binary64_exact_inclusive_faces_without_tolerance(axis, coordinate):
++    base, xyz, kw = inputs(arrival=None)
++    xyz[0] = 0
++    kw['target'][axis] = coordinate
++    assert h.capture_dwell_proposal(base, xyz, **kw).arrival_index == 0
++    # Move only the target one binary64 representable value beyond that face.
++    direction = float('inf') if coordinate > 0 else -float('inf')
++    kw['target'][axis] = torch.nextafter(kw['target'][axis], torch.tensor(direction, dtype=torch.float64))
++    assert h.capture_dwell_proposal(base, xyz, **kw).reason == 'no_projected_entry'
++
++
++def test_hand_frame_not_world_frame_and_quaternion_scale_invariance():
++    base, xyz, kw = inputs()
++    kw['target'] = torch.tensor([.015, 0., 0.], dtype=torch.float64)
++    assert h.capture_dwell_proposal(base, xyz, **kw).reason == 'no_projected_entry'
++    # Quarter turn maps the wide jaw axis to world x; no predicted wrist rotation.
++    kw['hand_quaternion_xyzw'] = torch.tensor([0., 0., 1., 1.], dtype=torch.float64)
++    rotated = h.capture_dwell_proposal(base, xyz, **kw)
++    kw['hand_quaternion_xyzw'] *= 2
++    scaled = h.capture_dwell_proposal(base, xyz, **kw)
++    assert rotated.arrival_index == scaled.arrival_index == 0
++    assert raw(rotated.candidate) == raw(scaled.candidate)
++
++
++@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
++def test_zero_gap_is_not_negative_gap(dtype):
++    base, xyz, kw = inputs(dtype)
++    kw['gripper_qpos'] = torch.tensor([.0005, -.0005], dtype=torch.float64)
++    assert h.capture_dwell_proposal(base, xyz, **kw).changed
++    kw['gripper_qpos'] = torch.zeros(2, dtype=torch.float64)
++    assert h.capture_dwell_proposal(base, xyz, **kw).reason == 'empty_inner_gap'
++
++
++@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
++def test_no_change_zero_native_sign_and_last_arrival(dtype):
++    base, xyz, kw = inputs(dtype, 7)
++    base[7, 10] = 1
++    same = h.capture_dwell_proposal(base, xyz, **kw)
++    assert not same.changed and same.arrival_index == 7 and same.reason == 'no_native_change'
++    base[7, 10] = -0.0  # Decoder would already close; literal native +1 still changes content.
++    result = h.capture_dwell_proposal(base, xyz, **kw)
++    assert result.changed and result.candidate[7, 10] == 1
++    assert raw(result.candidate[8:]) == raw(base[8:])
++
++
++def test_signed_zero_hold_is_a_native_byte_change():
++    base, xyz, kw = inputs()
++    base[:8, 10] = 1
++    base[1:8, 39:45] = -0.0
++    result = h.capture_dwell_proposal(base, xyz, **kw)
++    assert result.changed and not torch.signbit(result.candidate[1:8, 39:45]).any()
++    assert torch.signbit(base[1:8, 39:45]).all()
++
++
++def test_existing_complete_dwell_is_not_reinjected():
++    base, xyz, kw = inputs()
++    base[:8, 10] = 1
++    base[1:8, 39:45] = 0
++    before = raw(base)
++    result = h.capture_dwell_proposal(base, xyz, **kw)
++    assert result.reason == 'no_native_change' and result.arrival_index == 0
++    assert result.candidate is None and raw(base) == before
++
++
++@pytest.mark.parametrize("missing,reason", [('target','target_unavailable'),('hand_quaternion_xyzw','proprioception_unavailable'),('gripper_qpos','proprioception_unavailable')])
++def test_missing_snapshot_explicitly_skips(missing, reason):
++    base, xyz, kw = inputs();kw[missing] = None
++    result = h.capture_dwell_proposal(base, xyz, **kw)
++    assert result.candidate is None and result.arrival_index is None and result.reason == reason
++
++
++def test_unrecognized_and_no_entry_skip_without_input_mutation():
++    base, xyz, kw = inputs(arrival=None);before=raw(base)
++    assert h.capture_dwell_proposal(base, xyz, **kw).reason == 'no_projected_entry'
++    kw['target_recognized'] = False
++    assert h.capture_dwell_proposal(base, xyz, **kw).reason == 'unrecognized_target'
++    assert raw(base) == before
++
++
++@pytest.mark.parametrize("bad", ['base_shape','projection_shape','projection_dtype','base_int','nan_base','inf_projection','nan_target','zero_quaternion','bad_qpos_shape','nonbool_recognition'])
++def test_malformed_input_raises_without_fallback(bad):
++    base, xyz, kw = inputs()
++    if bad == 'base_shape':base=base[:8]
++    elif bad == 'projection_shape':xyz=xyz[:7]
++    elif bad == 'projection_dtype':xyz=xyz.bfloat16()
++    elif bad == 'base_int':base=base.long()
++    elif bad == 'nan_base':base[63,127]=float('nan')
++    elif bad == 'inf_projection':xyz[7,2]=float('inf')
++    elif bad == 'nan_target':kw['target'][0]=float('nan')
++    elif bad == 'zero_quaternion':kw['hand_quaternion_xyzw'].zero_()
++    elif bad == 'bad_qpos_shape':kw['gripper_qpos']=torch.zeros(3)
++    else:kw['target_recognized']=1
++    with pytest.raises(ValueError):h.capture_dwell_proposal(base, xyz, **kw)
++
++
++@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
++def test_noncontiguous_inputs_native_tail_and_rng_unchanged(dtype):
++    base, xyz, kw = inputs(dtype, 3)
++    storage=torch.empty(128,64,dtype=dtype);view=storage.T;view.copy_(base)
++    pstore=torch.empty(3,8,dtype=dtype);pview=pstore.T;pview.copy_(xyz)
++    before=raw(view);state=torch.random.get_rng_state().clone()
++    result=h.capture_dwell_proposal(view,pview,**kw)
++    assert raw(view)==before and torch.equal(state,torch.random.get_rng_state())
++    assert raw(result.candidate[8:])==raw(view[8:])
++    assert not result.candidate.requires_grad
++
++
++def test_no_parameter_or_hidden_population_selection():
++    # Helper produces one plan only. The future caller must replace slot15, never select a better slot.
++    base, xyz, kw=inputs();result=h.capture_dwell_proposal(base,xyz,**kw)
++    assert result.candidate.shape==(64,128)
++    assert set(result.__dataclass_fields__)=={'candidate','arrival_index','reason'}

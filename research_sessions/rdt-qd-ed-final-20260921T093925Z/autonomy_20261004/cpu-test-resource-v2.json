@@ -1,0 +1,22 @@
+{
+  "schema": "autonomy-driver-cpu-test-resource-v1",
+  "source_hashes": {
+    "driver_v1.py": "068db4dee2132936f06d6ba92a7d5c60a5f813167520da491a2e0514935c431a",
+    "test_driver_v2.py": "19311762f57ef97e0b4a1a3bd2d34893486dbb4a4bcdc86df7691f6955b8fcdc",
+    "run_cpu_tests_v2.py": "9a2b7121177df5af76ecb9e48f2281ea5c1654c3aa4015c6a66be929237c3190"
+  },
+  "exit": 0,
+  "guard_clean": true,
+  "denied": [],
+  "cpu_seconds": 0.48562679500000006,
+  "child_cpu_seconds": 0.045445,
+  "wall_seconds": 0.8320095899980515,
+  "affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "official_cli_calls": 0,
+  "gpu_api_model_sim_calls": 0
+}

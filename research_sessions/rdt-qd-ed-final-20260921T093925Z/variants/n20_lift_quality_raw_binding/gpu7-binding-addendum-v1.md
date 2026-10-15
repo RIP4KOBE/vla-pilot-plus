@@ -1,0 +1,5 @@
+# Conditional N20 GPU7 binding
+
+The user explicitly allowed a move from occupied GPU3 to another idle GPU, and GPU7 was selected and proven for N18/N19. N20 may use only physical GPU7 UUID `GPU-48473162-9548-1a19-04aa-ea86c5349187` with EGL device index 4 and CUDA/EGL proof resource `rdt-qd-ed-final-20260921T093925Z__gpu7_cuda_egl__4fafff3673e5`. Its scientific runtime manifest must be the byte-identical physical file `/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260929/n18-close-then-lift-dev-v1/gpu7-rebind/runtime-manifest.gpu7.frozen.v3.json` bound by SHA in the plan. The resource admission gate must find GPU7 idle immediately before each cell.
+
+This binding applies only to `N20_TERMINAL_RAW_DEV_20260929`, with one exclusive worker and no automatic GPU fallback. It is **conditional on separate approval** of [the N20 budget amendment](../../budget-extension-proposal-20260929-n20.md); the existing GPU-transfer reply does not raise the baseline attempt cap. N18/N19 remain terminal implementation failures in the ledger, and their cells will not be retried.

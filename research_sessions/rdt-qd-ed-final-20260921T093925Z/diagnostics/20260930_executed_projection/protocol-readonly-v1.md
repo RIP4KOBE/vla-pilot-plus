@@ -1,0 +1,9 @@
+# Bounded read-only executed-projection audit
+
+Purpose: while N22 runs unchanged, measure whether the candidate trajectory proxy describes already executed actions. Inputs are only native-audited exposed Dev paths: N17/N7 task0, N17/N7 task9, and N21 task0. No model, provider, GPU, simulator, branch rollout, training or protected-data access. No online method or source modification is authorized by this audit.
+
+Use SHA-verified native bundles. Associate decision-start source EEF origin, policy-decoded eight actions, actual sent actions, and the next decision-start source EEF origin in the same episode/reset. Require exactly eight action returns and next global step=current+8; exclude terminal/reset/nonmatching/incomplete intervals. Never use origins recorded after action execution as the decision-start origin. Report all exclusions.
+
+Compare endpoint Euclidean error for three predetermined analytic forecasts: current 0.01m times raw translation sum; 0.01m times [-1,1]-clipped translation sum; and the installed OSC configuration's translation scale times clipped sum. Also report the actual selected stored native projection where present. The three definitions come from the frozen adapter and installed controller source, not fitting against outcomes. Record source/config hashes. The controller target increment is not a claim of realized EEF displacement: robot dynamics, lag, collisions and clipping may invalidate simple integration. Do not call a scale difference itself a bug.
+
+Report per-path total and guided/unguided chunk errors, command saturation, and full paired records. These correlated paths estimate descriptive projection error only, not unselected-action outcomes, task-success improvement or controller calibration generalization. A subsequent QD mechanism would need a separate prospective hypothesis and protocol and must preserve frozen provider/decoder/Stage.

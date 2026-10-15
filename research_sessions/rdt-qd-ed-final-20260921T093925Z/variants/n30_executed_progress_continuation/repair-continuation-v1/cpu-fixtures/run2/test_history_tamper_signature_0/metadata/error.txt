@@ -1,0 +1,2 @@
+_run_episode
+UnboundLocalError: cannot access local variable 'obs' where it is not associated with a value

@@ -1,0 +1,5 @@
+Committed as `34c6f219af18`. All 180 focused CPU tests passed; worktree is clean.
+
+Wrote `result-v1.json` and `report-v1.md` in `production-adapter-v1/`, including source hashes, commands, log hashes, and remaining prerequisites.
+
+No GPU/provider calls or owning-state mutation. The original draft remains disabled; real root review and release are still required.

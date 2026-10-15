@@ -1,0 +1,22 @@
+{
+  "phase": "PREPARATION_ONLY",
+  "scope_sha256": "1d175453bc3123277ece4b6cea6a21bc2b08dffdc792ca6e570b10236bd9aa7f",
+  "affinity": [
+    0,
+    1
+  ],
+  "thread_environment": 2,
+  "input_read_cpu_seconds": 0.014572123999999999,
+  "initial_scope_read_cpu_seconds": 0.000330526,
+  "syntax_packaging_cpu_seconds_so_far": 0.012791511999999998,
+  "cpu_limit_seconds": 300,
+  "exact_end_to_end_cpu_measured": false,
+  "unmeasured": "Small source-authoring/edit commands and interpreter/shell startup; no tests, subprocess workloads or production imports. Only permitted source/Phase A metadata and own files read.",
+  "payload_read_hash_decode_count": 0,
+  "torch_numpy_production_import_count": 0,
+  "model_api_gpu_simulator_calls": 0,
+  "syntax_parse_count": 1,
+  "failed_execution_invocations": 0,
+  "output_source_bytes": 32681,
+  "execution_released": false
+}

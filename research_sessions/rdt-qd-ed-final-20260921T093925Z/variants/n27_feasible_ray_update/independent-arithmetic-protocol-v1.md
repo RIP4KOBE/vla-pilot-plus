@@ -1,0 +1,13 @@
+# N27 bounded native arithmetic proof, prospective v1
+
+This is CPU preparation only. Root review, exact final-source bridge, finite budget reuse adoption and one-shot release are required before any CUDA work. It does not authorize model, provider, simulator or episode calls.
+
+The single owned GPU7 resource process receives 120 seconds plus 40 seconds cleanup, health-ledger charging from reservation through terminal, no retry. Its source and runtime must equal future N27 screen source and runtime; old proofs are inherited only through the accepted immutable N26 closure. No old proof or controller is rerun.
+
+Fixed matrix: existing six `qd_ed_n26_reference.CASES` × FP32/BF16 × contiguous, transposed and model-like sliced layouts (36 cases). Use the unchanged clean sample projection and native geometry formula, then independently calculate per-particle FP32 ratios and minimum alpha without importing the production feasible-ray helper in the oracle. Native bitwise comparisons use contiguous uint8 views, zero tolerance. Compare source input=model-before, origins, projections, pre/post normalized gradients, unconstrained proposed operand, FP32 alpha and actual assigned after. Preserve exact custom boundary derivative zero, legitimate zero gradients and nonbinding positive infinite ratios. Alpha maximality is only with respect to specified FP32 ratio operations, not exact-real or rounded-ray maximality.
+
+Production tensor route keeps existing projector/origin counts16, schedules, scale20/sign and model no-grad order; no extra forward, score or scheduler call. Directly assign the returned prefix. Verify full tensor tail/nontranslation/gripper and RNG bytes unchanged. Interior geometry parity compares original absolute-RBF gradient; the constrained update need not equal unconstrained legacy addition. Legacy branch is verified separately in CPU actual-call tests.
+
+Negative controls corrupt each native witness arithmetic field and source/signed-zero bindings, wrong/nonfinite inputs and missing/epsilon/v-prediction schedulers. Zero gradient/coincident/all-saturated cases are valid. No activity threshold or performance claim. A failed tensor resource remains charged and blocks this scope; no tolerances may be adjusted to make it pass.
+
+Same-process N27 episode witness audit reuses this independent geometry/ray reference; all other arms retain original profile auditors. The bounded first-guided 11 witnesses are exact arithmetic scope; later all-call scalar consistency is descriptive and not independently replayed. Observed host overhead includes synchronization and scalar serialization, not an isolated CUDA latency measure.

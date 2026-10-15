@@ -1,0 +1,67 @@
+artifacts: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/n23-v2-guarded-fixtures-arithmetic-plumbing-v2/test_one_charge_four_groups_sa1/artifacts
+budget:
+  amendment:
+    physical_gpu: 7
+    proposal_sha256: 6a5704152a2e783b3769648e915e458d4f08e8d75f12bde47a2b95ed1ebdc7ee
+    schema: gpu7-n23-budget-amendment-v2
+  dispatched: 4
+  gpu_hour_reservations:
+    formal: 12.0
+    validation: 32.0
+  gpu_hours_consumed: 0.00828268344420293
+  max_episode_attempts: 478
+  max_gpu_hours: 100.0
+  reserved:
+    baseline: 51
+    development: 187
+    formal: 40
+    recovery: 20
+    validation: 180
+  running: 0
+  aborted: 4
+  valid: 0
+  invalid: 0
+  completed: 0
+gpu_pool:
+- 7
+max_concurrent_gpu_workers: 1
+n23_arithmetic_repair_authority:
+  path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/n23-v2-guarded-fixtures-arithmetic-plumbing-v2/test_one_charge_four_groups_sa1/arithmetic-authority.json
+  sha256: 8f31ea888da3fefa13fb27257df295b75ff53d7cf0bfac3b30975764e9c11e6c
+n23_uuid_native_repair_authority:
+  path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/n23-v2-guarded-fixtures-arithmetic-plumbing-v2/test_one_charge_four_groups_sa1/native-authority.json
+  sha256: aa29678f654b1d85c30638db037f741f0ad30642421c180b6668fde6501c1e27
+n23_uuid_repair_authority:
+  path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/n23-v2-guarded-fixtures-arithmetic-plumbing-v2/test_one_charge_four_groups_sa1/authority.json
+  sha256: dca23c23cec1a7165b31e192d420818276b210bf24335d9fa66f05246a5361d1
+n23_v2_gpu7_binding:
+  addendum_path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/protocol-dev-v2-prospective.md
+  addendum_sha256: 11a311d46f62c809160ba18b7960c6eb36ad612450601b32998a3d6e21f95e0d
+  scope: N23_CLIPPED_QUALITY_DEV_V2_20260930_and_backend_preflight_only
+  selected_gpu: 7
+  user_reply: "\u7EE7\u7EED\u5B8C\u6210\u6EE1\u8DB3\u76EE\u6807\u4E14\u65E0\u9700\u6211\
+    \u4ECB\u5165\u7684autoresearch"
+resource_isolation:
+  private_budget: true
+  status: ACTIVE
+  validation_status: PASS
+run_name: synthetic
+worktree: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/n23-v2-guarded-fixtures-arithmetic-plumbing-v2/test_one_charge_four_groups_sa1
+runner:
+  by_bucket:
+    baseline: 0
+    development: 0
+    validation: 0
+    formal: 0
+    recovery: 4
+  reserved_attempts: 4
+  gpu_hours_by_bucket:
+    baseline: 0.0
+    development: 0.0
+    validation: 0.0
+    formal: 0.0
+    recovery: 0.00828268344420293
+  gpu_healthcheck_hours: 0.0
+  gpu_healthcheck_inflight: 0
+  last_attempt_id: synthetic__n23_backend_arithmetic_repair__d74fce5601ad
+  last_event: aborted

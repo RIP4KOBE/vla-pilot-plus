@@ -1,0 +1,28 @@
+{
+  "schema": "n30-conditional-static-resource-v1",
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "instrumented_read_and_write_process_cpu_seconds": 0.014696794000000003,
+  "unmetered_file_commands": [
+    "initial scope sed",
+    "scope inventory stdlib",
+    "one narrow-pattern rg locator"
+  ],
+  "unique_existing_input_files_excluding_scope": 19,
+  "existing_input_bytes_including_repeats_rg_and_scope": 1922609,
+  "file_limit": 24,
+  "payload_byte_limit": 16777216,
+  "numerical_packages_imported": false,
+  "production_modules_imported": false,
+  "tests_run": 0,
+  "tensor_reads": 0,
+  "gpu_api_model_simulator_calls": 0,
+  "actual_live_attempt_payload_reads": 0,
+  "new_n30_results_read_beyond_allowlist": 0,
+  "algorithm_candidates_nominated": 0,
+  "scope_expansion_used_files": 1,
+  "root_status_message_received": "Task1 C0/Q0 valid failures/3guided noted in message; no additional file read or inference from it; N30 cohort remains live."
+}

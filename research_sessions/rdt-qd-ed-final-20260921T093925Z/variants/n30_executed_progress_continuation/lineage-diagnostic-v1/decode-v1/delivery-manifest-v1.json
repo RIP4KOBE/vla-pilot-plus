@@ -1,0 +1,65 @@
+{
+  "schema": "n30-lineage-decoder-preparation-delivery-v1",
+  "executable": false,
+  "payload_reads": 0,
+  "torch_startups": 0,
+  "syntax_checks": 1,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/command.disabled.v1.json",
+      "sha256": "cd311a975bf613d2754d91b4a5b171360838218cdbefd9f9e8fc9bcb2c4a91af",
+      "bytes": 1800
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/decode_cpu_v1.py",
+      "sha256": "3f6404a29c0108f190a5eb83dffbfb0e42696f1cef1be44d9612c5c4dc99263d",
+      "bytes": 32681
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/decoder-source-manifest-v1.json",
+      "sha256": "7905260c9cac6c2c3fae0814392d33909f30d78fefa724533d598c2cdabc6fe8",
+      "bytes": 4012
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/execution-release.disabled.v1.json",
+      "sha256": "3bd16fb4284c04e56407508569d4a277ef4aa3b4d45b0e101e901e1945dbd12b",
+      "bytes": 2321
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/preparation-inputs-v1.json",
+      "sha256": "f97b98335c34b22c0c001902902d4e136893f23284b8e8550b4eca2aeb0448b2",
+      "bytes": 3000
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/preparation-report-v1.md",
+      "sha256": "74a729b793ff1e9a34d028d21e9241ca6f15de85fb7631e1d932ef7e7381f0e4",
+      "bytes": 3665
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/preparation-resource-v1.json",
+      "sha256": "c62e4c942915da059cf9b4540b338668f40e940e7afb91681a90df8afc673221",
+      "bytes": 861
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/root-decoder-preparation-scope-v1.md",
+      "sha256": "1d175453bc3123277ece4b6cea6a21bc2b08dffdc792ca6e570b10236bd9aa7f",
+      "bytes": 4085
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/root-preparation-registration-v1.json",
+      "sha256": "a54f579076478280e7a5a27fbe9e779f39213ee674832e235e0a3109edcc0d1c",
+      "bytes": 2745
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/root-register-preparation-v1.py",
+      "sha256": "aaa404ab98db1a11644660766c819514f3d86e3871c15d9ab5feaa63322529f7",
+      "bytes": 4341
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/lineage-diagnostic-v1/decode-v1/syntax-review-v1.json",
+      "sha256": "d9f8772069866c3b642792dd330996fa6843c5bc136b93c42284b78f217724a9",
+      "bytes": 559
+    }
+  ],
+  "closure_cpu_seconds_before_write": 0.0006632249999999999
+}

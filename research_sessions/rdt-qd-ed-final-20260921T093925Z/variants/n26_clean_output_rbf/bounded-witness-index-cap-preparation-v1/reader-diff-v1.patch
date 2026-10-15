@@ -1,0 +1,29 @@
+--- accepted/witness_reader_v1.py
++++ index-cap/witness_reader_v1.py
+@@ -19,7 +19,7 @@
+         'update_operand','model_output_before','model_output_after'}
+ SLOTS=[['initial',-1]]+[['rollout',i] for i in range(10)]
+ MiB=1024**2
+-CAPS={'metadata_files':66,'metadata_file':16*MiB,'metadata_total':128*MiB,
++CAPS={'metadata_files':66,'metadata_file':16*MiB,'index_file':20*MiB,'metadata_total':128*MiB,
+       'bundles':40,'bundles_per_attempt':2,'bundle_file':64*MiB,'bundle_total':1024*MiB,
+       'zip_entries':8192,'pickle_bytes':8*MiB,'uncompressed_file':128*MiB,'uncompressed_total':2048*MiB,
+       'storage_file':128*MiB,'storage_total':2048*MiB,'nodes':500000,'depth':64,'events':20000,'output':16*MiB}
+@@ -84,7 +84,7 @@
+                  and integer(row['bytes']),'inventory hash/size')
+             key=str(p.resolve());need(key not in self.rows,'duplicate/aliased inventory path')
+             need(str(p)==key,'noncanonical/symlink input path')
+-            need(row['bytes']<=CAPS['bundle_file' if role=='bundle' else 'metadata_file'],'per-file cap')
++            need(row['bytes']<=CAPS['bundle_file' if role=='bundle' else 'index_file' if role=='index' else 'metadata_file'],'per-file cap')
+             self.rows[key]=dict(row);counts[role]+=1;sizes['bundle' if role=='bundle' else 'metadata']+=row['bytes']
+         need(all(counts[k]==1 for k in CONTROLS),'exact five control JSONs')
+         need(sum(counts.values())-counts['bundle']<=65 and counts['bundle']<=CAPS['bundles'],'file ceilings')
+@@ -97,7 +97,7 @@
+         row=self.rows[key];need(row['role']==role and row['sha256']==ref['sha256'],'reference role/hash')
+         need(role!='bundle' or key not in self.cache,'container second read forbidden')
+         if key not in self.cache:
+-            cap=CAPS['bundle_file' if role=='bundle' else 'metadata_file']
++            cap=CAPS['bundle_file' if role=='bundle' else 'index_file' if role=='index' else 'metadata_file']
+             if self.loader is None:
+                 p=Path(row['path']);need(p.is_file() and not p.is_symlink() and p.stat().st_size==row['bytes'],'input file changed/missing/linked')
+                 with p.open('rb') as f:b=f.read(min(cap,row['bytes'])+1)

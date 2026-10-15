@@ -1,0 +1,32 @@
+{
+  "schema": "n31-phase-b-reverse-v1",
+  "base_commit": "d6de4b4fecc2784d1f7a6b4d4b93d451b09a79d0",
+  "final_commit": "ae5ecf82ccbfd8f904a655ea78f75d433e8a5c77",
+  "patch": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/phase-b-source.diff",
+    "sha256": "5b3dda1e3406b508e253cc818e1e4bc46b49fed1c7cdb9fc6c876f84c52c0d28",
+    "bytes": 283869
+  },
+  "reverse_check": {
+    "argv": [
+      "git",
+      "-C",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/implementation",
+      "apply",
+      "--reverse",
+      "--check",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/phase-b-source.diff"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "source_modified": false,
+  "meaning": "Read-only Git reverse applicability check; file hashes/Git blob equality are independently listed in source manifest. No worktree reverse applied.",
+  "diff_whitespace_check": {
+    "exit_code": 2,
+    "stdout": "core/qd_capture_dwell.py:299: new blank line at EOF.\ndocs/experiments/n31_phase_b_integration.md:34: new blank line at EOF.\n",
+    "stderr": ""
+  },
+  "whitespace_disposition": "Two blank EOF line warnings retained to preserve tested bytes; no semantic defect identified."
+}

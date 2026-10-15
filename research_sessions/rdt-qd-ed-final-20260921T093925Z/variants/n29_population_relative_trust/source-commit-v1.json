@@ -1,0 +1,81 @@
+[
+  {
+    "command": [
+      "git",
+      "-C",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/implementation",
+      "diff",
+      "--exit-code",
+      "52b9eb0a8a365ee2ea12daffdb7a98c76bec0a72"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/implementation",
+      "add",
+      "-f",
+      "--",
+      "core/qd_population_relative_trust.py",
+      "tests/test_qd_population_relative_trust.py",
+      "docs/experiments/n29-population-relative-trust-native-arithmetic-v1.md"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/implementation",
+      "diff",
+      "--cached",
+      "--stat"
+    ],
+    "exit_code": 0,
+    "stdout": " core/qd_population_relative_trust.py               |  97 ++++++++++\n ...pulation-relative-trust-native-arithmetic-v1.md |  63 +++++++\n tests/test_qd_population_relative_trust.py         | 210 +++++++++++++++++++++\n 3 files changed, 370 insertions(+)\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/implementation",
+      "commit",
+      "-m",
+      "Add N29 population-relative trust distance pure helper and CPU evidence"
+    ],
+    "exit_code": 0,
+    "stdout": "[codex/n29-population-relative-trust-20261001 427b987] Add N29 population-relative trust distance pure helper and CPU evidence\n 3 files changed, 370 insertions(+)\n create mode 100644 core/qd_population_relative_trust.py\n create mode 100644 docs/experiments/n29-population-relative-trust-native-arithmetic-v1.md\n create mode 100644 tests/test_qd_population_relative_trust.py\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/implementation",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout": "427b98703938f4e2a14ff810ff56ed5b7bcbd715\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/implementation",
+      "status",
+      "--short"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,7 @@
+# N18 Dev GPU7 run start
+
+The user explicitly allowed another idle GPU for this round after GPU3 became occupied. The original GPU3 watcher was stopped. GPU7 UUID `GPU-48473162-9548-1a19-04aa-ea86c5349187`, EGL device 4 and the reusable native proof were verified. The accepted v4 hardware-only plan is `plan.frozen.v4.gpu7.json` SHA-256 `6110ef27d8e18610a264f120422b2563d727ea862f8b115341b8511c7b29cd7e`, source commit `5e2b668d3304e3b3d2f51441fec6610dfddb9b50`, and release `execution-release.v3.gpu7.json` SHA-256 `74ac358ef0ad12abb857529c296363ffc30bbd9c8bf87d13ddb5a2151480f8a8`.
+
+The first C0 task0 attempt `rdt-qd-ed-final-20260921T093925Z__n18_dev_t00_c0_20260929__007f4c1766ec` was dispatched on physical GPU7; its child PID was 977994 at the initial observation. This is the first N18 cohort dispatch after three preserved no-dispatch prelaunch failures. The supervisor status is available through `artifacts/continuation_20260929/n18-close-then-lift-dev-v1/supervisor-status-gpu7-v4.json`; a `started` status is not an experimental result. All 12 cells remain subject to native-evidence and protected-budget gates, and validation/formal remain closed.
+
+First audited cell: C0 task0 completed valid and failed the task-success predicate after 720 actions, GPU process wall time 933.5093 s. The same-task Q0 cell `rdt-qd-ed-final-20260921T093925Z__n18_dev_t00_q0_20260929__f8f017abfdae` was then dispatched on GPU7. No N18 candidate cell has run yet.

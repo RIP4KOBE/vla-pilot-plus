@@ -1,0 +1,132 @@
+{
+  "base_commit": "d855cfd690482e018bb40ce98edec80fad9700e0",
+  "base_tree": "788ed6cb765ddffb7f9045d1b8c11b589d67b583",
+  "commit": "9029b384a34343efd73b4ea02184d83c5e52de61",
+  "files": [
+    {
+      "bytes": 6751,
+      "path": "configs/config.yaml",
+      "sha256": "0acd3900021b9e2b12b018c7a2f5a3847e4e88f39726a51c1b5390a23c8b01ef",
+      "status": "M"
+    },
+    {
+      "bytes": 3455,
+      "path": "configs/qd_ed_final/candidate_n30.json",
+      "sha256": "a9412f37934a5e208123f139d32d3fb26e88c08451b038bdac2f808e0e9098b6",
+      "status": "A"
+    },
+    {
+      "bytes": 56700,
+      "path": "configs/qd_ed_final/n4_observed_baseline_profiles.json",
+      "sha256": "9ad91066bc0cf91bc8c79d9b02acbd4b83e5e5a45ae31072b0e92d2221baa54f",
+      "status": "unchanged_dependency"
+    },
+    {
+      "bytes": 16241,
+      "path": "core/decision_evidence.py",
+      "sha256": "899659e6060822e6abf31c25ca3624066633527beb20a5883560a64ee29e2295",
+      "status": "unchanged_dependency"
+    },
+    {
+      "bytes": 37806,
+      "path": "core/eds_eval_metrics.py",
+      "sha256": "59b51b4a14d4f9bbdc3992173f96fd35508202e0349c50fdc08b94dcd74b8a13",
+      "status": "M"
+    },
+    {
+      "bytes": 24129,
+      "path": "core/eds_mechanism_trace.py",
+      "sha256": "312087f5c354f81a820f2acb8419c6380e96805de79f1789c5c7ff23a8fcabf3",
+      "status": "unchanged_dependency"
+    },
+    {
+      "bytes": 11249,
+      "path": "core/keypoint_tracker.py",
+      "sha256": "7925b62d8c6404c250ccdba6ae0df12df79dd23db1f308112b7b3f22e1a22190",
+      "status": "unchanged_dependency"
+    },
+    {
+      "bytes": 46573,
+      "path": "core/qd_ed.py",
+      "sha256": "63dfbbba835378e1936ae133221b42c2154b8496c4a9d5b02da97135f3609c89",
+      "status": "unchanged_dependency"
+    },
+    {
+      "bytes": 11200,
+      "path": "core/qd_executed_progress.py",
+      "sha256": "8868bd68144c68a955b5512f5bf8e58b7ecf428ab6610c3639796148413aa75f",
+      "status": "A"
+    },
+    {
+      "bytes": 10250,
+      "path": "core/qd_executed_quality.py",
+      "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b",
+      "status": "unchanged_dependency"
+    },
+    {
+      "bytes": 2380,
+      "path": "core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+      "status": "unchanged_dependency"
+    },
+    {
+      "bytes": 415679,
+      "path": "core/rdt_policy_steer.py",
+      "sha256": "ff1bbe63347853082de8b67f875f2706503f568aa453fc6cd105c51af159ad5e",
+      "status": "M"
+    },
+    {
+      "bytes": 1749,
+      "path": "docs/experiments/n30/compute-interpretation-v1.md",
+      "sha256": "76aa0d72de0f29cea7183837205310a037ed6bfacd3ca35038b4ea0cf939fa8d",
+      "status": "A"
+    },
+    {
+      "bytes": 10500,
+      "path": "docs/experiments/n30/hypothesis-and-protocol-v1.md",
+      "sha256": "af9dfc9810c2535d428c7003d48d666eac69d02d858578da5f8c8309335c0c0e",
+      "status": "A"
+    },
+    {
+      "bytes": 4614,
+      "path": "docs/experiments/n30/interface-and-arithmetic-v1.md",
+      "sha256": "31283d3e163a27c9f879ac986daf2a38665f5f8cad37e4f0bc23a2c23e22e42a",
+      "status": "A"
+    },
+    {
+      "bytes": 108644,
+      "path": "main.py",
+      "sha256": "866e8a7c3debabe4e0c135d88e2138f2359132c803d2fd88c3a20665aed8b2f4",
+      "status": "M"
+    },
+    {
+      "bytes": 181740,
+      "path": "tests/n30_original_control_functions.json",
+      "sha256": "c4ad5bf7de888ee151820389c323ae3156f4d91711c6838ce90982847ecf48b9",
+      "status": "A"
+    },
+    {
+      "bytes": 19499,
+      "path": "tests/test_n30_executed_progress.py",
+      "sha256": "f750e30d67eb674ec4f4d91d259692117cf8a4638ca3031b9104d0104d8511ed",
+      "status": "A"
+    },
+    {
+      "bytes": 422556,
+      "path": "tests/test_rdt_steer.py",
+      "sha256": "1f16056a9ada4715a2c86c64ddc59324f85f09fb9890e4f0e530e488d1ae6df4",
+      "status": "unchanged_dependency"
+    }
+  ],
+  "only_modified_existing_files": [
+    "configs/config.yaml",
+    "core/eds_eval_metrics.py",
+    "core/rdt_policy_steer.py",
+    "main.py"
+  ],
+  "schema": "n30-phase-a-source-delta-v1",
+  "scope": "all changed/additional files plus eight direct unchanged source dependencies; all remaining repository content inherits pinned base Git tree, not a separately rebuilt online code_files manifest",
+  "sha256": "b4dc6e0cb7ecc0409a768a089f49edb6d9143f29f5839f73c70fb09b713c6cfe",
+  "tree": "ed1345e6161ef2039f90e2ad786342fbdadf79eb",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation"
+}

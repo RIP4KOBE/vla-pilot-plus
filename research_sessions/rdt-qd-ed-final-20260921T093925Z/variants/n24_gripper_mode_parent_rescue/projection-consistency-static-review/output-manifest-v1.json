@@ -1,0 +1,26 @@
+{
+  "schema": "n24-projection-consistency-static-delivery-v1",
+  "scope_closed": true,
+  "source_commit": "3b7afa02757eb3519d95547e4b6e6e939f7068f2",
+  "new_payload_reads": 0,
+  "runtime_imports": 0,
+  "tests": 0,
+  "algorithm_changed": false,
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/projection-consistency-static-review/read-scope-v1.json",
+      "sha256": "1960f2a4347f9a302563b7ef09613e7be41f9d19d08c28f6fd2a61141a2d4db2",
+      "bytes": 3464
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/projection-consistency-static-review/static-result-v1.json",
+      "sha256": "c7d00bdf562d6a7229cbb998c13a5603b45d8ea65be330476965f06e06d8f4cf",
+      "bytes": 8552
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n24_gripper_mode_parent_rescue/projection-consistency-static-review/report-v1.md",
+      "sha256": "b0849ea346c677e1f00943526cb04f31b3603576b58e512b4b78d45bdb1cb330",
+      "bytes": 6881
+    }
+  ]
+}

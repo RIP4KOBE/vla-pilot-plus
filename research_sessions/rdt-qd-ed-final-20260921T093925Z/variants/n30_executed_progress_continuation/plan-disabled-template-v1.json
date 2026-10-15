@@ -1,0 +1,75 @@
+{
+  "executable": false,
+  "frozen": false,
+  "schema": "n30-plan-preparation-template-v1",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/source-manifest-execution-v1.json",
+    "sha256": "7f723ac3c412649214e53a64737fe9d6723df93016aecb7c161d9b44b82ab26a"
+  },
+  "prepare_cli": "python scripts/qd_ed_n30_prepare.py --output /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/plan.draft.v1.gpu7.json",
+  "freeze_cli": "python scripts/qd_ed_n30_prepare.py --output /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/plan.frozen.v1.gpu7.json --freeze",
+  "matrix": [
+    [
+      0,
+      "C0"
+    ],
+    [
+      0,
+      "Q0"
+    ],
+    [
+      0,
+      "N30"
+    ],
+    [
+      1,
+      "C0"
+    ],
+    [
+      1,
+      "Q0"
+    ],
+    [
+      1,
+      "N30"
+    ],
+    [
+      2,
+      "C0"
+    ],
+    [
+      2,
+      "Q0"
+    ],
+    [
+      2,
+      "N30"
+    ],
+    [
+      3,
+      "C0"
+    ],
+    [
+      3,
+      "Q0"
+    ],
+    [
+      3,
+      "N30"
+    ]
+  ],
+  "identity_source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/plan.frozen.v1.gpu7.json",
+    "sha256": "151ce8fdb088012676982703aad0cbc2a9952f1f656864bb3cea58d4ca223bc0"
+  },
+  "mapping": "Original row4*t for C0; row4*t+1 (Q0 identity) for both Q0 and N30; original task/init/env/policy fingerprints unchanged.",
+  "no_actual_plan_created": true,
+  "requires": [
+    "root source/runtime review",
+    "root adopted finite authority",
+    "whole remaining attempt/protected capacity",
+    "current idle GPU7 identity/admission"
+  ],
+  "validation_authorized": false,
+  "formal_authorized": false
+}

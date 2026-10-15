@@ -1,0 +1,51 @@
+{
+  "base_commit": "b2775fa2008a8a88e374c43a5753f8862485af1f",
+  "commit": "debda23a0e8eda86a3bb4f398e9596edf05b37e5",
+  "path": "scripts/qd_ed_n30_native.py",
+  "old_sha256": "9411b7b229eda58e5bebb1a07f75c5c882572a3676fd448a3dd3f93c7390a399",
+  "new_sha256": "c7d8c779f977aaae61976b33d9b52cec5fb068913896f6b09a0d8abecf8067c0",
+  "hunks": [
+    {
+      "start": 22,
+      "end": 31,
+      "old": [],
+      "new": [
+        "\n",
+        "\n",
+        "def terminal_bool(value):\n",
+        "    \"\"\"Decode the two native recorder representations without truthiness coercion.\"\"\"\n",
+        "    if type(value) is bool:\n",
+        "        return value\n",
+        "    require(type(value) is torch.Tensor and value.device.type=='cpu'\n",
+        "        and value.dtype==torch.bool and value.ndim==0, 'terminal boolean type/shape/device differs')\n",
+        "    return value.item()\n"
+      ]
+    },
+    {
+      "start": 105,
+      "end": 106,
+      "old": [
+        "        if prior_outcome is not None and not prior_outcome['values']['terminated'] and context['global_step']>0:\n"
+      ],
+      "new": [
+        "        if prior_outcome is not None and not terminal_bool(prior_outcome['values']['terminated']) and context['global_step']>0:\n"
+      ]
+    },
+    {
+      "start": 189,
+      "end": 195,
+      "old": [
+        "            require(a['terminated'] is rv['terminated'] and a['truncated'] is rv['truncated'] and q['terminated'] is rv['terminated'],'terminal feedback binding')\n",
+        "            terminal=rv['terminated'] or rv['truncated'];counts['actual_acknowledgments_verified']+=1\n"
+      ],
+      "new": [
+        "            ack_terminal=terminal_bool(a['terminated']);ack_truncated=terminal_bool(a['truncated'])\n",
+        "            returned_terminal=terminal_bool(rv['terminated']);returned_truncated=terminal_bool(rv['truncated'])\n",
+        "            outcome_terminal=terminal_bool(q['terminated'])\n",
+        "            require(ack_terminal==returned_terminal and ack_truncated==returned_truncated\n",
+        "                and outcome_terminal==returned_terminal,'terminal feedback binding')\n",
+        "            terminal=returned_terminal or returned_truncated;counts['actual_acknowledgments_verified']+=1\n"
+      ]
+    }
+  ]
+}

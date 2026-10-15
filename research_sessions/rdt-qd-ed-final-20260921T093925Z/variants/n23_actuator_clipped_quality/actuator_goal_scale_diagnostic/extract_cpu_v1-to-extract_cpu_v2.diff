@@ -1,0 +1,11 @@
+--- extract_cpu_v1.py
++++ extract_cpu_v2.py
+@@ -71,7 +71,7 @@
+     check(isinstance(sem[key],list) and len(sem[key])==6 and all(type(x) in [int,float] and math.isfinite(x) for x in sem[key]),'actual bounds malformed')
+    check(all(sem['input_min'][i]<sem['input_max'][i] and sem['output_min'][i]<sem['output_max'][i] for i in range(6)),'actual bound order')
+    check(sem['input_min'][:3]==[-1.]*3 and sem['input_max'][:3]==[1.]*3,'N23 input bound contradiction')
+-   check(ctx['task_index']==a['task'] and ctx['episode_index']==0 and all(type(x) is int and x>=0 for x in ctx.values()),'actual controller lifecycle identity')
++   check(ctx['task_index']==a['task'] and all(type(x) is int and x>=0 for x in ctx.values()),'actual controller lifecycle identity:'+repr(ctx))
+    if semantics is None:semantics=sem;context=ctx
+    else:check(semantics==sem and context==ctx,'metadata bounds or controller/reset identity drift')
+    for method,sourcekey,qualname in [('set_goal','installed_robosuite/osc.py','OperationalSpaceController.set_goal'),('scale_action','installed_robosuite/base_controller.py','Controller.scale_action')]:

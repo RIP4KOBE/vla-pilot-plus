@@ -1,0 +1,25 @@
+{
+  "schema": "n23-planned-gripper-continuity-root-review-v1",
+  "recorded_at": "2026-09-30T13:26:13.576446+00:00",
+  "manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n23_actuator_clipped_quality/planned_gripper_continuity_diagnostic/output-manifest-v1.json",
+    "sha256": "c2429d725ebbb9aa5ab1c6b3fe111bdfc1325bf70535f9878cdd8a7b2c7f31f0"
+  },
+  "reviewed_extraction_code_and_report": true,
+  "native_data_reread": false,
+  "derived_denominators_reconciled": true,
+  "boundaries": 360,
+  "pairs": 356,
+  "strict_same_identity_pairs": 114,
+  "strict_full_positive_prediction_pairs": 15,
+  "next_prefix_counts": {
+    "mixed": 8,
+    "retained": 5,
+    "absent": 2
+  },
+  "all_actual_stage_fields_present": true,
+  "interpretation": "The two all-nonpositive next pools in task2 establish a terminal-pool availability limit. Differences between an unexecuted prior model tail and fresh replanning are not defects or evidence of a beneficial memory policy. Same identity does not imply unchanged observations; EEF motion and physical effects are Unknown. No successor priority or implementation is approved by this review; await active cohort disposition and budget review.",
+  "active_cohort_changed": false,
+  "new_candidate_created": false,
+  "new_api_gpu_simulator_calls": 0
+}

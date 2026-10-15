@@ -1,0 +1,62 @@
+{
+  "schema": "n29-executed-resource-total-v1",
+  "reader": {
+    "cpu_seconds": 38.370017231,
+    "wall_seconds": 40.70825519110076,
+    "native_container_reads": 34737,
+    "native_bytes": 811841103,
+    "zip_uncompressed_bytes": 694054089,
+    "completed_attempts": 24,
+    "address_space_limit_bytes": 17179869184,
+    "cpu_limit_seconds": 570,
+    "peak_rss_kib": 568452,
+    "torch_imported": true,
+    "cuda_initialized": false,
+    "cuda_visible_devices": "",
+    "affinity": [
+      0,
+      1
+    ],
+    "denied": [],
+    "error": null,
+    "model_api_sim_calls": 0,
+    "whole_container_decode": true,
+    "runtime_dependency_exceptions": [
+      "readonly own /proc/self/maps",
+      "readonly /proc/cpuinfo",
+      "verified character /dev/null sink"
+    ],
+    "successful_passes": 1
+  },
+  "manifest": {
+    "cpu_seconds": 6.3382399650000005,
+    "wall_seconds": 6.59169530402869,
+    "metadata_bytes": 301426776,
+    "native_stat_bytes": 811841103,
+    "index_files": 24,
+    "denied": [],
+    "error": null,
+    "tensor_reads": 0,
+    "affinity": [
+      0,
+      1
+    ]
+  },
+  "measured_static_prep_cpu_seconds": 0.13575488,
+  "measured_own_output_analysis_cpu_seconds": 0.164870785,
+  "measured_packaging_cpu_seconds": 0.005703187000000002,
+  "measured_cpu_subtotal_seconds": 45.190973301999996,
+  "unmetered_overhead": "Small source-window inspections, script creation/AST and two own-log/result inspections not individually metered; exact process aggregate unavailable. No original native reread.",
+  "conservative_unmetered_cpu_allowance_seconds": 30,
+  "bounded_total_with_allowance_seconds": 75.190973302,
+  "cumulative_cpu_limit_seconds": 600,
+  "original_metadata_bytes": 301426776,
+  "original_metadata_limit_bytes": 536870912,
+  "native_bytes": 811841103,
+  "native_limit_bytes": 4294967296,
+  "whole_container_decode": true,
+  "no_new_data_or_experiment_authority": true,
+  "successful_native_passes": 1,
+  "failed_native_passes": 0,
+  "measured_fixed_window_followup_cpu_seconds": 0.176387254
+}

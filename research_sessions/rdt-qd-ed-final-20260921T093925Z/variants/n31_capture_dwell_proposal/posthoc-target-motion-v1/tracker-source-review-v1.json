@@ -1,0 +1,45 @@
+{
+  "schema": "n31-tracker-source-review-v1",
+  "at": "2026-10-04T14:50:54.219038+00:00",
+  "source_commit": "7428ce8a51f76c5f641537be9a7614631d82b0d9",
+  "inputs": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/keypoint_tracker.py",
+      "sha256": "7925b62d8c6404c250ccdba6ae0df12df79dd23db1f308112b7b3f22e1a22190",
+      "bytes": 11249
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64",
+      "bytes": 72160
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py",
+      "sha256": "32ff2c8368c15d3777ebba497d356d835a6cca6aa59dca5b4a2ac8142b3dfd72",
+      "bytes": 109716
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n31_capture_dwell_proposal/posthoc-target-motion-v1/review-manifest.json",
+      "sha256": "4b624a7801da06a0a642cdd479a62cc4a54b9965b7c5d065d7f09b757742ce4f",
+      "bytes": 2043
+    }
+  ],
+  "findings": [
+    {
+      "source": "main.py:1718",
+      "finding": "Guidance chunk boundary calls read_keypoints_with_passive_tracking."
+    },
+    {
+      "source": "core/keypoint_tracker.py:25,201-224",
+      "finding": "Read invokes get_keypoint_positions; tracked non-background targets query adapter current pose. Missing pose uses separately labelled invalid current_pose_fallback."
+    },
+    {
+      "source": "core/env_adapters/libero_adapter.py:1356-1406",
+      "finding": "get_object_pose_by_segment calls get_scene_objects, which copies current sim.data.body_xpos/body_xquat. No cached pose return is present in this inspected chain."
+    }
+  ],
+  "interpretation": "Repeated tracked coordinates are not explained by a cached return in the inspected call chain. They describe equal sampled tracked point coordinates; semantic object association, between-sample movement, contact and grasp remain unestablished. No causal capture classification. Frozen N31 rejection unchanged.",
+  "scope": "Read-only source and existing review; no new tensor/video/native simulation reads or executions.",
+  "next_bounded_step": "Resume Arbor IDEATE from refreshed tree constraints using N31 terminal, executed close/dwell, target-motion and tracker-source reviews. Choose one mechanistic successor with explicit counters to prior failures; require isolated executor CPU implementation and frozen prospective protocol/native audits before any new Dev launch. Do not repeat closed N31 diagnostics without a specific unresolved decision.",
+  "target_met": false
+}

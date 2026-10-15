@@ -1,0 +1,874 @@
+{
+  "schema": "n30-cpu-resource-v1",
+  "run": "run1",
+  "pytest_exit": 1,
+  "process_cpu_seconds": 10.763108162,
+  "wall_seconds": 8.142108477069996,
+  "cpu_affinity": [
+    0,
+    1
+  ],
+  "threads": 2,
+  "cuda_visible_devices": "",
+  "cuda_initialized": false,
+  "denied": [
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/tests/__pycache__/test_n30_executed_progress.cpython-312-pytest-9.0.3.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/proc/3457257/maps"
+    },
+    {
+      "event": "os.listdir",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/feat/rdt-libero-gt-rollout-reintegration/third_party/lerobot/src"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/feat/rdt-libero-gt-rollout-reintegration/third_party/lerobot/src"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/tests/__pycache__/test_rdt_steer.cpython-312-pytest-9.0.3.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_policy_steer.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_eval_metrics.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_mechanism_trace.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/fkd_class.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_feedback.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_clean_output_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_update.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_parent_before_renoise.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_trust.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_lift_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_terminal_population.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_grasp_timing.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_contact_sweep.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_gripper_parent_rescue.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_ed.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_obs_processor.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/utils/__pycache__/__init__.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/utils/__pycache__/guidance_utils.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/utils/__pycache__/logging_utils.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_policy_steer.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_eval_metrics.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_mechanism_trace.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/fkd_class.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_feedback.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_clean_output_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_update.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_parent_before_renoise.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_trust.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_lift_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_terminal_population.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_grasp_timing.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_contact_sweep.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_gripper_parent_rescue.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_ed.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_obs_processor.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_policy_steer.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_eval_metrics.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_mechanism_trace.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/fkd_class.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_feedback.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_clean_output_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_update.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_parent_before_renoise.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_trust.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_lift_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_terminal_population.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_grasp_timing.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_contact_sweep.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_gripper_parent_rescue.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_ed.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_obs_processor.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_policy_steer.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_eval_metrics.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_mechanism_trace.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/fkd_class.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_feedback.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_clean_output_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_update.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_parent_before_renoise.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_trust.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_lift_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_terminal_population.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_grasp_timing.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_contact_sweep.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_gripper_parent_rescue.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_ed.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_obs_processor.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_policy_steer.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_eval_metrics.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_mechanism_trace.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/fkd_class.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_feedback.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_clean_output_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_update.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_parent_before_renoise.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_trust.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_lift_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_terminal_population.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_grasp_timing.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_contact_sweep.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_gripper_parent_rescue.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_ed.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_obs_processor.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_policy_steer.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_eval_metrics.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/eds_mechanism_trace.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/fkd_class.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_progress.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_feedback.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_executed_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_actuator_clipped_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_clean_output_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_feasible_ray_update.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_parent_before_renoise.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_rbf.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_population_relative_trust.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_lift_quality.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_terminal_population.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_grasp_timing.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_contact_sweep.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_gripper_parent_rescue.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/qd_ed.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_obs_processor.cpython-312.pyc"
+    },
+    {
+      "event": "open",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/implementation/core/__pycache__/rdt_libero_action_converter.cpython-312.pyc"
+    },
+    {
+      "event": "os.listdir",
+      "value": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/feat/rdt-libero-gt-rollout-reintegration/third_party/lerobot/src"
+    }
+  ],
+  "guard_clean": false,
+  "test_args": [
+    "-q",
+    "tests/test_n30_executed_progress.py"
+  ],
+  "peak_rss_kib": 765612
+}

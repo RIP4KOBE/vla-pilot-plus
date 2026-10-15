@@ -1,0 +1,73 @@
+{
+  "schema": "n28-root-current-source-runtime-check-v1",
+  "accepted": true,
+  "checked_at": "2026-10-01T12:19:50.288434+00:00",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/source-manifest-execution-v1.json",
+    "sha256": "a26a52fa413c43778a341d72b85e570892a13933954c4fa0b78c5a6357c1ef12"
+  },
+  "owning_worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree",
+  "source_commit": "52b9eb0a8a365ee2ea12daffdb7a98c76bec0a72",
+  "source_files_verified": 383,
+  "source_bridge": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/source-equivalence-bridge-v1.json",
+    "sha256": "403822398f7e9939c6d33ca8323abe2cf6a4715cf9c11a82f489a67a4e3448d4"
+  },
+  "runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260929/n18-close-then-lift-dev-v1/gpu7-rebind/runtime-manifest.gpu7.frozen.v3.json",
+    "sha256": "8b9aebb5af45ab355f4c03bf7669ed78c50b595185ff1e624ebc180dcca89dd7"
+  },
+  "inventory": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/runtime-inventory.json",
+    "sha256": "44d456203ca168eec9eddfb6834d54347153b2c859eb1b4fc0dea02c15138b83"
+  },
+  "checkpoint_and_encoder_bytes_verified": true,
+  "runtime_input_task_ids": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seed_init_bddl_bindings_verified": 16,
+  "provider": {
+    "backend": "codex_cli",
+    "auth_mode": "chatgpt",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "low",
+    "timeout_seconds": 180,
+    "cli_path": "/home/hynx/.codex/packages/standalone/releases/0.155.1-x86_64-unknown-linux-musl/bin/codex"
+  },
+  "login_status": "Logged in using ChatGPT",
+  "poe_allowed": false,
+  "credential_files_read_or_modified": false,
+  "budget_snapshot": {
+    "dispatched": 355,
+    "aborted": 7,
+    "valid": 332,
+    "invalid": 16,
+    "completed": 348,
+    "running": 0,
+    "gpu_hours_consumed": 48.11473511024313,
+    "by_bucket": {
+      "baseline": 62,
+      "development": 220,
+      "validation": 60,
+      "formal": 0,
+      "recovery": 13
+    },
+    "reserved_attempts": 355,
+    "gpu_hours_by_bucket": {
+      "baseline": 8.26406140536508,
+      "development": 30.495392796493547,
+      "validation": 7.7591759975691845,
+      "formal": 0.0,
+      "recovery": 1.596104910815299
+    },
+    "gpu_healthcheck_hours": 0.22458013707349375,
+    "gpu_healthcheck_inflight": 0
+  },
+  "native_proof_run": false,
+  "gpu_dispatch_authorized": false,
+  "root_gpu_model_api_sim_calls": 0,
+  "wall_seconds": 37.42024522903375
+}

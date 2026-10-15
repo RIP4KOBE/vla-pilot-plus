@@ -1,0 +1,24 @@
+{
+  "schema": "n31-posthoc-json-review-manifest-v1",
+  "at": "2026-10-04T14:33:05.710003+00:00",
+  "artifacts": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../variants/n31_capture_dwell_proposal/posthoc-mechanism-v1/scope-v1.json",
+      "sha256": "dacd1c52a12848f91449db13804c4a8e278788205f89a3750e481104384dd45f"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../variants/n31_capture_dwell_proposal/posthoc-mechanism-v1/analyze_json.py",
+      "sha256": "73fd6b3181b5c5668cc2733112935757589da7d66a8d2817e197993cffb9bfe8"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../variants/n31_capture_dwell_proposal/posthoc-mechanism-v1/summary.json",
+      "sha256": "fcd83b3e61cabbe7c25e1e5522e3d2b7abfe585be4e1ef33cb58a369108aa1dd"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../variants/n31_capture_dwell_proposal/posthoc-mechanism-v1/review.md",
+      "sha256": "31dcf7abd76138874e575d6eb0bc4942ee42fc84230e9f37f81420d538d352c7"
+    }
+  ],
+  "target_met": false,
+  "new_gpu_dispatch": false
+}

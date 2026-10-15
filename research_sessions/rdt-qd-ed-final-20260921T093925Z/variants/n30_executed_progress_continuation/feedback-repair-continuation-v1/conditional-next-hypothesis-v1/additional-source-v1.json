@@ -1,0 +1,6 @@
+{
+  "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/qd_executed_feedback.py",
+  "sha256": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab",
+  "bytes": 14117,
+  "reason": "Direct import from admitted rdt_policy_steer.py lines38-40: determine whether progress-based quality calibration already exists before proposing it as new."
+}

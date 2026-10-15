@@ -1,0 +1,41 @@
+{
+  "schema": "n25-downstream-root-static-source-review-v1",
+  "accepted": true,
+  "source_commit": "ff285373cc69a898cb1f5e6ed9cbbfe370a2972a",
+  "historical_objects": 528,
+  "historical_source_bytes": 10048546,
+  "unchanged6f_source_files": 271,
+  "historical5a_6f_same_files": 255,
+  "historical_route_files": [
+    {
+      "path": "scripts/qd_ed_final_runner.py",
+      "original_sha256": "b3e5ccd90b4ae0eee036560809dcdb74ff68bbaecb56792d676b64bec6e2f7f5",
+      "new_sha256": "0887d04f5e628504c41ceed2b9503321575a18a3cad4f9cf2d1a9a301c357aab",
+      "functions": [
+        "check_budget",
+        "check_retry",
+        "metered_support"
+      ],
+      "reverse_exact": true
+    },
+    {
+      "path": "scripts/qd_ed_n23_worker.py",
+      "original_sha256": "dd162c7bd0d9cf91da064fcb2652aa5ee3a0a48d4c70940dfa3ce4cdab5bc74e",
+      "new_sha256": "6a803949c9d2dc37b333ed56bcdb67e7edeca005bdf1513ff9a9856d597e1441",
+      "functions": [
+        "validate_context"
+      ],
+      "reverse_exact": true
+    }
+  ],
+  "all_deltas_additions": [
+    "A\texperiments/qd_ed_n25_continuation_downstream/evidence-contract-v1.md",
+    "A\texperiments/qd_ed_n25_continuation_downstream/protocol-v1.md",
+    "A\tscripts/qd_ed_n25_cont_downstream.py",
+    "A\ttests/n25_downstream_fixtures.py",
+    "A\ttests/test_qd_ed_n25_cont_downstream.py"
+  ],
+  "actual_experiment_payloads_read": false,
+  "gpu_or_api": false,
+  "current_worktree_modified": false
+}

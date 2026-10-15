@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "source_commit": "60425750c41c8a46e1102e02e2e4e4d2f97fb242",
+  "plan_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n22_hold_conditioned_lift/plan.preview.v1.gpu7.json",
+  "plan_sha256": "30846268778c46f2d9ad25a92abe7869395d3ead218da1a97dbf24fae4d07218",
+  "episodes": 40,
+  "arms": [
+    "C0",
+    "Q0",
+    "N21",
+    "N22"
+  ],
+  "model_runtime_source_fingerprints_verified": true,
+  "physical_gpu": 7,
+  "gpu_dispatched": false,
+  "wall_seconds": 36.12419509887695
+}

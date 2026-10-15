@@ -1,0 +1,24 @@
+{
+  "final_driver": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_v1.py",
+    "sha256": "8b3552676e8e2296fa48ff79dc6361b21225bf82e673e98312ac289a64cce627"
+  },
+  "pre_root_driver": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/driver_pre_root_v1.py",
+    "sha256": "068db4dee2132936f06d6ba92a7d5c60a5f813167520da491a2e0514935c431a"
+  },
+  "changed_functions": [
+    "validate_release"
+  ],
+  "added_constant": "CLI_SHA",
+  "unchanged_function_class_count": 22,
+  "run2_resource": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v2.json",
+    "sha256": "57e0b4c4cb7c7882349c08ef7026463164d9c7a4cba4c6ab2c1a9ebeb1c5d111"
+  },
+  "run3_resource": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/cpu-test-resource-v3.json",
+    "sha256": "97db904bcece8cdb6c81bb781c0be3e8bffb578088eeac8ba870b2281614fcbd"
+  },
+  "tests": "16 clean cases plus six focused repetitions/new binding case; do not sum as22 distinct. 17 distinct cases overall."
+}

@@ -1,0 +1,60 @@
+--- startup_cpu_v1.py
++++ startup_cpu_v2.py
+@@ -14,9 +14,13 @@
+ HERE = Path(__file__).resolve().parent
+ PYROOT = Path('/home/hynx/miniconda3/envs/vla-pilot').resolve()
+ SCOPE_SHA = 'f670a3c2d90838356f2e90cc1481068a9546312293cd3165869537ed932b5de4'
++AMENDMENT_SHA = '59fbdf54de44fca33f7a08a52c0b7089cc64aaaaf963b76b22f80c756d37d1e5'
++PRIOR_SECONDS = 1.1819649679819122
++REMAINING_SECONDS = 28.818035032
++EXACT_METADATA_READS = {Path(p) for p in ['/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/tqdm-4.67.3.dist-info', '/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/tqdm-4.67.3.dist-info/METADATA', '/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/tqdm-4.67.3.dist-info/PKG-INFO', '/home/hynx/miniconda3/envs/vla-pilot/lib/python312.zip']}
+ OWNED_TMP = HERE / 'tmp'
+-READS = {HERE/'read-scope-v1.json', HERE/'input-manifest-v1.json', Path(__file__).resolve()}
+-WRITES = {HERE/'startup-result-v1.json', HERE/'startup-error-v1.json', HERE/'guard-result-v1.json'}
++READS = {HERE/'read-scope-v1.json', HERE/'input-manifest-v2.json', HERE/'trusted-metadata-amendment-v1.json', Path(__file__).resolve()}
++WRITES = {HERE/'startup-result-v2.json', HERE/'startup-error-v2.json', HERE/'guard-result-v2.json'}
+ BLOCKED = []
+ COUNTS = Counter()
+ START = time.monotonic()
+@@ -37,6 +41,8 @@
+             COUNTS['dev_null_write' if writing else 'dev_null_read']+=1; return
+         if not writing and p==Path('/proc/self/maps') and resolved==Path('/proc')/str(os.getpid())/'maps':
+             COUNTS['own_proc_maps_read']+=1; return
++        if not writing and p==resolved and p in EXACT_METADATA_READS:
++            COUNTS['exact_trusted_metadata_read']+=1; return
+         if writing:
+             if p not in WRITES or resolved!=p: deny('write',p)
+             COUNTS['owned_output_write']+=1;return
+@@ -68,10 +74,13 @@
+ def timeout(*_): raise TimeoutError('one 30-second startup preflight limit')
+ 
+ try:
+-    signal.signal(signal.SIGALRM,timeout); signal.setitimer(signal.ITIMER_REAL,30)
++    signal.signal(signal.SIGALRM,timeout); signal.setitimer(signal.ITIMER_REAL,REMAINING_SECONDS)
+     need(sha(HERE/'read-scope-v1.json')==SCOPE_SHA,'scope SHA')
++    need(sha(HERE/'trusted-metadata-amendment-v1.json')==AMENDMENT_SHA,'amendment SHA')
++    amendment=json.loads((HERE/'trusted-metadata-amendment-v1.json').read_bytes())
++    need({Path(p) for p in amendment['additional_exact_read_paths']}==EXACT_METADATA_READS,'exact amendment paths')
+     scope=json.loads((HERE/'read-scope-v1.json').read_bytes())
+-    manifest=json.loads((HERE/'input-manifest-v1.json').read_bytes())
++    manifest=json.loads((HERE/'input-manifest-v2.json').read_bytes())
+     need(manifest['scope']['sha256']==SCOPE_SHA and manifest['extractor']=={'path':str(Path(__file__).resolve()),'sha256':sha(__file__)},'frozen script/manifest')
+     need(scope['temporary_directory']==str(OWNED_TMP) and OWNED_TMP.resolve()==OWNED_TMP and OWNED_TMP.is_dir(),'existing owned tmp identity')
+     # The sole engineering correction: no tempfile probing or new write permission.
+@@ -92,12 +101,12 @@
+     need(x.device.type=='cpu' and cumulative.dtype==torch.bfloat16 and distances.dtype==torch.float32,'synthetic dtype/device')
+     need(bool((bounded.abs()<=1).all()) and bool(torch.isfinite(cumulative).all()) and bool(torch.isfinite(distances).all()),'synthetic finite operations')
+     need(not torch.cuda.is_initialized() and not BLOCKED,'guard completion')
+-    result={'schema':'n24-cpu-startup-preflight-result-v1','status':'PASS_CPU_STARTUP_ONLY','scope':manifest['scope'],'input_manifest':{'path':str(HERE/'input-manifest-v1.json'),'sha256':sha(HERE/'input-manifest-v1.json')},'extractor':manifest['extractor'],'torch_version':torch.__version__,'cpu_threads':torch.get_num_threads(),'interop_threads':torch.get_num_interop_threads(),'cuda_visible_devices':os.environ['CUDA_VISIBLE_DEVICES'],'cuda_initialized':torch.cuda.is_initialized(),'tempfile_tempdir':tempfile.gettempdir(),'tmp_writes_permitted':False,'synthetic':{'source':'nine literal constants in frozen script','shape':list(x.shape),'native_dtype':str(x.dtype),'norm_dtype':str(distances.dtype),'clamped':bounded.float().tolist(),'cumulative':cumulative.float().tolist(),'norm':distances.tolist()},'elapsed_seconds':time.monotonic()-START,'guard_counts':dict(COUNTS),'blocked':BLOCKED,'payload_reads':0,'gpu_api_model_sim_calls':0,'geometry_scope_reopened':False,'geometry_run_authorized':False,'limitations':'CPU import and small synthetic operation coverage only; not CUDA parity, native payload association, extraction readiness or scientific evidence.'}
+-    write('startup-result-v1.json',result);print(json.dumps(result,sort_keys=True),flush=True)
++    result={'schema':'n24-cpu-startup-preflight-result-v1','status':'PASS_CPU_STARTUP_ONLY','prior_failed_seconds':PRIOR_SECONDS,'cumulative_seconds':PRIOR_SECONDS+time.monotonic()-START,'amendment':{'path':str(HERE/'trusted-metadata-amendment-v1.json'),'sha256':AMENDMENT_SHA},'scope':manifest['scope'],'input_manifest':{'path':str(HERE/'input-manifest-v2.json'),'sha256':sha(HERE/'input-manifest-v2.json')},'extractor':manifest['extractor'],'torch_version':torch.__version__,'cpu_threads':torch.get_num_threads(),'interop_threads':torch.get_num_interop_threads(),'cuda_visible_devices':os.environ['CUDA_VISIBLE_DEVICES'],'cuda_initialized':torch.cuda.is_initialized(),'tempfile_tempdir':tempfile.gettempdir(),'tmp_writes_permitted':False,'synthetic':{'source':'nine literal constants in frozen script','shape':list(x.shape),'native_dtype':str(x.dtype),'norm_dtype':str(distances.dtype),'clamped':bounded.float().tolist(),'cumulative':cumulative.float().tolist(),'norm':distances.tolist()},'elapsed_seconds':time.monotonic()-START,'guard_counts':dict(COUNTS),'blocked':BLOCKED,'payload_reads':0,'gpu_api_model_sim_calls':0,'geometry_scope_reopened':False,'geometry_run_authorized':False,'limitations':'CPU import and small synthetic operation coverage only; not CUDA parity, native payload association, extraction readiness or scientific evidence.'}
++    write('startup-result-v2.json',result);print(json.dumps(result,sort_keys=True),flush=True)
+ except BaseException as exc:
+     ERROR={'schema':'n24-cpu-startup-preflight-error-v1','type':type(exc).__name__,'message':str(exc),'traceback':traceback.format_exc(),'elapsed_seconds':time.monotonic()-START,'payload_reads':0,'automatic_retry_authorized':False}
+-    write('startup-error-v1.json',ERROR);print(json.dumps(ERROR),flush=True)
++    write('startup-error-v2.json',ERROR);print(json.dumps(ERROR),flush=True)
+ finally:
+     signal.setitimer(signal.ITIMER_REAL,0)
+-    write('guard-result-v1.json',{'blocked':BLOCKED,'counts':dict(COUNTS),'error':ERROR is not None,'cuda_initialized':None if TORCH is None else TORCH.cuda.is_initialized(),'payload_reads':0,'tmp_write_permission':False})
++    write('guard-result-v2.json',{'blocked':BLOCKED,'counts':dict(COUNTS),'error':ERROR is not None,'cuda_initialized':None if TORCH is None else TORCH.cuda.is_initialized(),'payload_reads':0,'tmp_write_permission':False})
+ if ERROR is not None:sys.exit(1)

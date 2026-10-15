@@ -1,0 +1,15 @@
+{
+  "executable": false,
+  "root_authorized": false,
+  "actual_evidence_read": false,
+  "intended_future_location": "N26/plan.frozen.v1.gpu7.json",
+  "record": {
+    "function": "scripts.qd_ed_n26_prepare.build_plan",
+    "source": null,
+    "review": null,
+    "authority": null,
+    "predecessor_ref": null,
+    "frozen": false
+  },
+  "notes": "This is a preparation argument template, not a scientific plan. Existing build_plan derives the exact original task-major rows; do not manually invent seed metadata."
+}

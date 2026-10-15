@@ -1,0 +1,712 @@
+diff --git a/experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md b/experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md
+new file mode 100644
+index 0000000..0544146
+--- /dev/null
++++ b/experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md
+@@ -0,0 +1,33 @@
++# N23 native UUID object correction — second prospective engineering exception
++
++Recorded 2026-09-30 before any execution of corrected native-object code. This is a transparent extension of necessary engineering work under the continuing explicit autonomous research instruction, interpreted by the coordinator; it is not new user approval, a budget expansion, an algorithm variant, or a retrospective valid result.
++
++## Two exhausted opportunities
++
++The original backend attempt `rdt-qd-ed-final-20260921T093925Z__n23_backend_preflight_v2__7ca117f9b7fb` (source `77302aab40d6b059e85c8d1d8011ea36cb3d3856`, 6.538148973020725 GPU-process seconds) failed before arithmetic because of its UUID check. Original root review `backend-failure-review-v1.json` SHA256 `95353cd515ca1e759e781d63108ecf03fcdea62372c7d1578159fe79a225c661` remains immutable.
++
++The separately authorized first engineering recovery `rdt-qd-ed-final-20260921T093925Z__n23_backend_uuid_repair__41eab61a8079` (source `675c2f4d07e787a7e160a2a26312c8ab2e4a19f6`, 6.601666689035483 GPU-process seconds) also failed before arithmetic. Its root review `uuid-repair-native-type-failure-review-v1.json` SHA256 `b6bed05adae2e1895a17bb331bfa91f6176eb37591bad02ff807958245bd72a7` binds its complete plan/report/terminal and prior failure. The first exception `uuid-repair-engineering-exception-v1.md` SHA256 `d5c80006512203343d89dc24ab4de53356c045bc0f755800bf0e8337524d5f20` is exhausted and permits no further run. All its files and authority records are preserved.
++
++Both reports have accepted=false, task_outcome=false, empty batches/synthetic lists and exactly `RuntimeError:audit physical CUDA UUID differs or unavailable`. Both ledger groups must remain reserved/dispatched/aborted, with complete original costs and explicit second retry_of first. Neither report retained the actual live UUID. No N23 Dev reservation or task outcome exists.
++
++## Concrete correction and evidence boundary
++
++The installed PyTorch2.7.1+cu126 exposes a non-string `torch._C._CUuuid` class. The [official v2.7.1 binding](https://raw.githubusercontent.com/pytorch/pytorch/v2.7.1/torch/csrc/cuda/Module.cpp), lines991–999 and1038–1039, exposes the native object, a16-byte value and its string representation. The first repair dropped the old str conversion and tested only string fixtures, so it rejected this legitimate native type. This is an independently identified software defect. It does not establish the failed workers' actual physical-device value.
++
++Before release, the executor must CPU-test support for strings or the installed exact native UUID type, validate byte/string agreement, retain JSON-safe serialized raw/type/canonical identity, reject malformed/mismatched/arbitrary objects and preserve all visible-device/count/current-device checks. Failure reports must retain bounded public identity diagnostics. No credential contents or environment values outside device identity are recorded. Complete frozen source review must cover these changes and their narrowly necessary admission/proof/tests. All science, model, Stage, provider, profiles, arithmetic, tolerance, corpus and task conditions remain byte-identical to source77302aab. Existing v1 protocols and results are not rewritten.
++
++## One additional metered backend attempt
++
++This new exception prospectively allows exactly one additional backend execution after the concrete CPU correction and root review: at most three backend attempts total, explicitly preserving both failed predecessors. A new attempt must identify retry_of the second failure and transitively retain the first. A different predecessor, any additional backend reservation, any N23 Dev reservation before the repaired proof, any arithmetic already evaluated in a failed predecessor, an unresolved attempt, or altered evidence blocks this exception.
++
++Use new versioned exception/authority/source-review/frozen-plan paths. Never overwrite previous reviews/plans. The active authority must be adopted under the private runner/state locks and bound by hash to the exact final source and runtime. No generic retry switch or renamed scientific cohort. The original N23 v2 four-arm Dev matrix stays the only conditional scientific target.
++
++Use one exclusive idle GPU7 process with the same frozen UUID/EGL/runtime and accounted health probe. Charge one existing recovery slot, at most120 seconds plus40 seconds cleanup, before dispatch. Keep cumulative478 attempts/100 GPU-hours, buckets51/187/180/40/20 and protected32/12-hour reservations unchanged. Require the full remaining22-hour Dev ceiling, both Dev timeout recovery slots and protected reserves to fit. Both old failures remain charged. No model/provider/simulator call is permitted in this backend test.
++
++Replay exactly the original176 canonical batches/2816 candidates from the same2250 saved N21 task0 bundles, and the same two synthetic FP32/BF16 batches. All exact arithmetic and wrong-bound rejection checks remain unchanged. No tolerance adjustment, failed-prefix omission or outcome-based selection. Any error, timeout, mismatch or incomplete proof closes this exception; it grants no fourth backend execution.
++
++## Conditional Dev continuation
++
++Only the complete valid third-attempt proof, with raw/type/canonical CUDA evidence, all three ledger groups and exactly the final Dev source/runtime, may unlock the unchanged N23 v2 Dev plan. Preserve original main/cohort/arms/task order/seeds/limits/timeout-recovery policy and promotion rules; add this exception and all backend lineage to provenance. Protected validation/formal remain closed until original scientific gates.
++
++Stage uses only the current Codex managed login. Poe and other provider fallbacks remain disabled; saved Poe credentials are preserved. CPU implementation is authorized now; this document does not launch a GPU worker. Concrete source/runtime review, exact named failure proof, actual capacity, locked authority adoption and a fresh immutable plan are required before the one added execution.
+diff --git a/scripts/qd_ed_n23_uuid_native_repair.py b/scripts/qd_ed_n23_uuid_native_repair.py
+new file mode 100644
+index 0000000..f86d456
+--- /dev/null
++++ b/scripts/qd_ed_n23_uuid_native_repair.py
+@@ -0,0 +1,187 @@
++#!/usr/bin/env python3
++"""Second explicit UUID exception: preserve two named failures, allow no fourth."""
++from __future__ import annotations
++import copy
++from pathlib import Path
++import subprocess
++from scripts import qd_ed_n23_v2_contract as c
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n23_uuid_repair as prior
++from scripts.qd_ed_audit_backend import canonical_cuda_uuid
++
++EXCEPTION=c.RUN_DIR/'uuid-native-repair-engineering-exception-v2.md'
++EXCEPTION_SHA='b75b60a13a2e1d0ff90433d9161f32b1bec4c056807d9f46598c10bdfe4d4071'
++FAILURE_REVIEW=c.RUN_DIR/'uuid-repair-native-type-failure-review-v1.json'
++FAILURE_SHA='b6bed05adae2e1895a17bb331bfa91f6176eb37591bad02ff807958245bd72a7'
++AUTHORITY=c.RUN_DIR/'uuid-native-repair-adoption-v2/authority.json'
++FINAL_REVIEW=c.RUN_DIR/'final-source-runtime-review.uuid-native-repair.v2.json'
++FAILED_ATTEMPT='rdt-qd-ed-final-20260921T093925Z__n23_backend_uuid_repair__41eab61a8079'
++FAILED_SOURCE='675c2f4d07e787a7e160a2a26312c8ab2e4a19f6'
++FAILED_SECONDS=6.601666689035483
++FAILED_WORKER_SECONDS=5.115942551055923
++LIMITS={**prior.LIMITS,'max_total_backend_attempts':3}
++CAPS=prior.CAPS
++EXTRA_SOURCE={'scripts/qd_ed_n23_uuid_native_repair.py','tests/test_qd_ed_n23_uuid_native_repair.py',
++    'experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md'}
++ALLOWED_DELTA=prior.ALLOWED_DELTA|EXTRA_SOURCE
++
++
++def binding():
++    w.require(c.sha(EXCEPTION)==EXCEPTION_SHA and c.sha(FAILURE_REVIEW)==FAILURE_SHA
++        and c.sha(prior.FAILURE_REVIEW)==prior.FAILURE_SHA,'native UUID repair immutable scope changed')
++    return {'schema':'n23-uuid-native-repair-binding-v2','exception':c.ref(EXCEPTION),
++        'failed_review':c.ref(FAILURE_REVIEW),'prior_failure':c.ref(prior.FAILURE_REVIEW),
++        'authority':c.ref(AUTHORITY),'retry_of':FAILED_ATTEMPT,'prior_attempt':prior.FAILED_ATTEMPT}
++
++
++def source_delta(root):
++    changed=set(subprocess.check_output(['git','diff','--name-only',prior.ORIGINAL_SOURCE,'HEAD'],cwd=root,text=True).splitlines())
++    w.require(changed<=ALLOWED_DELTA,'native UUID repair changed scientific or unrelated source bytes')
++    for filename,expected in ((EXCEPTION.name,EXCEPTION_SHA),(prior.EXCEPTION.name,prior.EXCEPTION_SHA)):
++        w.require(c.sha(Path(root)/'experiments/iteration_023_actuator_clipped_quality'/filename)==expected,
++            'native UUID repair tracked exception differs')
++    return sorted(changed)
++
++
++def final_review(source,runtime):
++    w.require(c.sha(c.PROTOCOL)==c.PROTOCOL_SHA and c.sha(c.BACKEND_PROTOCOL)==c.BACKEND_PROTOCOL_SHA
++        and c.sha(c.BUDGET_AMENDMENT)==c.AMENDMENT_SHA and c.sha(c.OBSERVABILITY)==c.OBSERVABILITY_SHA
++        and c.sha(EXCEPTION)==EXCEPTION_SHA and c.sha(FAILURE_REVIEW)==FAILURE_SHA
++        and c.sha(prior.EXCEPTION)==prior.EXCEPTION_SHA and c.sha(prior.FAILURE_REVIEW)==prior.FAILURE_SHA,
++        'native UUID repair immutable protocol/amendment/exception/failure bytes differ')
++    reference=c.ref(FINAL_REVIEW);record=w.read_ref(reference)
++    w.require(record=={'schema':'n23-final-source-runtime-review-uuid-native-repair-v2','disposition':'accepted',
++        'source':source,'runtime':runtime,'dev_protocol':c.ref(c.PROTOCOL),'backend_protocol':c.ref(c.BACKEND_PROTOCOL),
++        'amendment':c.ref(c.BUDGET_AMENDMENT),'timeout_observability':c.ref(c.OBSERVABILITY),
++        'exception':c.ref(EXCEPTION),'failed_review':c.ref(FAILURE_REVIEW),'prior_failure':c.ref(prior.FAILURE_REVIEW),
++        'no_gpu_release':True},'native UUID repair final source/runtime review missing or differs')
++    return reference
++
++
++def authority(meta,source,runtime,state=None):
++    w.require(meta==binding(),'native UUID repair exact authority binding differs')
++    record=w.read_ref(meta['authority'])
++    keys={'schema','exception','failed_review','prior_failure','final_source_review','source','runtime',
++        'authority_interpretation','recorded_at','user_message','cumulative_caps','limits','validation_authorized','formal_authorized'}
++    w.require(set(record)==keys and record['schema']=='n23-uuid-native-repair-authority-v2'
++        and record['exception']==c.ref(EXCEPTION) and record['failed_review']==c.ref(FAILURE_REVIEW)
++        and record['prior_failure']==c.ref(prior.FAILURE_REVIEW)
++        and record['final_source_review']==final_review(source,runtime) and record['source']==source and record['runtime']==runtime
++        and all(isinstance(record[k],str) and record[k].strip() for k in ('authority_interpretation','recorded_at'))
++        and record['user_message']==c.AUTONOMOUS_REPLY and record['cumulative_caps']==CAPS and record['limits']==LIMITS
++        and record['validation_authorized'] is False and record['formal_authorized'] is False,'native UUID repair finite authority differs')
++    if state is not None:w.require(state.get('n23_uuid_native_repair_authority')==meta['authority'],
++        'native UUID repair not adopted in private state')
++    return record
++
++
++def named_failures(events,r):
++    first,original,_=prior.named_failure(events,r)
++    review=w.read_ref(c.ref(FAILURE_REVIEW))
++    w.require(c.sha(FAILURE_REVIEW)==FAILURE_SHA and review.get('schema')=='n23-uuid-repair-native-type-failure-review-v1'
++        and review.get('attempt_id')==FAILED_ATTEMPT and review.get('status')=='INVALID_INFRASTRUCTURE_BEFORE_ARITHMETIC'
++        and review.get('task_outcome') is False and review.get('dev_dispatched') is False
++        and review.get('gpu_process_wall_seconds')==FAILED_SECONDS
++        and review.get('additional_gpu_recovery_under_v1_authorized') is False
++        and review.get('current_failed_worker_raw_uuid')=='not recorded; neither failed worker exposed its live value'
++        and review.get('prior_failure')==c.ref(prior.FAILURE_REVIEW) and review.get('authority')==c.ref(prior.AUTHORITY),
++        'native UUID repair second named failure review differs')
++    plan=w.read_ref(review['plan']);report=w.read_ref(review['report']);terminal=w.read_ref(review['attempt_result'])
++    meta=plan.get('uuid_repair');prior.authority(meta,plan['source'],plan['runtime'])
++    w.require(plan=={**original,'source':review['source'],'uuid_repair':meta} and plan['source']['commit']==FAILED_SOURCE
++        and report.get('plan')==review['plan'] and report.get('source')==plan['source']
++        and report.get('attempt_id')==FAILED_ATTEMPT and report.get('schema')=='n23-backend-preflight-proof-v2'
++        and report.get('accepted') is False and report.get('task_outcome') is False
++        and report.get('errors')==[prior.ERROR] and report.get('batches')==report.get('synthetic')==[]
++        and report.get('runtime')==plan['runtime'] and report.get('uuid_repair')==meta
++        and report.get('retry_of')==prior.FAILED_ATTEMPT and report.get('worker_wall_seconds')==FAILED_WORKER_SECONDS,
++        'native UUID repair requires second zero-arithmetic UUID failure with unchanged corpus')
++    w.require(terminal.get('attempt_id')==FAILED_ATTEMPT and terminal.get('event')=='aborted'
++        and terminal.get('outcome_valid') is False and terminal.get('task_outcome') is False
++        and terminal.get('source_commit')==FAILED_SOURCE and terminal.get('plan_sha256')==review['plan']['sha256']
++        and terminal.get('budget_bucket')=='recovery' and terminal.get('retry_of')==prior.FAILED_ATTEMPT
++        and terminal.get('gpu_process_wall_seconds')==FAILED_SECONDS and terminal.get('n23_preflight_dispatched') is True
++        and terminal.get('process')==report.get('process') and terminal.get('n23_uuid_repair')==meta
++        and terminal.get('n23_final_review')==prior.final_review(plan['source'],plan['runtime']),
++        'native UUID repair second terminal/cost/source differs')
++    groups=r['event_groups'](events);group=groups.get(FAILED_ATTEMPT,[])
++    w.require([e['event'] for e in group]==['reserved','dispatched','aborted'] and group[-1]==terminal
++        and all(e.get('identity',{}).get('iteration')==c.PREFLIGHT and e.get('retry_of')==prior.FAILED_ATTEMPT
++            and e.get('source_commit')==FAILED_SOURCE and e.get('plan_sha256')==review['plan']['sha256']
++            and e.get('n23_uuid_repair')==meta and e.get('n23_backend_preflight') is True
++            and e.get('budget_bucket')=='recovery' and e.get('physical_gpu')==7 for e in group),
++        'native UUID repair second charged ledger group differs')
++    first_end=next(i for i,e in enumerate(events) if e is groups[prior.FAILED_ATTEMPT][-1])
++    second_start=next(i for i,e in enumerate(events) if e is group[0])
++    w.require(first_end<second_start,'native UUID repair failed predecessors out of order')
++    return review,original,terminal
++
++
++def validate_plan(plan):
++    authority(plan['uuid_repair'],plan['source'],plan['runtime']);source_delta(plan['worktree'])
++    original=w.read_ref(w.read_ref(c.ref(prior.FAILURE_REVIEW))['plan'])
++    w.require(plan=={**original,'source':plan['source'],'uuid_repair':plan['uuid_repair']},
++        'native UUID repair changed original corpus/arithmetic/runtime outside source and lineage')
++    return plan
++
++
++def admission(plan,state,events,resources,reservations,*,root,r):
++    from scripts import qd_ed_n23_v2_backend as backend
++    from scripts import qd_ed_n23_v2_preflight_admit as admit
++    c.require_state(state,r);authority(plan['uuid_repair'],plan['source'],plan['runtime'],state)
++    named_failures(events,r);prior.no_dev(events)
++    w.require({e['attempt_id'] for e in prior.backend_events(events)}=={prior.FAILED_ATTEMPT,FAILED_ATTEMPT},
++        'native UUID repair already reserved or another backend opportunity exists')
++    w.require(plan['source']==w.source_record(root,c.source_paths(r)) and plan['runtime']==c.ref(c.GPU7_RUNTIME)
++        and plan['predecessor_review']==c.predecessor_review(),'native UUID repair source/runtime/predecessor differs')
++    runtime=backend.validate_plan(plan);c.validate_runtime(runtime,root,r)
++    w.require(Path(plan['artifact_root']).resolve()==Path(state['artifacts']).resolve()
++        and Path(state.get('worktree',root)).resolve()==Path(root).resolve(),'native UUID repair private owning roots differ')
++    w.require(r['check_budget'](state,events,admit.diagnostic_row(plan),resources,reservations,physical_gpu=7)==120,
++        'native UUID repair existing recovery capacity unavailable')
++    c.full_capacity(state,events,resources,r,preflight=True)
++    return runtime
++
++
++def verify_lineage(plan,reference,events,source,r):
++    authority(plan['uuid_repair'],source,plan['runtime']);named_failures(events,r)
++    groups=r['event_groups'](prior.backend_events(events))
++    w.require(set(groups)=={prior.FAILED_ATTEMPT,FAILED_ATTEMPT,reference['attempt_id']}
++        and reference['attempt_id'] not in {prior.FAILED_ATTEMPT,FAILED_ATTEMPT},
++        'native UUID repair proof must retain exactly three backend attempts')
++    repaired=groups[reference['attempt_id']]
++    w.require([e['event'] for e in repaired]==['reserved','dispatched','valid']
++        and all(e.get('retry_of')==FAILED_ATTEMPT and e.get('n23_uuid_repair')==plan['uuid_repair']
++            and e.get('identity',{}).get('iteration')==c.PREFLIGHT and e.get('n23_backend_preflight') is True
++            and e.get('budget_bucket')=='recovery' and e.get('physical_gpu')==7
++            and e.get('source_commit')==source['commit'] and e.get('plan_sha256')==reference['plan']['sha256'] for e in repaired)
++        and repaired[-1].get('outcome_valid') is True and repaired[-1].get('n23_final_review')==final_review(source,plan['runtime']),
++        'native UUID repair proof terminal lineage/review differs')
++    second_end=next(i for i,e in enumerate(events) if e is groups[FAILED_ATTEMPT][-1])
++    repaired_start=next(i for i,e in enumerate(events) if e is repaired[0])
++    w.require(second_end<repaired_start,'native UUID repair precedes second failure closure')
++    boundary=next(i for i,e in enumerate(events) if e is repaired[-1]);prior.no_dev(events[:boundary+1])
++    return repaired[-1]
++
++
++def verify_identity(backend,runtime):
++    expected=canonical_cuda_uuid(runtime['gpu_mapping']['uuid'])
++    raw=backend.get('actual_uuid');kind=backend.get('actual_uuid_type');native_hex=backend.get('actual_uuid_bytes_hex')
++    w.require(canonical_cuda_uuid(raw)==expected and backend.get('physical_uuid')==expected
++        and kind in {'builtins.str','torch._C._CUuuid'}
++        and ((kind=='builtins.str' and native_hex is None)
++            or (kind=='torch._C._CUuuid' and native_hex==expected[4:].replace('-','')))
++        and backend.get('cuda_visible_devices')=='7','native UUID repair serialized raw/type/canonical evidence differs')
++    diagnostic=backend.get('identity_diagnostic')
++    w.require(isinstance(diagnostic,dict) and type(diagnostic.get('visible_device_count')) is int
++        and type(diagnostic.get('current_device')) is int and diagnostic=={'schema':'n23-public-cuda-identity-diagnostic-v1',
++        'expected_physical_gpu':7,'expected_uuid':expected,'cuda_visible_devices':'7','visible_device_count':1,
++        'current_device':0,'uuid_public_type':kind,'serialized_raw_uuid':raw,'canonical_uuid':expected,'status':'matched'},
++        'native UUID repair matched public device diagnostic missing or differs')
++
++
++def build_plan(root,r):
++    original=w.read_ref(w.read_ref(c.ref(prior.FAILURE_REVIEW))['plan'])
++    source=w.source_record(root,c.source_paths(r));plan=copy.deepcopy(original)
++    plan.update(source=source,uuid_repair=binding());validate_plan(plan)
++    return plan
+diff --git a/scripts/qd_ed_n23_v2_backend.py b/scripts/qd_ed_n23_v2_backend.py
+index 649d29c..5a851f6 100644
+--- a/scripts/qd_ed_n23_v2_backend.py
++++ b/scripts/qd_ed_n23_v2_backend.py
+@@ -60,13 +60,15 @@ def validate_plan(plan):
+     worker.require(EXTRA_SOURCE <= {r['path'] for r in plan['source']['files']}, 'preflight required source absent')
+     worker.require(plan['corpus'] == corpus_from_index(plan['corpus']['index']), 'preflight corpus changed')
+     if plan.get('uuid_repair') is not None:
+-        from scripts import qd_ed_n23_uuid_repair as repair
++        repair=contract.repair_module(plan['uuid_repair'])
+         repair.validate_plan(plan)
+     predecessor_gate(plan['predecessor_review'])
+     return worker.read_ref(plan['runtime'])
+ 
+ 
+ def artifact_name(plan,kind):
++    if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':
++        return 'n23-backend-uuid-native-repair-'+kind+'-v2.json'
+     prefix='n23-backend-uuid-repair' if plan.get('uuid_repair') is not None else 'n23-backend-preflight'
+     return prefix+'-'+kind+('-v1.json' if plan.get('uuid_repair') is not None else '.json')
+ 
+@@ -171,6 +173,8 @@ def verify_preflight_proof(plan_path, report_path, attempt_result, future_source
+                    and len(report['batches']) == 176 and sum(r['candidates'] for r in report['batches']) == 2816
+                    and len(report['synthetic']) == 2 and all(r['accepted'] and not r['mismatches'] for r in report['batches'] + report['synthetic'])
+                    and report.get('wrong_bounds_rejected') is True, 'preflight CUDA coverage or strict arithmetic proof missing')
++    if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':
++        contract.repair_module(plan['uuid_repair']).verify_identity(backend,runtime)
+     return {'path': str(Path(report_path).resolve()), 'sha256': worker.sha(report_path)}
+ 
+ 
+diff --git a/scripts/qd_ed_n23_v2_contract.py b/scripts/qd_ed_n23_v2_contract.py
+index 4aec668..dec1d6c 100644
+--- a/scripts/qd_ed_n23_v2_contract.py
++++ b/scripts/qd_ed_n23_v2_contract.py
+@@ -43,7 +43,9 @@ EXTRA_SOURCE={'scripts/qd_ed_n23_v2_contract.py','scripts/qd_ed_n23_v2_predecess
+  'experiments/iteration_023_actuator_clipped_quality/budget-amendment-v2.md',
+  'experiments/iteration_023_actuator_clipped_quality/closed-runtime-admission-v2.md',
+  'scripts/qd_ed_n23_uuid_repair.py','tests/test_qd_ed_n23_uuid_repair.py',
+- 'experiments/iteration_023_actuator_clipped_quality/uuid-repair-engineering-exception-v1.md'}
++ 'experiments/iteration_023_actuator_clipped_quality/uuid-repair-engineering-exception-v1.md',
++ 'scripts/qd_ed_n23_uuid_native_repair.py','tests/test_qd_ed_n23_uuid_native_repair.py',
++ 'experiments/iteration_023_actuator_clipped_quality/uuid-native-repair-engineering-exception-v2.md'}
+ sha=worker.sha
+ ref=v1.ref
+ _SCOPE=None
+@@ -164,9 +166,20 @@ SCIENTIFIC_BASE='1bcf888e88181580bfb854b2e7aa1834bf85df99'
+ ALLOWED_EXISTING={'scripts/qd_ed_final_runner.py','scripts/qd_ed_n23_preflight_admit.py'}
+ 
+ 
++def repair_module(meta):
++    """Only the two explicit historical engineering exception schemas route."""
++    if isinstance(meta,dict) and meta.get('schema')=='n23-uuid-repair-binding-v1':
++        from scripts import qd_ed_n23_uuid_repair as selected
++    elif isinstance(meta,dict) and meta.get('schema')=='n23-uuid-native-repair-binding-v2':
++        from scripts import qd_ed_n23_uuid_native_repair as selected
++    else:
++        raise ValueError('unrecognized N23 UUID repair authority schema')
++    return selected
++
++
+ def source_delta(root,*,repair=None):
+     if repair is not None:
+-        from scripts import qd_ed_n23_uuid_repair as uuid_repair
++        uuid_repair=repair_module(repair)
+         worker.require(repair==uuid_repair.binding(),'UUID repair source scope binding differs')
+         return uuid_repair.source_delta(root)
+     import subprocess
+@@ -184,7 +197,7 @@ def predecessor_review():
+ 
+ def final_review(source, runtime_ref,*,repair=None):
+     if repair is not None:
+-        from scripts import qd_ed_n23_uuid_repair as uuid_repair
++        uuid_repair=repair_module(repair)
+         worker.require(repair==uuid_repair.binding(),'UUID repair review binding differs')
+         return uuid_repair.final_review(source,runtime_ref)
+     reference = ref(FINAL_REVIEW); review = worker.read_ref(reference)
+@@ -206,7 +219,7 @@ def backend_proof(reference, source, root, r):
+                  and plan['predecessor_review'] == predecessor_review(), 'N23 preflight runtime/source/predecessor differs')
+     events = r['read_events'](Path(root) / 'data/attempt-ledger.jsonl')
+     if plan.get('uuid_repair') is not None:
+-        from scripts import qd_ed_n23_uuid_repair as uuid_repair
++        uuid_repair=repair_module(plan['uuid_repair'])
+         terminal=uuid_repair.verify_lineage(plan,reference,events,source,r)
+         r['require'](backend.verify_preflight_proof(reference['plan']['path'],reference['report']['path'],terminal,source)
+             ==reference['report'],'UUID repair backend proof hash differs')
+@@ -272,7 +285,7 @@ def validate_contract(plan, manifest, runtime, seeds, root, r):
+     validate_runtime(runtime, root, r)
+     state=r['read_state'](Path(root) / 'research-state.yaml');require_state(state,r)
+     if meta.get('uuid_repair') is not None:
+-        from scripts import qd_ed_n23_uuid_repair as uuid_repair
++        uuid_repair=repair_module(meta['uuid_repair'])
+         uuid_repair.authority(meta['uuid_repair'],source,ref(GPU7_RUNTIME),state)
+ 
+ 
+diff --git a/scripts/qd_ed_n23_v2_preflight_admit.py b/scripts/qd_ed_n23_v2_preflight_admit.py
+index 7fb4af8..dd4c16f 100644
+--- a/scripts/qd_ed_n23_v2_preflight_admit.py
++++ b/scripts/qd_ed_n23_v2_preflight_admit.py
+@@ -22,13 +22,14 @@ def diagnostic_row(plan=None):
+     row= {'split': 'backend_diagnostic', 'iteration': contract.PREFLIGHT, 'profile': 'N23_backend',
+             'task_id': -1, 'env_seed': -1, 'policy_seed': -1, 'init_index': -1,
+             'episode_key': 'n23_backend_preflight_v2_once', 'budget_bucket': 'recovery', 'timeout_seconds': 120}
+-    if plan is not None and plan.get('uuid_repair') is not None:row['episode_key']='n23_backend_uuid_repair_once'
++    if plan is not None and plan.get('uuid_repair') is not None:
++        row['episode_key']='n23_backend_uuid_native_repair_once' if plan['uuid_repair'].get('schema')=='n23-uuid-native-repair-binding-v2' else 'n23_backend_uuid_repair_once'
+     return row
+ 
+ 
+ def admission(plan, state, events, resources, reservations, *, root=ROOT):
+     if plan.get('uuid_repair') is not None:
+-        from scripts import qd_ed_n23_uuid_repair as repair
++        repair=contract.repair_module(plan['uuid_repair'])
+         return repair.admission(plan,state,events,resources,reservations,root=root,r=vars(runner))
+     contract.require_state(state, vars(runner))
+     runner.require(plan['source'] == worker.source_record(root, contract.source_paths(vars(runner)))
+@@ -75,7 +76,8 @@ def run(plan_path, *, root=ROOT):
+             device = gpu_gate(runtime, resources, root=root)
+             repaired=plan.get('uuid_repair') is not None
+             retry={'retry_of':plan['uuid_repair']['retry_of']} if repaired else {}
+-            attempt_id=state['run_name']+('__n23_backend_uuid_repair__' if repaired else '__n23_backend_preflight_v2__')+uuid.uuid4().hex[:12]
++            prefix='__n23_backend_uuid_native_repair__' if repaired and plan['uuid_repair'].get('schema')=='n23-uuid-native-repair-binding-v2' else ('__n23_backend_uuid_repair__' if repaired else '__n23_backend_preflight_v2__')
++            attempt_id=state['run_name']+prefix+uuid.uuid4().hex[:12]
+             output = runner.owned(Path(plan['artifact_root']) / 'attempts' / attempt_id, plan['artifact_root'])
+             runner.require(not output.exists(), 'N23 preflight output already exists')
+             output.mkdir(parents=True)
+@@ -108,7 +110,7 @@ def run(plan_path, *, root=ROOT):
+             with runner.locked(root / 'data/qd-ed-state.lock'):
+                 state = runner.read_state(root / 'research-state.yaml'); contract.require_state(state, vars(runner))
+                 if repaired:
+-                    from scripts import qd_ed_n23_uuid_repair as repair
++                    repair=contract.repair_module(plan['uuid_repair'])
+                     repair.authority(plan['uuid_repair'],plan['source'],plan['runtime'],state)
+                 runner.require(runner.check_budget(state, runner.read_events(root / 'data/attempt-ledger.jsonl'), row,
+                     runner.read_events(root / 'data/gpu-healthcheck-ledger.jsonl'),
+diff --git a/scripts/qd_ed_n23_v2_prepare.py b/scripts/qd_ed_n23_v2_prepare.py
+index 44e6141..5c8e080 100644
+--- a/scripts/qd_ed_n23_v2_prepare.py
++++ b/scripts/qd_ed_n23_v2_prepare.py
+@@ -76,6 +76,7 @@ def backend_draft(corpus_index=None):
+ def freeze_backend(plan,path):
+     from scripts import qd_ed_n23_v2_preflight_admit as admit
+     name='backend-preflight-plan.uuid-repair.frozen.v1.json' if plan.get('uuid_repair') is not None else 'backend-preflight-plan.frozen.v2.json'
++    if plan.get('uuid_repair',{}).get('schema')=='n23-uuid-native-repair-binding-v2':name='backend-preflight-plan.uuid-native-repair.frozen.v2.json'
+     runner.require(Path(path).resolve()==(contract.RUN_DIR/name).resolve(),
+         'N23 v2 preflight plan path differs')
+     with runner.locked(ROOT/'data/qd-ed-runner.lock',nonblocking=True):
+@@ -89,11 +90,12 @@ def freeze_backend(plan,path):
+ 
+ def main():
+     p=argparse.ArgumentParser(description=__doc__)
+-    p.add_argument('--kind',choices=['dev','backend','uuid-repair'],required=True);p.add_argument('--output',type=Path,required=True)
++    p.add_argument('--kind',choices=['dev','backend','uuid-repair','uuid-native-repair'],required=True);p.add_argument('--output',type=Path,required=True)
+     p.add_argument('--freeze',action='store_true');p.add_argument('--corpus-index',type=Path);p.add_argument('--backend-proof',type=Path)
+     args=p.parse_args()
+-    if args.kind=='uuid-repair':
+-        from scripts import qd_ed_n23_uuid_repair as repair
++    if args.kind in {'uuid-repair','uuid-native-repair'}:
++        if args.kind=='uuid-native-repair':from scripts import qd_ed_n23_uuid_native_repair as repair
++        else:from scripts import qd_ed_n23_uuid_repair as repair
+         plan=repair.build_plan(ROOT,vars(runner))
+         if args.freeze:plan=freeze_backend(plan,args.output)
+         else:worker.atomic_json(args.output,plan)
+diff --git a/tests/test_qd_ed_n23_uuid_native_repair.py b/tests/test_qd_ed_n23_uuid_native_repair.py
+new file mode 100644
+index 0000000..853dc49
+--- /dev/null
++++ b/tests/test_qd_ed_n23_uuid_native_repair.py
+@@ -0,0 +1,312 @@
++"""Synthetic third-opportunity admission and JSON proof; no actual CUDA/data."""
++import copy
++import json
++import os
++from pathlib import Path
++from types import SimpleNamespace
++import pytest
++import torch
++import yaml
++from test_qd_ed_n23_uuid_repair import case as prior_case, write, no_cuda
++from scripts import qd_ed_final_runner as r
++from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n23_v2_contract as c
++from scripts import qd_ed_n23_v2_backend as b
++from scripts import qd_ed_n23_v2_preflight_admit as admit
++from scripts import qd_ed_n23_v2_prepare as prepare
++from scripts import qd_ed_n23_uuid_repair as prior
++from scripts import qd_ed_n23_uuid_native_repair as repair
++from scripts.qd_ed_audit_backend import AuditBackend
++
++
++@pytest.fixture
++def case(prior_case,monkeypatch):
++    first=prior_case;root=first.root
++    first.source['commit']=repair.FAILED_SOURCE
++    write(prior.FINAL_REVIEW,first.review);first.auth['final_source_review']=c.ref(prior.FINAL_REVIEW)
++    write(prior.AUTHORITY,first.auth);first.meta['authority']=c.ref(prior.AUTHORITY)
++    secondplan=write(root/'second-plan.json',first.plan)
++    base={'attempt_id':repair.FAILED_ATTEMPT,'identity':r.episode_identity(admit.diagnostic_row(first.plan)),
++        'episode_key':admit.diagnostic_row(first.plan)['episode_key'],'budget_bucket':'recovery',
++        'retry_of':prior.FAILED_ATTEMPT,'source_commit':repair.FAILED_SOURCE,'plan_sha256':secondplan['sha256'],
++        'n23_backend_preflight':True,'task_outcome':False,'physical_gpu':7,'n23_uuid_repair':first.meta,
++        'n23_final_review':c.ref(prior.FINAL_REVIEW)}
++    process={'pid':321,'proc_start_ticks':'654','boot_id':'synthetic'}
++    report={'schema':'n23-backend-preflight-proof-v2','plan':secondplan,'source':first.source,
++        'attempt_id':repair.FAILED_ATTEMPT,'accepted':False,'task_outcome':False,'errors':[prior.ERROR],
++        'batches':[],'synthetic':[],'runtime':first.old['runtime'],'process':process,'uuid_repair':first.meta,
++        'retry_of':prior.FAILED_ATTEMPT,'worker_wall_seconds':repair.FAILED_WORKER_SECONDS}
++    terminal={**base,'event':'aborted','outcome_valid':False,'gpu_process_wall_seconds':repair.FAILED_SECONDS,
++        'n23_preflight_dispatched':True,'process':process}
++    events=first.events+[{**base,'event':'reserved'},{**base,'event':'dispatched'},terminal]
++    failure={'schema':'n23-uuid-repair-native-type-failure-review-v1','attempt_id':repair.FAILED_ATTEMPT,
++        'status':'INVALID_INFRASTRUCTURE_BEFORE_ARITHMETIC','task_outcome':False,'dev_dispatched':False,
++        'gpu_process_wall_seconds':repair.FAILED_SECONDS,'additional_gpu_recovery_under_v1_authorized':False,
++        'current_failed_worker_raw_uuid':'not recorded; neither failed worker exposed its live value',
++        'prior_failure':c.ref(prior.FAILURE_REVIEW),'authority':c.ref(prior.AUTHORITY),'source':first.source,
++        'plan':secondplan,'report':write(root/'second-report.json',report),
++        'attempt_result':write(root/'second-terminal.json',terminal)}
++    failurepath=root/'second-failure-review.json';write(failurepath,failure)
++    monkeypatch.setattr(repair,'FAILURE_REVIEW',failurepath);monkeypatch.setattr(repair,'FAILURE_SHA',c.sha(failurepath))
++    source={'commit':'native-source','files':[],'sha256':'native-source-hash'}
++    review={'schema':'n23-final-source-runtime-review-uuid-native-repair-v2','disposition':'accepted',
++        'source':source,'runtime':first.old['runtime'],'dev_protocol':c.ref(c.PROTOCOL),
++        'backend_protocol':c.ref(c.BACKEND_PROTOCOL),'amendment':c.ref(c.BUDGET_AMENDMENT),
++        'timeout_observability':c.ref(c.OBSERVABILITY),'exception':c.ref(repair.EXCEPTION),
++        'failed_review':c.ref(failurepath),'prior_failure':c.ref(prior.FAILURE_REVIEW),'no_gpu_release':True}
++    reviewpath=root/'native-review.json';write(reviewpath,review);monkeypatch.setattr(repair,'FINAL_REVIEW',reviewpath)
++    auth={'schema':'n23-uuid-native-repair-authority-v2','exception':c.ref(repair.EXCEPTION),
++        'failed_review':c.ref(failurepath),'prior_failure':c.ref(prior.FAILURE_REVIEW),
++        'final_source_review':c.ref(reviewpath),'source':source,'runtime':first.old['runtime'],
++        'authority_interpretation':'synthetic explicit engineering exception','recorded_at':'synthetic',
++        'user_message':c.AUTONOMOUS_REPLY,'cumulative_caps':repair.CAPS,'limits':repair.LIMITS,
++        'validation_authorized':False,'formal_authorized':False}
++    authpath=root/'native-authority.json';write(authpath,auth);monkeypatch.setattr(repair,'AUTHORITY',authpath)
++    meta=repair.binding();plan={**first.old,'source':source,'uuid_repair':meta}
++    state=copy.deepcopy(first.state);state['n23_uuid_native_repair_authority']=meta['authority']
++    state['budget']['dispatched']=2;state['budget']['gpu_hours_consumed']=(prior.ORIGINAL_SECONDS+repair.FAILED_SECONDS)/3600
++    return SimpleNamespace(first=first,root=root,source=source,plan=plan,meta=meta,events=events,report=report,
++        terminal=terminal,failure=failure,state=state,review=review,auth=auth,runtime=first.runtime)
++
++
++@pytest.mark.parametrize('fault',['none','wrong_attempt','wrong_source','wrong_error','arithmetic','synthetic','cost',
++    'worker_cost','retry','authority','prior_ref','missing_first','missing_second','unsettled','reordered','raw_claim'])
++def test_exact_both_named_failures_and_costs(case,monkeypatch,fault):
++    x=case
++    if fault=='wrong_attempt':x.failure['attempt_id']='other'
++    if fault=='wrong_source':x.report['source']={'commit':'other'}
++    if fault=='wrong_error':x.report['errors']=['other']
++    if fault=='arithmetic':x.report['batches']=[{}]
++    if fault=='synthetic':x.report['synthetic']=[{}]
++    if fault=='cost':x.terminal['gpu_process_wall_seconds']=0
++    if fault=='worker_cost':x.report['worker_wall_seconds']=0
++    if fault=='retry':x.terminal['retry_of']=None
++    if fault=='authority':x.failure['authority']=None
++    if fault=='prior_ref':x.failure['prior_failure']=None
++    if fault=='missing_first':x.events=x.events[3:]
++    if fault=='missing_second':x.events=x.events[:3]
++    if fault=='unsettled':x.events.pop()
++    if fault=='reordered':x.events=x.events[3:]+x.events[:3]
++    if fault=='raw_claim':x.failure['current_failed_worker_raw_uuid']=c.GPU7_UUID
++    x.failure['report']=write(x.root/'second-report.json',x.report)
++    x.failure['attempt_result']=write(x.root/'second-terminal.json',x.terminal)
++    write(repair.FAILURE_REVIEW,x.failure);monkeypatch.setattr(repair,'FAILURE_SHA',c.sha(repair.FAILURE_REVIEW))
++    if fault=='none':assert repair.named_failures(x.events,vars(r))[2]==x.terminal
++    else:
++        with pytest.raises((ValueError,KeyError)):repair.named_failures(x.events,vars(r))
++
++
++@pytest.mark.parametrize('fault',['none','missing','not_adopted','old_only','source','runtime','limit','fourth','caps',
++    'protected','review','retry','schema','prior_attempt'])
++def test_separate_exact_authority_never_reinterprets_v1(case,fault):
++    x=case
++    if fault=='missing':repair.AUTHORITY.unlink()
++    if fault in {'not_adopted','old_only'}:x.state.pop('n23_uuid_native_repair_authority')
++    if fault=='source':x.auth['source']={'commit':'other'}
++    if fault=='runtime':x.auth['runtime']=None
++    if fault=='limit':x.auth['limits']={**x.auth['limits'],'additional_backend_attempts':2}
++    if fault=='fourth':x.auth['limits']={**x.auth['limits'],'max_total_backend_attempts':4}
++    if fault=='caps':x.auth['cumulative_caps']={**x.auth['cumulative_caps'],'attempts':479}
++    if fault=='protected':x.auth['validation_authorized']=True
++    if fault=='review':x.auth['final_source_review']=None
++    if fault=='retry':x.meta['retry_of']=prior.FAILED_ATTEMPT
++    if fault=='schema':x.meta['schema']='generic_retry'
++    if fault=='prior_attempt':x.meta['prior_attempt']='other'
++    if fault not in {'missing','not_adopted','old_only','retry','schema','prior_attempt'}:
++        write(repair.AUTHORITY,x.auth);x.meta['authority']=c.ref(repair.AUTHORITY);x.state['n23_uuid_native_repair_authority']=x.meta['authority']
++    if fault=='none':assert repair.authority(x.meta,x.source,x.plan['runtime'],x.state)==x.auth
++    else:
++        with pytest.raises((ValueError,FileNotFoundError)):repair.authority(x.meta,x.source,x.plan['runtime'],x.state)
++    if fault=='schema':
++        with pytest.raises(ValueError):c.repair_module(x.meta)
++
++
++@pytest.mark.parametrize('fault',['none','corpus','runtime','protocol','arithmetic','worktree','source'])
++def test_only_source_and_lineage_differ_from_original_plan(case,monkeypatch,fault):
++    x=case;monkeypatch.setattr(repair,'source_delta',lambda *_:[])
++    key={'corpus':'corpus','runtime':'runtime','protocol':'protocol','arithmetic':'synthetic_cases','worktree':'worktree','source':'source'}.get(fault)
++    if key:x.plan[key]='other'
++    if fault=='none':assert repair.validate_plan(x.plan)==x.plan
++    else:
++        with pytest.raises(ValueError):repair.validate_plan(x.plan)
++
++
++def stub_inputs(x,monkeypatch):
++    monkeypatch.setattr(w,'source_record',lambda *_:x.source)
++    monkeypatch.setattr(c,'predecessor_review',lambda:x.first.old['predecessor_review'])
++    monkeypatch.setattr(b,'validate_plan',lambda *_:x.runtime)
++    monkeypatch.setattr(c,'validate_runtime',lambda *_:None)
++
++
++@pytest.mark.parametrize('fault',['none','dev_reserved','v1_dev','third_reserved','third_failed','fourth','unsettled',
++    'not_adopted','protected','slots'])
++def test_at_most_third_opportunity_and_unchanged_protected_reserves(case,monkeypatch,fault):
++    x=case;stub_inputs(x,monkeypatch)
++    if fault in {'dev_reserved','v1_dev'}:x.events.append({'attempt_id':'dev','event':'reserved','identity':{'iteration':c.COHORT if fault=='dev_reserved' else c.v1.COHORT}})
++    if fault in {'third_reserved','third_failed','fourth'}:
++        x.events.append({'attempt_id':'extra','event':'aborted' if fault=='third_failed' else 'reserved',
++            'identity':{'iteration':c.PREFLIGHT},'retry_of':repair.FAILED_ATTEMPT,'n23_backend_preflight':True})
++    if fault=='unsettled':x.events.pop()
++    if fault=='not_adopted':x.state.pop('n23_uuid_native_repair_authority')
++    if fault in {'protected','slots'}:
++        original=r.budget_snapshot
++        def snap(*a):
++            value=original(*a)
++            if fault=='protected':value['gpu_hours_consumed']=34.
++            else:value['by_bucket']['recovery']=18
++            return value
++        monkeypatch.setattr(r,'budget_snapshot',snap)
++    reserve=[{'event':'gpu_hour_reservations_changed','gpu_hour_reservations':{'validation':32.,'formal':12.},'rationale':'synthetic','time_unix':1.}]
++    if fault=='none':assert admit.admission(x.plan,x.state,x.events,[],reserve,root=x.root)==x.runtime
++    else:
++        with pytest.raises((ValueError,r.GateError)):admit.admission(x.plan,x.state,x.events,[],reserve,root=x.root)
++    # Old exception remains exhausted even with new authority present.
++    with pytest.raises(ValueError):prior.admission(x.first.plan,x.state,x.events,[],reserve,root=x.root,r=vars(r))
++
++
++def identity(kind='torch._C._CUuuid'):
++    raw=c.GPU7_UUID[4:]
++    return {'kind':'cuda','logical_device':'cuda:0','physical_uuid':c.GPU7_UUID,'torch_version':'fixture','cuda_version':'fixture',
++        'actual_uuid':raw,'actual_uuid_type':kind,'actual_uuid_bytes_hex':raw.replace('-','') if kind=='torch._C._CUuuid' else None,
++        'cuda_visible_devices':'7','identity_diagnostic':{'schema':'n23-public-cuda-identity-diagnostic-v1',
++            'expected_physical_gpu':7,'expected_uuid':c.GPU7_UUID,'cuda_visible_devices':'7','visible_device_count':1,
++            'current_device':0,'uuid_public_type':kind,'serialized_raw_uuid':raw,'canonical_uuid':c.GPU7_UUID,'status':'matched'}}
++
++
++@pytest.mark.parametrize('fault',['native','str','missing_raw','wrong_raw','type','missing_hex','wrong_hex','str_hex',
++    'missing_diagnostic','count','count_bool','logical','logical_bool','mask','status','diagnostic_raw','canonical','expected'])
++def test_proof_requires_json_safe_raw_type_hex_and_matched_diagnostic(case,fault):
++    value=identity('builtins.str' if fault in {'str','str_hex'} else 'torch._C._CUuuid')
++    if fault=='missing_raw':value.pop('actual_uuid')
++    if fault=='wrong_raw':value['actual_uuid']='00000000-0000-0000-0000-000000000001'
++    if fault=='type':value['actual_uuid_type']='fake'
++    if fault=='missing_hex':value.pop('actual_uuid_bytes_hex')
++    if fault in {'wrong_hex','str_hex'}:value['actual_uuid_bytes_hex']='00'*16
++    if fault=='missing_diagnostic':value.pop('identity_diagnostic')
++    if fault in {'count','logical','mask','status','diagnostic_raw','canonical','expected'}:
++        key={'count':'visible_device_count','logical':'current_device','mask':'cuda_visible_devices','status':'status',
++            'diagnostic_raw':'serialized_raw_uuid','canonical':'canonical_uuid','expected':'expected_uuid'}[fault]
++        value['identity_diagnostic'][key]='other'
++    if fault=='count_bool':value['identity_diagnostic']['visible_device_count']=True
++    if fault=='logical_bool':value['identity_diagnostic']['current_device']=False
++    if fault in {'native','str'}:repair.verify_identity(json.loads(json.dumps(value)),case.runtime)
++    else:
++        with pytest.raises(ValueError):repair.verify_identity(value,case.runtime)
++
++
++def composition_setup(x,monkeypatch):
++    x.source['files']=[{'path':p,'sha256':'synthetic'} for p in sorted(c.source_paths(vars(r)))]
++    write(repair.FINAL_REVIEW,x.review);x.auth['final_source_review']=c.ref(repair.FINAL_REVIEW)
++    write(repair.AUTHORITY,x.auth);x.meta['authority']=c.ref(repair.AUTHORITY);x.state['n23_uuid_native_repair_authority']=x.meta['authority']
++    write(x.root/'data/attempt-ledger.jsonl',x.events,True)
++    write(x.root/'data/gpu-hour-reservation-ledger.jsonl',[{'event':'gpu_hour_reservations_changed',
++        'gpu_hour_reservations':{'validation':32.,'formal':12.},'rationale':'synthetic','time_unix':1.}],True)
++    (x.root/'research-state.yaml').write_text(yaml.safe_dump(x.state))
++    monkeypatch.setattr(b,'ROOT',x.root);monkeypatch.setattr(w,'source_record',lambda *_:copy.deepcopy(x.source))
++    monkeypatch.setattr(w,'verify_source',lambda *_:None);monkeypatch.setattr(repair,'source_delta',lambda *_:[])
++    monkeypatch.setattr(b,'corpus_from_index',lambda _:copy.deepcopy(x.first.old['corpus']))
++    monkeypatch.setattr(b,'verify_corpus_files',lambda *_:None);monkeypatch.setattr(b,'predecessor_gate',lambda *_:{})
++    monkeypatch.setattr(c,'predecessor_review',lambda:x.first.old['predecessor_review'])
++    monkeypatch.setattr(c,'validate_runtime',lambda *_:None);monkeypatch.setattr(admit,'gpu_gate',lambda *a,**k:{'uuid':c.GPU7_UUID})
++    monkeypatch.setattr(r,'child_environment',lambda *_:{})
++    monkeypatch.setattr(r,'verify_provider',lambda *a,**k:(_ for _ in ()).throw(AssertionError('provider forbidden')))
++    arithmetic=AuditBackend(torch.device('cpu'),identity());arithmetic.dtypes.update(['torch.float32','torch.bfloat16'])
++    monkeypatch.setattr(b,'create_backend',lambda *a,**k:arithmetic)
++    monkeypatch.setattr(b,'iter_batches',lambda _:iter([{'batch':i} for i in range(176)]))
++    monkeypatch.setattr(b,'synthetic_batches',lambda _:iter([{'synthetic':True}]*2))
++    monkeypatch.setattr(b,'check_batch',lambda batch,_:{'accepted':True,'candidates':16,'mismatches':[]})
++    monkeypatch.setattr(r,'terminate_owned',lambda _:None)
++
++
++@pytest.mark.parametrize('fault',['none','worker_error','worker_timeout','missing_proof','launch_error','bad_identity_proof'])
++def test_native_preflight_charge_proof_then_unchanged_dev_and_no_fourth(case,monkeypatch,fault):
++    x=case;composition_setup(x,monkeypatch)
++    path=x.root/'backend-preflight-plan.uuid-native-repair.frozen.v2.json';write(path,x.plan)
++    calls=[];returncodes=[];cleanup=[]
++    def popen(command,**kwargs):
++        calls.append(command);events=r.read_events(x.root/'data/attempt-ledger.jsonl')
++        assert events[-1]['event']=='dispatched' and events[-1]['retry_of']==repair.FAILED_ATTEMPT
++        assert r.budget_snapshot(events)['by_bucket']['recovery']==3
++        assert str(x.root/'main.py') in command and '--ownership-main' in command
++        if fault=='launch_error':raise OSError('synthetic launch error')
++        if fault in {'none','worker_error','bad_identity_proof'}:
++            if fault=='worker_error':monkeypatch.setattr(b,'create_backend',lambda *a,**k:(_ for _ in ()).throw(RuntimeError('synthetic error')))
++            if fault=='bad_identity_proof':
++                broken=identity();broken.pop('actual_uuid_type')
++                arithmetic=AuditBackend(torch.device('cpu'),broken);arithmetic.dtypes.update(['torch.float32','torch.bfloat16'])
++                monkeypatch.setattr(b,'create_backend',lambda *a,**k:arithmetic)
++            returncodes.append(b.run_preflight(command[command.index('--plan')+1],command[command.index('--release')+1],
++                command[command.index('--attempt-context')+1]))
++        return SimpleNamespace(pid=os.getpid())
++    monkeypatch.setattr(admit.subprocess,'Popen',popen)
++    monkeypatch.setattr(r,'terminate_owned',lambda p:cleanup.append(p))
++    def wait(*a,**k):
++        if fault=='worker_timeout':raise TimeoutError('whole-worker timeout')
++        return returncodes[-1] if returncodes else 0
++    monkeypatch.setattr(r,'wait_exclusively',wait)
++    if fault=='none':terminal=admit.run(path,root=x.root)
++    else:
++        with pytest.raises((ValueError,r.GateError,OSError,TimeoutError)):admit.run(path,root=x.root)
++    events=r.read_events(x.root/'data/attempt-ledger.jsonl');snap=r.budget_snapshot(events)
++    assert snap['dispatched']==snap['by_bucket']['recovery']==3 and snap['running']==0 and len(cleanup)==1
++    assert events[:6]==x.events and events[-1]['retry_of']==repair.FAILED_ATTEMPT
++    assert snap['gpu_hours_consumed']*3600>=prior.ORIGINAL_SECONDS+repair.FAILED_SECONDS and len(calls)==1
++    assert events[-1]['outcome_valid'] is (fault=='none')
++    with pytest.raises(ValueError):admit.run(path,root=x.root)
++    assert len(calls)==1 and r.read_events(x.root/'data/attempt-ledger.jsonl')==events
++    if fault!='none':return
++    output=Path(terminal['output_dir']);reference=json.loads((output/'backend-proof-reference.json').read_text())
++    assert Path(reference['report']['path']).name=='n23-backend-uuid-native-repair-report-v2.json'
++    assert c.backend_proof(reference,x.source,x.root,vars(r))==reference
++    parent={'n22_cohort':{'cohort_id':'N22_HOLD_LIFT_DEV_20260930'},'scientific_config_files':[],
++        'runtime_manifest_path':str(c.GPU7_RUNTIME),'stage_condition':r.E2_STAGE_CONDITION}
++    parentpath=x.root/'parent-dev.json';write(parentpath,parent);monkeypatch.setattr(c,'SOURCE_PLAN',parentpath)
++    rows=[{'episode_key':f'{t}-{arm}','task_id':t,'profile':arm,'split':'dev','iteration':c.COHORT} for t in range(10) for arm in c.ARMS]
++    monkeypatch.setattr(c,'expected_rows',lambda:copy.deepcopy(rows))
++    original=prepare.build_plan(predecessor=x.first.old['predecessor_review'],review=c.ref(repair.FINAL_REVIEW),proof=reference)
++    dev=prepare.build_plan(predecessor=x.first.old['predecessor_review'],review=c.ref(repair.FINAL_REVIEW),proof=reference,uuid_repair=x.meta)
++    assert dev['episodes']==rows and dev['source_commit']==x.source['commit']
++    assert dev['phase_authorization']=={'dev':True,'validation':False,'formal':False}
++    manifest=r.read_json(r.ROOT/'configs/qd_ed_final/baseline_profiles.json')
++    for arm in ('N7','N23'):manifest['profiles'][arm]=r.expand_candidate(arm,w.read_ref(dev['candidate_profiles'][arm]),manifest['profiles']['Q0'])
++    reader=dict(vars(r));reader['read_state']=lambda *_:x.state;reader['read_events']=lambda *_:events
++    c.validate_contract(dev,manifest,x.runtime,None,r.ROOT,reader)
++    del dev['n23_cohort']['uuid_repair'];assert dev==original
++
++
++@pytest.mark.parametrize('fault',['none','fourth','unsettled','missing_retry','wrong_review','dev_before','dev_after','wrong_order'])
++def test_valid_proof_preserves_three_groups_and_dev_temporal_boundary(case,fault):
++    x=case;planref=write(x.root/'native-plan.json',x.plan);reference={'attempt_id':'third','plan':planref}
++    base={'attempt_id':'third','identity':{'iteration':c.PREFLIGHT},'n23_backend_preflight':True,
++        'source_commit':x.source['commit'],'plan_sha256':planref['sha256'],'budget_bucket':'recovery','physical_gpu':7,
++        'retry_of':repair.FAILED_ATTEMPT,'n23_uuid_repair':x.meta,'n23_final_review':c.ref(repair.FINAL_REVIEW)}
++    new=[{**base,'event':e,**({'outcome_valid':True} if e=='valid' else {})} for e in ('reserved','dispatched','valid')]
++    if fault=='missing_retry':new[0]['retry_of']=None
++    if fault=='wrong_review':new[-1]['n23_final_review']=None
++    if fault=='unsettled':new.pop()
++    events=x.events+new
++    if fault=='fourth':events.append({'attempt_id':'fourth','event':'reserved','n23_backend_preflight':True})
++    dev={'attempt_id':'dev','event':'reserved','identity':{'iteration':c.COHORT}}
++    if fault=='dev_before':events.insert(6,dev)
++    if fault=='dev_after':events.append(dev)
++    if fault=='wrong_order':events=new+x.events
++    if fault in {'none','dev_after'}:assert repair.verify_lineage(x.plan,reference,events,x.source,vars(r))==new[-1]
++    else:
++        with pytest.raises(ValueError):repair.verify_lineage(x.plan,reference,events,x.source,vars(r))
++
++
++@pytest.mark.parametrize('which',['PROTOCOL','BACKEND_PROTOCOL','BUDGET_AMENDMENT','OBSERVABILITY','EXCEPTION','FAILURE_REVIEW',
++    'prior.EXCEPTION','prior.FAILURE_REVIEW'])
++def test_all_frozen_documents_rechecked_before_release(case,monkeypatch,which):
++    owner=prior if which.startswith('prior.') else repair if which in {'EXCEPTION','FAILURE_REVIEW'} else c
++    name=which.split('.')[-1];path=case.root/'drift.md';path.write_text('changed');monkeypatch.setattr(owner,name,path)
++    with pytest.raises(ValueError,match='immutable'):repair.final_review(case.source,case.plan['runtime'])
++
++
++@pytest.mark.parametrize('changed',[['scripts/qd_ed_n23_uuid_native_repair.py','scripts/qd_ed_audit_backend.py'],
++    ['main.py'],['core/qd_actuator_clipped_quality.py'],['configs/qd_ed_final/candidate_n23.json'],['scripts/unrelated.py']])
++def test_no_numerical_profile_stage_or_unrelated_source_delta(monkeypatch,changed):
++    monkeypatch.setattr(repair.subprocess,'check_output',lambda *a,**k:'\n'.join(changed))
++    if set(changed)<=repair.ALLOWED_DELTA:assert repair.source_delta(r.ROOT)==sorted(changed)
++    else:
++        with pytest.raises(ValueError,match='scientific'):repair.source_delta(r.ROOT)

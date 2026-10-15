@@ -1,0 +1,10 @@
+{
+  "branch": "codex/n26-clean-output-rbf",
+  "clean": true,
+  "commit": "c09dffe956c391d85ecc02e3288b9fa982e86ce7",
+  "git_status_porcelain": "",
+  "source_manifest": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/source-manifest-controller-v1.json",
+    "sha256": "8cae3e7bb0104cb978237b5d4323909e13ffc8a03036958717c5378960ca9bdf"
+  }
+}

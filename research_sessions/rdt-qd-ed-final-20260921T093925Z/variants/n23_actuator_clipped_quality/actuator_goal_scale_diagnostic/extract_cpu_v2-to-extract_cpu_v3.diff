@@ -1,0 +1,27 @@
+--- extract_cpu_v2.py
++++ extract_cpu_v3.py
+@@ -61,6 +61,7 @@
+   r=a['metrics'];b=Path(r['path']).read_bytes();check(sha(b)==r['sha256'],'metrics changed');safe=[]
+   for line in b.decode().splitlines():
+    row=json.loads(line);safe.append({k:row.get(k) for k in scope['allowed_metric_fields']});del row
++  check(all(t['attempt_id']==a['attempt_id'] for t in d['transitions'] if t['task']==a['task']),'frozen global-task/attempt binding')
+   prefixes=[p for p in d['prefixes'] if p['task']==a['task']];guided={p['step']:p for p in prefixes if p['guided']};check(len(safe)==len(guided) and len(safe)>0,'guided metadata coverage')
+   semantics=None;context=None;steps=set();actual=[]
+   for row in safe:
+@@ -71,7 +72,7 @@
+     check(isinstance(sem[key],list) and len(sem[key])==6 and all(type(x) in [int,float] and math.isfinite(x) for x in sem[key]),'actual bounds malformed')
+    check(all(sem['input_min'][i]<sem['input_max'][i] and sem['output_min'][i]<sem['output_max'][i] for i in range(6)),'actual bound order')
+    check(sem['input_min'][:3]==[-1.]*3 and sem['input_max'][:3]==[1.]*3,'N23 input bound contradiction')
+-   check(ctx['task_index']==a['task'] and all(type(x) is int and x>=0 for x in ctx.values()),'actual controller lifecycle identity:'+repr(ctx))
++   check(all(type(x) is int and x>=0 for x in ctx.values()),'actual controller lifecycle identity:'+repr(ctx))
+    if semantics is None:semantics=sem;context=ctx
+    else:check(semantics==sem and context==ctx,'metadata bounds or controller/reset identity drift')
+    for method,sourcekey,qualname in [('set_goal','installed_robosuite/osc.py','OperationalSpaceController.set_goal'),('scale_action','installed_robosuite/base_controller.py','Controller.scale_action')]:
+@@ -82,6 +83,7 @@
+   bytask[a['task']]=semantics
+   metadata.append({'task':a['task'],'attempt_id':a['attempt_id'],'metrics':r,'recorded_snapshot_count':len(actual),'snapshot_steps':sorted(steps),'same_controller_context':context,'semantics':semantics,
+     'snapshots':actual,'unguided_boundaries_without_snapshot':len(prefixes)-len(actual),
++    'global_task_binding':'frozen explicit task/attempt manifest plus hash-bound completed-native derived actions; snapshot task_index is local filtered-environment index, not benchmark task_id',
+     'B_coverage_interpretation':'same per-attempt recorded static bounds; not a live snapshot at every action; final goal, position_limits and cached action_scale unobserved'})
+  check(sum(m['recorded_snapshot_count'] for m in metadata)==139,'snapshot count')
+  # Validate the source trace text without importing or invoking controller/environment classes.

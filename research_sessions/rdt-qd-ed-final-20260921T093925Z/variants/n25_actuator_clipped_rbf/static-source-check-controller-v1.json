@@ -1,0 +1,34 @@
+{
+  "schema": "n25-phase-b-static-source-check-v1",
+  "base": "aadec3f7435f31c60b74f709efb61427c3b829c7",
+  "phase_a_files": 236,
+  "unchanged": 234,
+  "shared_changed": {
+    "scripts/qd_ed_final_runner.py": {
+      "changed_functions": [
+        "check_budget",
+        "check_retry",
+        "expand_candidate",
+        "is_n23_plan",
+        "is_n23_v2_plan",
+        "is_n7_plan",
+        "metered_plan",
+        "metered_support",
+        "reconcile_ledger",
+        "run_plan",
+        "typed_metered_plan",
+        "validate_plan"
+      ],
+      "unchanged_functions": 77
+    },
+    "scripts/qd_ed_n23_worker.py": {
+      "changed_functions": [
+        "run_worker",
+        "validate_context",
+        "verify_receipt"
+      ],
+      "unchanged_functions": 13
+    }
+  },
+  "scientific_bytes_unchanged": true
+}

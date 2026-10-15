@@ -1,0 +1,13 @@
+{
+  "schema": "n26-terminal-static-input-supplement-v1",
+  "reason": "N26 reference imports the six fixed case names from the N25 static reference; no runtime import or proof read.",
+  "commit": "6026794cd5d52f3a5054bf2704ebb3c516f9f47e",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n26_clean_output_rbf/conditional_implementation/scripts/qd_ed_n25_reference.py",
+      "relative_path": "scripts/qd_ed_n25_reference.py",
+      "sha256": "dd100a41021eb84b6a279d7dce8789eb65b53e04dc0a4df4df301abc1d241b3b"
+    }
+  ],
+  "real_metadata_read": false
+}

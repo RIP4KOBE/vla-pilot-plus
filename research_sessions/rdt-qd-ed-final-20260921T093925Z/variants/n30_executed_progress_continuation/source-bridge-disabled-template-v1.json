@@ -1,0 +1,35 @@
+{
+  "executable": false,
+  "schema": "n30-source-bridge-preparation-template-v1",
+  "source": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/source-manifest-execution-v1.json",
+    "sha256": "7f723ac3c412649214e53a64737fe9d6723df93016aecb7c161d9b44b82ab26a"
+  },
+  "builder": "scripts.qd_ed_n30_bridge.build(source_record, runtime_ref, owning_root)",
+  "output": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/source-equivalence-bridge-v1.json",
+  "allowed_history_refs": {
+    "closed_review": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/root-terminal-review-v1.json",
+      "sha256": "9905c0a5b2ab7c27c599597a5cbc3dde83a643bd337820cfd7dba37afe866fb4"
+    },
+    "source_review": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/final-source-runtime-review-v1.json",
+      "sha256": "8327520b8628cde21d9f6c0960de8e17a8bc4cfb4dca46a868fdcfee37aaa6c2"
+    },
+    "source_plan": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/plan.frozen.v1.gpu7.json",
+      "sha256": "151ce8fdb088012676982703aad0cbc2a9952f1f656864bb3cea58d4ca223bc0"
+    },
+    "budget_authority": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n29_population_relative_trust/budget-adoption-v1/authority.json",
+      "sha256": "237d929b2135470921c6050e321f9776e41bfdc266c2c298a8134cd2c275c251"
+    }
+  },
+  "runtime_ref": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260929/n18-close-then-lift-dev-v1/gpu7-rebind/runtime-manifest.gpu7.frozen.v3.json",
+    "sha256": "8b9aebb5af45ab355f4c03bf7669ed78c50b595185ff1e624ebc180dcca89dd7"
+  },
+  "old_raw_proof_or_tensor_replay": false,
+  "new_standalone_preflight": false,
+  "root_source_integration_required": true
+}

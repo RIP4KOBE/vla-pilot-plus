@@ -1,0 +1,1 @@
+Metadata-only root review v1 failed before process verification/output/state mutation: TypeError at line20 Path(/proc / str(pid)). V2 uses Path(/proc)/str(pid). No native payload read or scientific execution. Original v1 script retained.

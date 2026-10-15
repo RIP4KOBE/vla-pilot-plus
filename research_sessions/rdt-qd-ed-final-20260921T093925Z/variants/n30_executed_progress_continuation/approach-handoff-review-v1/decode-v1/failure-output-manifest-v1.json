@@ -1,0 +1,46 @@
+{
+  "schema": "n30-handoff-failed-startup-output-manifest-v1",
+  "status": "FAILED_BEFORE_READER_AUTHORIZATION_OR_PAYLOAD",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/execution-v1.log",
+      "sha256": "eb2dcd4c18c6a3d6d39bec249c4a6065c61e2839811185902afa1d80901a72ab",
+      "bytes": 396
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/external-execution-v1.json",
+      "sha256": "70c529523d24adab575aba770287d3b1fa6f54b12574f610c17c30862e305bf5",
+      "bytes": 1908
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/administrative-inspection-v1.json",
+      "sha256": "a76efd378c8cdebc1ccbbcfbde4290947e83d75c1499de2039effa9d0aaaeec9",
+      "bytes": 320
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/execution-closure-v1.json",
+      "sha256": "eb9f7f8e70c7785602a1d028d36f5fe981fb5d3f5dfa141b6809a05104c06f1f",
+      "bytes": 4017
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/failure-summary-v1.md",
+      "sha256": "7f525cc7a3838224654e47e1992838d98809fde8fd51b0ea5de68ddd7db95999",
+      "bytes": 1193
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n30_executed_progress_continuation/approach-handoff-review-v1/decode-v1/failure-output-manifest-pre-rename-v1.json",
+      "sha256": "9d06ab214e5525fca39cf87b120ed00648b1d6a0b02101193f906af6cce5e0cd",
+      "bytes": 2782
+    }
+  ],
+  "administrative_naming_correction": "Administrative failure summary was initially named summary-v1.md; renamed unchanged bytes to failure-summary-v1.md at root instruction. Old administrative manifest preserved under pre-rename name; its summary path is historical. No reader output now exists.",
+  "reader_output_names_present": {
+    "invocation-v1.json": false,
+    "progress-v1.jsonl": false,
+    "partial-v1.json": false,
+    "result-v1.json": false,
+    "resource-v1.json": false,
+    "summary-v1.md": false
+  },
+  "cpu_seconds": 0.0005780270000000018
+}
