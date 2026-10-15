@@ -1,0 +1,47 @@
+{
+  "schema": "post-n2-mechanism-space-source-review-v2",
+  "prior_source_manifest_sha256": "987c14806dfdcff5d5630692bd0f889ffa0dc89831fd743d99341b5388d8a386",
+  "prior_memo_sha256": "2a1c2397d757e476f13dab74b678c57bab353eb5f767f2efdea63d8e9cf9c4e4",
+  "memo": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/memo-v2.md",
+    "sha256": "531c638f6adcf01b876a5811bb18c540e23b36ac25157ff1b4a51a1822c6e7c4"
+  },
+  "source_files": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_002_executed_quality/protocol.md",
+      "sha256": "d5e560bb48cb705e13c931290adfccb3da905cf0a352e8d7bde8188dc5ca75b1"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/task0-closed-loop-exploration/findings-v3.md",
+      "sha256": "e1b7fb423ad2733a838bc775b0b5d903ddfcf3d2e5e06cd60373e6fc70bece96"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/task0-closed-loop-exploration/source-schema-v1.json",
+      "sha256": "9347c3a381baa44791d70a35d430fe96f1064b6241b0d38b93d905e2fb813012"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/task0-recorded-video-exploration/chronological-note-v1.md",
+      "sha256": "0deb725115c92bdafdd2706bb0592cb5d3e75f888968535850092bd43f1c366f"
+    }
+  ],
+  "new_actual_artifact_reads": 0,
+  "new_calls": 0,
+  "parent_reported_not_independently_read": {
+    "full_report_sha256": "d376f98a0d0d23d7b73b0a20ab768594c63ed6a6abce9473e0e67d2247bc88ab",
+    "candidate": "REJECT",
+    "study": "active",
+    "dispatched": 79,
+    "gpu_hours": 11.72537440950208,
+    "running": 0,
+    "protected_attempts": 100,
+    "protected_gpu_hours": 24,
+    "unreserved_attempts": 61,
+    "unreserved_gpu_hours": 12.27462559049792,
+    "all30_chronology_read_authorized_to": "separate E executor, not used by this review"
+  },
+  "scope_judgment": "Fixed untrained one-step feedback algebra used only by internal QD quality is within original section4 history/quality scope; learned scorer/descriptor training or external projector/provider changes are not covered. This is a prospective scope classification, not evidence of benefit."
+}

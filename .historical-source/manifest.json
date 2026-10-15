@@ -1,0 +1,128 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "exp/rdt-qd-ed-executed-quality-20260923",
+  "original_commit": "4e89c129087304263e2c8afd832d680d5e49461f",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n2_executed_quality/implementation",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-02/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n2_executed_quality/implementation",
+  "snapshot_source_files_considered": 3092,
+  "changed_or_added_files": [
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review-v1.md",
+      "bytes": 2437,
+      "sha256": "04af15089fea4135485e4ee1c2556777f1daf0cc13816068db02b0b6a8c8218f",
+      "git_blob": "2457420aac06ba80e0fc22c9ec8380965b2b693d",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review-v2.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review-v2.md",
+      "bytes": 1870,
+      "sha256": "e3ce17979347a13971b1ccc9f36fcdd7e3a94ee2fb577602869b3e07e4ba7683",
+      "git_blob": "b64bc661414e97dd2c4b10ab36488444391156e6",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review_reproductions.py",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review_reproductions.py",
+      "bytes": 2904,
+      "sha256": "cf3040839f92f14d744fcf7ffa0719dfaa77a7a7a55383829b74da1ab27c1cd8",
+      "git_blob": "027f029c1e3861be4771ab665ac3bc4b1e0ba58c",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review_reproductions_v2.py",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-chronology-review/review_reproductions_v2.py",
+      "bytes": 6443,
+      "sha256": "039652673d7c01ccfb9bd34e121a49ceda22b5b110c37a9d032a590e28913f34",
+      "git_blob": "4b924610735425fc488dca0c00c69971c40edfe7",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/memo-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/memo-v1.md",
+      "bytes": 12478,
+      "sha256": "2a1c2397d757e476f13dab74b678c57bab353eb5f767f2efdea63d8e9cf9c4e4",
+      "git_blob": "546df0e794be4fa7b0abd1104c1937872a5846bb",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/memo-v2.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/memo-v2.md",
+      "bytes": 13872,
+      "sha256": "531c638f6adcf01b876a5811bb18c540e23b36ac25157ff1b4a51a1822c6e7c4",
+      "git_blob": "2e8fc11075d8c74508ad2d505ee84602c171a7f2",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/runtime-feedback-interface-review-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/runtime-feedback-interface-review-v1.md",
+      "bytes": 9012,
+      "sha256": "207345842c775f96dd72265e410631b340f381c33d567382094dd0916e096c23",
+      "git_blob": "576dc3aeca2cd56411efc1bdb4d7749530a4f6d5",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/runtime-feedback-source-review-v1.json",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/runtime-feedback-source-review-v1.json",
+      "bytes": 2041,
+      "sha256": "e6237c73e12bbbbfdd8a8ad256954b4bf98b731f8295a32271ca473c7f42a86b",
+      "git_blob": "35bfa584c95a587b6511245044324b993bde36fa",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/selected-tracking-protocol-draft-v1.md",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/selected-tracking-protocol-draft-v1.md",
+      "bytes": 10426,
+      "sha256": "abb6cf3d725a453397d49bc130d8889028bf59d86ca915abaff7ee48f2f9c539",
+      "git_blob": "5e6bf746d2d872e8de9f13c911537b809d70bf1a",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/selected-tracking-source-review-v1.json",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/selected-tracking-source-review-v1.json",
+      "bytes": 3115,
+      "sha256": "a92f284e15ed92ca5f0498f7ef40500d6404b7774d691f5c356b2fa01dd30689",
+      "git_blob": "652f331aa267332534da6950aa635da12b2563b3",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/sources-v1.json",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/sources-v1.json",
+      "bytes": 2342,
+      "sha256": "987c14806dfdcff5d5630692bd0f889ffa0dc89831fd743d99341b5388d8a386",
+      "git_blob": "c77c88baabf3f68b9ea9eb3da4726057c20e0af8",
+      "mode": "100644",
+      "previous_blob": null
+    },
+    {
+      "source_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/sources-v2.json",
+      "published_path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/sources-v2.json",
+      "bytes": 2771,
+      "sha256": "b6b98fc91986f595e57622af8d5d7b1c1321ec9ffb90e985b827888f0fc633f1",
+      "git_blob": "0c1024f2a12198786a5c40c87d072781886fc622",
+      "mode": "100644",
+      "previous_blob": null
+    }
+  ],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "88c645315ce325a603a52716ef6b25d0e76c10a2",
+    "overlay_redacted_paths": 0
+  }
+}

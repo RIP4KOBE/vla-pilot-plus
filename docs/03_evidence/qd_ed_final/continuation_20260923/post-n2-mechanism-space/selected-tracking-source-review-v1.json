@@ -1,0 +1,56 @@
+{
+  "schema": "selected-tracking-source-review-v1",
+  "status": "PROPOSED_SCOPE_ONLY_NO_IMPLEMENTATION_OR_ACTUAL_READ",
+  "source_commit": "525506ca3198f54d86dadf84bbb76eb64926d87a",
+  "protocol": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/selected-tracking-protocol-draft-v1.md",
+    "sha256": "abb6cf3d725a453397d49bc130d8889028bf59d86ca915abaff7ee48f2f9c539"
+  },
+  "source_files": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_policy_steer.py",
+      "sha256": "cf5d50870738f94c6c8cb211e8e0557e2db5e67639da7c2bf545d54e9ed17bdc",
+      "source_commit_bytes_verified": true
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/env_adapters/libero_adapter.py",
+      "sha256": "029657074f6fc783beebc3b4a1431faceee51f970e4d79f0ead3796b6dd2f508",
+      "source_commit_bytes_verified": true
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+      "source_commit_bytes_verified": true
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/decision_evidence.py",
+      "sha256": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c",
+      "source_commit_bytes_verified": true
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/main.py",
+      "sha256": "258d66b3040be8750beb9e0eab47a7b607db7cbe00d167726664526554fdec57",
+      "source_commit_bytes_verified": true
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/audit_decision_evidence.py",
+      "sha256": "c5936a251bc8145093392136fc8b06779c499cb456953d1079fc4e26c68e1b95",
+      "source_commit_bytes_verified": true
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/continuation_20260923/decision-analysis-draft/analyze_episode.py",
+      "sha256": "26fb0952507b41694cb7b6d56991caef5afbb5b71aa0f13f4356cb731676e0b1",
+      "source_commit_bytes_verified": true
+    }
+  ],
+  "actual_bundles_read": 0,
+  "actual_residuals_computed": 0,
+  "gpu_model_provider_projector_simulator_calls": 0,
+  "scope_note": "Old analyzer source read only for existing fields; its CLI/helper was not invoked and its source lock is not bypassed. Future reader must be independently frozen for current exact sources.",
+  "pending_root_decisions": [
+    "exact30 representative manifest binding and fresh-audit/index reuse",
+    "selected-only projection/origin/sent-action/actual-response extraction scope",
+    "fixed one-step last-residual retrospective predictive check"
+  ],
+  "source_observation": "Adapter fixed 0.01 projection scale and internal controller scaling comment establish an approximation, not observed mismatch or a bug."
+}

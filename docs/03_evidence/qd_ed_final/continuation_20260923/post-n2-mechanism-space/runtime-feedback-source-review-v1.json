@@ -1,0 +1,39 @@
+{
+  "schema": "runtime-feedback-source-review-v1",
+  "source_commit": "525506ca3198f54d86dadf84bbb76eb64926d87a",
+  "source_files": [
+    {
+      "relative_path": "core/env_adapters/libero_adapter.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/env_adapters/libero_adapter.py",
+      "sha256": "029657074f6fc783beebc3b4a1431faceee51f970e4d79f0ead3796b6dd2f508",
+      "commit_bytes_verified": true
+    },
+    {
+      "relative_path": "main.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/main.py",
+      "sha256": "258d66b3040be8750beb9e0eab47a7b607db7cbe00d167726664526554fdec57",
+      "commit_bytes_verified": true
+    },
+    {
+      "relative_path": "core/rdt_policy_steer.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_policy_steer.py",
+      "sha256": "cf5d50870738f94c6c8cb211e8e0557e2db5e67639da7c2bf545d54e9ed17bdc",
+      "commit_bytes_verified": true
+    },
+    {
+      "relative_path": "core/keypoint_tracker.py",
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/keypoint_tracker.py",
+      "sha256": "292d63964b90405769118bda0e1acc9666f8ae076f41abbb7df8e5bf8abc6f45",
+      "commit_bytes_verified": true
+    }
+  ],
+  "report": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/runtime-feedback-interface-review-v1.md",
+    "sha256": "207345842c775f96dd72265e410631b340f381c33d567382094dd0916e096c23"
+  },
+  "scope": "Source only; exact returned raw-derived EEF route and lifecycle feasibility. No candidate implementation or new actual episode read.",
+  "result": "FEASIBLE_WITH_EXPLICIT_FEEDBACK_AND_INVALIDATION_PLUMBING",
+  "unresolved": "Tracker exposes no per-call fallback validity; do not infer target validity from unchanged registry/hash.",
+  "extra_environment_model_provider_projector_calls": 0,
+  "w_edits": false
+}

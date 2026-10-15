@@ -1,0 +1,46 @@
+{
+  "schema": "post-n2-mechanism-space-source-review-v1",
+  "scope": "docs-only; original prompt, N2 protocol and already authorized task0 summaries/schema only",
+  "recommended_outer_loop": "COLLECT_TARGETED_EVIDENCE",
+  "new_candidate_proven": false,
+  "hypotheses": 2,
+  "new_actual_episode_reads": 0,
+  "image_frames_viewed": 0,
+  "gpu_model_provider_projector_simulator_calls": 0,
+  "w_edits": false,
+  "actual_chronology_read_authorized": false,
+  "source_files": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_002_executed_quality/protocol.md",
+      "sha256": "d5e560bb48cb705e13c931290adfccb3da905cf0a352e8d7bde8188dc5ca75b1"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/task0-closed-loop-exploration/findings-v3.md",
+      "sha256": "e1b7fb423ad2733a838bc775b0b5d903ddfcf3d2e5e06cd60373e6fc70bece96"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/task0-closed-loop-exploration/source-schema-v1.json",
+      "sha256": "9347c3a381baa44791d70a35d430fe96f1064b6241b0d38b93d905e2fb813012"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/task0-recorded-video-exploration/chronological-note-v1.md",
+      "sha256": "0deb725115c92bdafdd2706bb0592cb5d3e75f888968535850092bd43f1c366f"
+    }
+  ],
+  "parent_reported_not_independently_checked": {
+    "full_cohort_valid_cells": 30,
+    "full_cohort_dispatches": 31,
+    "c0_successes": 2,
+    "q0_successes": 1,
+    "n2_successes": 1,
+    "approximate_global_dispatched": 79
+  },
+  "memo": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/memo-v1.md",
+    "sha256": "2a1c2397d757e476f13dab74b678c57bab353eb5f767f2efdea63d8e9cf9c4e4"
+  }
+}
