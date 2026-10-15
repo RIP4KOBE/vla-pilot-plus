@@ -1,0 +1,19 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "exp/rdt-qd-ed-n19-lift-quality-corrected-20260929",
+  "original_commit": "8a027d3e038963eaeecc50fe0c8f5801059471fb",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n19_lift_quality_contract_repair/implementation",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-02/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n19_lift_quality_contract_repair/implementation",
+  "snapshot_source_files_considered": 3137,
+  "changed_or_added_files": [],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "b5112e467aaeb4726969e32e1aed6012525a0385",
+    "overlay_redacted_paths": 0
+  }
+}
