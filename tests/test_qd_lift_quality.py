@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -102,3 +104,14 @@ def test_supervisor_and_runner_share_one_scope(tmp_path):
     support = runner.n18_support()
     with support.supervised_scope(plan, tmp_path, episode_key):
         support.require_scope(plan, tmp_path, runner.__dict__, {"episode_key": episode_key})
+
+
+def test_full_n18_profile_passes_terminal_and_quality_contracts():
+    profile = json.loads((Path(__file__).resolve().parents[1] /
+        "configs/qd_ed_final/candidate_n18.json").read_text())["profile"]
+    resolved = RDTSteer._resolve_eds_config_with_reference_defaults(None, profile)
+    assert resolved.qd_quality_mode == "close_then_lift_v1"
+    assert resolved.qd_final_selection_mode == "terminal_grasp_proximity_v1"
+    with pytest.raises(ValueError, match="N4 terminal population requires qd_quality_mode"):
+        RDTSteer._resolve_eds_config_with_reference_defaults(
+            None, {**profile, "qd_quality_mode": "executed_prefix_v1"})

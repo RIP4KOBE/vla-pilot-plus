@@ -8124,8 +8124,12 @@ class RDTSteer:
         if resolved.qd_final_selection_mode not in {DEFAULT_FINAL_SELECTION_MODE, TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}:
             raise ValueError("EDS qd_final_selection_mode is unsupported")
         if resolved.qd_final_selection_mode in {TERMINAL_POPULATION_MODE, GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}:
+            terminal_lift_quality = (resolved.qd_quality_mode == LIFT_MODE
+                                     and resolved.qd_final_selection_mode == GRASP_TIMING_MODE
+                                     and resolved.qd_descriptor == DIRECTION_HEIGHT_DESCRIPTOR)
             required_terminal = {
-                "qd_quality_mode": "provider", "reward_mode": "normal",
+                "qd_quality_mode": LIFT_MODE if terminal_lift_quality else "provider",
+                "reward_mode": "normal",
                 "qd_archive_mode": "grid_archive",
                 "qd_descriptor": (resolved.qd_descriptor
                                   if resolved.qd_final_selection_mode in {GRASP_TIMING_MODE, CONTACT_SWEEP_MODE}

@@ -1,0 +1,38 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "exp/rdt-qd-ed-n18-lift-quality-20260929",
+  "original_commit": "6bfbb169e3c1a93833de8fc48ebf62bfbb16483b",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n18_lift_quality/implementation",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-02/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n18_lift_quality/implementation",
+  "snapshot_source_files_considered": 3133,
+  "changed_or_added_files": [
+    {
+      "source_path": "core/rdt_policy_steer.py",
+      "published_path": "core/rdt_policy_steer.py",
+      "bytes": 388730,
+      "sha256": "3efea866296aea35a546fda38bad95189d5dca5415130fe3abe18a1884b0ad83",
+      "git_blob": "b3f19cefb9f017de0c10957852c965978098cc2c",
+      "mode": "100644",
+      "previous_blob": "7c1d055383cfe4fb6d9d8c583be1022d7f10afaa"
+    },
+    {
+      "source_path": "tests/test_qd_lift_quality.py",
+      "published_path": "tests/test_qd_lift_quality.py",
+      "bytes": 5293,
+      "sha256": "2ee8e636a30a8f1156f1f3d1b23f350e53fe74dcb3c8899d2588d83d0fedadd9",
+      "git_blob": "1f8d76db4789b58732cf7c32d0bd6b26c551643a",
+      "mode": "100644",
+      "previous_blob": "12db328ffdcbe578bd23d24a8a0509f87768ee94"
+    }
+  ],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "ee0528b7ff10326b0a41c84d49d90ce6751c9a01",
+    "overlay_redacted_paths": 0
+  }
+}
