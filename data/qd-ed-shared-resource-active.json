@@ -1,0 +1,9 @@
+{
+  "schema": "qd-ed-shared-resource-pointer-v1",
+  "active_contract": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-resumption-v1/shared-resource-contract-v1.json",
+    "sha256": "26972958be5372d8dffd304abcba844259e882588ca86a20c3b703e9446768b5"
+  },
+  "physical_gpu": 3,
+  "online_dispatch_authorized": false
+}

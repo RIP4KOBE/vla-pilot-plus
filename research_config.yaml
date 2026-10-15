@@ -1,13 +1,18 @@
-task: Execute ARBOR_CONTRACT.md and docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md;
-  GPU7 only.
+task: 'Implement and independently review N30: Q0 plus one observed-progress-conditioned
+  executed-plan continuation slot. No GPU release yet; proposed12cell C0/Q0/N30 Dev
+  screen fits existing buckets. Keep week expansion pending and protected phases closed.'
 coordinator:
   max_cycles: 32
   ui:
     interaction_mode: auto
 budget:
-  max_gpu_hours: 48
-  max_episode_attempts: 240
+  max_gpu_hours: 224
+  max_episode_attempts: 1800
   formal_candidates: 1
+  standing_authorization:
+    path: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json
+    sha256: a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c
+  future_budget_amendments_preapproved: true
 gpu_pool:
 - 7
 max_concurrent_gpu_workers: 1
