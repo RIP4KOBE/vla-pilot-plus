@@ -33,6 +33,8 @@
 
 历史分支含更多研究变体，已归档可查；不能将未合入 main 的实现或旧协议实验升级成当前能力。
 
+2026-10-15 的[远端历史源码索引](../maintenance/historical-source-index-20261015.md)提供历史分支、工作树未提交源码、stash 和外部源码快照的 GitHub 入口。发布副本存在凭据样式内容脱敏，原始字节与提交映射另存；不将归档发布描述为新算法验收。main 运行时行为未因本次整理改变。
+
 ## 3. 三模式实际运行机制
 
 统一入口：`scripts/evaluate_steering.py --method METHOD --local-config configs/local.yaml --output-dir NEW_DIR`。先按[安装说明](../steering/installation.md)准备配置和资产，预览与预检见 [README](../../README.md#开始使用)。
