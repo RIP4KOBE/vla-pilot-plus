@@ -1,0 +1,27 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp cream cheese (keypoint 0), which is visually identified in front of the robot.
+# Stage 2: Move gripper with cream cheese to the basket (keypoints 1, 2, 3, 4, 5). The exact placement is handled by the policy, so just return 0.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Guidance for moving to the cream cheese (keypoint 0)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)  # Keypoint 0 corresponds to cream cheese
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Scalar reward
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No decision needed for placing into the basket, just return 0
+    return torch.tensor(0.0, device=action_sequence.device)
+```

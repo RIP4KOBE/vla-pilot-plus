@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2: Place the grasped chocolate pudding into the basket (keypoint 1).
+    # No decision needs to be made here; return 0 to indicate that default policy will handle trajectory.
+    return torch.tensor(0.0, device=action_sequence.device)
+

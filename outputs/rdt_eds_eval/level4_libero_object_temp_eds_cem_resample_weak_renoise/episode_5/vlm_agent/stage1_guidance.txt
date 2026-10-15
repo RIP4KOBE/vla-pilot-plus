@@ -1,0 +1,19 @@
+def stage1_guidance(keypoints, action_sequence):
+    # Guidance to move the gripper to the ketchup bottle
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Apply higher weights toward the later timesteps
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # The target keypoint is the ketchup bottle at index 5
+    target_idx = torch.tensor([5], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape (3,)
+
+    # Calculate 3D distances and reward
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted distances
+    return reward.mean()  # Return a scalar reward
+

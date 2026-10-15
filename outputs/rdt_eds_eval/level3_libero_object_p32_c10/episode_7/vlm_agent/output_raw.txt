@@ -1,0 +1,35 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the butter (keypoint 0) as identified in the image.
+# Stage 2: Move gripper with butter to the basket (keypoints 1, 2, 3, 4).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Each item must be fully self-contained.
+    # Guiding the robot to grasp the butter (keypoint 0).
+    
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Emphasize final timesteps for better trajectory guidance.
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Target is the position of butter (keypoint 0).
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+
+    # Calculate weighted distance to the target position.
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward.
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2 requires no explicit decision-making, as it's about placing in the basket.
+    # Return 0 as the policy handles the motion automatically to place the butter.
+    return torch.tensor(0.0, device=action_sequence.device)
+```

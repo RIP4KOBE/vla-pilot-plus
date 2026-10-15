@@ -1,0 +1,32 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp bbq sauce (keypoint 0), identified as the bottle labeled "bbq_sauce_1_main" in front of the robot.
+# Stage 2: Move gripper with the grasped bbq sauce to the basket (keypoints 1, 2, 3, 4, 5), identified as "basket_1_main". No special reward function needed here—just return 0.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Move gripper to BBQ sauce (keypoint 0).
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+
+    # Apply higher weight to the last 30% of timesteps for smooth guidance.
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Hard-coded target keypoint index for bbq sauce
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+
+    # Compute negative-squared 3D distance reward (higher reward = closer to target)
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Distance at each timestep
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted sum of distances across timesteps
+    return reward.mean()  # Return a scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making for placing in the basket—return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+```

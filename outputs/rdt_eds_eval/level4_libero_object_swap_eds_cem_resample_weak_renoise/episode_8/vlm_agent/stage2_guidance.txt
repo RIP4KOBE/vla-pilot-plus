@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision is required for placing the object in the basket
+    return 0.0  # Policy handles this automatically
+

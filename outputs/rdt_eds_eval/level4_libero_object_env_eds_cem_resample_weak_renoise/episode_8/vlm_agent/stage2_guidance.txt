@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2: Move the milk to the basket (no decision needed; return 0)
+    return torch.tensor(0.0, device=action_sequence.device)
+

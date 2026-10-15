@@ -1,0 +1,36 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the ketchup (keypoint 5), which I identified is the BBQ sauce bottle labeled as "ketchup" in the task description.
+# Stage 2: Move gripper with ketchup to place it in the basket (keypoints 0, 1, 2, 3, 4). No additional reward function is needed for stage 2.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    
+    T = action_sequence.shape[1]  # Number of timesteps in action_sequence
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)  # After 70% of timesteps, reward the final target more strongly
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()  # Normalize weights
+
+    # Select keypoint corresponding to the ketchup (BBQ sauce bottle)
+    target_idx = torch.tensor([5], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Extract the 3D position of the target keypoint
+
+    # Compute distances from the action sequence to the target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted sum of -ve squared distances
+    return reward.mean()  # MUST return scalar!
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No decision needed for stage 2 as robot policy already knows how to place object into the basket.
+    return torch.tensor(0.0, device=action_sequence.device)
+
+```

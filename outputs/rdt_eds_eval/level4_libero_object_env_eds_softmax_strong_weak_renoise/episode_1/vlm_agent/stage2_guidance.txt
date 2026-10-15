@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # For placing the can in the basket, we do not need decision-making, so we return a constant reward.
+    return torch.tensor(0.0, device=action_sequence.device)
+

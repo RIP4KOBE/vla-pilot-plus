@@ -1,0 +1,19 @@
+def stage1_guidance(keypoints, action_sequence):
+    # Identify the target keypoint for the ketchup
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    
+    # Calculate distances between the action sequence and the target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    
+    # Define weights for emphasizing the final timesteps
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()  # Normalize weights
+    
+    # Compute the reward as the negative weighted distance
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Shape: (B,)
+    return reward.mean()  # Return a scalar reward
+

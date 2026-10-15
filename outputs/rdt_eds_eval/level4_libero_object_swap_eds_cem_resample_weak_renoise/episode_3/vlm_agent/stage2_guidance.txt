@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Guidance for placing the object is not needed as per task.
+    return 0.0  # Simply return a constant zero reward
+

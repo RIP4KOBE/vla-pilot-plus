@@ -1,0 +1,29 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the alphabet soup (keypoint 0)
+# Stage 2: Move gripper with alphabet soup to the basket (no decision needed here)
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    # Guide gripper to the position of the alphabet soup (keypoint 0)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)  # Keypoint 0: Alphabet soup main
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted sum of distances, shape: (B,)
+    return reward.mean()  # MUST return scalar!
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No decision needed for stage 2 as the policy knows how to place objects into the basket. Always return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+
+```

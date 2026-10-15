@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move the cream cheese to the basket (keypoints 1, 2, 3). No decision-making needed here.
+    return torch.tensor(0.0, device=action_sequence.device)  # Return zero since no guidance is needed
+

@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move the tomato sauce to the basket; no decision-making is required here
+    return torch.tensor(0.0, device=action_sequence.device)  # No guidance required
+

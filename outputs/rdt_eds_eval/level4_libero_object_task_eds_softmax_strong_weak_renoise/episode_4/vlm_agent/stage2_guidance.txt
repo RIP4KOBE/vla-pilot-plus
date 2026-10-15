@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No choice about where to place the ketchup (basket is predetermined)
+    # Return a default scalar value of 0
+    return torch.tensor(0.0, device=action_sequence.device)
+

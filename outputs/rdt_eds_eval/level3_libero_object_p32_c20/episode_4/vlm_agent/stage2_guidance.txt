@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No guidance needed for placing into the basket
+    return 0.0
+

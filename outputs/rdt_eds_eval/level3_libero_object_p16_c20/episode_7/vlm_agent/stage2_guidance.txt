@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2 is moving the butter into the basket (keypoint 1).
+    # No specific guidance needed as the placement target is clear.
+    return torch.tensor(0.0, device=action_sequence.device)
+

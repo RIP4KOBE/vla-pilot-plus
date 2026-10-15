@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No need for specific guidance in stage 2 since the placing position (basket) is clear.
+    return 0.0
+

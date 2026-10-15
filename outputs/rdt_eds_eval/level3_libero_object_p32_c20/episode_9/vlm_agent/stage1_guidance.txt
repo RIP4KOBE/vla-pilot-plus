@@ -1,0 +1,23 @@
+def stage1_guidance(keypoints, action_sequence):
+    # Stage 1: Move gripper to grasp the chocolate pudding (keypoint 0).
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Assign higher reward to the end of the trajectory.
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()
+
+    # Target keypoint for chocolate pudding.
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Key index 0 corresponds to chocolate pudding.
+
+    # Compute distances with weighted emphasis toward the final points.
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Make reward stronger when closer.
+    return reward.mean()  # MUST return scalar.
+

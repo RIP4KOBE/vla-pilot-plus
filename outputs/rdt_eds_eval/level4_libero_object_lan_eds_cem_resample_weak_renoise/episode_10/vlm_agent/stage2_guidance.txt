@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2: Move gripper with orange juice to the basket
+    # No reward function is needed since diffusion policy resolves this placement task on its own.
+    return torch.tensor(0.0, device=action_sequence.device)
+

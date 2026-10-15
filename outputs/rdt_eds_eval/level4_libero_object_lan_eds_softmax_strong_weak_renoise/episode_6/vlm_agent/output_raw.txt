@@ -1,0 +1,35 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the tomato sauce (keypoint 0).
+# Stage 2: Move gripper with the grasped tomato sauce to the basket (keypoints 1, 2, 3, 4).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code for stage 1 guidance must be inside this function!
+    # Move gripper to grasp the tomato sauce (keypoint 0).
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Final stretch gets higher weighting
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device),
+                          torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+    
+    # Identify the keypoint for the tomato sauce
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape: (3,) for target position
+    
+    # Calculate distance from trajectory to target and reward
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # MUST return a scalar!
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No need for complex decision-making for placing into basket, just return 0
+    return torch.tensor(0.0, device=action_sequence.device)
+
+```

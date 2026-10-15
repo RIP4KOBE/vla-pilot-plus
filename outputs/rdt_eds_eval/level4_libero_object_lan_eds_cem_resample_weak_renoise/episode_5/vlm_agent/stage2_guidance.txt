@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No specific guidance is needed for this stage since the task is to place in the basket
+    return torch.tensor(0.0, device=action_sequence.device)  # Policy handles placement
+

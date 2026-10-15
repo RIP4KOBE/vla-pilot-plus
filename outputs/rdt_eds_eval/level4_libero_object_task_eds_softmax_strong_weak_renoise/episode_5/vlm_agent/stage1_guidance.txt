@@ -1,0 +1,21 @@
+def stage1_guidance(keypoints, action_sequence):
+    # Move gripper to grasp the milk (keypoint 13)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+
+    # Assign higher weights to the final part of the trajectory.
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Target is keypoint 13 (milk)
+    target_idx = torch.tensor([13], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+
+    # Calculate distances to the target
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+
+    # Compute reward as negative squared distance weighted by trajectory weights
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # MUST return scalar!
+

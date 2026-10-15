@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2 requires no explicit decision-making, as it's about placing in the basket.
+    # Return 0 as the policy handles the motion automatically to place the butter.
+    return torch.tensor(0.0, device=action_sequence.device)
+

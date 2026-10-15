@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move the chocolate pudding into the basket (no decision-making needed; return 0 as guidance is not required)
+    return torch.tensor(0.0, device=action_sequence.device)  # No additional guidance is necessary
+

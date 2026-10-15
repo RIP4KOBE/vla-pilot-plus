@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2 guidance is not required as policy handles placement once object is grasped
+    return torch.tensor(0.0, device=action_sequence.device)  # Return zero reward for stage 2
+

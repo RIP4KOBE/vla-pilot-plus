@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No preference for specific placement keypoint; guidance is not required for this stage
+    return 0.0
+

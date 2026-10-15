@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No need to provide a target location for the basket since the policy inherently knows how to place.
+    return torch.tensor(0.0, device=action_sequence.device)
+

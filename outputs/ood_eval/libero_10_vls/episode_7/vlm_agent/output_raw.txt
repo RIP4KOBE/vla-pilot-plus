@@ -1,0 +1,70 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the white mug (keypoint 0)
+# Stage 2: Move gripper with the white mug to the plate (keypoints 6, 7)
+# Stage 3: Move gripper to grasp the chocolate pudding (keypoint 8)
+# Stage 4: Move gripper with the chocolate pudding to the right of the plate (keypoint 7 with an offset in +Y direction)
+
+num_stages = 4
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Move gripper to grasp the white mug (keypoint 0)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Move gripper with the white mug to the plate (keypoints 6, 7)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    plate_indices = torch.tensor([6, 7], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[plate_indices].mean(dim=0)
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 3 guidance
+def stage3_guidance(keypoints, action_sequence):
+    # Move gripper to grasp the chocolate pudding (keypoint 8)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    target_idx = torch.tensor([8], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 4 guidance
+def stage4_guidance(keypoints, action_sequence):
+    # Move gripper with the chocolate pudding to the right of the plate (keypoint 7 with an offset in +Y direction)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    plate_right_idx = torch.tensor([7], dtype=torch.long, device=keypoints.device)
+    plate_right_pos = keypoints[plate_right_idx][0]
+    offsetted_point = plate_right_pos + torch.tensor([0.0, 0.1, 0.0], device=keypoints.device)  # Offset in +Y direction
+    all_dists = torch.norm(action_sequence - offsetted_point, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()
+```

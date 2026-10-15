@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No guidance is needed for placing the BBQ sauce in the basket
+    return 0
+

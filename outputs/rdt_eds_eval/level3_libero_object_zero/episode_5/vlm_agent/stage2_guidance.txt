@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No need to provide a specific reward for placing in the basket, as this is handled by the diffusion model
+    return torch.tensor(0.0, device=action_sequence.device)
+

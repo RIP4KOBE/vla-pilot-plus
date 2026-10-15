@@ -1,0 +1,29 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the alphabet soup (keypoint 0) which I can see is labeled as `alphabet_soup_1_main`
+# Stage 2: Move gripper with the alphabet soup to place it in the basket (keypoint 1), as there is only one basket labeled `basket_1_main`
+
+num_stages = 2
+
+### stage 1 guidance: Move gripper to grasp the alphabet soup
+def stage1_guidance(keypoints, action_sequence):
+    # Guidance to move the gripper toward keypoint 0 (alphabet soup can)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+    
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)  # Alphabet soup keypoint
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    
+    # Compute the distance between each point in the trajectory and the target keypoint
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted reward for proximity to the target
+    return reward.mean()
+
+### stage 2 guidance: Move gripper with alphabet soup and place it in the basket
+def stage2_guidance(keypoints, action_sequence):
+    # No decision needed, simply return 0
+    return torch.tensor(0.0, device=action_sequence.device)
+```

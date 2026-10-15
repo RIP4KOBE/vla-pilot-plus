@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No need to create a reward for this stage as basket placement requires no decision-making.
+    return 0
+

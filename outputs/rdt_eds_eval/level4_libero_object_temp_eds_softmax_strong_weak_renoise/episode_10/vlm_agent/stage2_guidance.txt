@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No specific decision guidance is needed for placing. Just return 0 as instructed.
+    return torch.tensor(0.0, device=action_sequence.device)
+

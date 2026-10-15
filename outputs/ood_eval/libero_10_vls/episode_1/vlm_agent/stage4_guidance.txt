@@ -1,0 +1,5 @@
+def stage4_guidance(keypoints, action_sequence):
+    # Move gripper with the tomato sauce to the basket (keypoints 4, 5, 6, 7).
+    # No decision-making needed here, just return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+

@@ -1,0 +1,30 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the salad dressing (keypoint 0) which I identified visually from the image.
+# Stage 2: Move the gripper with the salad dressing to the basket (keypoints 2, 3, 4, 5).
+# Note: No Stage 2 guidance is required as stated in the task-specific rules.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Guide the gripper to approach the salad dressing marked at keypoint 0.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    # Give higher weight to later timesteps in the trajectory.
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)  # Salad dressing keypoint index
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Compute distances to the target
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted negative squared distance
+    return reward.mean()  # Return scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No need for decision-making in this stage, as placing is handled automatically by policy.
+    return 0
+```

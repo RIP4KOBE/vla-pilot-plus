@@ -1,0 +1,27 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the orange juice (keypoint 1).
+# Stage 2: Move the gripper with the orange juice to the basket (keypoints 2, 3, 4, 5, 6).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Guidance to grasp the orange juice
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    target_idx = torch.tensor([1], dtype=torch.long, device=keypoints.device)  # Keypoint for orange juice
+    target_pos = keypoints[target_idx][0]
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making needed for placing in the basket
+    return torch.tensor(0.0, device=action_sequence.device)  # Just return 0 reward
+```

@@ -1,0 +1,3 @@
+def stage2_guidance(keypoints, action_sequence):
+    return 0  # No guidance needed; policy knows how to place in the basket
+

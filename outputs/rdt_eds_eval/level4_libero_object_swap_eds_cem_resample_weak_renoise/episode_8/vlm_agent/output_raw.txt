@@ -1,0 +1,30 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the milk (keypoint 0 or 1, as keypoints 0 and 1 correspond to 'milk_1_main').
+# Stage 2: Place the milk in the basket (keypoints 2, 3, 4, 5, or 6, as these correspond to 'basket_1_main').
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Move to grasp the milk
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Select keypoint for the milk
+    milk_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)  # Using keypoint 0 for milk
+    target_pos = keypoints[milk_idx][0]
+    
+    # Calculate reward
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No decision is required for placing the object in the basket
+    return 0.0  # Policy handles this automatically
+```

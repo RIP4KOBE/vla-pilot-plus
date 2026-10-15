@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making needed for placing the book in the back compartment of the caddy
+    return torch.tensor(0.0, device=action_sequence.device)
+

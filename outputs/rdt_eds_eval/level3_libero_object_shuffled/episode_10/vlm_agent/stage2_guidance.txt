@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision needed for placing the orange juice in the basket
+    # The policy uses its pre-learned motion to complete this stage
+    return torch.tensor(0.0, device=action_sequence.device)  # Always return 0 for stage 2
+

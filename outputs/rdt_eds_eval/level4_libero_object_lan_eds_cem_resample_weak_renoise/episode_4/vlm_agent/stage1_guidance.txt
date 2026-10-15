@@ -1,0 +1,23 @@
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]  # Total timesteps
+    timesteps = torch.arange(T, device=action_sequence.device)
+
+    # Assign time-based weights: emphasize the final portion of the trajectory
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, 
+                          torch.tensor(3.0, device=action_sequence.device), 
+                          torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()  # Normalize weights to sum to 1
+
+    # Select the target keypoint index for BBQ sauce, which is clearly marked with index 0
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Get the 3D position of the target (shape: (3,))
+
+    # Calculate the Euclidean distances between the action sequence and the target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    
+    # Compute the reward as the negative weighted square of the distances (higher reward for closer actions)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Mean over timesteps
+    return reward.mean()  # Return the scalar reward
+

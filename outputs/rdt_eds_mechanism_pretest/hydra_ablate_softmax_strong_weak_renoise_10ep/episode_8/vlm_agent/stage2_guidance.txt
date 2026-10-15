@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # The robot knows how to place the milk in the basket – no decision needed here
+    return torch.tensor(0.0, device=action_sequence.device)  # Return 0 for stage 2 as no action choice is required
+

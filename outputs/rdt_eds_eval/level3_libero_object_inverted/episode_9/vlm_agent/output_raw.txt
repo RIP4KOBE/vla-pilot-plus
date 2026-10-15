@@ -1,0 +1,33 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the chocolate pudding (keypoint 0), as identified from the image.
+# Stage 2: Move gripper with the chocolate pudding to the basket (keypoints 1, 2, 3, 4). 
+#           Since the basket's location is unambiguous and does not require further decision-making, return 0.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Moving the end-effector to grasp the chocolate pudding at keypoint 0
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Weighted time for prioritizing later trajectory points
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()  # Normalize the weights
+    
+    # Keypoint index for chocolate pudding
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Extract the 3D position of keypoint 0 (chocolate pudding)
+    
+    # Calculate distances and compute the weighted reward
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Calculate the 3D distances over the trajectory
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Squared negative distances with weights
+    return reward.mean()  # Return the scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # As moving to the basket does not require fine-grained keypoint selection, we return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+```

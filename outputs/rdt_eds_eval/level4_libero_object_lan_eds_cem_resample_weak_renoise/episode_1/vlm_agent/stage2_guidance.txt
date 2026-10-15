@@ -1,0 +1,6 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move gripper to place the object into the basket.
+    # NO decision-making required for placing into the basket.
+    # The policy already knows where to move.
+    return torch.tensor(0.0, device=action_sequence.device)  # Just return 0
+

@@ -1,0 +1,23 @@
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Assign higher weight to the later part of the trajectory
+    weights = torch.where(
+        timesteps >= final_start, 
+        torch.tensor(3.0, device=action_sequence.device), 
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()
+
+    # Salad dressing keypoint index (both 0 and 1 represent the same object in this case)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+
+    # Compute distances from action sequence to target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Negative squared distance for maximizing closeness
+    return reward.mean()  # MUST return scalar!
+

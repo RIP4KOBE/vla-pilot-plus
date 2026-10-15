@@ -1,0 +1,17 @@
+def stage1_guidance(keypoints, action_sequence):
+    # Guidance to move the gripper to grasp the BBQ sauce
+    T = action_sequence.shape[1]  # Number of timesteps in the action sequence
+    timesteps = torch.arange(T, device=action_sequence.device)  # Timesteps tensor
+    final_start = int(0.7 * T)  # Final 30% of the sequence gets higher weight
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()  # Normalize weights
+
+    # BBQ sauce is at keypoint index 0
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Extract [X, Y, Z] of keypoint 0
+
+    # Compute distances to the BBQ sauce from the sequence
+    dists = torch.norm(action_sequence - target_pos, dim=-1)  # Full 3D distances: shape (B, T)
+    reward = -(dists**2 * weights).sum(dim=1)  # Weighted sum of squared distances
+    return reward.mean()  # Output scalar reward value
+

@@ -1,0 +1,43 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the tomato sauce (keypoint 0).
+# Stage 2: Move the gripper with the tomato sauce to the basket (keypoints 2, 3, 4, 5).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    # Stage 1: Guide policy to move the gripper to grasp the tomato sauce (keypoint 0).
+    
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Define weights for trajectory
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),  # Higher weight for end timesteps
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()
+
+    # Target position corresponds to keypoint 0 (tomato sauce)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Get the position of keypoint 0
+
+    # Calculate all distances between trajectory and target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    
+    # Calculate reward as negative squared distances weighted by the trajectory weights
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    
+    return reward.mean()  # Output a scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2: Guidance for placing the grasped object in the basket.
+    # As mentioned in the task constraints, guidance is not needed here. Simply return 0.
+
+    return torch.tensor(0.0, device=action_sequence.device)  # No decision needed at this stage
+```

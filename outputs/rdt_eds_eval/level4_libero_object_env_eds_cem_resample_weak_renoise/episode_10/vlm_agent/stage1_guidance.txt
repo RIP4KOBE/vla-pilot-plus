@@ -1,0 +1,17 @@
+def stage1_guidance(keypoints, action_sequence):
+    # Targeting keypoint 6 for the orange juice
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()  # Normalize weights
+
+    # Keypoint index for "orange juice"
+    target_idx = torch.tensor([6], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Coordinates of keypoint 6
+
+    # Compute rewards based on proximity to target
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Distance to target
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted sum of negative squared distances
+    return reward.mean()  # Return scalar reward
+

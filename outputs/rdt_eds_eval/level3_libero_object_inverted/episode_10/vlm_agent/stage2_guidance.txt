@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No additional guidance is needed for placing the orange juice into the basket
+    return 0
+

@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # For this stage, no decision needs to be guided (policy knows how to place in the basket)
+    return torch.tensor(0.0, device=action_sequence.device)  # Return scalar zero
+

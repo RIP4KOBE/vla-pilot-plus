@@ -1,0 +1,34 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the butter (keypoint 0) as the task specifies picking up the butter.
+# Stage 2: Place the gripper with the butter into the basket (keypoints 1, 2, 3, 4) as the task specifies placing it in the basket.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    # Stage 1: Move gripper to the butter at keypoint 0
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Assign higher weights to later timesteps for planning
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Identify the target keypoint for butter (keypoint 0)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    
+    # Calculate 3D distances between the trajectory and the target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    reward = -(all_dists**2 * weights).sum(dim=1)  # Weight and sum distances over timesteps
+    return reward.mean()  # Return scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2: No need to guide as the placement into the basket doesn't require decision-making here.
+    # Simply return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+```

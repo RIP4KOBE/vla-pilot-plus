@@ -1,0 +1,34 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the BBQ sauce (keypoint 11), as visually identified in the image.
+# Stage 2: Move gripper with the BBQ sauce to the basket (keypoints 1,2,3,4,5). No guidance function is required for this stage.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Move gripper to the BBQ sauce at keypoint 11
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Assign higher weights to the later part of the trajectory
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, 
+                          torch.tensor(3.0, device=action_sequence.device), 
+                          torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Target position is defined by keypoint 11
+    target_idx = torch.tensor([11], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape (3,)
+    
+    # Compute distance between action sequence and target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted negative distance squared
+    return reward.mean()  # MUST return a scalar
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No need to provide a target location for the basket since the policy inherently knows how to place.
+    return torch.tensor(0.0, device=action_sequence.device)
+```

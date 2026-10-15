@@ -1,0 +1,7 @@
+def stage2_guidance(keypoints, action_sequence):
+    """
+    This function guides the robot to place the butter in the basket.
+    Since no decision is required for the placement here, we directly return 0.
+    """
+    return torch.tensor(0.0, device=action_sequence.device)
+

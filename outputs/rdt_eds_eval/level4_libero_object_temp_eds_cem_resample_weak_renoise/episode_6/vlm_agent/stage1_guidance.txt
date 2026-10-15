@@ -1,0 +1,22 @@
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    # Weight final part of trajectory higher
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()
+    
+    # Target is the tomato sauce at keypoint 0
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape (3,)
+
+    # Calculate the negative squared distance to the target
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted sum of distances
+    return reward.mean()  # Return scalar
+

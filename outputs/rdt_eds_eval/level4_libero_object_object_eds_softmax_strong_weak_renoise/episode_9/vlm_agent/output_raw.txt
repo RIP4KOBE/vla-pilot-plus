@@ -1,0 +1,38 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the chocolate pudding (keypoint 0)
+# Stage 2: Place the grasped chocolate pudding in the basket (keypoint 2)
+# Note: Stage 2 guidance does not require a specific reward function, as placement occurs automatically.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Move gripper toward the chocolate pudding at keypoint 0
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Assign higher weights to the final part of the trajectory
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start, 
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()  # Normalize the weights
+
+    # Identify the target keypoint for the chocolate pudding
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape (3,)
+
+    # Compute the distance between the action sequence and the target position
+    distances = torch.norm(action_sequence - target_pos, dim=-1)  # Shape (B, T)
+    reward = -(distances**2 * weights).sum(dim=1)  # Weighted negative distance
+
+    return reward.mean()  # Return a scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Placement guidance is not required for this stage, return 0
+    return torch.tensor(0.0, device=action_sequence.device)
+```

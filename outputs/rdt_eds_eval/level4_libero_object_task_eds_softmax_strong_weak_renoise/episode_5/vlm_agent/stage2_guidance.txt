@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move gripper with milk to the basket. No decision-making is needed for the placement.
+    return torch.tensor(0.0, device=action_sequence.device)  # Return 0 as no additional guidance is needed
+

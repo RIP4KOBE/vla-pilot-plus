@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No specific decision needed for Stage 2 as the task is to place the object into a basket.
+    return torch.tensor(0.0, device=action_sequence.device)  # Returning 0 as per critical instruction
+

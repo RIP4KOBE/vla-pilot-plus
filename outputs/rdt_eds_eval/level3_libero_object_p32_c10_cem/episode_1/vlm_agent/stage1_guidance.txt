@@ -1,0 +1,25 @@
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers allowed!
+    # Guide the robot to the alphabet soup (keypoint 0)
+
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+
+    # Assign weights to trajectory (higher weight at last part of the sequence)
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    # Target keypoint for alphabet soup
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Get the position of keypoint 0
+
+    # Calculate distances and reward
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted sum of negative squared distances
+    return reward.mean()  # Return scalar reward
+

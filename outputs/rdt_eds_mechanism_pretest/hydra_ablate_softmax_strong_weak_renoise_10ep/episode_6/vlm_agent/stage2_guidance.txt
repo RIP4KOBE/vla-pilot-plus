@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # We do not need to create reward for placing into basket as per the task's rules.
+    return 0
+

@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move gripper with the chocolate pudding to the basket (keypoints 2, 3, 4)
+    # No decision-making needed here, just return 0
+    return torch.tensor(0.0, device=action_sequence.device)
+

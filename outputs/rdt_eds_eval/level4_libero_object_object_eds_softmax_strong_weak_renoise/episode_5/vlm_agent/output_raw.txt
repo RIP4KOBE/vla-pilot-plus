@@ -1,0 +1,32 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the ketchup (keypoint 0) which corresponds to the blue ketchup bottle.
+# Stage 2: Place the grasped object (ketchup) in the basket (keypoints 2, 3, 4, 5).
+
+num_stages = 2
+
+### stage 1 guidance (Grasp the ketchup at keypoint 0)
+def stage1_guidance(keypoints, action_sequence):
+    # Identify the target keypoint for the ketchup
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    
+    # Calculate distances between the action sequence and the target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    
+    # Define weights for emphasizing the final timesteps
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()  # Normalize weights
+    
+    # Compute the reward as the negative weighted distance
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Shape: (B,)
+    return reward.mean()  # Return a scalar reward
+
+### stage 2 guidance (Place the ketchup into the basket - no need to guide specific placement)
+def stage2_guidance(keypoints, action_sequence):
+    # No specific guidance needed for placing into the basket
+    return 0  # Return 0 as per instructions
+```

@@ -1,0 +1,23 @@
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    # Guide the robot to move the gripper above and close to the butter for grasping.
+    
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)  # Apply higher weight in later timesteps
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()
+
+    # Identify target keypoint for the butter (keypoint 0)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Position of butter keypoint
+
+    # Minimize the distance between the action sequence and the target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists**2 * weights).sum(dim=1)
+    return reward.mean()  # Return the mean reward as a scalar
+

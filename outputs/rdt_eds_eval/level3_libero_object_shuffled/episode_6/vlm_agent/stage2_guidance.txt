@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision is required for placing the object into the basket.
+    # The low-level policy knows how to complete this step once the object is grasped.
+    return torch.tensor(0.0, device=action_sequence.device)
+

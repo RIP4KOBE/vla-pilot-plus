@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move the gripper with the cream cheese to the basket. No decision is needed here.
+    return 0
+

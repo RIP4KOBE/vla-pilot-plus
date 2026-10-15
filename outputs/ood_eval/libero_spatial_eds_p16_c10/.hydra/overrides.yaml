@@ -1,0 +1,17 @@
+- policy.type=rdt
+- backend.libero.suite_name=libero_spatial
+- main.episode_num=10
+- backend.libero.max_episode_steps=280
+- main.use_vlm_stage_recognition=true
+- perception.gemini_grounding.enabled=true
+- perception.vlm_agent.base_url=https://api.poe.com/v1
+- perception.vlm_agent.model=GPT-4o
+- perception.vlm_agent.temperature=0.0
+- main.render=false
+- main.visualize_trajectory=true
+- main.debug_draw_trajectory=true
+- main.use_guidance=true
+- main.guidance_type=eds
+- main.eds_config.population_size=16
+- main.eds_config.cem_iters=10
+- main.eds_config.use_cem=false

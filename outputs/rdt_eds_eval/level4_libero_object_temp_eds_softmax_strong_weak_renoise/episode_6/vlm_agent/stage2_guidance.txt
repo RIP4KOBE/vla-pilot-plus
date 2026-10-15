@@ -1,0 +1,6 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2: Guidance for placing the grasped object in the basket.
+    # As mentioned in the task constraints, guidance is not needed here. Simply return 0.
+
+    return torch.tensor(0.0, device=action_sequence.device)  # No decision needed at this stage
+

@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making required for placing in basket
+    # Policy knows how to perform this stage
+    return torch.tensor(0.0, dtype=action_sequence.dtype, device=action_sequence.device)
+

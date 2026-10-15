@@ -1,0 +1,24 @@
+def stage1_guidance(keypoints, action_sequence):
+    # Move the gripper to grasp the tomato sauce (keypoint 0).
+    # Reward motion close to the tomato sauce position in both X-Y and Z directions.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Assign higher weights to the final segment of the trajectory
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()
+
+    # Keypoint index for the tomato sauce (keypoint 0)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    
+    # Compute distances and reward closer trajectories
+    distances = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    reward = -(distances**2 * weights).sum(dim=1)  # Weighted sum of negative squared distances
+    return reward.mean()  # Return scalar reward
+

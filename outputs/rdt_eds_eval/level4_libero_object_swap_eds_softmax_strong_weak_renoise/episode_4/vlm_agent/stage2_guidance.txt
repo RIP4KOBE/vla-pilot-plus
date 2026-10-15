@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No need to guide the placement into the basket (keypoints 1-4).
+    # Return a constant reward of 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+

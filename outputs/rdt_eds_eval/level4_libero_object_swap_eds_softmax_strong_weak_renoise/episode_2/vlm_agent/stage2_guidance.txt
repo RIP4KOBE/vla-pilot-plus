@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # THIS STAGE DOES NOT REQUIRE DECISION GUIDANCE.
+    # No decision needs to be made for placing cream cheese in the basket.
+    return 0.0  # Return a neutral reward
+

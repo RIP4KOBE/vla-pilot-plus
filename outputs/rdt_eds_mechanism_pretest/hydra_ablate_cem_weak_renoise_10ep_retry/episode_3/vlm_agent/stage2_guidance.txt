@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No need for decision-making in this stage, as placing is handled automatically by policy.
+    return 0
+

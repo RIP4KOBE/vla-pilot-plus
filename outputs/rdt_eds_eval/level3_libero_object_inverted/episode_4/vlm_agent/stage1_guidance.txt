@@ -1,0 +1,22 @@
+def stage1_guidance(keypoints, action_sequence):
+    # All code must be inside this function - no external helpers!
+    # Emphasize XY-plane alignment more strongly for grasping
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Set target to BBQ sauce keypoint (keypoint 0)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # (3,)
+
+    # Compute distances in the XY plane and Z separately
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)  # Distance in XY plane
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])  # Distance in Z direction
+    total_dist = xy_dist + z_dist
+
+    # Weighted reward
+    reward = -(total_dist ** 2 * weights).sum(dim=1)  # Reward higher when closer
+    return reward.mean()  # MUST return scalar!
+

@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No guidance function is needed for this stage as the policy knows how to place the object in the basket.
+    return 0
+

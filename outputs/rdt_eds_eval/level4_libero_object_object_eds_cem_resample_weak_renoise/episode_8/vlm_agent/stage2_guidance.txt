@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision needed, the action is placing the grasped milk in the basket
+    return 0
+

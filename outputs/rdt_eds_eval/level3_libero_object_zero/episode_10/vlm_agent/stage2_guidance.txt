@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No specific motion guidance is required for the placement task (basket).
+    # The policy knows how to execute the placement in stage 2. Return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+

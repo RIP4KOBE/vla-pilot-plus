@@ -1,0 +1,33 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the cream cheese (keypoint 0)
+# Stage 2: Move gripper with cream cheese to the basket (keypoints 1, 2, 3, 4)
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Move the gripper to grasp the cream cheese at keypoint 0
+    T = action_sequence.shape[1]  # Number of timesteps
+    timesteps = torch.arange(T, device=action_sequence.device)  # Time indices
+    final_start = int(0.7 * T)  # Start giving higher weight near the final part of the trajectory
+    weights = torch.where(timesteps >= final_start, 
+                          torch.tensor(3.0, device=action_sequence.device), 
+                          torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()  # Normalize weights
+
+    # Keypoint for cream cheese
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Extract keypoint position (shape: (3,))
+
+    # Compute distance between trajectory and keypoint
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted distance sum for each batch
+    return reward.mean()  # Return scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Move the gripper with the cream cheese to the basket
+    # No decision-making is required for placement in the basket; we just return 0
+    return 0
+```

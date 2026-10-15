@@ -1,0 +1,38 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the salad dressing bottle (keypoint 0).
+# Stage 2: Move gripper with grasped salad dressing bottle to the basket (placement does not require guidance as specified).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Guiding the gripper to the salad dressing bottle
+    T = action_sequence.shape[1]  # Number of time steps
+    timesteps = torch.arange(T, device=action_sequence.device)
+
+    # Apply higher weights to later timesteps for smoother approach to target
+    final_start = int(0.7 * T)  # Start emphasizing final steps
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()  # Normalize weights
+
+    # Setting target position to the salad dressing bottle (keypoint 0)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Extract the 3D coordinates of keypoint 0
+
+    # Calculating distances between action sequence points and target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+
+    # Compute negative squared distance weighted by time-step weights
+    reward = -(all_dists**2 * weights).sum(dim=1)  # Shape: (B,)
+    return reward.mean()  # Return a scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Guidance for placing the object is not needed as per task.
+    return 0.0  # Simply return a constant zero reward
+```

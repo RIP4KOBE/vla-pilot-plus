@@ -1,0 +1,23 @@
+def stage1_guidance(keypoints, action_sequence):
+    # Guidance to move the gripper to the cream cheese (keypoint 0)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)  # Assign higher weight to the final steps
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()  # Normalize weights
+
+    # Directly assign the target keypoint index for the cream cheese
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+
+    # Calculate distances between action sequence and target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    
+    # Calculate weighted reward
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward
+

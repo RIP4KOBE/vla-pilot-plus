@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move the cream cheese to the basket. The policy knows how to place it correctly,
+    # so no decision needs to be made here—just return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+

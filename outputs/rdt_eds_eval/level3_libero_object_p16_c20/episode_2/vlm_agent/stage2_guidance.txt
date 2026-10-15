@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No specific decision needed for placement. The policy will handle this stage.
+    # Return 0 as no additional guidance is required.
+    return torch.tensor(0.0, device=action_sequence.device)
+

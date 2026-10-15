@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Moving the butter to the basket (target location is already specified by policy)
+    # No additional decision is needed for this stage, so we return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+

@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move gripper with milk to the basket at keypoint 1 (no additional reward guidance needed).
+    # Return zero as no decision-making is required at this stage.
+    return torch.tensor(0.0, device=action_sequence.device)
+

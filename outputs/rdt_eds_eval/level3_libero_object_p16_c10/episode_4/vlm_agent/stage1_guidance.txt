@@ -1,0 +1,24 @@
+def stage1_guidance(keypoints, action_sequence):
+    # This stage guides the robot to grasp the BBQ sauce (keypoint 0)
+    
+    T = action_sequence.shape[1]  # Number of timesteps
+    timesteps = torch.arange(T, device=action_sequence.device)  # Timesteps for weighting
+    final_start = int(0.7 * T)  # Last 30% of trajectory gets higher weight
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()  # Normalize weights
+
+    # Target keypoint is the BBQ sauce (index 0)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape: (3, )
+
+    # Compute distance between action points and target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape (B, T)
+
+    # Weighted distance (negative for reward maximization)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Shape (B,)
+    return reward.mean()  # Return scalar reward
+

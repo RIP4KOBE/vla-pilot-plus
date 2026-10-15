@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No need to make spatial decision for placement in basket
+    return 0.0
+

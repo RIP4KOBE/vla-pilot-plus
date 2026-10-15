@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Guidance function not needed since placing does not require a decision.
+    return 0.0
+

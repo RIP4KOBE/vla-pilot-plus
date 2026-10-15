@@ -1,0 +1,27 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the salad dressing (keypoint 0 or 1 as they both belong to the "salad_dressing_1_main")
+# Stage 2: Place the salad dressing into the basket (keypoints 2, 3, 4, or 5 - basket-related keypoints)
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Choose keypoint 0 for salad dressing grasping, as it belongs to "salad_dressing_1_main"
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)  # Keypoint 0 (salad dressing)
+    target_pos = keypoints[target_idx][0]
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # MUST return scalar!
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No guidance needed for placing into the basket, return a reward of 0
+    return torch.tensor(0.0, device=action_sequence.device)
+```

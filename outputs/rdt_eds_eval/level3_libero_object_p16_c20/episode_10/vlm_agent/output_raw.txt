@@ -1,0 +1,30 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the orange juice (keypoint 0 or 1 - both represent orange juice based on the keypoint-to-object map).
+# Stage 2: Move gripper with orange juice to place it in the basket (keypoints 2, 3, 4, 5, 6 - all corresponding to the basket).
+
+num_stages = 2
+
+### Stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Move the gripper to grasp the orange juice
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Orange juice corresponds to keypoints 0 and 1. We pick keypoint 0.
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+
+    # Reward close proximity to the target keypoint
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # MUST return scalar!
+
+### Stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No need for guidance here as the policy knows how to place in the basket.
+    return torch.tensor(0.0, device=action_sequence.device)
+```

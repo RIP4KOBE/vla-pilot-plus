@@ -1,0 +1,35 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the alphabet soup can (keypoint 0) based on the task instruction.
+# Stage 2: Move gripper with the alphabet soup to the basket (keypoints 1, 2, 3, 4). Stage 2 does not need a separate guidance function here.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # This function guides the robot arm to move close to the alphabet soup can (keypoint 0).
+    
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+
+    # Apply higher weight near the end of the trajectory to focus on the final position.
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # The alphabet soup can is at keypoint index 0.
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+
+    # Compute distances between action sequence points and target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+
+    # Reward is the negative weighted squared distance to minimize the distance to the target keypoint
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward value
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No specific decision needed for Stage 2 as the task is to place the object into a basket.
+    return torch.tensor(0.0, device=action_sequence.device)  # Returning 0 as per critical instruction
+```

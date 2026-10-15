@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making required for stage 2, as the basket location is predefined
+    return torch.tensor(0.0, device=action_sequence.device)  # Return zero reward for stage 2
+

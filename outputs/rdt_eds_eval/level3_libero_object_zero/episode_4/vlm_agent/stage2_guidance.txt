@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making required for placing the bbq sauce in the basket.
+    # Return 0 reward as per instructions.
+    return torch.tensor(0.0, device=action_sequence.device)
+

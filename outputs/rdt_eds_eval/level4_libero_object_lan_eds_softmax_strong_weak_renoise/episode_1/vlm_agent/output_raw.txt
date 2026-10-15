@@ -1,0 +1,31 @@
+```python
+# Task breakdown:
+# Stage 1: Move the gripper to grasp the alphabet soup (keypoint 0), which is identified from the image.
+# Stage 2: Move the gripper with the alphabet soup to the basket (keypoint 1). For this stage, no specific guidance is needed, return 0.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # This stage guides the robot to move its gripper to the alphabet soup located at keypoint 0.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()
+
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)  # Alphabet soup is at keypoint 0
+    target_pos = keypoints[target_idx][0]
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return a scalar value
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making is required for placing the alphabet soup in the basket (keypoint 1).
+    return 0  # Guidance not needed
+```

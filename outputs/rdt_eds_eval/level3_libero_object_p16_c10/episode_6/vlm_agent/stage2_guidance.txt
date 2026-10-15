@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No keypoint needs to be selected here for motion to the basket. Just return 0 to indicate no additional guidance is needed.
+    return torch.tensor(0.0, device=action_sequence.device)  # Return scalar reward of 0
+

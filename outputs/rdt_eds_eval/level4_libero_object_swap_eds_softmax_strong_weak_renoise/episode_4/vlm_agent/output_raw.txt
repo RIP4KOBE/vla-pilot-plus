@@ -1,0 +1,40 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the bbq sauce (keypoint 0) as it is labeled in the image.
+# Stage 2: Place the grasped object into the basket (keypoints 1-4). Stage 2 does not require a reward function.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Moving the gripper to grasp the bbq sauce (keypoint 0)
+    
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Increased weight towards the end of the trajectory
+    weights = torch.where(
+        timesteps >= final_start, 
+        torch.tensor(3.0, device=action_sequence.device), 
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()
+
+    # Index for bbq sauce
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+    
+    # Compute distances over the whole trajectory
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    
+    # Reward function
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # Return scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No need to guide the placement into the basket (keypoints 1-4).
+    # Return a constant reward of 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+```

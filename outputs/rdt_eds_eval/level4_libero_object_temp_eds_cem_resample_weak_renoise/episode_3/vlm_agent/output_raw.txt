@@ -1,0 +1,35 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the salad dressing (keypoint 0) which I identified as the object labeled "salad_dressing_1_main".
+# Stage 2: Move the grasped salad dressing into the basket (no reward function is needed for this stage).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Reward function to guide the gripper towards the salad dressing (keypoint 0).
+    T = action_sequence.shape[1]  # Number of timesteps
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)  # Encourage being close to the target in the last 30% of the trajectory
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),  # Heavier weight for the final timesteps
+        torch.tensor(1.0, device=action_sequence.device),
+    )
+    weights = weights / weights.sum()  # Normalize the weights
+
+    # Keypoint for the salad dressing
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Position of the salad dressing (keypoint 0)
+
+    # Compute distances and reward
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Euclidean distance to target
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted sum of distances, squared
+    return reward.mean()  # Must return scalar reward
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No decision making is needed for placing the object in the basket; just return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+
+```

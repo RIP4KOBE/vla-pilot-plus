@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making is required for placing the alphabet soup in the basket (keypoint 1).
+    return 0  # Guidance not needed
+
