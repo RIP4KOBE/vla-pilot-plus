@@ -1,0 +1,167 @@
+backend:
+  backend: libero
+  libero:
+    suite_name: libero_object_swap
+    task_id: 0
+    camera_name: agentview_image, robot0_eye_in_hand_image
+    obs_type: pixels_agent_pos
+    render_mode: rgb_array
+    observation_width: 128
+    observation_height: 128
+    visualization_width: 640
+    visualization_height: 640
+    init_states: true
+    num_steps_wait: 5
+    max_episode_steps: 240
+    vlm_camera: agentview
+    auto_apply_perturbations: true
+    strict_perturbations: true
+    task_ids_filter: null
+perception:
+  keypoint_detector:
+    num_candidates_per_mask: 5
+    min_dist_bt_keypoints: 0.05
+    max_mask_ratio: 0.5
+    device: ${device}
+    seed: ${seed}
+    bounds_min:
+    - -1.0
+    - -0.75
+    - -0.1
+    bounds_max:
+    - 1.0
+    - 0.75
+    - 1.2
+    feature_extractor: dinov2_vitb14
+  vlm_agent:
+    base_url: null
+    model: gpt-4o
+    api_key: null
+    temperature: 1.0
+    max_completion_tokens: 2000
+    api_max_retries: 8
+    api_retry_backoff_seconds: 5.0
+    api_retry_max_backoff_seconds: 30.0
+    query_template_dir: vlm_query/
+  sam3:
+    enabled: false
+  gemini_grounding:
+    enabled: false
+    api_key: null
+    model: gemini-2.5-flash
+    default_objects:
+    - drawer handle
+    - sliding handle
+    - slider handle
+    - black switch
+    - red cube
+    - blue cube
+    - pink cube
+  gemini:
+    api_key: null
+    model: gemini-2.5-flash
+policy:
+  type: rdt
+  diffusion:
+    pretrained_path: Vision-Language-Steering/vls_calvin_base
+    num_inference_steps: 100
+    n_obs_steps: 2
+    action_chunk_horizon: 16
+  pi05:
+    pretrained_path: lerobot/pi05_libero_finetuned_v044
+    num_inference_steps: 10
+    action_chunk_horizon: 10
+  rdt:
+    pretrained_path: /mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object
+    weight_variant: ema
+    text_encoder: /mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl
+    vision_encoder: /mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384
+    num_inference_steps: null
+    action_chunk_horizon: 8
+    control_frequency: 20
+    debug_first_step: false
+    undo_libero_preprocessor_flip: false
+    fail_on_zero_language_embedding: true
+    semantics: libero_gt_rollout
+device: cuda
+seed: 0
+main:
+  episode_num: 10
+  max_episode_steps: 240
+  output_dir: ${hydra:run.dir}
+  cached_functions_dir: /home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent
+  visualize_trajectory: true
+  debug_draw_trajectory: true
+  render: true
+  use_guidance: true
+  guidance_type: eds
+  use_vlm_stage_recognition: false
+  vlm_query_limit: 50
+  vls_config:
+    use_diversity: true
+    sample_batch_size: 20
+    guide_scale: 40.0
+    diversity_scale: 10.0
+    start_ratio: null
+    MCMC_steps: 4
+    sigmoid_k: 25.0
+    sigmoid_x0: 0.75
+    use_fkd: true
+    fkd:
+      potential_type: max
+      lmbda: 10.0
+      adaptive_resampling: true
+      resample_frequency: 5
+  eds_config:
+    population_size: 16
+    use_cem: false
+    cem_iters: 10
+    num_elites: 16
+    temperature: 0.1
+    renoise_t_max: 3
+    renoise_t_min: 1
+    initial_population_cache: null
+    ed_population_cache: null
+    use_initial_cache: false
+    save_initial_cache: false
+    save_ed_cache: false
+    initial_sampling_mode: rbf_diverse_denoise
+    initial_diversity_scale: 20.0
+    initial_diversity_start_ratio: 0.8
+    initial_diversity_fallback: iid
+    initial_cache_metadata: true
+    truncated_rollout_mode: rbf_diverse
+    rollout_diversity_scale: 15.0
+    rollout_diversity_start_ratio: 0.6
+    rollout_diversity_iters: 1
+    rollout_diversity_skip_final_steps: 0
+  eds_eval:
+    enabled: true
+    write_metrics: true
+    save_qualitative: true
+    output_dir: /home/hynx/VLA-Pilot++/.worktrees/exp/eds-init-pg-diverse-sampling/outputs/ood_eval/level4_libero_object_swap_rbf_s20_start08_rt3to1_rollrbf_s15_start06_iter1/eds_eval
+    report_dir: docs/03_evidence/eds_steering
+    method_label: rbf_s20_start08_rt3to1_rollrbf_s15_start06_iter1
+    job_id: level4_libero_object_swap_rbf_s20_start08_rt3to1_rollrbf_s15_start06_iter1
+    reward_mode: normal
+    shuffle_seed: 0
+    max_visual_chunks_per_episode: 2
+    save_population_cloud: true
+    save_per_iter_best: true
+    save_initial_vs_final: true
+  eds_mechanism_pretest:
+    enabled: true
+    first_chunk_only: false
+    save_single_step: true
+    save_full_process: true
+    save_tensors: true
+    plot_3d: true
+    output_dir: outputs/rdt_eds_mechanism_pretest
+    output_mode: qualitative_chunk
+    run_id: null
+    max_chunks: 2
+    max_full_process_iters: 10
+experiment:
+  name: ${backend.backend}
+  tags:
+  - ${backend.backend}

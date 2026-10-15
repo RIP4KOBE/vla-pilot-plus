@@ -1,0 +1,98 @@
+{
+  "schema": "historical_source_snapshot_v1",
+  "created_date": "2026-10-15",
+  "original_branch": "exp/eds-init-pg-diverse-sampling",
+  "original_commit": "b3db98cf4fd98a6479d92683e33ebe3d032f25d9",
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/historical_variants/eds_init_pg_diverse_sampling",
+  "archive_path": "/mnt/data/shared2/hynx/vla-pilot-repository-archive-20261015/workspaces/snapshot-02/historical_variants/eds_init_pg_diverse_sampling",
+  "snapshot_source_files_considered": 16913,
+  "changed_or_added_files": [],
+  "deleted_tracked_paths": [],
+  "excluded_sensitive_or_large_paths": [],
+  "submodule_source_copies": ".historical-source/submodule-files/",
+  "scope": "Original Git history plus actual tracked working files and archived source/configuration/documentation. Large raw evidence, credentials and transient Git administration remain in private archive. Original source bytes are not edited.",
+  "entries_key": "changed_or_added_files",
+  "entry_count": 14246,
+  "entry_shards": [
+    {
+      "path": ".historical-source/manifests/part-0000.json",
+      "entries": 1000,
+      "sha256": "f55ea6871f7f359135e97b2212a151a940e1d76222470c0c4ee99bfc0b839611"
+    },
+    {
+      "path": ".historical-source/manifests/part-0001.json",
+      "entries": 1000,
+      "sha256": "1f4bfb42d9324c87f078720a116a0c27e99fbc10dfef6755429f63febe2ddd7d"
+    },
+    {
+      "path": ".historical-source/manifests/part-0002.json",
+      "entries": 1000,
+      "sha256": "314b92fc41ddaba1d9cdbe1f709e858bf2501ccc361922e227ae129d6147f388"
+    },
+    {
+      "path": ".historical-source/manifests/part-0003.json",
+      "entries": 1000,
+      "sha256": "e124c30ecce834a451d332852d31e29fe1939e936004008bdfccd136b915a2d8"
+    },
+    {
+      "path": ".historical-source/manifests/part-0004.json",
+      "entries": 1000,
+      "sha256": "0e0a017e444e71f19775bdb01bbf03affee0408bfb688e052d36c86ae9cd9f66"
+    },
+    {
+      "path": ".historical-source/manifests/part-0005.json",
+      "entries": 1000,
+      "sha256": "9912bc22a9f1fba38334d03b1d1cf54b7992ae5037f3d55eee226df91327b8fe"
+    },
+    {
+      "path": ".historical-source/manifests/part-0006.json",
+      "entries": 1000,
+      "sha256": "aad1e12adeb4fb4ead729928a3f11d2dd5904f23dca16496c72586330e35db18"
+    },
+    {
+      "path": ".historical-source/manifests/part-0007.json",
+      "entries": 1000,
+      "sha256": "8094965d8df771bd4b40a7580b67d36947ebd7954807a05e66d8ce238d9ccb03"
+    },
+    {
+      "path": ".historical-source/manifests/part-0008.json",
+      "entries": 1000,
+      "sha256": "17b0e88487411b1b81aed080a1cad62eaf5c3e038e6d7488389539aa0a549d75"
+    },
+    {
+      "path": ".historical-source/manifests/part-0009.json",
+      "entries": 1000,
+      "sha256": "1abb531a2512a86f5554bc2a71e7d2319de36a8ba156f5e7ba9c49dce19398fc"
+    },
+    {
+      "path": ".historical-source/manifests/part-0010.json",
+      "entries": 1000,
+      "sha256": "0e73a934bee901632e5acfe5f300238d9f6d3efd70cc77557affdff6f51c7f52"
+    },
+    {
+      "path": ".historical-source/manifests/part-0011.json",
+      "entries": 1000,
+      "sha256": "d5f7894fbba92c39c2939cb224a30711b00236d9985914946d79d8686ccfd885"
+    },
+    {
+      "path": ".historical-source/manifests/part-0012.json",
+      "entries": 1000,
+      "sha256": "da396c95a7a200f2bb598249b1cfe0324458475a6ba1657db6b95bac47b33754"
+    },
+    {
+      "path": ".historical-source/manifests/part-0013.json",
+      "entries": 1000,
+      "sha256": "cea7f3aa58ea4885657fac3c33d32e30b3fe428367c68720b313146bd4c7525e"
+    },
+    {
+      "path": ".historical-source/manifests/part-0014.json",
+      "entries": 246,
+      "sha256": "0a1f8d7eec91a90b1761b40bf1c304f46e42efeaaded8cf0792014e6d31b7f23"
+    }
+  ],
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "95ff860b811e1b10080066a432b08a508a761a11",
+    "overlay_redacted_paths": 0
+  }
+}
