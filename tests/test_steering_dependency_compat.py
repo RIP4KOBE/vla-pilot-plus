@@ -94,6 +94,24 @@ def test_wrong_output_hash_is_rejected_before_install(vendor):
     assert all(p.read_bytes() == b'value = 1\r\n' for p in root.glob('*.py'))
 
 
+def test_exact_legacy_mixed_line_endings_are_preserved(vendor):
+    root, manifest = vendor
+    old = b'value = 1\r\nsecond = 1\r\n'
+    target = b'value = 2\nsecond = 1\r\n'
+    (root / 'file0.py').write_bytes(old)
+    patch = ''.join(difflib.unified_diff(old.decode().replace('\r\n', '\n').splitlines(True),
+        target.decode().replace('\r\n', '\n').splitlines(True),
+        fromfile='a/file0.py', tofile='b/file0.py')).encode()
+    (manifest.parent / 'file0.py.patch').write_bytes(patch)
+    data = json.loads(manifest.read_text())
+    data['files']['file0.py'].update(upstream_sha256=compat.digest(old),
+        patched_sha256=compat.digest(target), patch_sha256=compat.digest(patch),
+        output_newlines={'default': 'crlf', 'lf_only_lines': [1]})
+    manifest.write_text(json.dumps(data))
+    compat.install_runtime_compat()
+    assert (root / 'file0.py').read_bytes() == target
+
+
 def test_source_freeze_includes_dependency_patches(tmp_path, monkeypatch):
     from scripts import steering_runtime
     monkeypatch.setattr(steering_runtime, 'ROOT', tmp_path)

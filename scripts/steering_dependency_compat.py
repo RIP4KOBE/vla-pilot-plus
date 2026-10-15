@@ -82,6 +82,13 @@ def install_runtime_compat():
             subprocess.run(['git', 'apply', str(patch.resolve())], cwd=stage, check=True,
                            capture_output=True)
             result = target.read_bytes()
+            # Preserve the legacy files' exact CRLF/mixed-newline bytes as well
+            # as their logic, so the installed dependency has one known hash.
+            newlines = expected.get('output_newlines', {})
+            if newlines.get('default') == 'crlf':
+                lf_only = set(newlines.get('lf_only_lines', []))
+                result = b''.join(line if number in lf_only else line.replace(b'\n', b'\r\n')
+                                  for number, line in enumerate(result.splitlines(keepends=True), 1))
             if digest(result) != expected['patched_sha256']:
                 raise ValueError(f'Unexpected compatibility output; no files changed: {relative}')
             staged.append((path, result))
