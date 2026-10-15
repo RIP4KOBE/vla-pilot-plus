@@ -1,0 +1,5 @@
+benchmark_root: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-libero-object-ckpt/third_party/libero/libero/libero
+bddl_files: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-libero-object-ckpt/third_party/libero/libero/libero/bddl_files
+init_states: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-libero-object-ckpt/third_party/libero/libero/libero/init_files
+datasets: /mnt/data/hf_cache/hub
+assets: /home/hynx/VLA-Pilot++/.worktrees/feat/rdt-libero-object-ckpt/third_party/libero/libero/libero/assets

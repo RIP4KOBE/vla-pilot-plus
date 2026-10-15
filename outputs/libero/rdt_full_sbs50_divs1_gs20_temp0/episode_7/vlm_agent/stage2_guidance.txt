@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # No decision-making is needed for placing the butter in the basket.
+    # The policy knows how to place the object once grasped.
+    return torch.tensor(0.0, device=action_sequence.device)
+

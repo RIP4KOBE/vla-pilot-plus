@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Move gripper with the butter to the basket (keypoint 1)
+    # No decision-making is needed here, so return 0
+    return torch.tensor(0.0, device=action_sequence.device)
+

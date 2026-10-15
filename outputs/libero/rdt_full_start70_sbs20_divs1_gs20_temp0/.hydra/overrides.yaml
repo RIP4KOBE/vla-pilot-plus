@@ -1,0 +1,12 @@
+- policy.type=rdt
+- main.use_guidance=true
+- main.use_vlm_stage_recognition=false
+- main.episode_num=10
+- main.guide_scale=20.0
+- main.sample_batch_size=20
+- main.use_diversity=true
+- main.diversity_scale=1.0
+- main.use_fkd=true
+- main.start_step=70
+- +backend.libero.task_guide_scales=[20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0]
+- perception.vlm_agent.temperature=0.0
