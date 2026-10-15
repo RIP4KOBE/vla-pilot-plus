@@ -1,0 +1,36 @@
+# Task breakdown:
+# Stage 1: Move gripper to grasp the salad dressing. Looking at the image and the keypoint map, keypoints 0 and 1 are on the salad dressing. Keypoint 1 represents the top/neck area which is a good grasp point.
+# Stage 2: Place the salad dressing into the basket. The instruction specifies that for pick-and-place into a basket, no specific guidance is needed for stage 2 as the policy handles the placement once the correct object is picked.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    # Increase weight for the end of the trajectory to ensure precise reaching
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # I identified keypoint 1 as the top of the salad dressing main body/neck
+    target_idx = torch.tensor([1], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate distance for reward. The robot approaches from above, so we emphasize XY alignment.
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+    
+    # Combined distance reward (negative square of distance)
+    # Give slightly more weight to XY for top-down picking tasks as per instructions
+    total_dist = 2.0 * xy_dist + z_dist
+    reward = -(total_dist ** 2 * weights).sum(dim=1)
+    
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Per instructions: For pick something into basket, stage 2 does not need additional guidance.
+    # The policy knows where the basket is and how to place into it.
+    return torch.tensor(0.0, device=action_sequence.device)

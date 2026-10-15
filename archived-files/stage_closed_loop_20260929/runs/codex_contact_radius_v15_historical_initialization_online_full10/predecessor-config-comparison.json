@@ -1,0 +1,22 @@
+[
+  {
+    "path": "main.contact_reward_max_distance_m",
+    "before": 0.1,
+    "after": 0.06
+  },
+  {
+    "path": "main.eds_eval.job_id",
+    "before": "codex_partial_visibility_v14_historical_initialization_online_full10",
+    "after": "codex_contact_radius_v15_historical_initialization_online_full10"
+  },
+  {
+    "path": "main.eds_eval.output_dir",
+    "before": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z/artifacts/stage_closed_loop_20260929/runs/codex_partial_visibility_v14_historical_initialization_online_full10/output/eds_eval",
+    "after": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z/artifacts/stage_closed_loop_20260929/runs/codex_contact_radius_v15_historical_initialization_online_full10/output/eds_eval"
+  },
+  {
+    "path": "perception.gemini.capture_dir",
+    "before": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z/artifacts/stage_closed_loop_20260929/runs/codex_partial_visibility_v14_historical_initialization_online_full10/output/captured_stage_inputs",
+    "after": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-gpu6-20260922T063626Z/artifacts/stage_closed_loop_20260929/runs/codex_contact_radius_v15_historical_initialization_online_full10/output/captured_stage_inputs"
+  }
+]

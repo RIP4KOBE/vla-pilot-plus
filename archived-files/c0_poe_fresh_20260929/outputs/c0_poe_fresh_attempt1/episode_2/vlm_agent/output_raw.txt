@@ -1,0 +1,35 @@
+```python
+# Task breakdown:
+# Stage 1: Move the gripper to grasp the cream cheese (keypoint 0).
+# Stage 2: Move the grasped cream cheese to the basket (represented by keypoints 1, 2, 3, 4, 5).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    # Increase weight towards the end of the action sequence to ensure the gripper reaches the target
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # I looked at the image and the object name map: keypoint 0 is 'cream_cheese_1_main'
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance from each point in the action sequence to the target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    
+    # Reward is negative squared distance, maximized when distance is zero
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # MUST return scalar!
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # For tasks where an object is placed into a basket, the low-level policy handles the specific placing motion.
+    # As per the instructions: "For scene with pick something into basket, you do not need to create stage 2 reward function, since we do not need to make decision here, just return 0."
+    return torch.tensor(0.0, device=action_sequence.device)
+
+```

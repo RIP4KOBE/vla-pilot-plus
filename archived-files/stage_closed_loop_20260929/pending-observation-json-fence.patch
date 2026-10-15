@@ -1,0 +1,42 @@
+--- a/core/stage_evidence.py
++++ b/core/stage_evidence.py
+@@ -18,7 +18,9 @@
+ 
+ 
+ def parse_observation(text):
+-    """Strict JSON: no legacy regex fallback, extra keys or implicit defaults."""
++    """Strict JSON schema after lossless outer presentation decoding."""
++    from core.stage_observation_json import unwrap
++    text, _ = unwrap(text)
+     def unique_pairs(pairs):
+         result = {}
+         for key, value in pairs:
+--- a/core/stage_response_validation.py
++++ b/core/stage_response_validation.py
+@@ -9,6 +9,7 @@
+ 
+ def request_validated(observer, content, limit):
+     from core.stage_evidence import parse_observation
++    from core.stage_observation_json import unwrap
+     if isinstance(limit,bool) or not isinstance(limit,int) or not 1 <= limit <= 3:
+         raise ValueError('observation validation limit must be an integer in [1,3]')
+     attempts=[]
+@@ -20,6 +21,7 @@
+         try:
+             if (completion or {}).get('finish_reason')=='length':
+                 raise ValueError('truncated observation')
++            _, item["presentation"] = unwrap(raw)
+             observation=parse_observation(raw)
+         except (ValueError,TypeError) as exc:
+             item.update(valid=False,error_type=type(exc).__name__)
+--- a/scripts/stage_closed_loop_run.py
++++ b/scripts/stage_closed_loop_run.py
+@@ -19,7 +19,7 @@
+ ROOT = STUDY/'artifacts/stage_closed_loop_20260929'
+ FRESH = STUDY/'artifacts/c0_poe_fresh_20260929'
+ GPU_UUID = 'GPU-a5d6a5f8-b6df-7f3a-c3dc-19734c41ec0e'
+-SOURCES = ['core/stage_release_guard.py','core/c0_reward_contract.py',
++SOURCES = ['core/stage_observation_json.py','core/stage_release_guard.py','core/c0_reward_contract.py',
+     'vlm_query/c0_contract_v1/guidance_template.txt','vlm_query/c0_contract_v1/guidance_template_libero.txt',
+     'vlm_query/c0_contract_v1/stage_template.txt','vlm_query/c0_contract_v1/segmentation_planning_template.txt',
+     'main.py','core/stage_evidence.py','core/stage_contact_handoff.py',

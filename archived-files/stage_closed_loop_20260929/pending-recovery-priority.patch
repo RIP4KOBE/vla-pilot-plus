@@ -1,0 +1,22 @@
+--- a/core/stage_robot_evidence.py
++++ b/core/stage_robot_evidence.py
+@@ -71,15 +71,14 @@
+     if not evidence['outside_goal']:
+         return 'negative_grasp_evidence_preserve_location_uncertainty'
+     state.update(current_stage=1, guidance_requested=True, completion_evidence_count=0,
+-                 completion_evidence_step=None, completion_confirmed=False)
++                 completion_evidence_step=None, completion_confirmed=False,
++                 contact_until=None, contact_phase='approach', recovery_approach_since=step)
+     # A physical empty closure needs reopening before another grasp can work.
+-    # Each recovery pulse is bounded; persistent evidence cannot extend it.
++    # Reopening pulses are rate limited. Failed-grasp recovery always cancels
++    # contact grace; its guidance request must not be suppressed by cooldown.
+     last = state.get('robot_recovery_step')
+     if last is None or step-last >= 64:
+         state['robot_recovery_step'] = step
+-        state['contact_until'] = None
+-        state['contact_phase'] = 'approach'
+-        state['recovery_approach_since'] = step
+         if 'empty_closed_fingers' in evidence['no_grasp_reasons']:
+             state['empty_release_until'] = step+16
+     return 'robot_observed_failed_grasp_reacquire'

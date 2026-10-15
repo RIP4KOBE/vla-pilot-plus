@@ -1,0 +1,74 @@
+Error during episode execution:
+Traceback (most recent call last):
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/main.py", line 1456, in run
+    self._run_episode(episode, episode_dir, episode_seed)
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/main.py", line 1728, in _run_episode
+    action_chunk = self.policy.select_action(**select_kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/core/rdt_policy_steer.py", line 1539, in select_action
+    raw = self._predict_guided(
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/core/rdt_policy_steer.py", line 1692, in _predict_guided
+    guided = self._eds_guided_denoise_loop(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/core/rdt_policy_steer.py", line 5595, in _eds_guided_denoise_loop
+    offspring, rollout_scores, rollout_info = self._eds_rollout_reference(
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/core/rdt_policy_steer.py", line 3385, in _eds_rollout_reference
+    return self._eds_rollout_rbf_diverse_reference(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/core/rdt_policy_steer.py", line 3632, in _eds_rollout_rbf_diverse_reference
+    model_output = self._counted_dit(x_t, t, cond)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/core/rdt_policy_steer.py", line 1419, in _counted_dit
+    return self._dit(samples, t, cond)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/core/rdt_policy_steer.py", line 736, in forward
+    model_output_128 = self.runner.model(
+                       ^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/third_party/rdt/models/rdt/model.py", line 159, in forward
+    x = block(x, c, mask)                       # (B, T+1, D)
+        ^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/third_party/rdt/models/rdt/blocks.py", line 175, in forward
+    x = self.cross_attn(x, c, mask)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/third_party/rdt/models/rdt/blocks.py", line 109, in forward
+    q, k = self.q_norm(q), self.k_norm(k)
+                           ^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/timm/layers/norm.py", line 247, in forward
+    x = rms_norm(x, self.normalized_shape, self.weight, self.eps)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/functional.py", line 2929, in rms_norm
+    return torch.rms_norm(input, normalized_shape, weight, eps)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 548.00 MiB. GPU 0 has a total capacity of 139.80 GiB of which 161.75 MiB is free. Including non-PyTorch memory, this process has 139.62 GiB memory in use. Of the allocated memory 136.90 GiB is allocated by PyTorch, and 910.32 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

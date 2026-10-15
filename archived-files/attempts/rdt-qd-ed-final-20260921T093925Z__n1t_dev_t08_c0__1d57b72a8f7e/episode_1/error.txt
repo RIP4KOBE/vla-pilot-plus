@@ -1,0 +1,10 @@
+Error during episode execution:
+Traceback (most recent call last):
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/main.py", line 1462, in run
+    self._run_episode(episode, episode_dir, episode_seed)
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/main.py", line 1633, in _run_episode
+    stage_state = self._update_stage(stage_state, gripper_val, UPPER_THRESHOLD, LOWER_THRESHOLD)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/main.py", line 1389, in _update_stage
+    raise RuntimeError("stage_json_query_failed: " + str(query_result.get("error")))
+RuntimeError: stage_json_query_failed: codex_timeout

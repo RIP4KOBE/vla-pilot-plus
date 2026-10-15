@@ -1,0 +1,43 @@
+Observe a robot doing a two-stage pick-and-place task. Report visual facts ONLY.
+Task: pick up the orange juice and place it in the basket
+Target appearance from the initial reference (identity only): The target is a rectangular orange juice carton, labeled with '0' and '1'. It is primarily yellow and orange, featuring a prominent image of a sliced orange at the bottom and the words "ORANGE JUICE" in bold black text. It stands upright on the floor, positioned between the small chocolate pudding box (8) and the taller ketchup bottle (10, 11). It is taller than the nearby butter and pudding boxes but shorter than the condiment bottles.
+Initial reference keypoint labels: 0: orange_juice_1_main
+1: orange_juice_1_main
+2: basket_1_main
+3: basket_1_main
+4: basket_1_main
+5: basket_1_main
+6: basket_1_main
+7: butter_1_main
+8: chocolate_pudding_1_main
+9: bbq_sauce_1_main
+10: ketchup_1_main
+11: ketchup_1_main
+12: salad_dressing_1_main
+13: salad_dressing_1_main
+
+Identify the exact instructed object and the destination (basket in these tasks).
+The initial image helps identify objects; only the CURRENT image describes the
+current state. Do not infer success from a gripper command, a reward, a stage
+description, proximity, or what the robot was supposed to do.
+
+Distinguish an object next to the basket from one inside its interior. Overlap in
+the image alone does not establish containment or support. If the basket rim,
+robot or another object hides the target, use occluded/unknown. A closed gripper
+near an object is not proof that the object is held. A target visibly suspended
+and supported by the fingers can be held. If grasp/contact is ambiguous, unknown.
+Use supported only when the target visibly rests on a surface; unsupported for
+a suspended target; otherwise unknown. An open gripper does not prove placement.
+Describe visible target location relative to the destination and fingers, and
+state uncertainty. Never fabricate facts hidden behind the robot or basket wall.
+
+Return exactly one JSON object, no Markdown fences, no control decisions, with
+these five keys and ONLY the following enum values:
+target_visibility: "clear", "occluded", or "unknown"
+target_location: "outside_goal", "inside_goal", "above_goal", or "unknown"
+grasp: "held", "not_held", or "unknown"
+support: "supported", "unsupported", or "unknown"
+evidence: a short string giving visible supporting evidence and any uncertainty
+
+
+Current observation; judge this image

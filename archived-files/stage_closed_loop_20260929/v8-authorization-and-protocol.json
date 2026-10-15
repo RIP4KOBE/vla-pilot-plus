@@ -1,0 +1,10 @@
+{
+  "utc": "2026-09-29T17:06:56.160819+00:00",
+  "name": "current_target_marker_v8_c0_contract_online_full10",
+  "authorization": "User requested autonomous closed-loop repair and waived budget stopping",
+  "change": "Current-target marker from existing tracked keypoints; preserve v7 controller and continuous RNG",
+  "historical_rng_fixture_used": false,
+  "gripper_passthrough_used": false,
+  "cpu_checks": 158,
+  "acceptance": "Complete fresh online ten-task cohort, valid audits and >=3/10"
+}

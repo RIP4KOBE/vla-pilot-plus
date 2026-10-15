@@ -1,0 +1,18 @@
+{
+  "core/stage_evidence.py": {
+    "base_sha256": "b18fb3de7c1fba28d08325128c0326f987b3e018a8ac8dafcbc7ce4e64661acc",
+    "candidate_sha256": "b4ebfde703daa1727146abcb6603217c77d4c861e2cbb1cacf947a908b718695"
+  },
+  "core/stage_fused_carry_hold.py": {
+    "base_sha256": null,
+    "candidate_sha256": "99c4983289e71d7d326b0608f147226019465a139372f293986b189a26babc04"
+  },
+  "scripts/stage_closed_loop_run.py": {
+    "base_sha256": "e450a7bd31c43e864cb017b0f0023265f052d25bf0da62aa91b8445d08a8faa8",
+    "candidate_sha256": "0d43541be2fe308eabaf1d44d55938b86d1f0d9f6620c2851c13162e50289f83"
+  },
+  "scripts/stage_closed_loop_deep_audit.py": {
+    "base_sha256": "6396e47fa0fd18e5eb34473f2a63fce93241a9ab74c10c775a1dace6421a17cb",
+    "candidate_sha256": "1fbfe412e7474f617ddb659491d4a4b6e3281c5a24352b9277042e9a9b67795c"
+  }
+}

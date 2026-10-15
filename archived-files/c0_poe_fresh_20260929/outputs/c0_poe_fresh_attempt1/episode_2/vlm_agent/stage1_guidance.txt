@@ -1,0 +1,20 @@
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    # Increase weight towards the end of the action sequence to ensure the gripper reaches the target
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # I looked at the image and the object name map: keypoint 0 is 'cream_cheese_1_main'
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance from each point in the action sequence to the target position
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    
+    # Reward is negative squared distance, maximized when distance is zero
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # MUST return scalar!
+

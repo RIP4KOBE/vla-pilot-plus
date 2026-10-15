@@ -1,0 +1,40 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the milk carton. By looking at the image and the keypoint map, keypoints 0 and 1 are on the milk carton. I will target the top of the carton (keypoint 1) for a secure grasp from above.
+# Stage 2: Move the grasped milk carton to the basket. Keypoints 3, 4, 5, 6 mark the top rim of the basket, and keypoint 2 marks the base. The policy knows how to place it, so per instructions for pick-and-place into a basket, we don't need to specify a guidance function for stage 2.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Prioritize reaching the target at the end of the trajectory
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Identifying the milk carton keypoint from the map and image: keypoint 1 is at the top.
+    target_idx = torch.tensor([1], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance between the gripper trajectory and the target position
+    # The gripper should approach from above, so we emphasize X-Y alignment.
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+    
+    # Combine distances - higher weight on XY to ensure centering before descending
+    total_dist = 2.0 * xy_dist + z_dist
+    
+    # Reward is negative distance squared; maximize to approach 0.
+    reward = -(total_dist ** 2 * weights).sum(dim=1)
+    
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Per instructions: "For scene with pick something into basket, you do not need to create stage 2 reward function, since we do not need to make decision here, just return 0."
+    return torch.tensor(0.0, device=action_sequence.device)
+```

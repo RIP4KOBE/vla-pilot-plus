@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # For scenes involving placing something into a basket, the instructions specify to return 0.
+    return torch.tensor(0.0, device=action_sequence.device)
+

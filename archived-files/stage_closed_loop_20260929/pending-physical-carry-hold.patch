@@ -1,0 +1,128 @@
+--- a/core/stage_evidence.py
++++ b/core/stage_evidence.py
+@@ -207,6 +207,11 @@
+         from core.stage_robot_evidence import check, filter_observation, apply_recovery, target_goal_geometry, enforce_recovery_priority
+         robot_evidence = check(state, step=int(state["global_step"]), width=width, distance=distance,
+             executed_gripper=gripper_command, geometry=target_goal_geometry(runner))
++    physical_carry_evidence = None
++    if controller == 'proprio_v4' and runner.config.get('physical_carry_hold_enabled', False):
++        from core.stage_carry_hold import observe as observe_physical_carry, filter_observation as filter_carry_observation, finalize as finalize_physical_carry
++        physical_carry_evidence = observe_physical_carry(state, step=int(state['global_step']),
++            evidence=robot_evidence, executed_gripper=gripper_command)
+     capabilities = {stage: assess_reward(fns, runner.stage_live_keypoints,
+                     horizon=runner.policy._action_chunk_horizon)
+                     for stage, fns in runner.guidance_fns.items()}
+@@ -242,6 +247,11 @@
+                         step=int(state["global_step"]), executed_gripper=gripper_command, width=width, distance=distance)
+                     if robot_evidence is not None:
+                         control_observation = filter_observation(control_observation, robot_evidence)
++                    if physical_carry_evidence is not None:
++                        control_observation, carry_reason = filter_carry_observation(
++                            control_observation, state, physical_carry_evidence)
++                        if carry_reason:
++                            sensor_reason = carry_reason
+                     update_visual_hold(state, control_observation, int(state["global_step"]))
+                 reason = decide(state, control_observation, int(state["global_step"]), cfg["confirmation_steps"])
+                 if sensor_reason == 'unheld_above_goal_requires_reacquisition':
+@@ -261,6 +271,8 @@
+     recovery_priority_override = False
+     if robot_evidence is not None:
+         recovery_priority_override = enforce_recovery_priority(state, robot_evidence, int(state['global_step']))
++    if physical_carry_evidence is not None:
++        physical_carry_evidence = finalize_physical_carry(state, physical_carry_evidence)
+     capability = apply_guidance_gate(state, capabilities, master)
+     if before_stage != state["current_stage"] or before_guidance != state["use_guidance"]:
+         # Also rebase reward normalization on off->on; old reward is never evidence.
+@@ -288,7 +300,8 @@
+                      sensor_consistency_reason=sensor_reason, visual_hold=state.get('visual_hold'))
+     if robot_evidence is not None:
+         event.update(robot_evidence=robot_evidence, empty_release_until=state.get("empty_release_until"),
+-                     recovery_priority_override=recovery_priority_override)
++                     recovery_priority_override=recovery_priority_override,
++                     physical_carry_evidence=physical_carry_evidence)
+     for key in ("identity_memory", "identity_generated_this_query", "validation_attempts", "observation_validation_retries", "api_request_attempts", "api_sdk_retry_attempts", "api_request_counter_available", "transport", "completion_metadata"):
+         if key in result:
+             event[key] = result[key]
+--- a/core/stage_grasp_guard.py
++++ b/core/stage_grasp_guard.py
+@@ -46,7 +46,8 @@
+         target_distance_m=distance, visual_hold=bool(state.get('visual_hold')),
+         gripper_width_m=observed_width(runner), payload_geometry=payload,
+         payload_aligned=payload_aligned, payload_release_until=state.get('payload_release_until'),
+-        semantic_stage=state.get('current_stage')))
++        semantic_stage=state.get('current_stage'), visual_hold_since=state.get('visual_hold_since'),
++        physical_carry_hold_step=state.get('physical_carry_hold_step')))
+     return chunk
+ 
+ 
+@@ -118,6 +119,9 @@
+     maximum = int(config.get('grasp_hold_max_steps', 160))
+     debounce = int(config.get('grasp_contact_debounce_steps', 16))
+     hold_since = state.get('visual_hold_since')
++    if config.get('physical_carry_hold_enabled', False):
++        from core.stage_carry_hold import expiry_anchor
++        hold_since = expiry_anchor(state, config)
+     if hold_since is not None and step-hold_since >= maximum:
+         state['visual_hold'] = False
+         state['visual_hold_since'] = None
+@@ -137,6 +141,10 @@
+         state['contact_close_until'] = step+debounce
+     state['previous_raw_gripper'] = raw
+     if raw < 0 and state.get('visual_hold'):
++        if config.get('physical_carry_hold_enabled', False):
++            from core.stage_carry_hold import permit_hold
++            if not permit_hold(state, step=step, config=config):
++                return raw, 'unverified_visual_hold_preserve_policy_open'
+         return 1., 'hold_visible_target_outside_destination'
+     until = state.get('contact_close_until')
+     if raw < 0 and until is not None and step < until:
+--- a/scripts/stage_closed_loop_run.py
++++ b/scripts/stage_closed_loop_run.py
+@@ -19,7 +19,7 @@
+ ROOT = STUDY/'artifacts/stage_closed_loop_20260929'
+ FRESH = STUDY/'artifacts/c0_poe_fresh_20260929'
+ GPU_UUID = 'GPU-a5d6a5f8-b6df-7f3a-c3dc-19734c41ec0e'
+-SOURCES = ['core/stage_release_guard.py','core/c0_reward_contract.py',
++SOURCES = ['core/stage_carry_hold.py','core/stage_release_guard.py','core/c0_reward_contract.py',
+     'vlm_query/c0_contract_v1/guidance_template.txt','vlm_query/c0_contract_v1/guidance_template_libero.txt',
+     'vlm_query/c0_contract_v1/stage_template.txt','vlm_query/c0_contract_v1/segmentation_planning_template.txt',
+     'main.py','core/stage_evidence.py','core/stage_contact_handoff.py',
+@@ -118,6 +118,24 @@
+         checks['recovery_override_respects_guidance_gate']=all(r['guidance_requested'] and
+             r['contact_phase']=='approach' and r['guidance_after']==bool(config['main'].get('use_guidance',True)
+                 and r['reward_capability']['available']) for r in events if r.get('recovery_priority_override'))
++    if config['main'].get('physical_carry_hold_enabled', False):
++        checks['physical_carry_evidence_logged']=bool(events) and all(isinstance(r.get('physical_carry_evidence'),dict) for r in events)
++        refreshed=[r for r in events if (r.get('physical_carry_evidence') or {}).get('refreshed')]
++        checks['physical_refresh_requires_existing_hold_and_evidence']=all(
++            r['stage_after']==2 and r['visual_hold'] and not r['completion_confirmed'] and
++            not r['robot_evidence']['no_grasp'] and r['physical_carry_evidence']['present'] and
++            r['physical_carry_evidence']['persistent'] and r['gripper_value_used']>0 and
++            .005<r['gripper_width_m']<.075 and r['target_distance_m']<.10 and
++            r['physical_carry_evidence']['target_lift_m']>=.03 and
++            r['physical_carry_evidence']['physical_carry_hold_step']==r['global_step'] for r in refreshed)
++        checks['contradictory_visual_negative_is_only_made_uncertain']=all(
++            (r.get('observation') or {}).get('grasp')=='not_held' and
++            (r.get('control_observation') or {}).get('grasp')=='unknown' and r['stage_before']==2 and
++            r['stage_after']==2 and r['visual_hold'] and r['physical_carry_evidence']['present'] and
++            r['physical_carry_evidence']['persistent'] and not r['robot_evidence']['no_grasp'] and
++            {k:v for k,v in r['observation'].items() if k!='grasp'}==
++            {k:v for k,v in r['control_observation'].items() if k!='grasp'}
++            for r in events if r.get('sensor_consistency_reason')=='negative_visual_grasp_conflicts_with_measured_carry')
+     per_task=[]
+     for i,t in enumerate(manifest['tasks']):
+         videos=list((out/f'episode_{i+1}').glob('*agentview.mp4'))
+@@ -148,6 +166,13 @@
+                 elif r['reason']=='complete_policy_requested_payload_release':
+                     valid_release &= (episode in starts and 0<step-starts[episode]<dwell and r['executed_action'][-1]<0)
+             checks['release_initiated_by_policy_and_bounded']=valid_release
++    if config['main'].get('physical_carry_hold_enabled', False):
++        maximum=config['main'].get('grasp_hold_max_steps',80)
++        checks['forced_hold_requires_measured_carry']=all(
++            r.get('physical_carry_hold_step') is not None and r.get('visual_hold_since') is not None and
++            r['physical_carry_hold_step']>=r['visual_hold_since'] and
++            0<=r['global_step']-r['physical_carry_hold_step']<maximum and r['semantic_stage']==2
++            for r in guarded if r['override'] and r['reason']=='hold_visible_target_outside_destination')
+     if config['main'].get('reward_contract'):
+         proofs=[out/f'episode_{i+1}/vlm_agent/c0_reward_contract.json' for i in range(len(manifest['tasks']))]
+         checks['numerical_reward_contract']=all(p.exists() and json.loads(p.read_text()).get('valid')

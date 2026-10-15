@@ -1,0 +1,38 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the ketchup (keypoint 0).
+# Stage 2: Place the grasped ketchup into the basket (centered between keypoints 2, 3, 4, 5). 
+# According to instructions for basket tasks, stage 2 does not require explicit guidance as the policy handles the placement mode once the object is grasped.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Move gripper to grasp the ketchup. Looking at the image and keypoint map, 
+    # keypoint 0 is at the top of the ketchup bottle, which is a good grasp point.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Increase weight for the end of the trajectory to ensure precise reaching
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Select the ketchup main keypoint (index 0)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance in 3D
+    # Per instructions: for pick-and-place from above, emphasize X-Y alignment.
+    # However, standard 3D norm is generally effective.
+    dist_sq = torch.norm(action_sequence - target_pos, dim=-1) ** 2
+    
+    # Reward is negative distance squared (maximizing reward = minimizing distance)
+    reward = -(dist_sq * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Per instructions: "For scene with pick something into basket, you do not need to create stage 2 reward function, since we do not need to make decision here, just return 0."
+    return torch.tensor(0.0, device=action_sequence.device)
+```

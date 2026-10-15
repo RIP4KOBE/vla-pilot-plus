@@ -1,0 +1,42 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the alphabet soup (keypoint 0).
+# Stage 2: Move the grasped alphabet soup to the basket (represented by keypoints 1, 2, 3, 4). 
+# Note: Per instructions for "pick something into basket", stage 2 decision is handled by the policy, return 0.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Focus guidance on the latter part of the trajectory
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Identify alphabet soup keypoint from map and image: index 0
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance for all timesteps
+    # For pick-and-place from above, emphasize XY coordinates
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+    
+    # Weighted sum of distances (emphasizing XY to ensure centered approach)
+    all_dists = 2.0 * xy_dist + z_dist
+    
+    # Reward is negative distance squared
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()  # MUST return scalar!
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # For tasks involving placing objects into a basket, the policy handles the spatial logic.
+    # Returning 0 as per the "CRITICAL: Task specific rules".
+    return torch.tensor(0.0, device=action_sequence.device)
+
+```

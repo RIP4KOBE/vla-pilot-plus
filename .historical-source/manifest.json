@@ -1,0 +1,66 @@
+{
+  "schema": "historical_supplemental_source_v1",
+  "date": "2026-10-15",
+  "source_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z",
+  "files": [],
+  "scope": "Source/configuration/documentation only. Raw videos/model weights/logs/captures and private files remain external. Source symlinks are materialized here and mapped to their observed targets.",
+  "entries_key": "files",
+  "entry_count": 9767,
+  "entry_shards": [
+    {
+      "path": ".historical-source/manifests/part-0000.json",
+      "entries": 1000,
+      "sha256": "09ddbbe5b8f63d1583db0a88c988f356c8a5de342fd196a57580c5fe1625f46a"
+    },
+    {
+      "path": ".historical-source/manifests/part-0001.json",
+      "entries": 1000,
+      "sha256": "bf4983a945173bfc829b29081a1753c211eac311ccb346c1f88fcab5cadbb082"
+    },
+    {
+      "path": ".historical-source/manifests/part-0002.json",
+      "entries": 1000,
+      "sha256": "6673ab23a75f1391cca65702c8363ad54877e87b7151545ea43140ada0ade9c7"
+    },
+    {
+      "path": ".historical-source/manifests/part-0003.json",
+      "entries": 1000,
+      "sha256": "f47c0931218206f28a73bbdbf3a577e81da51c717720fbd42a9e3105e60f3485"
+    },
+    {
+      "path": ".historical-source/manifests/part-0004.json",
+      "entries": 1000,
+      "sha256": "235878a019f64c288a8d53baf185e8583f089217852628093583b22b4da9145a"
+    },
+    {
+      "path": ".historical-source/manifests/part-0005.json",
+      "entries": 1000,
+      "sha256": "75d720067d57c8b6dcd77cfb7e58c04dd3cae1c27bd31b3dbb62dda4c0840b80"
+    },
+    {
+      "path": ".historical-source/manifests/part-0006.json",
+      "entries": 1000,
+      "sha256": "c5e9fefeaaf37d5ef128c2c642dfa975d2816502d3df42d30dec933315b7d7ba"
+    },
+    {
+      "path": ".historical-source/manifests/part-0007.json",
+      "entries": 1000,
+      "sha256": "b001ee05195bdf84559a0fa5af437e9f9fe52304cb2700e11bb3d437dd558e78"
+    },
+    {
+      "path": ".historical-source/manifests/part-0008.json",
+      "entries": 1000,
+      "sha256": "12a5381c3cf4bd201d4379ec48393689ccc7d09b758cf0b03ddc08f568178a54"
+    },
+    {
+      "path": ".historical-source/manifests/part-0009.json",
+      "entries": 767,
+      "sha256": "a569cb833f31072e09d59b8dca81c39a6fc8b5688e12ed16584ce4fc93d81673"
+    }
+  ],
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
+    "overlay_redacted_paths": 20
+  }
+}

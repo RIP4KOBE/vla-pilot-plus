@@ -1,0 +1,36 @@
+```python
+# Task breakdown:
+# Stage 1: Move the gripper to grasp the orange juice (keypoint 0).
+# Stage 2: Place the grasped orange juice into the basket (keypoints 2, 3, 4, 5, 6).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Assign weight 3 when t >= 0.7*T, otherwise weight 1
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Target is orange juice, lowest numbered keypoint is 0
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0] # Shape (3,)
+    
+    # Calculate squared Euclidean distance for each timestep
+    # action_sequence shape: (B, T, 3), target_pos shape: (3,)
+    sq_dists = torch.sum((action_sequence - target_pos)**2, dim=-1) # Shape (B, T)
+    
+    # Weighted sum over time, then mean over batch
+    reward = -(sq_dists * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2 returns a scalar zero tensor as per the C0 control condition
+    return torch.tensor(0.0, device=action_sequence.device)
+
+```

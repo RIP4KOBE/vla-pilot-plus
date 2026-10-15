@@ -1,0 +1,5 @@
+def stage2_guidance(keypoints, action_sequence):
+    # The instruction says for picking into a basket, stage 2 guidance is not needed 
+    # as the policy handles the placement automatically once the object is grasped.
+    return torch.tensor(0.0, device=action_sequence.device)
+

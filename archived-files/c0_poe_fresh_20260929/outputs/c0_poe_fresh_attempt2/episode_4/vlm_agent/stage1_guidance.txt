@@ -1,0 +1,24 @@
+def stage1_guidance(keypoints, action_sequence):
+    # Move gripper to grasp the bbq sauce (keypoint 0)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    # Increase weight for the end of the trajectory to ensure precise grasping
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Identifying bbq sauce at keypoint 0 from the provided map and image
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate distance for steering
+    # Gripper should approach from above, so we give more weight to XY alignment
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+    
+    # Combined distance, emphasizing XY precision
+    all_dists = 2.0 * xy_dist + z_dist
+    
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()
+

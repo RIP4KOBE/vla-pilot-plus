@@ -1,0 +1,39 @@
+```python
+# Task breakdown:
+# Stage 1: Move the gripper to grasp the butter. The butter is identified by keypoint 0.
+# Stage 2: Move the grasped butter into the basket. The basket is represented by keypoints 1-5.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Define temporal weights: 3.0 for the final 30% of the trajectory, 1.0 otherwise
+    weights = torch.where(
+        timesteps >= final_start, 
+        torch.tensor(3.0, device=action_sequence.device), 
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()
+
+    # Target is the butter, which is keypoint 0
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance for each timestep
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    
+    # Reward is the negative weighted sum of squared distances
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2 returns a scalar zero tensor as per the C0 control condition instructions
+    return torch.tensor(0.0, device=action_sequence.device)
+```

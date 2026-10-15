@@ -1,0 +1,111 @@
+--- a/core/stage_grasp_guard.py
++++ b/core/stage_grasp_guard.py
+@@ -28,6 +28,14 @@
+     distance = target_distance(runner)
+     command, reason = guard_command(state, float(raw_list[-1]), step=step, aligned=aligned,
+                                      distance=distance, config=runner.config)
++    payload = None
++    payload_aligned = False
++    if runner.config.get('payload_release_enabled', False):
++        from core.stage_release_guard import payload_geometry, aligned_payload, apply
++        payload = payload_geometry(runner)
++        payload_aligned = aligned_payload(payload, runner.config.get('payload_release_margin_m', .005))
++        command, reason = apply(state, float(raw_list[-1]), command, reason, step=step,
++            width=observed_width(runner), distance=distance, geometry=payload, config=runner.config)
+     executed_list = list(raw_list); executed_list[-1] = command
+     if command != raw_list[-1]:
+         chunk = chunk.clone() if hasattr(chunk, 'clone') else np.array(chunk, copy=True)
+@@ -36,7 +44,9 @@
+         task_id=state.get('task_id'), global_step=step, raw_action=raw_list, executed_action=executed_list,
+         override=command != raw_list[-1], reason=reason, goal_aligned=aligned, goal_geometry=geometry,
+         target_distance_m=distance, visual_hold=bool(state.get('visual_hold')),
+-        gripper_width_m=observed_width(runner)))
++        gripper_width_m=observed_width(runner), payload_geometry=payload,
++        payload_aligned=payload_aligned, payload_release_until=state.get('payload_release_until'),
++        semantic_stage=state.get('current_stage')))
+     return chunk
+ 
+ 
+--- a/main.py
++++ b/main.py
+@@ -1003,6 +1003,13 @@
+ 
+         if self.config.get("stage_controller", "legacy") in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"} and set(self.guidance_fns) != {1, 2}:
+             raise ValueError("evidence_v1 supports exactly two pick/place stages")
++
++        reward_contract = self.config.get('reward_contract')
++        if reward_contract:
++            if reward_contract != 'c0_xyz_v1':
++                raise ValueError('Unknown numerical reward contract')
++            from core.c0_reward_contract import validate_task
++            validate_task(self, key_points, episode_dir)
+ 
+         output_raw_path = os.path.join(guidance_functions_dir, 'output_raw.txt')
+         self.stage_descriptions = self.vlm_agent._extract_stage_descriptions_from_output(output_raw_path)
+--- a/scripts/stage_closed_loop_run.py
++++ b/scripts/stage_closed_loop_run.py
+@@ -19,7 +19,10 @@
+ ROOT = STUDY/'artifacts/stage_closed_loop_20260929'
+ FRESH = STUDY/'artifacts/c0_poe_fresh_20260929'
+ GPU_UUID = 'GPU-a5d6a5f8-b6df-7f3a-c3dc-19734c41ec0e'
+-SOURCES = ['main.py','core/stage_evidence.py','core/stage_contact_handoff.py',
++SOURCES = ['core/stage_release_guard.py','core/c0_reward_contract.py',
++    'vlm_query/c0_contract_v1/guidance_template.txt','vlm_query/c0_contract_v1/guidance_template_libero.txt',
++    'vlm_query/c0_contract_v1/stage_template.txt','vlm_query/c0_contract_v1/segmentation_planning_template.txt',
++    'main.py','core/stage_evidence.py','core/stage_contact_handoff.py',
+     'core/stage_grasp_guard.py','configs/stage_controller/grasp_v3.yaml',
+     'core/stage_robot_evidence.py','core/stage_identity_memory.py','configs/stage_controller/proprio_v4.yaml',
+     'core/stage_response_validation.py','core/rdt_libero_action_converter.py',
+@@ -66,14 +69,14 @@
+     cfg=subprocess.run(argv+['--cfg','job'],cwd=STUDY,env=process_env(),capture_output=True,text=True,timeout=90)
+     if cfg.returncode:raise RuntimeError(cfg.stderr[-2200:])
+     resolved=yaml.safe_load(cfg.stdout)
+-    assert resolved['main']['episode_policy_rng_mode']=='per_seed_v1'
++    assert resolved['main']['episode_policy_rng_mode'] in {'per_seed_v1','continuous'}
+     assert resolved['main']['stage_controller']==args.controller
+     assert resolved['perception']['gemini']['api_key'] is None
+     source_hashes={p:digest(STUDY/p) for p in SOURCES}
+     manifest={'name':args.name,'tasks':tasks,'seeds':[SEEDS[t] for t in tasks],'controller':args.controller,
+         'reward':args.reward,'argv':argv,'physical_gpu':2,'gpu_uuid':GPU_UUID,
+         'allocator_ceiling_gib':48,'admission_free_gib':56,'source_sha256':source_hashes,
+-        'policy_rng':'per_seed_v1; same initial policy RNG for each environment seed independent of episode ordering',
++        'policy_rng':resolved['main']['episode_policy_rng_mode'],
+         'base_manifest_sha256':digest(FRESH/'manifest-attempt2.json')}
+     path=folder/'manifest.json'
+     if path.exists() and json.loads(path.read_text())!=manifest:raise RuntimeError('Frozen manifest differs')
+@@ -105,6 +108,7 @@
+         'ed_steps_match_gate':[(r['episode_id'],r['global_step']) for r in events if r['guidance_after']]==[(r['episode'],r['global_step']) for r in metrics],
+         'reward_gate':all(not r['guidance_after'] or r['reward_capability']['available'] for r in events),
+         'source_unchanged':all(digest(STUDY/p)==h for p,h in manifest['source_sha256'].items())}
++    config=yaml.safe_load((folder/'resolved-config.yaml').read_text())
+     per_task=[]
+     for i,t in enumerate(manifest['tasks']):
+         videos=list((out/f'episode_{i+1}').glob('*agentview.mp4'))
+@@ -119,7 +123,26 @@
+     guarded=[r for r in rows(out/'eds_eval/safety_events.jsonl') if r.get('event')=='stage_grasp_guard_action']
+     if manifest['controller'] in {'grasp_v3','proprio_v4'}:
+         checks['arm_commands_preserved']=bool(guarded) and all(r['raw_action'][:6]==r['executed_action'][:6] for r in guarded)
+-        checks['release_allowed_at_goal']=all(not r['override'] for r in guarded if r['goal_aligned'])
++        payload_enabled=config['main'].get('payload_release_enabled',False)
++        checks['release_allowed_at_goal']=all(not r['override'] or
++            (payload_enabled and r['reason']=='complete_policy_requested_payload_release' and r['executed_action'][-1]<0)
++            for r in guarded if r['goal_aligned'])
++        if payload_enabled:
++            starts={};valid_release=True;dwell=config['main'].get('payload_release_dwell_steps',8)
++            for r in guarded:
++                episode=r['episode'];step=r['global_step']
++                if r['reason']=='allow_policy_release_payload_over_destination':
++                    valid_release &= (r['raw_action'][-1]<0 and r['executed_action'][-1]<0 and
++                        r['payload_aligned'] and r['semantic_stage']==2 and r['visual_hold'] and
++                        .005<r['gripper_width_m']<.075 and r['target_distance_m']<.12)
++                    starts[episode]=step
++                elif r['reason']=='complete_policy_requested_payload_release':
++                    valid_release &= (episode in starts and 0<step-starts[episode]<dwell and r['executed_action'][-1]<0)
++            checks['release_initiated_by_policy_and_bounded']=valid_release
++    if config['main'].get('reward_contract'):
++        proofs=[out/f'episode_{i+1}/vlm_agent/c0_reward_contract.json' for i in range(len(manifest['tasks']))]
++        checks['numerical_reward_contract']=all(p.exists() and json.loads(p.read_text()).get('valid')
++            and json.loads(p.read_text()).get('contract')=='c0_xyz_v1' for p in proofs)
+     if manifest['reward']=='regenerate':
+         compute=rows(out/'eds_eval/episode_compute.jsonl')
+         checks['one_fresh_generation_per_task']=len(compute)==len(manifest['tasks']) and all(

@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2 returns a scalar zero tensor on action_sequence.device as per C0 control condition.
+    return torch.tensor(0.0, device=action_sequence.device)
+

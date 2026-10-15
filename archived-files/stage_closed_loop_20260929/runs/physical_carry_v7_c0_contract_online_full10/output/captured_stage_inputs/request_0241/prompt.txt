@@ -1,0 +1,43 @@
+Observe a robot doing a two-stage pick-and-place task. Report visual facts ONLY.
+Task: pick up the milk and place it in the basket
+Target appearance from the initial reference (identity only): The target object is a tall, rectangular milk carton labeled 0 and 1. It features a red and white color scheme, with the word "Milk" prominently displayed in large white letters on a red background. A small graphic of a cow is visible near the bottom. It stands upright, similar in height and shape to the orange juice carton (labeled 11, 12) but is distinguished by its red color, whereas the juice carton is orange and yellow. It is taller than the nearby small boxes of butter, cream cheese, and pudding.
+Initial reference keypoint labels: 0: milk_1_main
+1: milk_1_main
+2: basket_1_main
+3: basket_1_main
+4: basket_1_main
+5: basket_1_main
+6: basket_1_main
+7: cream_cheese_1_main
+8: tomato_sauce_1_main
+9: tomato_sauce_1_main
+10: butter_1_main
+11: orange_juice_1_main
+12: orange_juice_1_main
+13: chocolate_pudding_1_main
+
+Identify the exact instructed object and the destination (basket in these tasks).
+The initial image helps identify objects; only the CURRENT image describes the
+current state. Do not infer success from a gripper command, a reward, a stage
+description, proximity, or what the robot was supposed to do.
+
+Distinguish an object next to the basket from one inside its interior. Overlap in
+the image alone does not establish containment or support. If the basket rim,
+robot or another object hides the target, use occluded/unknown. A closed gripper
+near an object is not proof that the object is held. A target visibly suspended
+and supported by the fingers can be held. If grasp/contact is ambiguous, unknown.
+Use supported only when the target visibly rests on a surface; unsupported for
+a suspended target; otherwise unknown. An open gripper does not prove placement.
+Describe visible target location relative to the destination and fingers, and
+state uncertainty. Never fabricate facts hidden behind the robot or basket wall.
+
+Return exactly one JSON object, no Markdown fences, no control decisions, with
+these five keys and ONLY the following enum values:
+target_visibility: "clear", "occluded", or "unknown"
+target_location: "outside_goal", "inside_goal", "above_goal", or "unknown"
+grasp: "held", "not_held", or "unknown"
+support: "supported", "unsupported", or "unknown"
+evidence: a short string giving visible supporting evidence and any uncertainty
+
+
+Current observation; judge this image

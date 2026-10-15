@@ -1,0 +1,36 @@
+```python
+# Task breakdown:
+# Stage 1: Move the gripper to grasp the chocolate pudding (keypoint 0).
+# Stage 2: Move the grasped chocolate pudding into the basket (keypoints 1-5).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Build temporal weights from float32 scalar constants
+    w_high = torch.tensor(3.0, device=action_sequence.device)
+    w_low = torch.tensor(1.0, device=action_sequence.device)
+    weights = torch.where(timesteps >= final_start, w_high, w_low)
+    weights = weights / weights.sum()
+
+    # Identify the instructed target: chocolate_pudding_1_main is keypoint 0
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Compute full isotropic Euclidean XYZ distance
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    
+    # Return the batch mean of the negative weighted sum of SQUARED Euclidean distances
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # Stage 2 returns a scalar zero tensor as per the C0 control condition
+    return torch.tensor(0.0, device=action_sequence.device)
+```

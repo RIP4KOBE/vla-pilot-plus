@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # Per instructions: "For scene with pick something into basket, you do not need to create stage 2 reward function, since we do not need to make decision here, just return 0."
+    return torch.tensor(0.0, device=action_sequence.device)
+

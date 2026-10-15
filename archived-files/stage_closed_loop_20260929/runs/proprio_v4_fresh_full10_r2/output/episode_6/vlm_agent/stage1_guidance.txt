@@ -1,0 +1,26 @@
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Increase weight for the end of the trajectory to ensure accurate grasping
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Identifying keypoint 0 as the tomato sauce from the image and mapping
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance between each point in the action sequence and the target position
+    # The tomato sauce is picked from above, so we give higher weight to XY alignment
+    diff = action_sequence - target_pos
+    xy_dist = torch.norm(diff[..., :2], dim=-1)
+    z_dist = torch.abs(diff[..., 2])
+    
+    # Combine distances with a higher weight for XY to ensure vertical approach
+    dist = 2.0 * xy_dist + z_dist
+    
+    reward = -(dist ** 2 * weights).sum(dim=1)
+    return reward.mean()
+

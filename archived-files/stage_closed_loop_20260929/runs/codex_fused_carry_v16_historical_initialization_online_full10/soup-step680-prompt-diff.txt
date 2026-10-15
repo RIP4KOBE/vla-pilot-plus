@@ -1,0 +1,10 @@
+--- V14
+
++++ V16
+
+@@ -2,3 +2,3 @@
+
+ Task: pick up the alphabet soup and place it in the basket
+-Target appearance from the initial reference (identity only): The target is the small upright cylindrical alphabet soup can labeled 0, near the center behind the larger tomato sauce can. It has a dark gray metal top, a mostly blue upper wrapper, and a yellow-orange lower section with green details. It is shorter and narrower than the red-and-green tomato sauce can in front. It sits left of the basket and right of the dark green salad dressing bottle.
++Target appearance from the initial reference (identity only): The target is the small upright cylindrical can labeled 0, with a dark gray metal top and a blue upper label above a yellow-orange soup graphic. It stands behind the larger red-and-green tomato sauce can, to the right of the green salad dressing bottle and to the left of the basket. It is shorter and narrower than the foreground tomato sauce can.
+ Initial reference keypoint labels: 0: alphabet_soup_1_main

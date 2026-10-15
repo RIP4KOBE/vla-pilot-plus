@@ -1,0 +1,39 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the ketchup. Looking at the image and keypoint map, keypoints 0 and 1 represent the ketchup. Keypoint 0 is near the top/cap area, which is a good grasp point.
+# Stage 2: Move the grasped ketchup to the basket. Keypoints 2, 3, 4, 5 define the basket. Since this is a pick-and-place into a single basket, the policy is already well-trained for the placement phase once the correct object is picked. As per instructions, for pick into basket tasks, stage 2 reward can return 0.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Target is the ketchup. Visually, keypoint 0 is the cap/upper body, suitable for grasping.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Emphasize the end of the trajectory for precise reaching
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Identifying keypoint 0 as the grasp target for ketchup
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance to the ketchup
+    # High weight on XY because it's a top-down grasp scenario
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+    
+    # Combine distances - rewarding being closer to the target
+    dist = xy_dist + z_dist
+    reward = -(dist ** 2 * weights).sum(dim=1)
+    
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # As per instructions: "For scene with pick something into basket, you do not need to create stage 2 reward function, since we do not need to make decision here, just return 0."
+    return torch.tensor(0.0, device=action_sequence.device)
+
+```

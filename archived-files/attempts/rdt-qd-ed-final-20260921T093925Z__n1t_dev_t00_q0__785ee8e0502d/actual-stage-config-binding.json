@@ -1,0 +1,9 @@
+{
+  "backend": "codex_cli",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "low",
+  "output_format": "json_schema_v1",
+  "event_policy": "completed_reconnect_v1",
+  "timeout_seconds": 90,
+  "cli_path": "/home/hynx/.codex/packages/standalone/releases/0.155.1-x86_64-unknown-linux-musl/bin/codex"
+}

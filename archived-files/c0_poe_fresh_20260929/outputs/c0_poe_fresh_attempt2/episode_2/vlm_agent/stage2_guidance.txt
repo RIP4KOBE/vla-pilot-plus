@@ -1,0 +1,6 @@
+def stage2_guidance(keypoints, action_sequence):
+    # For "pick something into basket" tasks, we don't need a specific placement guidance function
+    # The policy has enough information once the correct object is picked.
+    # We return a constant 0 as specified in the instructions for basket tasks.
+    return torch.tensor(0.0, device=action_sequence.device)
+

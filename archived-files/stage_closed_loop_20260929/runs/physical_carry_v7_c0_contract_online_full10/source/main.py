@@ -1,0 +1,2275 @@
+"""
+VLS Main Entry Point - Supports multiple backends (CALVIN, LIBERO, RealWorld)
+
+Uses Hydra for configuration management and EnvAdapter abstraction layer.
+
+Usage:
+    python main.py                                    # Default: libero backend
+    python main.py env=calvin task=drawer_open        # CALVIN + drawer_open task
+    python main.py env=calvin task=door_left          # CALVIN + other tasks
+    python main.py env=libero                         # LIBERO backend (explicit)
+    python main.py main.episode_num=50                # Override parameters
+"""
+
+import os
+import faulthandler
+import inspect
+import warnings
+from pathlib import Path
+# Suppress pydantic v2 Field attribute warnings from third-party PI05 config classes
+warnings.filterwarnings("ignore", category=UserWarning, message=".*'repr'.*Field.*")
+warnings.filterwarnings("ignore", category=UserWarning, message=".*'frozen'.*Field.*")
+# Load .env before anything else
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+except ImportError:
+    pass
+# Set tokenizers parallelism to false to avoid fork warnings
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+# Disable torch inductor/Triton compilation — PyTorch 2.7+cu118 generates invalid
+# chained broadcast_to() calls in its SDPA fallback kernel, causing CompilationError.
+os.environ.setdefault("TORCHDYNAMO_DISABLE", "1")
+
+from typing import Any, Callable, List, Optional
+import gymnasium as gym
+import numpy as np
+import torch
+from collections import deque
+from PIL import Image
+import cv2
+import imageio
+from functools import partial
+import matplotlib.pyplot as plt
+import h5py
+import random
+from dataclasses import dataclass, field
+import tqdm
+import time
+import sys
+import json
+import hashlib
+import warnings
+
+# Hydra imports
+import hydra
+from omegaconf import DictConfig, ListConfig, OmegaConf
+
+warnings.filterwarnings('ignore', category=FutureWarning, message='.*pynvml.*')
+warnings.filterwarnings('ignore', category=UserWarning, message='.*pkg_resources.*')
+warnings.filterwarnings('ignore', category=UserWarning, message='.*xFormers.*')
+warnings.filterwarnings('ignore', category=UserWarning, message='.*env.get_obs.*')
+
+
+def _config_section_to_dict(section: Any, section_name: str) -> dict:
+    """Return a fresh plain dict for optional grouped config sections."""
+    if section is None:
+        return {}
+    if isinstance(section, dict):
+        return dict(section)
+    if isinstance(section, (DictConfig, ListConfig)):
+        section = OmegaConf.to_container(section, resolve=True)
+        if section is None:
+            return {}
+        if isinstance(section, dict):
+            return dict(section)
+        raise TypeError(f"{section_name} must be a mapping, got {type(section).__name__}")
+    raise TypeError(f"{section_name} must be a mapping, got {type(section).__name__}")
+
+
+def _episode_policy_rng_seed(run_seed: int, episode: int, episode_seed: int) -> int:
+    """Stable seed for prospective paired Stage comparisons across episodes."""
+    payload = f"episode-policy-rng-v1:{run_seed}:{episode}:{episode_seed}".encode()
+    return int.from_bytes(hashlib.sha256(payload).digest()[:4], "big")
+
+
+_LEGACY_MAIN_VLS_FIELDS = (
+    "guide_scale",
+    "sample_batch_size",
+    "use_diversity",
+    "diversity_scale",
+    "MCMC_steps",
+    "use_fkd",
+    "sigmoid_k",
+    "sigmoid_x0",
+    "start_ratio",
+)
+
+
+def _config_has_key(section: Any, key: str) -> bool:
+    try:
+        return key in section
+    except TypeError:
+        return False
+
+
+def _main_vls_config(main_config: Any) -> dict:
+    """Merge preferred main.vls_config with legacy flat main.* VLS overrides."""
+    vls_config = _config_section_to_dict(main_config.get("vls_config"), "main.vls_config")
+    for field in _LEGACY_MAIN_VLS_FIELDS:
+        if _config_has_key(main_config, field):
+            vls_config[field] = main_config.get(field)
+    if _config_has_key(main_config, "fkd_config"):
+        fkd_config = main_config.get("fkd_config")
+        vls_config["fkd"] = (
+            _config_section_to_dict(fkd_config, "main.fkd_config")
+            if fkd_config is not None
+            else None
+        )
+    elif _config_has_key(main_config, "fkd"):
+        fkd_config = main_config.get("fkd")
+        vls_config["fkd"] = (
+            _config_section_to_dict(fkd_config, "main.fkd")
+            if fkd_config is not None
+            else None
+        )
+    return vls_config
+
+
+def _validate_task_cache_identity(program_info, task_id, live_keypoint_map):
+    """Fail closed for opt-in task-bound caches without changing keypoint order."""
+    identity = program_info.get("qd_ed_task_identity")
+    if not isinstance(identity, dict):
+        raise ValueError("Task-bound guidance cache lacks identity metadata")
+    if task_id is None or identity.get("task_id") != task_id:
+        raise ValueError("Guidance cache task ID does not match the current task")
+    target = identity.get("expected_target_object")
+    basket = identity.get("expected_basket_object")
+    if not isinstance(target, str) or not target or not isinstance(basket, str) or not basket:
+        raise ValueError("Guidance cache target/basket identity is incomplete")
+    if live_keypoint_map.get(0) != target:
+        raise ValueError("Guidance keypoint 0 does not match the task target")
+    if basket not in live_keypoint_map.values():
+        raise ValueError("Task basket is missing from the live keypoint mapping")
+
+
+def _adapter_actual_task_id(adapter: Any) -> int | None:
+    """Return the dataset task id, preserving filtered LIBERO task ids."""
+    current_task_idx = getattr(adapter, "current_task_idx", None)
+    envs = getattr(adapter, "_env", None)
+    if current_task_idx is not None and envs is not None:
+        try:
+            current_env = envs[int(current_task_idx)]
+            task_id = getattr(current_env, "task_id", None)
+            if task_id is not None:
+                return int(task_id)
+        except (IndexError, KeyError, TypeError, ValueError):
+            pass
+
+    task_id = getattr(adapter, "task_id", None)
+    if task_id is not None:
+        try:
+            return int(task_id)
+        except (TypeError, ValueError):
+            pass
+
+    if current_task_idx is not None:
+        try:
+            return int(current_task_idx)
+        except (TypeError, ValueError):
+            return None
+    return None
+
+
+_EXECUTION_HORIZON_CHOICES = frozenset({2, 4, 8})
+_GRIPPER_QPOS_MIN = -0.04245
+_GRIPPER_QPOS_MAX = 0.05185
+_GRIPPER_QPOS_TOLERANCE = 1e-3
+
+
+def _episode_seed_schedule(value: Any, *, episode_num: int) -> list[int] | None:
+    """Validate an optional fixed environment-seed schedule for conservative resume."""
+    if value is None:
+        return None
+    if isinstance(value, (str, bytes)) or not isinstance(value, (list, tuple)):
+        try:
+            value = list(value)
+        except TypeError as exc:
+            raise ValueError("episode_seed_schedule must be a list of integers") from exc
+    seeds = list(value)
+    if len(seeds) != episode_num:
+        raise ValueError("episode_seed_schedule length must equal episode_num")
+    if any(
+        isinstance(seed, bool)
+        or not isinstance(seed, int)
+        or not 0 <= seed < 2**31
+        for seed in seeds
+    ):
+        raise ValueError("episode_seed_schedule values must be integers in [0, 2**31)")
+    return seeds
+
+
+def _episode_seed_for_index(
+    schedule: list[int] | None,
+    *,
+    episode_index: int,
+    sampled_seed: int,
+) -> int:
+    """Use a preregistered environment seed while retaining the legacy RNG draw."""
+    return int(sampled_seed if schedule is None else schedule[episode_index])
+
+
+def _adapter_episode_window(
+    *, episode_num: int, episode_start_index: int
+) -> dict[str, int]:
+    """Keep the full task schedule while positioning a conservative suffix resume."""
+    episode_num = int(episode_num)
+    episode_start_index = int(episode_start_index)
+    if episode_num <= 0:
+        raise ValueError("episode_num must be positive")
+    if not 0 <= episode_start_index < episode_num:
+        raise ValueError("episode_start_index must satisfy 0 <= start < episode_num")
+    return {
+        "episode_num": episode_num,
+        "episode_start_index": episode_start_index,
+    }
+
+
+def _chunk_boundary_action_jump(
+    action_chunk: Any,
+    previous_executed_action: Any | None,
+) -> float | None:
+    """Return translation jump from the last executed action to a new chunk."""
+    if previous_executed_action is None:
+        return None
+    if not isinstance(action_chunk, (torch.Tensor, np.ndarray)):
+        raise ValueError("action_chunk must be a tensor or ndarray")
+    if tuple(int(value) for value in action_chunk.shape[:1]) != (1,) or (
+        action_chunk.ndim != 3 or action_chunk.shape[1] <= 0 or action_chunk.shape[2] != 7
+    ):
+        raise ValueError("action_chunk must have shape (1, T, 7)")
+    current = action_chunk[0, 0, :3]
+    previous = previous_executed_action[:3]
+    if torch.is_tensor(current):
+        current_np = current.detach().cpu().numpy().astype(np.float64, copy=False)
+    else:
+        current_np = np.asarray(current, dtype=np.float64)
+    if torch.is_tensor(previous):
+        previous_np = previous.detach().cpu().numpy().astype(np.float64, copy=False)
+    else:
+        previous_np = np.asarray(previous, dtype=np.float64)
+    if current_np.shape != (3,) or previous_np.shape != (3,):
+        raise ValueError("boundary actions must expose three translation values")
+    if not np.isfinite(current_np).all() or not np.isfinite(previous_np).all():
+        raise ValueError("boundary action translations must be finite")
+    return float(np.linalg.norm(current_np - previous_np))
+
+
+def _gripper_qpos_violation_count(observation: Any) -> int:
+    """Count an observation-level gripper qpos range/shape/finite violation."""
+    if not isinstance(observation, dict) or "robot0_gripper_qpos" not in observation:
+        return 0
+    try:
+        values = np.asarray(observation["robot0_gripper_qpos"], dtype=np.float64)
+    except (TypeError, ValueError):
+        return 1
+    if values.shape != (2,) or not bool(np.isfinite(values).all()):
+        return 1
+    low = _GRIPPER_QPOS_MIN - _GRIPPER_QPOS_TOLERANCE
+    high = _GRIPPER_QPOS_MAX + _GRIPPER_QPOS_TOLERANCE
+    return int(bool(np.any(values < low) or np.any(values > high)))
+
+
+def _gripper_transition_in_prefix(
+    action_chunk: Any,
+    *,
+    prefix_steps: int,
+    previous_gripper_command: float | None = None,
+) -> bool | None:
+    """Detect a gripper sign change at the chunk boundary or inside its prefix."""
+    if action_chunk is None:
+        return None
+    if not isinstance(action_chunk, (torch.Tensor, np.ndarray)):
+        raise ValueError("action_chunk must be a torch.Tensor, numpy.ndarray, or None")
+    if (
+        isinstance(prefix_steps, bool)
+        or not isinstance(prefix_steps, int)
+        or prefix_steps < 2
+    ):
+        raise ValueError("prefix_steps must be an integer of at least 2")
+
+    shape = tuple(int(size) for size in action_chunk.shape)
+    if len(shape) != 3 or shape[0] != 1 or shape[2] != 7:
+        raise ValueError("action_chunk must have strict decoded LIBERO shape (1, T, 7)")
+    time_steps = shape[1]
+    if time_steps < 2:
+        raise ValueError("action_chunk time dimension T must be at least 2")
+    if prefix_steps > time_steps:
+        raise ValueError("prefix_steps must not exceed action_chunk time dimension T")
+
+    gripper = action_chunk[0, :prefix_steps, -1]
+    if isinstance(gripper, torch.Tensor):
+        if not bool(torch.isfinite(gripper).all().item()):
+            raise ValueError("gripper prefix contains nonfinite values")
+        values = gripper.detach().to(device="cpu", dtype=torch.float64).numpy()
+    else:
+        values = np.asarray(gripper, dtype=np.float64)
+        if not bool(np.isfinite(values).all()):
+            raise ValueError("gripper prefix contains nonfinite values")
+    boundary_transition = False
+    if previous_gripper_command is not None:
+        if isinstance(previous_gripper_command, bool):
+            raise ValueError("previous gripper command must be numeric, not bool")
+        previous_gripper_command = float(previous_gripper_command)
+        if not np.isfinite(previous_gripper_command):
+            raise ValueError("previous gripper command must be finite")
+        boundary_transition = previous_gripper_command * values[0] < 0.0
+    return bool(boundary_transition or np.any(values[:-1] * values[1:] < 0.0))
+
+
+def _resolve_execution_horizon(
+    *,
+    mode: str,
+    policy_horizon: int,
+    guidance_enabled: bool,
+    stage_changed: bool,
+    target_distance: float | None,
+    gripper_transition: bool | None,
+    far_steps: int = 8,
+    near_steps: int = 4,
+    contact_steps: int = 2,
+    near_distance: float = 0.08,
+    contact_distance: float = 0.04,
+) -> tuple[int, str]:
+    """Resolve how many actions from the current 8-step chunk to execute."""
+    mode = str(mode).lower()
+    if mode not in {"fixed", "adaptive_prefix"}:
+        raise ValueError(
+            "execution_horizon_mode must be one of "
+            "{'fixed', 'adaptive_prefix'}"
+        )
+
+    step_values = {
+        "policy_horizon": policy_horizon,
+        "far_steps": far_steps,
+        "near_steps": near_steps,
+        "contact_steps": contact_steps,
+    }
+    for name, value in step_values.items():
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise ValueError(f"{name} must be one of {sorted(_EXECUTION_HORIZON_CHOICES)}")
+        if value not in _EXECUTION_HORIZON_CHOICES:
+            raise ValueError(f"{name} must be one of {sorted(_EXECUTION_HORIZON_CHOICES)}")
+    if not (contact_steps <= near_steps <= far_steps <= policy_horizon):
+        raise ValueError(
+            "execution horizons must satisfy contact <= near <= far <= policy_horizon"
+        )
+
+    if isinstance(near_distance, bool) or isinstance(contact_distance, bool):
+        raise ValueError("execution distance thresholds must be numeric, not bool")
+    near_distance = float(near_distance)
+    contact_distance = float(contact_distance)
+    if not np.isfinite(near_distance) or near_distance < 0.0:
+        raise ValueError("execution_near_distance must be finite and nonnegative")
+    if not np.isfinite(contact_distance) or contact_distance < 0.0:
+        raise ValueError("execution_contact_distance must be finite and nonnegative")
+    if contact_distance > near_distance:
+        raise ValueError("execution_contact_distance must not exceed execution_near_distance")
+    if target_distance is not None:
+        if isinstance(target_distance, bool):
+            raise ValueError("target_distance must be numeric, not bool")
+        target_distance = float(target_distance)
+        if not np.isfinite(target_distance):
+            raise ValueError("target_distance must be finite when provided")
+
+    if mode == "fixed":
+        return policy_horizon, "fixed"
+    if gripper_transition is True:
+        return contact_steps, "gripper_transition"
+    if target_distance is not None and target_distance <= contact_distance:
+        return contact_steps, "contact_distance"
+    if stage_changed:
+        return min(near_steps, policy_horizon), "stage_change"
+    if not guidance_enabled:
+        return policy_horizon, "guidance_off"
+    if target_distance is not None and target_distance <= near_distance:
+        return near_steps, "near_distance"
+    if target_distance is None:
+        return far_steps, "target_distance_unavailable"
+    return far_steps, "far_distance"
+
+
+def _eds_mechanism_pretest_output_root(
+    *,
+    eds_pretest_config: dict,
+    eds_eval_config: dict,
+    run_id: str,
+    output_dir: str,
+    episode: int,
+    global_step: int,
+) -> Path:
+    output_mode = str(eds_pretest_config.get("output_mode", "run_id"))
+    if output_mode == "qualitative_chunk":
+        eval_root = Path(eds_eval_config.get("output_dir", output_dir))
+        return (
+            eval_root
+            / "qualitative"
+            / f"episode_{int(episode):03d}"
+            / f"chunk_{int(global_step):06d}"
+        )
+    if output_mode != "run_id":
+        raise ValueError(
+            "main.eds_mechanism_pretest.output_mode must be one of "
+            "{'run_id', 'qualitative_chunk'}"
+        )
+    return (
+        Path(
+            eds_pretest_config.get(
+                "output_dir",
+                "outputs/rdt_eds_mechanism_pretest",
+            )
+        )
+        / run_id
+    )
+
+# Add project root to path (for local modules like steer_utils, utils, etc.)
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+# Monkey-patch calvin_env Light class with our modified version (supports initial_state config)
+from patches.light import Light as PatchedLight, LightState as PatchedLightState
+sys.modules['calvin_env.scene.objects.light'] = type(sys)('calvin_env.scene.objects.light')
+sys.modules['calvin_env.scene.objects.light'].Light = PatchedLight
+sys.modules['calvin_env.scene.objects.light'].LightState = PatchedLightState
+
+# Import adapters
+from core.env_adapters import create_adapter, BaseEnvAdapter
+from core.keypoint_tracker import KeypointTracker
+from core.keypoint_detector import KeypointDetector
+from core.sam3_segmenter import create_segmenter as create_sam3_segmenter
+from core.gemini_grounder import create_gemini_grounder, create_gemini_stage_recognizer, observe_api_requests
+from vlm_query.vlm_agent import VLMAgent
+from utils.vis_utils import TrajectoryVideoRecorder, add_text_to_image
+from utils.eds_eval_vis import save_eds_qualitative_artifacts
+from utils.eds_mechanism_pretest_vis import save_eds_mechanism_pretest_artifacts
+
+from core.policy_observation_sampling import policy_observation_sample_num
+from core.eds_eval_metrics import append_jsonl
+from core.eds_mechanism_trace import build_run_id, save_mechanism_trace
+
+# Import logging utility
+from utils.logging_utils import SteerLogger
+
+# Create logger instance
+log = SteerLogger("Main")
+
+
+class _CachedGuidanceAgent:
+    """Read frozen descriptions without constructing an authenticated API client."""
+
+    cache_only = True
+    _extract_stage_descriptions_from_output = VLMAgent._extract_stage_descriptions_from_output
+
+    def generate_guidance(self, *args, **kwargs):
+        raise RuntimeError("Codex Stage runs require frozen cached guidance; generation is disabled")
+
+    def plan_segmentation(self, *args, **kwargs):
+        raise RuntimeError("Codex Stage runs require adapter segmentation; VLM planning is disabled")
+
+
+def _detect_keypoints_with_retries(
+    *,
+    adapter: Any,
+    detector: Any,
+    max_attempts: int,
+    initial_result: tuple[Any, ...] | None = None,
+    min_keypoints: int = 1,
+    required_mask_ids: tuple[int, ...] = (),
+) -> tuple[Any, ...]:
+    """Retry read-only perception renders when a shared EGL render is empty."""
+    if (
+        isinstance(max_attempts, bool)
+        or not isinstance(max_attempts, int)
+        or not 1 <= max_attempts <= 10
+    ):
+        raise ValueError("keypoint detection max_attempts must be an integer in [1, 10]")
+    if (
+        isinstance(min_keypoints, bool)
+        or not isinstance(min_keypoints, int)
+        or min_keypoints <= 0
+    ):
+        raise ValueError("min_keypoints must be a positive integer")
+
+    def sufficient(result: tuple[Any, ...]) -> bool:
+        keypoints = np.asarray(result[5]).reshape(-1, 3)
+        mask_ids = {int(value) for value in np.asarray(result[7]).reshape(-1)}
+        return len(keypoints) >= min_keypoints and set(required_mask_ids) <= mask_ids
+
+    attempts_used = 0
+    if initial_result is not None:
+        if len(initial_result) != 8:
+            raise ValueError("initial keypoint detection result must contain eight fields")
+        attempts_used = 1
+        if sufficient(initial_result):
+            return initial_result
+    while attempts_used < max_attempts:
+        attempts_used += 1
+        rgb, depth, points, segmentation, segment_id_to_name = (
+            adapter.get_keypoint_detection_inputs()
+        )
+        if (
+            segmentation is None
+            or segment_id_to_name is None
+            or not segment_id_to_name
+        ):
+            log.warning(
+                f"Keypoint render retry {attempts_used}/{max_attempts} "
+                "has no adapter segmentation"
+            )
+            continue
+        key_points, projected_img, mask_ids = detector.get_keypoints(
+            rgb=rgb,
+            points=points,
+            segmentation=segmentation,
+            segment_id_to_name=segment_id_to_name,
+        )
+        result = (
+            rgb,
+            depth,
+            points,
+            segmentation,
+            segment_id_to_name,
+            key_points,
+            projected_img,
+            mask_ids,
+        )
+        if sufficient(result):
+            if attempts_used > 1:
+                log.warning(
+                    "Recovered keypoint perception on render attempt "
+                    f"{attempts_used}/{max_attempts}"
+                )
+            return result
+        log.warning(
+            f"Keypoint render attempt {attempts_used}/{max_attempts} "
+            "produced insufficient candidates or required masks"
+        )
+    raise RuntimeError(
+        f"No keypoint candidates after {max_attempts} render attempts"
+    )
+
+
+def _get_visualization_action_chunk(policy: Any, adapter: Any, action_chunk: torch.Tensor) -> torch.Tensor:
+    get_candidates = getattr(policy, "get_last_visualization_action_candidates", None)
+    if not callable(get_candidates):
+        return action_chunk
+
+    candidates = get_candidates()
+    if candidates is None:
+        return action_chunk
+
+    if hasattr(adapter, "env_postprocessor"):
+        transition = adapter.env_postprocessor({"action": candidates})
+        return transition["action"]
+    return candidates
+
+
+class Main:
+    def __init__(self, cfg: DictConfig):
+        """
+        Initialize with Hydra DictConfig.
+
+        Args:
+            cfg: Hydra configuration (OmegaConf DictConfig)
+        """
+        self.cfg = cfg
+        self.config = cfg.main  # Shortcut to main config section
+
+        # Log the resolved configuration
+        log.info(f"Configuration:\n{OmegaConf.to_yaml(cfg, resolve=True)[:500]}...")
+
+        # Set random seed
+        seed = cfg.get('seed', 0)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+
+        # Get backend from config
+        self.backend = cfg.backend.get('backend', 'calvin')
+        log.info(f"Using backend: {self.backend}")
+
+        # Get backend-specific config
+        env_config = OmegaConf.to_container(cfg.backend.get(self.backend, {}), resolve=True)
+
+        # Add main.episode_num to env_config for adapters that need it (e.g., LiberoAdapter)
+        env_config.update(
+            _adapter_episode_window(
+                episode_num=int(self.config.get('episode_num', 10)),
+                episode_start_index=int(self.config.get('episode_start_index', 0)),
+            )
+        )
+        # Pass task instruction from cfg.main (set by task config) so adapter can surface it
+        if self.config.get('instruction', ''):
+            env_config['instruction'] = self.config.get('instruction')
+
+        # Create adapter
+        self._enable_render_lifetime_diagnostics()
+        self.adapter = create_adapter(self.backend, env_config)
+
+        # Get task info from adapter for guidance adjustment
+        task_info = self.adapter.get_task_info()
+        instruction = task_info.get('instruction', '')
+        recommended_scale = task_info.get('recommended_guide_scale')
+        vls_config = _main_vls_config(self.config)
+        base_guide_scale = vls_config.get('guide_scale', 80.0)
+
+        # Override with recommended scale if available
+        if recommended_scale is not None:
+            self.current_guide_scale = recommended_scale
+            if recommended_scale != base_guide_scale:
+                log.info(f"Task '{instruction}' uses custom guide_scale={recommended_scale} (base: {base_guide_scale})")
+            else:
+                log.info(f"Using guide_scale: {recommended_scale} for task: '{instruction}'")
+        else:
+            self.current_guide_scale = base_guide_scale
+            log.info(f"Using default guide_scale: {base_guide_scale}")
+
+        # Initialize policy
+        policy_config = cfg.get('policy', {})
+        policy_type = policy_config.get('type', 'diffusion')
+        self.policy_type = policy_type
+        log.info(f"Policy config type: {policy_type}")
+
+        # Get pretrained_path from the specific policy type config
+        type_config = policy_config.get(policy_type, {})
+        pretrained_path = type_config.get('pretrained_path', 'Vision-Language-Steering/vls_calvin_base')
+        log.info(f"Loading {policy_type} from: {pretrained_path}")
+
+        if policy_type == 'diffusion':
+            from core.diffusion_policy_steer import DiffusionPolicySteer
+
+            self.policy = DiffusionPolicySteer.from_pretrained(pretrained_path)
+        elif policy_type == 'pi05':
+            from core.pi05_steer import PI05PolicySteer
+
+            self.policy = PI05PolicySteer.from_pretrained(pretrained_path)
+        elif policy_type == 'rdt':
+            from core.rdt_policy_steer import RDTSteer
+
+            raw_num_steps = type_config.get('num_inference_steps', None)
+            num_steps = None if raw_num_steps is None else int(raw_num_steps)
+            self.policy = RDTSteer.from_pretrained(
+                pretrained_path,
+                num_inference_steps=num_steps,
+                vision_encoder=type_config.get(
+                    'vision_encoder',
+                    '/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384',
+                ),
+                text_encoder=type_config.get(
+                    'text_encoder',
+                    '/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl',
+                ),
+                weight_variant=type_config.get('weight_variant', 'ema'),
+                control_frequency=int(type_config.get('control_frequency', 20)),
+            )
+        else:
+            raise ValueError(f"Unknown policy type: {policy_type}")
+
+        self.device = cfg.get('device', 'cuda')
+        self.policy.to(self.device)
+
+        if policy_type == 'rdt':
+            # RDTSteer handles all obs/action processing internally.
+            self.policy_preprocessor = lambda x: x
+            self.policy_postprocessor = lambda x: x
+        else:
+            from lerobot.policies.factory import make_pre_post_processors
+
+            preprocessor_overrides = {
+                "device_processor": {"device": str(self.policy.config.device)},
+            }
+            self.policy_preprocessor, self.policy_postprocessor = make_pre_post_processors(
+                policy_cfg=self.policy.config,
+                pretrained_path=pretrained_path,
+                preprocessor_overrides=preprocessor_overrides,
+            )
+
+        self.policy.post_init(
+            adapter=self.adapter,
+            postprocessor=self.policy_postprocessor,
+            sample_batch_size=_main_vls_config(self.config).get('sample_batch_size', 1),
+            policy_config=policy_config.get(policy_type, {}),
+        )
+
+        self.policy.eval()
+        log.info(f"Loaded {policy_type} policy from {pretrained_path}")
+
+        # Output directory (use Hydra's output directory directly)
+        self.output_dir = self.config.get('output_dir', 'results/')
+        # Ensure it ends with /
+        if not self.output_dir.endswith('/'):
+            self.output_dir += '/'
+        os.makedirs(self.output_dir, exist_ok=True)
+
+        # Initialize components
+        self._init_components(cfg)
+
+        # Reset environment and policy
+        # self.adapter.reset()
+        self.policy.reset()
+
+    def _init_components(self, cfg: DictConfig):
+        """Initialize components."""
+        if not self.config.get("use_guidance", True):
+            self.keypoint_detector = None
+            self.sam3_segmenter = None
+            self.use_sam3 = False
+            self.gemini_grounder = None
+            self.gemini_default_objects = []
+            self.use_gemini = False
+            self.keypoint_tracker = None
+            self.vlm_agent = None
+            self.gemini_stage_recognizer = None
+            self.video_recorder = TrajectoryVideoRecorder(output_dir=self.output_dir)
+            self.cached_functions_dir = self.config.get('cached_functions_dir', None)
+            return
+
+        # Get perception config (loaded from perception.yaml with @package perception)
+        perception_cfg = cfg.get('perception', {})
+        stage_config = OmegaConf.to_container(perception_cfg.get('gemini', {}), resolve=True)
+        stage_controller = self.config.get("stage_controller", "legacy")
+        if stage_controller not in {"legacy", "evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+            raise ValueError("Unknown main.stage_controller")
+        if stage_controller in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+            from core.stage_evidence import settings
+            settings(self.config)
+            if self.backend != "libero" or not self.config.get("use_vlm_stage_recognition", True):
+                raise ValueError("evidence_v1 requires LIBERO and online Stage recognition")
+            if stage_config.get("backend", "openai_compatible") != "openai_compatible":
+                raise ValueError("evidence_v1 requires OpenAI-compatible visual observation transport")
+            stage_config["output_format"] = "stage_observation_v1"
+        elif stage_config.get("output_format") == "stage_observation_v1":
+            raise ValueError("stage_observation_v1 requires main.stage_controller=evidence_v1")
+        codex_stage = stage_config.get('backend') == 'codex_cli'
+        if codex_stage:
+            cache = self.config.get('cached_functions_dir')
+            if not cache or not Path(cache).is_dir():
+                raise ValueError("Codex Stage requires an existing frozen cached_functions_dir")
+            if any(perception_cfg.get(name, {}).get('enabled', False)
+                   for name in ('sam3', 'gemini_grounding')):
+                raise ValueError("Codex Stage cache-only runs require SAM3 and Gemini grounding disabled")
+
+        # Initialize keypoint detector
+        kp_config = OmegaConf.to_container(perception_cfg.get('keypoint_detector', {}), resolve=True)
+        self.keypoint_detector = KeypointDetector(config=kp_config)
+
+        # Initialize SAM3 segmenter if enabled
+        sam3_config = perception_cfg.get('sam3', {})
+        self.use_sam3 = sam3_config.get('enabled', False) if sam3_config else False
+        if self.use_sam3:
+            log.info("Initializing SAM3 segmenter for text-prompted segmentation")
+            sam3_dict = OmegaConf.to_container(sam3_config, resolve=True)
+            self.sam3_segmenter = create_sam3_segmenter(sam3_dict)
+            self.sam3_default_objects = sam3_config.get('default_objects', [])
+        else:
+            self.sam3_segmenter = None
+
+        # Initialize Gemini grounder if enabled
+        grounding_config = perception_cfg.get('gemini_grounding', {})
+        self.use_gemini = grounding_config.get('enabled', False) if grounding_config else False
+        if self.use_gemini:
+            api_key = grounding_config.get('api_key') or os.environ.get('GOOGLE_API_KEY')
+            if api_key:
+                grounding_dict = OmegaConf.to_container(grounding_config, resolve=True)
+                grounding_dict['api_key'] = api_key
+                log.info("Initializing Gemini grounder for visual grounding")
+                self.gemini_grounder = create_gemini_grounder(grounding_dict)
+                self.gemini_default_objects = list(grounding_config.get('default_objects', []))
+            else:
+                log.warning("Gemini API key not found - disabling Gemini grounding")
+                self.use_gemini = False
+                self.gemini_grounder = None
+        else:
+            self.gemini_grounder = None
+
+        # Initialize keypoint tracker
+        self.keypoint_tracker = KeypointTracker(self.adapter)
+
+        # Initialize VLM agent (OpenAI - for generating guidance functions)
+        vlm_config = OmegaConf.to_container(perception_cfg.get('vlm_agent', {}), resolve=True)
+        # Ensure query_template_dir is absolute path
+        if vlm_config.get('query_template_dir') and not os.path.isabs(vlm_config['query_template_dir']):
+            vlm_config['query_template_dir'] = os.path.join(PROJECT_ROOT, vlm_config['query_template_dir'])
+        if codex_stage:
+            self.vlm_agent = _CachedGuidanceAgent()
+        else:
+            self.vlm_agent = VLMAgent(
+                config=vlm_config,
+                base_dir=self.output_dir,
+                env_type=self.backend,
+            )
+            self.vlm_agent.api_request_counter = observe_api_requests(self.vlm_agent.client)
+
+        # Initialize Gemini stage recognizer (for real-time stage recognition)
+        if self.config.get("use_vlm_stage_recognition", True):
+            try:
+                self.gemini_stage_recognizer = create_gemini_stage_recognizer(stage_config)
+                log.info(f"Stage recognizer initialized: {stage_config.get('backend', 'openai_compatible')}")
+            except Exception as e:
+                if stage_controller in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+                    raise RuntimeError("Required evidence Stage initialization failed") from e
+                if codex_stage:
+                    raise RuntimeError("Codex Stage initialization failed; provider fallback is disabled") from e
+                if stage_config.get('backend') in {'trace_replay', 'trace_replay_capture'}:
+                    raise RuntimeError("Required Stage initialization failed; provider fallback is disabled") from e
+                log.warning(f"Failed to initialize Gemini stage recognizer: {e}")
+                self.gemini_stage_recognizer = None
+        else:
+            self.gemini_stage_recognizer = None
+
+        # Initialize video recorder
+        self.video_recorder = TrajectoryVideoRecorder(output_dir=self.output_dir)
+
+        self.cached_functions_dir = self.config.get('cached_functions_dir', None)
+
+    def _get_policy_observation(self) -> dict:
+        """Get observation in policy expected format (backend-agnostic)."""
+        sample_num = policy_observation_sample_num(
+            self.policy_type,
+            _main_vls_config(self.config).get('sample_batch_size', None),
+        )
+        observation = self.adapter.get_policy_observation(sample_num=sample_num)
+
+        processed_observation = self.policy_preprocessor(observation)
+        return processed_observation
+
+    def perform_task_for_episode(self, episode_dir: str):
+        """Prepare for each episode (keypoint detection, guidance generation, etc.)"""
+        from utils.guidance_utils import load_functions_from_txt
+
+        # Get keypoint detection inputs from adapter (includes segmentation if available)
+        rgb, depth, points, segmentation, segment_id_to_name = self.adapter.get_keypoint_detection_inputs()
+
+        # Get instruction from adapter (backend-specific)
+        instruction = self.adapter.get_instruction()
+        log.info(f"Task instruction: {instruction}")
+
+        # segmentation = None
+
+        # Check if adapter provided valid segmentation
+        has_valid_segmentation = (
+            segmentation is not None and
+            segment_id_to_name is not None and
+            len(segment_id_to_name) > 0
+        )
+
+        if has_valid_segmentation:
+            log.info(f"Using adapter-provided segmentation with {len(segment_id_to_name)} objects: {list(segment_id_to_name.values())}")
+        else:
+            log.warning("No valid segmentation from adapter, will use Gemini/SAM3")
+
+            # Get interactable objects from adapter for grounding
+            interactable_objects = self.adapter.get_interactable_objects()
+            object_names = [obj.name for obj in interactable_objects]
+            log.info(f"Interactable objects from adapter: {object_names}")
+
+            # Use Gemini grounding for segmentation (preferred)
+            if self.use_gemini and self.gemini_grounder is not None and len(object_names) > 0:
+                log.info("Using Gemini for visual grounding")
+                log.info(f"Gemini detecting: {object_names}")
+                segmentation, segment_id_to_name = self.gemini_grounder.detect_to_segmentation(
+                    rgb, object_names
+                )
+
+            # Fallback to SAM3
+            elif self.use_sam3 and self.sam3_segmenter is not None:
+                log.info("Using SAM3 for text-prompted segmentation")
+
+                # Use VLM to plan which objects to segment based on instruction
+                planned_objects = self.vlm_agent.plan_segmentation(rgb, instruction)
+
+                if planned_objects and len(planned_objects) > 0:
+                    object_names = planned_objects
+                    log.info(f"VLM planned segmentation: {object_names}")
+                elif len(object_names) == 0:
+                    # Last resort: use default objects from config
+                    object_names = self.sam3_default_objects
+                    log.info(f"Using config default objects: {object_names}")
+
+                segmentation, segment_id_to_name = self.sam3_segmenter.segment(
+                    rgb, object_names, return_all_masks=False
+                )
+            else:
+                log.error("No segmentation method available and adapter didn't provide segmentation!")
+                raise RuntimeError("Cannot proceed without segmentation")
+
+        # Detect keypoints
+        key_points, projected_img, mask_ids = self.keypoint_detector.get_keypoints(
+            rgb=rgb,
+            points=points,
+            segmentation=segmentation,
+            segment_id_to_name=segment_id_to_name
+        )
+        max_detection_attempts = self.config.get(
+            "keypoint_detection_max_attempts", 1
+        )
+        if (
+            isinstance(max_detection_attempts, bool)
+            or not isinstance(max_detection_attempts, int)
+            or not 1 <= max_detection_attempts <= 10
+        ):
+            raise ValueError(
+                "main.keypoint_detection_max_attempts must be an integer in [1, 10]"
+            )
+        initial_keypoint_count = len(np.asarray(key_points).reshape(-1, 3))
+        initial_mask_ids = {int(value) for value in np.asarray(mask_ids).reshape(-1)}
+        if max_detection_attempts > 1 and (
+            initial_keypoint_count < 2 or not {1, 2} <= initial_mask_ids
+        ):
+            (
+                rgb,
+                depth,
+                points,
+                segmentation,
+                segment_id_to_name,
+                key_points,
+                projected_img,
+                mask_ids,
+            ) = _detect_keypoints_with_retries(
+                adapter=self.adapter,
+                detector=self.keypoint_detector,
+                max_attempts=max_detection_attempts,
+                min_keypoints=2,
+                required_mask_ids=(1, 2),
+                initial_result=(
+                    rgb,
+                    depth,
+                    points,
+                    segmentation,
+                    segment_id_to_name,
+                    key_points,
+                    projected_img,
+                    mask_ids,
+                ),
+            )
+
+        # Register keypoints
+        key_points_objects_map = self.keypoint_tracker.register_keypoints(
+            key_points,
+            mask_ids=mask_ids,
+            segment_id_to_name=segment_id_to_name
+        )
+
+        # Save for stage recognition (used by Gemini)
+        self.init_img_with_keypoints = projected_img  # Initial image with keypoint annotations
+        self.keypoint_id_to_object = key_points_objects_map  # Keypoint ID -> object name mapping
+
+        self.vlm_agent.task_dir = os.path.join(episode_dir, 'vlm_agent')
+        os.makedirs(self.vlm_agent.task_dir, exist_ok=True)
+
+        # Load or generate guidance functions
+        task_cache_root = self.config.get("cached_functions_root")
+        if task_cache_root and self.cached_functions_dir is not None:
+            raise ValueError("Choose task cache root or a single cache directory")
+        if task_cache_root or self.cached_functions_dir is not None:
+            guidance_functions_dir = (
+                str(Path(task_cache_root) / f"episode_{_adapter_actual_task_id(self.adapter) + 1}" / "vlm_agent")
+                if task_cache_root else self.cached_functions_dir)
+            if not os.path.exists(guidance_functions_dir):
+                raise ValueError(f"cached_functions_dir does not exist: {guidance_functions_dir}")
+            log.info(f"Using cached guidance functions from: {guidance_functions_dir}")
+        else:
+            # Use instruction from adapter (already retrieved above)
+            metadata = {
+                'init_keypoint_positions': key_points,
+                'num_keypoints': len(key_points),
+                'key_points_objects_map': key_points_objects_map
+            }
+            guidance_functions_dir = self.vlm_agent.generate_guidance(
+                projected_img, instruction, metadata
+            )
+
+        # Load guidance functions
+        with open(os.path.join(guidance_functions_dir, 'metadata.json'), 'r') as f:
+            self.program_info = json.load(f)
+
+        if task_cache_root:
+            frozen_map = {int(k): v for k, v in self.program_info['key_points_objects_map'].items()}
+            if frozen_map != self.keypoint_id_to_object:
+                raise ValueError("Task-bound cached reward keypoint identity changed")
+
+        if self.config.get("require_task_cache_identity", False):
+            _validate_task_cache_identity(
+                self.program_info,
+                _adapter_actual_task_id(self.adapter),
+                self.keypoint_id_to_object,
+            )
+
+        self.guidance_fns = dict()
+        for stage in range(1, self.program_info['num_stages'] + 1):
+            load_path = os.path.join(guidance_functions_dir, f'stage{stage}_guidance.txt')
+            self.guidance_fns[stage] = load_functions_from_txt(load_path) if os.path.exists(load_path) else []
+
+        if self.config.get("stage_controller", "legacy") in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"} and set(self.guidance_fns) != {1, 2}:
+            raise ValueError("evidence_v1 supports exactly two pick/place stages")
+
+        reward_contract = self.config.get('reward_contract')
+        if reward_contract:
+            if reward_contract != 'c0_xyz_v1':
+                raise ValueError('Unknown numerical reward contract')
+            from core.c0_reward_contract import validate_task
+            validate_task(self, key_points, episode_dir)
+
+        output_raw_path = os.path.join(guidance_functions_dir, 'output_raw.txt')
+        self.stage_descriptions = self.vlm_agent._extract_stage_descriptions_from_output(output_raw_path)
+
+        for stage, fns in self.guidance_fns.items():
+            log.info(f"Stage {stage}: {len(fns)} guidance functions loaded")
+        log.info(f"Loaded {len(self.guidance_fns)} stages total")
+        log.debug(f"Stage descriptions:\n{self.stage_descriptions}")
+
+    def _get_gripper_value(self, action_chunk, action_idx: int) -> Optional[float]:
+        """Extract gripper value from action chunk."""
+        if action_chunk is None:
+            return None
+        val = action_chunk[0][action_idx][-1]
+        return val.item() if hasattr(val, 'item') else val
+
+    def _get_gripper_edge_values(self, action_chunk) -> tuple[Optional[float], Optional[float]]:
+        """Return first/last gripper commands when the chunk shape is available."""
+        if action_chunk is None:
+            return None, None
+        try:
+            chunk_length = int(action_chunk.shape[1])
+            if chunk_length <= 0:
+                return None, None
+            return (
+                self._get_gripper_value(action_chunk, 0),
+                self._get_gripper_value(action_chunk, chunk_length - 1),
+            )
+        except (AttributeError, IndexError, TypeError, ValueError):
+            return None, None
+
+    def _stage_gripper_value(self, action_chunk, action_idx, previous_executed_gripper_command):
+        if self.config.get("stage_controller", "legacy") in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+            return previous_executed_gripper_command
+        return self._get_gripper_value(action_chunk, action_idx)
+
+    def _stage_event_secrets(self) -> list[str]:
+        secrets = [
+            os.environ.get("OPENAI_API_KEY"),
+            os.environ.get("GOOGLE_API_KEY"),
+        ]
+        recognizer = getattr(self, "gemini_stage_recognizer", None)
+        recognizer_config = getattr(recognizer, "config", None)
+        if isinstance(recognizer_config, dict):
+            secrets.append(recognizer_config.get("api_key"))
+        return [str(secret) for secret in secrets if secret]
+
+    def _append_stage_event(self, event: dict) -> None:
+        """Append one redacted stage event without interrupting control on I/O failure."""
+        secrets = self._stage_event_secrets()
+        safe_event = {}
+        for key, value in event.items():
+            if isinstance(value, str):
+                for secret in secrets:
+                    value = value.replace(secret, "[REDACTED]")
+            safe_event[key] = value
+
+        eds_eval_config = _config_section_to_dict(
+            self.config.get("eds_eval"),
+            "main.eds_eval",
+        )
+        trace_root = eds_eval_config.get("output_dir") or self.output_dir
+        trace_path = Path(trace_root) / "stage_events.jsonl"
+        try:
+            append_jsonl(trace_path, safe_event)
+        except Exception as e:
+            log.warning(f"Failed to append stage-event trace to {trace_path}: {e}")
+
+    def _append_episode_metadata(
+        self,
+        *,
+        episode: int,
+        episode_seed: int,
+        task_id: Optional[int],
+    ) -> None:
+        """Persist the episode seed needed for paired A/B validation."""
+        eds_eval_config = _config_section_to_dict(
+            self.config.get("eds_eval"),
+            "main.eds_eval",
+        )
+        trace_root = eds_eval_config.get("output_dir") or self.output_dir
+        metadata_path = Path(trace_root) / "episode_metadata.jsonl"
+        try:
+            append_jsonl(
+                metadata_path,
+                {
+                    "episode_id": int(episode),
+                    "episode_seed": int(episode_seed),
+                    "task_id": task_id,
+                    "episode_policy_rng_mode": str(self.config.get("episode_policy_rng_mode", "continuous")),
+                    "episode_policy_rng_seed": getattr(self, "_current_episode_policy_rng_seed", None),
+                },
+            )
+        except Exception as e:
+            log.warning(f"Failed to append episode metadata to {metadata_path}: {e}")
+
+    def _enable_phase_diagnostics(self):
+        """Use existing stderr for native-fault Python stacks, without locals."""
+        try:
+            config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+            if config.get("enabled", False):
+                faulthandler.enable(all_threads=True)
+                from utils.mujoco_phase_diagnostics import install
+                install(config.get("output_dir") or self.output_dir)
+        except Exception:
+            log.warning("Native-fault stack diagnostics unavailable")
+
+    def _enable_render_lifetime_diagnostics(self):
+        if os.environ.get("QD_ED_RENDER_LIFETIME", "0") != "1":
+            return
+        if self.backend != "libero":
+            raise RuntimeError("Render lifetime diagnostic requires LIBERO")
+        config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+        if not config.get("enabled") or not config.get("output_dir"):
+            raise RuntimeError("Render lifetime diagnostic requires an explicit evaluation output")
+        # Load the same adapter module before its constructor creates contexts.
+        from core.env_adapters import libero_adapter
+        from utils.render_lifetime_diagnostics import install
+        self._render_lifetime_emit = install(config["output_dir"])
+
+    def _append_phase_timing(self, *, episode, global_step, name, event, elapsed_s):
+        """Best-effort scalar phase markers; never log operation inputs/errors."""
+        observer = getattr(self, "_render_lifetime_emit", None)
+        if observer is not None and global_step == 0:
+            observer("episode_phase", name=name, boundary=event, elapsed_s=float(elapsed_s))
+        if getattr(self, "_phase_timing_write_failed", False):
+            return
+        try:
+            config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+            if not config.get("enabled", False):
+                return
+            path = Path(config.get("output_dir") or self.output_dir) / "phase_timing.jsonl"
+            append_jsonl(path, {
+                "schema": "qd-ed-phase-timing-v1", "episode": int(episode),
+                "global_step": int(global_step), "name": name, "event": event,
+                "elapsed_s": float(elapsed_s),
+            })
+        except Exception:
+            self._phase_timing_write_failed = True
+            log.warning("Phase timing unavailable; diagnostic writes disabled")
+
+    def _enable_runtime_render_guard(self):
+        if os.environ.get("QD_ED_CUDA_EGL_SERIALIZE", "0") != "1":
+            return
+        if self.backend != "libero":
+            raise RuntimeError("CUDA/EGL diagnostic guard requires LIBERO")
+        config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+        from utils.cuda_egl_guard import install
+        install(config.get("output_dir") or self.output_dir)
+
+    def _api_compute_snapshot(self):
+        """Read only counters, never requests, endpoints, headers, or credentials."""
+        snapshot = {}
+        for name, attribute in (
+            ("stage", "gemini_stage_recognizer"),
+            ("guidance", "vlm_agent"),
+            ("grounding", "gemini_grounder"),
+        ):
+            component = getattr(self, attribute, None)
+            counter = getattr(component, "api_request_counter", None)
+            if counter is None:
+                inactive = component is None or getattr(component, "cache_only", False) is True
+                snapshot[name] = {"request_attempts": 0, "sdk_retry_attempts": 0,
+                                  "observation_available": inactive,
+                                  "backend": "cache_only" if component is not None and inactive else "inactive" if inactive else "unknown"}
+            else:
+                snapshot[name] = counter.snapshot()
+        return snapshot
+
+    def _perception_compute_snapshot(self):
+        detector = getattr(self, "keypoint_detector", None)
+        getter = getattr(detector, "get_compute_counters", None)
+        counters = getter() if callable(getter) else {"dino_forward_calls": 0, "dino_batch_rows": 0}
+        sam = getattr(self, "sam3_segmenter", None)
+        grounder = getattr(self, "gemini_grounder", None)
+        grounder_counter = getattr(grounder, "api_request_counter", None)
+        grounding_observed = bool(grounder_counter and grounder_counter.snapshot()["observation_available"])
+        return {
+            **counters,
+            "observation_available": (detector is None or callable(getter)) and sam is None
+                                     and (grounder is None or grounding_observed),
+            "components": {
+                "dino": "inactive" if detector is None else ("active_observed" if callable(getter) else "active_unobserved"),
+                "sam3": "inactive" if sam is None else "active_unobserved",
+                "grounding": "inactive" if grounder is None else ("active_api_observed" if grounding_observed else "active_unobserved"),
+            },
+        }
+
+    def _begin_episode_compute(self):
+        self._episode_api_compute_start = self._api_compute_snapshot()
+        self._episode_perception_compute_start = self._perception_compute_snapshot()
+
+    def _append_episode_compute(self, *, episode, episode_seed, outcome):
+        """Persist whole-episode counters including prep and handled failures."""
+        before = getattr(self, "_episode_api_compute_start", {})
+        after = self._api_compute_snapshot()
+        provider = {}
+        available = True
+        codex_stage = after.get("stage", {}).get("backend") == "codex_cli"
+        for name, counts in after.items():
+            start = before.get(name, {"request_attempts": 0, "sdk_retry_attempts": 0,
+                                      "observation_available": False})
+            available = available and counts["observation_available"] and start["observation_available"]
+            for field in ("request_attempts", "sdk_retry_attempts"):
+                end_value, start_value = counts.get(field), start.get(field)
+                provider[f"{name}_api_{field}"] = (
+                    end_value - start_value if end_value is not None and start_value is not None else None
+                )
+        for field in ("request_attempts", "sdk_retry_attempts"):
+            values = [provider[f"{name}_api_{field}"] for name in after]
+            provider[f"provider_{field}"] = sum(values) if all(value is not None for value in values) else None
+        http_available = bool(available)
+        if codex_stage:
+            fields = ("logical_call_attempts", "completed_turns", "failed_calls", "usage_complete_calls",
+                      "input_tokens", "cached_input_tokens", "output_tokens", "reasoning_output_tokens",
+                      "call_latency_s")
+            logical_available = True
+            for name, counts in after.items():
+                start = before.get(name, {})
+                if counts.get("backend") == "codex_cli":
+                    for field in fields:
+                        end_value, start_value = counts.get(field), start.get(field)
+                        delta = (end_value - start_value
+                                 if isinstance(end_value, (int, float)) and not isinstance(end_value, bool)
+                                 and isinstance(start_value, (int, float)) and not isinstance(start_value, bool)
+                                 and end_value >= start_value else None)
+                        provider[f"{name}_codex_{field}"] = delta
+                    logical_available = logical_available and all(
+                        provider[f"{name}_codex_{field}"] is not None
+                        for field in ("logical_call_attempts", "completed_turns", "failed_calls", "call_latency_s")
+                    )
+                else:
+                    # A known inactive component has zero calls/tokens. An HTTP-only
+                    # component cannot supply CLI logical-call or token observations.
+                    inactive = counts.get("backend") in ("inactive", "cache_only") and start.get("backend") == counts.get("backend")
+                    logical_available = logical_available and inactive
+                    for field in fields:
+                        provider[f"{name}_codex_{field}"] = 0 if inactive else None
+            for field in fields:
+                values = [provider[f"{name}_codex_{field}"] for name in after]
+                provider[f"provider_{field}"] = sum(values) if all(value is not None for value in values) else None
+            provider["provider_logical_counters_available"] = bool(logical_available)
+            attempts = provider["provider_logical_call_attempts"]
+            provider["provider_token_usage_complete"] = (
+                attempts is not None and provider["provider_usage_complete_calls"] == attempts
+                and all(provider[f"provider_{field}"] is not None
+                        for field in ("input_tokens", "cached_input_tokens", "output_tokens"))
+            )
+            provider["stage_transport"] = dict(getattr(self.gemini_stage_recognizer, "transport_metadata", {}))
+            available = logical_available
+        getter = getattr(self.policy, "get_episode_compute_counters", None)
+        policy = getter() if callable(getter) else {}
+        perception_after = self._perception_compute_snapshot()
+        perception_before = getattr(self, "_episode_perception_compute_start", {})
+        perception = {key: perception_after[key] - perception_before.get(key, 0)
+                      for key in ("dino_forward_calls", "dino_batch_rows")}
+        record = {
+            **policy, **provider, **perception,
+            "schema": "qd-ed-episode-compute-v2" if codex_stage else "qd-ed-episode-compute-v1",
+            "episode_id": int(episode), "episode_seed": int(episode_seed),
+            "task_id": _adapter_actual_task_id(self.adapter), "outcome": outcome,
+            "policy_counters_available": callable(getter),
+            "provider_counters_available": bool(available),
+            "provider_http_counters_available": http_available,
+            "perception_counters_available": bool(perception_after["observation_available"]
+                                                  and perception_before.get("observation_available", False)),
+            "perception_components": perception_after["components"],
+            "perception_counter_semantics": "DINO model call attempts and input batch rows, including failures; inactive components are explicit",
+            "provider_counter_semantics": (
+                "Codex logical CLI call attempts include failures; completed_turns are transport completions; "
+                "failed_calls include parse failures and may overlap completed_turns. HTTP attempts and retries "
+                "are unavailable (null). Tokens are observed usage subtotals, with completeness recorded separately."
+                if codex_stage else
+                "HTTP send attempts including SDK and caller retries; separate retry counter classifies SDK retries only"
+            ),
+        }
+        eds_eval_config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+        path = Path(eds_eval_config.get("output_dir") or self.output_dir) / "episode_compute.jsonl"
+        try:
+            append_jsonl(path, record)
+        except Exception as e:
+            log.warning(f"Failed to append episode compute counters to {path}: {e}")
+
+    def _append_safety_event(self, event: dict[str, Any]) -> None:
+        """Persist a small, credential-free observation safety event."""
+        eds_eval_config = _config_section_to_dict(
+            self.config.get("eds_eval"),
+            "main.eds_eval",
+        )
+        trace_root = eds_eval_config.get("output_dir") or self.output_dir
+        path = Path(trace_root) / "safety_events.jsonl"
+        try:
+            append_jsonl(path, event)
+        except Exception as e:
+            log.warning(f"Failed to append safety event to {path}: {e}")
+
+    def _update_stage(self, state: dict, gripper_val: Optional[float],
+                      upper_th: float, lower_th: float) -> dict:
+        """
+        Update stage recognition state based on reward and gripper triggers.
+        Returns updated state dict.
+        """
+        if self.config.get("stage_controller", "legacy") in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+            from core.stage_evidence import update_stage
+            return update_stage(self, state, gripper_val)
+        curr_reward = self.policy.get_normalized_reward()
+        observed_reward = curr_reward
+        prev_reward = state['prev_norm_reward']
+        prev_gripper = state['prev_gripper_open']
+
+        # Detect gripper change (action < 0 = OPEN, action > 0 = CLOSE)
+        curr_gripper_open = (gripper_val < 0) if gripper_val is not None else None
+        gripper_changed = (prev_gripper is not None and curr_gripper_open is not None
+                          and curr_gripper_open != prev_gripper)
+
+        # Detect gripper state changes
+        gripper_just_closed = gripper_changed and not curr_gripper_open
+        gripper_just_opened = gripper_changed and curr_gripper_open
+
+        # Schmitt trigger on reward (only relevant when guidance is active)
+        reward_rising = state['use_guidance'] and (prev_reward < upper_th and curr_reward >= upper_th)
+        reward_falling = state['use_guidance'] and (prev_reward > lower_th and curr_reward <= lower_th)
+
+        # Build trigger reason (priority: gripper > reward > chunk interval > periodic)
+        trigger_reason = None
+        if gripper_just_closed:
+            trigger_reason = "gripper closed"
+        elif gripper_just_opened:
+            trigger_reason = "gripper opened"
+        elif reward_rising:
+            trigger_reason = f"reward rose above {upper_th:.0%}"
+        elif reward_falling:
+            trigger_reason = f"reward dropped below {lower_th:.0%}"
+
+        # Query VLM if triggered (with limit check)
+        vlm_query_limit = self.config.get("vlm_query_limit", 10)
+        stage_min_query_gap_steps = int(self.config.get("stage_min_query_gap_steps", 0))
+        if stage_min_query_gap_steps < 0:
+            raise ValueError("stage_min_query_gap_steps must be nonnegative")
+        vlm_query_count = state.get('vlm_query_count', 0)
+        last_vlm_query_step = state.get('last_vlm_query_step')
+        stage_query_gap_active = (last_vlm_query_step is not None and
+            int(state.get('global_step', 0)) - last_vlm_query_step < stage_min_query_gap_steps)
+        stage_before = state['current_stage']
+        guidance_before = state['use_guidance']
+        query_status = None
+        skipped_reason = None
+        query_result = {}
+
+        if (trigger_reason and self.gemini_stage_recognizer is not None and
+                vlm_query_count < vlm_query_limit and not stage_query_gap_active):
+            log.info(f"[Trigger] {trigger_reason} (query {vlm_query_count + 1}/{vlm_query_limit})")
+            state['last_vlm_query_step'] = int(state.get('global_step', 0))
+
+            set_trace_context = getattr(self.gemini_stage_recognizer, "set_trace_context", None)
+            if callable(set_trace_context):
+                set_trace_context(state, trigger_reason)
+
+            new_stage, need_guidance = self.gemini_stage_recognizer.identify_stage_and_guidance(
+                current_rgb=np.array(self.adapter.get_vlm_image()),
+                instruction=self.adapter.get_task_description(),
+                stage_descriptions=self.stage_descriptions,
+                init_img_with_keypoints=self.init_img_with_keypoints,
+                keypoint_id_to_object=self.keypoint_id_to_object,
+                num_stages=len(self.guidance_fns),
+                trigger_reason=trigger_reason,
+            )
+
+            state['vlm_query_count'] = vlm_query_count + 1
+            query_result = getattr(self.gemini_stage_recognizer, "last_result", None) or {}
+            if query_result:
+                query_status = "ok" if query_result.get("ok") else "error"
+            else:
+                query_status = "completed_without_result_metadata"
+
+            if new_stage != state['current_stage'] or need_guidance != state['use_guidance']:
+                log.info(f"[VLM] Stage: {state['current_stage']} → {new_stage}, Guidance: {state['use_guidance']} → {need_guidance}")
+                stage_changed = new_stage != state['current_stage']
+                guidance_changed = need_guidance != state['use_guidance']
+                if stage_changed:
+                    self.policy.reset_stage()
+                    curr_reward = 0.0  # Reset for new stage
+                elif guidance_changed:
+                    reset_chunk_memory = getattr(
+                        self.policy,
+                        "reset_eds_chunk_memory",
+                        None,
+                    )
+                    if callable(reset_chunk_memory):
+                        reset_chunk_memory("guidance_change")
+
+            state.update({
+                'current_stage': new_stage,
+                'use_guidance': need_guidance,
+            })
+        elif trigger_reason and vlm_query_count >= vlm_query_limit:
+            log.debug(f"[Trigger] {trigger_reason} (skipped, limit {vlm_query_limit} reached)")
+            query_status = "skipped"
+            skipped_reason = "query_limit_reached"
+        elif trigger_reason and stage_query_gap_active:
+            query_status = "skipped"
+            skipped_reason = "minimum_query_gap"
+        elif trigger_reason:
+            log.debug(f"[Trigger] {trigger_reason} (skipped, recognizer unavailable)")
+            query_status = "skipped"
+            skipped_reason = "recognizer_unavailable"
+
+        if trigger_reason:
+            self._append_stage_event({
+                "episode_id": state.get("episode_id"),
+                "task_id": state.get("task_id"),
+                "global_step": state.get("global_step"),
+                "chunk_id": state.get("chunk_id"),
+                "episode_seed": state.get("episode_seed"),
+                "trigger_reason": trigger_reason,
+                "stage_before": stage_before,
+                "stage_after": state['current_stage'],
+                "guidance_before": guidance_before,
+                "guidance_after": state['use_guidance'],
+                "normalized_reward_before": float(prev_reward),
+                "normalized_reward_at_query": float(observed_reward),
+                "normalized_reward_after_stage_update": float(curr_reward),
+                "schmitt_upper": float(upper_th),
+                "schmitt_lower": float(lower_th),
+                "vlm_query_count": state.get('vlm_query_count', vlm_query_count),
+                "vlm_query_limit": int(vlm_query_limit),
+                "stage_min_query_gap_steps": stage_min_query_gap_steps,
+                "last_vlm_query_step": state.get('last_vlm_query_step'),
+                "gripper_value_used": gripper_val,
+                "previous_gripper_value": state.get("previous_gripper_value"),
+                "first_gripper_value": state.get("first_gripper_value"),
+                "last_gripper_value": state.get("last_gripper_value"),
+                "query_status": query_status,
+                "query_ok": query_result.get("ok"),
+                "skipped_reason": skipped_reason,
+                "raw_response": query_result.get("raw_response"),
+                "parsed_stage": query_result.get("parsed_stage"),
+                "parsed_guidance": query_result.get("parsed_guidance"),
+                "evidence": query_result.get("evidence"),
+                "error": query_result.get("error"),
+                "query_latency_s": query_result.get("query_latency_s"),
+                **{key: query_result[key] for key in (
+                    "api_request_attempts", "api_sdk_retry_attempts", "api_request_counter_available",
+                    "transport", "codex_logical_call_attempts", "codex_completed_turns", "codex_failed_calls",
+                    "codex_usage_complete_calls", "codex_input_tokens", "codex_cached_input_tokens",
+                    "codex_output_tokens", "codex_reasoning_output_tokens", "codex_call_latency_s"
+                ) if key in query_result},
+            })
+
+        # This explicitly frozen transport condition fails closed after preserving
+        # its event. The episode exception path still saves video and all usage.
+        if query_status == "error":
+            if getattr(self.gemini_stage_recognizer, "output_format", None) == "json_schema_v1":
+                raise RuntimeError("stage_json_query_failed: " + str(query_result.get("error")))
+            if getattr(self.gemini_stage_recognizer, "config", {}).get("backend") == "codex_cli":
+                raise RuntimeError("codex_stage_query_failed: " + str(query_result.get("error")))
+
+        # Update tracking state
+        state['prev_norm_reward'] = curr_reward
+        state['prev_gripper_open'] = curr_gripper_open
+        state['last_gripper_value_used'] = gripper_val
+        return state
+
+    def run(self):
+        """Main running loop."""
+        self.success_count = 0
+        base_output_dir = self.output_dir
+        episode_num = self.config.get('episode_num', 10)
+        episode_start_index = int(self.config.get('episode_start_index', 0))
+        if not 0 <= episode_start_index < episode_num:
+            raise ValueError("episode_start_index must satisfy 0 <= start < episode_num")
+        episode_seed_schedule = _episode_seed_schedule(
+            self.config.get('episode_seed_schedule'),
+            episode_num=int(episode_num),
+        )
+        for _ in range(episode_start_index):
+            torch.randint(0, 1000, (1,)).item()
+
+        for episode in range(episode_start_index, episode_num):
+            sampled_seed = torch.randint(0, 1000, (1,)).item()
+            episode_seed = _episode_seed_for_index(
+                episode_seed_schedule,
+                episode_index=episode,
+                sampled_seed=sampled_seed,
+            )
+            rng_mode = str(self.config.get("episode_policy_rng_mode", "continuous"))
+            if rng_mode not in {"continuous", "per_episode_v1", "per_seed_v1"}:
+                raise ValueError("Unknown episode_policy_rng_mode")
+            self._current_episode_policy_rng_seed = None
+            if rng_mode in {"per_episode_v1", "per_seed_v1"}:
+                policy_seed = _episode_policy_rng_seed(
+                    int(self.cfg.get("seed", 0)), int(episode) if rng_mode == "per_episode_v1" else 0, int(episode_seed))
+                random.seed(policy_seed)
+                np.random.seed(policy_seed)
+                torch.manual_seed(policy_seed)
+                torch.cuda.manual_seed_all(policy_seed)
+                self._current_episode_policy_rng_seed = policy_seed
+            self.policy.reset()
+            self._begin_episode_compute()
+            self.video_recorder.clear()
+            episode_dir = os.path.join(base_output_dir, f'episode_{episode+1}')
+            os.makedirs(episode_dir, exist_ok=True)
+
+            # Reset environment
+            self.adapter.reset(seed=episode_seed)
+
+            # Update guide_scale for current task (may change when switching tasks)
+            task_info = self.adapter.get_task_info()
+            recommended_scale = task_info.get('recommended_guide_scale')
+            if recommended_scale is not None:
+                self.current_guide_scale = recommended_scale
+            log.info(f"Task {task_info.get('task_id', '?')}: guide_scale={self.current_guide_scale}")
+
+            # Perform task preparation with error handling
+            episode_error = False
+            if self.config.get("use_guidance", True):
+                try:
+                    self.perform_task_for_episode(episode_dir)
+                except Exception as e:
+                    log.error(f"Episode {episode+1} preparation failed: {e}")
+                    episode_error = True
+                    # Save error info
+                    error_file = os.path.join(episode_dir, 'error.txt')
+                    with open(error_file, 'w') as f:
+                        import traceback
+                        f.write(f"Error during episode preparation:\n{traceback.format_exc()}")
+                # Reset stage manager
+
+            # Skip this episode if preparation failed
+            if episode_error:
+                log.warning(f"Skipping episode {episode+1} due to preparation error")
+                # Save a placeholder fail video/marker
+                fail_marker = os.path.join(episode_dir, f'episode_{episode+1}_fail_error.txt')
+                with open(fail_marker, 'w') as f:
+                    f.write("Episode failed due to guidance function error\n")
+                self._append_episode_compute(episode=episode, episode_seed=episode_seed, outcome="preparation_error")
+                continue
+
+            # Wrap entire episode execution in try-except
+            try:
+                self._run_episode(episode, episode_dir, episode_seed)
+            except Exception as e:
+                log.error(f"Episode {episode+1} execution failed: {e}")
+                import traceback
+                error_file = os.path.join(episode_dir, 'error.txt')
+                with open(error_file, 'w') as f:
+                    f.write(f"Error during episode execution:\n{traceback.format_exc()}")
+                # Save a placeholder fail marker
+                fail_marker = os.path.join(episode_dir, f'episode_{episode+1}_fail_error.txt')
+                with open(fail_marker, 'w') as f:
+                    f.write(f"Episode failed due to execution error: {e}\n")
+                self._save_execution_failure_video(
+                    episode=episode,
+                    episode_dir=episode_dir,
+                    error=e,
+                )
+                log.warning(f"Skipping episode {episode+1} due to execution error")
+                self._append_episode_compute(episode=episode, episode_seed=episode_seed, outcome="execution_error")
+                continue
+            self._append_episode_compute(episode=episode, episode_seed=episode_seed, outcome="completed")
+
+        # Final statistics
+        executed_episode_count = episode_num - episode_start_index
+        success_rate = self.success_count / executed_episode_count * 100
+        log.info(f"Tested {executed_episode_count} episodes, success rate: {success_rate:.2f}%")
+
+        # Save results
+        log_file = os.path.join(self.output_dir, 'results.txt')
+        with open(log_file, 'a') as f:
+            f.write(f"Backend: {self.backend}\n")
+            f.write(f"Success count: {self.success_count}/{executed_episode_count}\n")
+            f.write(f"Success rate: {success_rate:.2f}%\n")
+
+    def _save_execution_failure_video(
+        self,
+        *,
+        episode: int,
+        episode_dir: str,
+        error: Exception,
+    ) -> None:
+        """Persist frames collected before an episode execution failure."""
+        video_path = os.path.join(
+            episode_dir,
+            f"episode_{episode + 1}_fail_error",
+        )
+        try:
+            self.video_recorder.save_video(
+                save_path=video_path,
+                success=False,
+                behavior_name=f"execution_error_{type(error).__name__}",
+            )
+        except Exception as video_error:
+            log.warning(
+                f"Failed to save partial video for episode {episode + 1}: "
+                f"{video_error}"
+            )
+
+    def _run_episode(self, episode: int, episode_dir: str, episode_seed: int):
+        """Run a single episode with the current configuration."""
+        set_episode_context = getattr(self.policy, "set_eds_episode_context", None)
+        if callable(set_episode_context):
+            set_episode_context(int(episode), int(episode_seed))
+        self._enable_phase_diagnostics()
+        self._enable_runtime_render_guard()
+        self._append_phase_timing(episode=episode, global_step=0,
+            name="initial_policy_observation", event="enter", elapsed_s=0.0)
+        phase_started_s = time.perf_counter()
+        observation = self._get_policy_observation()
+        self._append_phase_timing(episode=episode, global_step=0,
+            name="initial_policy_observation", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+        qpos_violations_since_last_metric = _gripper_qpos_violation_count(observation)
+        if qpos_violations_since_last_metric:
+            self._append_safety_event(
+                {
+                    "episode": int(episode),
+                    "global_step": 0,
+                    "event": "gripper_qpos_violation",
+                    "count": int(qpos_violations_since_last_metric),
+                }
+            )
+        self._append_episode_metadata(
+            episode=episode,
+            episode_seed=episode_seed,
+            task_id=_adapter_actual_task_id(self.adapter),
+        )
+
+        # Evaluation loop
+        done = False
+        global_steps = 0
+        keypoints = None
+        mask_ids = None
+        generate_new_chunk = False
+        action_executed = 0
+        use_guidance = False
+        action_horizon = self.policy._action_chunk_horizon
+        resolved_action_horizon = action_horizon
+        execution_horizon_reason = "fixed"
+        execution_horizon_stage_change = False
+        replan_count = 0
+        current_stage = 1
+        current_guidance_fns = None
+
+        # Stage recognition thresholds
+        UPPER_THRESHOLD = self.config.get("schmitt_upper", 0.8)
+        LOWER_THRESHOLD = self.config.get("schmitt_lower", 0.6)
+        action_chunk = None
+        chunk_id = 0
+        qualitative_chunks_saved = 0
+        pretest_chunks_saved = 0
+        previous_executed_gripper_command = None
+        previous_executed_action = None
+
+        log.info(f"Task description: {self.adapter.get_task_description()}")
+
+        # Default: start with stage 1 and guidance ON
+        current_stage = 1
+        use_guidance = self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns')
+        current_guidance_fns = self.guidance_fns.get(current_stage, []) if use_guidance else None
+
+        # Check if guidance functions are available
+        if use_guidance and not current_guidance_fns:
+            log.warning(f"No guidance functions for initial stage {current_stage}")
+        else:
+            log.info(f"Initial guidance: stage={current_stage}, use_guidance={use_guidance}, "
+                    f"num_fns={len(current_guidance_fns) if current_guidance_fns else 0}")
+
+        # Stage recognition state
+        stage_state = {
+            'prev_norm_reward': 0.0,
+            'prev_gripper_open': None,
+            'current_stage': current_stage,
+            'use_guidance': use_guidance,
+            'vlm_query_count': 0,
+            'episode_id': int(episode),
+            'task_id': _adapter_actual_task_id(self.adapter),
+            'global_step': 0,
+            'chunk_id': 0,
+            'episode_seed': int(episode_seed),
+            'previous_gripper_value': None,
+            'first_gripper_value': None,
+            'last_gripper_value': None,
+            'last_gripper_value_used': None,
+        }
+
+        while not done:
+            generate_new_chunk = (action_executed == 0)
+            if generate_new_chunk:
+                execution_horizon_stage_change = False
+
+            if generate_new_chunk:
+                self._append_phase_timing(episode=episode, global_step=global_steps,
+                    name="chunk_keypoints_stage", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
+            if generate_new_chunk and self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns'):
+                keypoints = self.keypoint_tracker.get_keypoint_positions()
+                mask_ids = self.keypoint_tracker.get_mask_ids()
+
+                # Update stage recognition
+                first_gripper_value, last_gripper_value = self._get_gripper_edge_values(
+                    action_chunk
+                )
+                gripper_val = self._stage_gripper_value(
+                    action_chunk, action_executed, previous_executed_gripper_command)
+                if self.config.get("stage_controller", "legacy") in {"evidence_v1", "contact_v2", "grasp_v3", "proprio_v4"}:
+                    self.stage_live_keypoints = keypoints
+                stage_state.update({
+                    'task_id': _adapter_actual_task_id(self.adapter),
+                    'global_step': int(global_steps),
+                    'chunk_id': int(chunk_id),
+                    'previous_gripper_value': stage_state.get('last_gripper_value_used'),
+                    'first_gripper_value': first_gripper_value,
+                    'last_gripper_value': last_gripper_value,
+                })
+                stage_before_update = stage_state["current_stage"]
+                stage_state = self._update_stage(stage_state, gripper_val, UPPER_THRESHOLD, LOWER_THRESHOLD)
+                execution_horizon_stage_change = (
+                    stage_state["current_stage"] != stage_before_update
+                )
+
+                current_stage = stage_state['current_stage']
+                use_guidance = stage_state['use_guidance']
+                current_guidance_fns = self.guidance_fns.get(current_stage, []) if use_guidance else None
+
+                if use_guidance and not current_guidance_fns:
+                    log.warning(f"No guidance functions for stage {current_stage}, disabling")
+                    use_guidance = False
+                    current_guidance_fns = None
+            elif generate_new_chunk:
+                use_guidance = False
+                keypoints = None
+                current_guidance_fns = None
+
+            if generate_new_chunk:
+                self._append_phase_timing(episode=episode, global_step=global_steps,
+                    name="chunk_keypoints_stage", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+
+            guidance_type = str(self.config.get("guidance_type", "vls")).lower()
+            if guidance_type not in {"vls", "eds"}:
+                raise ValueError(
+                    f"Unsupported main.guidance_type={guidance_type!r}; "
+                    "expected one of {'vls', 'eds'}"
+                )
+
+            vls_config = _main_vls_config(self.config)
+            eds_config = _config_section_to_dict(self.config.get("eds_config"), "main.eds_config")
+            eds_eval_config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
+            eds_pretest_config = _config_section_to_dict(
+                self.config.get("eds_mechanism_pretest"),
+                "main.eds_mechanism_pretest",
+            )
+            if eds_eval_config:
+                eds_config["reward_mode"] = eds_eval_config.get(
+                    "reward_mode",
+                    eds_config.get("reward_mode", "normal"),
+                )
+                eds_config["shuffle_seed"] = eds_eval_config.get(
+                    "shuffle_seed",
+                    eds_config.get("shuffle_seed", 0),
+                )
+            if eds_pretest_config:
+                eds_config["mechanism_pretest"] = eds_pretest_config
+            vls_config["guide_scale"] = getattr(
+                self,
+                "current_guide_scale",
+                vls_config.get("guide_scale", 80.0),
+            )
+            select_params = inspect.signature(self.policy.select_action).parameters
+            supports_grouped_guidance = "guidance_type" in select_params
+
+            select_kwargs = {
+                "batch": observation,
+                "generate_new_chunk": generate_new_chunk,
+                "use_guidance": use_guidance,
+                "keypoints": keypoints,
+                "guidance_fns": current_guidance_fns,
+                "verbose": True,
+                "global_step": global_steps,
+                "current_stage": current_stage,
+            }
+
+            legacy_vls_kwargs = {
+                "guide_scale": vls_config.get("guide_scale", 80.0),
+                "sigmoid_k": vls_config.get("sigmoid_k", 12.0),
+                "sigmoid_x0": vls_config.get("sigmoid_x0", 0.7),
+                "start_ratio": vls_config.get("start_ratio", None),
+                "use_diversity": vls_config.get("use_diversity", True),
+                "diversity_scale": vls_config.get("diversity_scale", 10.0),
+                "MCMC_steps": vls_config.get("MCMC_steps", 4),
+                "use_fkd": vls_config.get("use_fkd", False),
+                "fkd_config": (
+                    _config_section_to_dict(vls_config.get("fkd"), "main.vls_config.fkd")
+                    if vls_config.get("fkd") is not None
+                    else None
+                ),
+            }
+
+            if self.policy_type == "rdt" and supports_grouped_guidance:
+                select_kwargs.update(
+                    {
+                        "guidance_type": guidance_type,
+                        "vls_config": vls_config,
+                        "eds_config": eds_config,
+                    }
+                )
+            else:
+                if guidance_type == "eds":
+                    raise ValueError(
+                        "main.guidance_type=eds is currently implemented only for an RDT policy "
+                        "that supports grouped EDS guidance"
+                    )
+                select_kwargs.update(legacy_vls_kwargs)
+
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="select_action_fresh" if generate_new_chunk else "select_action_cached", event="enter", elapsed_s=0.0)
+            select_action_start_s = time.perf_counter()
+            action_chunk = self.policy.select_action(**select_kwargs)
+            select_action_latency_s = float(time.perf_counter() - select_action_start_s)
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="select_action_fresh" if generate_new_chunk else "select_action_cached", event="exit", elapsed_s=select_action_latency_s)
+            if hasattr(self.adapter, 'env_postprocessor'):
+                action_transition = {"action": action_chunk}
+                action_transition = self.adapter.env_postprocessor(action_transition)
+                action_chunk = action_transition["action"]
+            if self.config.get("stage_controller", "legacy") in {"grasp_v3", "proprio_v4"} and self.config.get("use_guidance", True):
+                from core.stage_grasp_guard import apply_to_action
+                action_chunk = apply_to_action(self, stage_state, action_chunk, action_executed, global_steps)
+            if generate_new_chunk:
+                chunk_id += 1
+                replan_count += 1
+            actual_task_id = _adapter_actual_task_id(self.adapter)
+
+            eds_metrics = None
+            if generate_new_chunk and use_guidance and guidance_type == "eds":
+                get_eds_metrics = getattr(self.policy, "get_last_eds_metrics", None)
+                if callable(get_eds_metrics):
+                    raw_eds_metrics = get_eds_metrics()
+                    if raw_eds_metrics is not None:
+                        if not isinstance(raw_eds_metrics, dict):
+                            raise TypeError("policy.get_last_eds_metrics() must return a dict or None")
+                        eds_metrics = dict(raw_eds_metrics)
+
+            if generate_new_chunk:
+                execution_mode = str(
+                    self.config.get("execution_horizon_mode", "fixed")
+                ).lower()
+                if execution_mode not in {"fixed", "adaptive_prefix"}:
+                    raise ValueError(
+                        "execution_horizon_mode must be one of "
+                        "{'fixed', 'adaptive_prefix'}"
+                    )
+                if execution_mode == "fixed":
+                    resolved_action_horizon = action_horizon
+                    execution_horizon_reason = "fixed"
+                elif guidance_type != "eds":
+                    resolved_action_horizon = action_horizon
+                    execution_horizon_reason = "non_eds_policy_horizon"
+                else:
+                    contact_prefix = self.config.get("execution_horizon_contact", 2)
+                    if (
+                        isinstance(contact_prefix, bool)
+                        or not isinstance(contact_prefix, int)
+                        or contact_prefix not in _EXECUTION_HORIZON_CHOICES
+                    ):
+                        raise ValueError(
+                            "execution_horizon_contact/contact_steps must be one of "
+                            f"{sorted(_EXECUTION_HORIZON_CHOICES)}"
+                        )
+                    target_distance = (
+                        eds_metrics.get("target_distance_after")
+                        if eds_metrics is not None
+                        else None
+                    )
+                    gripper_transition = _gripper_transition_in_prefix(
+                        action_chunk,
+                        prefix_steps=contact_prefix,
+                        previous_gripper_command=previous_executed_gripper_command,
+                    )
+                    resolved_action_horizon, execution_horizon_reason = (
+                        _resolve_execution_horizon(
+                            mode=execution_mode,
+                            policy_horizon=action_horizon,
+                            guidance_enabled=bool(use_guidance),
+                            stage_changed=bool(execution_horizon_stage_change),
+                            target_distance=target_distance,
+                            gripper_transition=gripper_transition,
+                            far_steps=self.config.get("execution_horizon_far", 8),
+                            near_steps=self.config.get("execution_horizon_near", 4),
+                            contact_steps=contact_prefix,
+                            near_distance=self.config.get("execution_near_distance", 0.08),
+                            contact_distance=self.config.get(
+                                "execution_contact_distance", 0.04
+                            ),
+                        )
+                    )
+
+            if generate_new_chunk:
+                self._append_phase_timing(episode=episode, global_step=global_steps,
+                    name="diagnostic_artifacts", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
+            if (
+                generate_new_chunk
+                and use_guidance
+                and guidance_type == "eds"
+                and eds_eval_config.get("enabled", False)
+                and eds_eval_config.get("write_metrics", True)
+            ):
+                if eds_metrics is not None:
+                    eds_metrics.update(
+                        {
+                            "episode": int(episode),
+                            "global_step": int(global_steps),
+                            "suite": getattr(self.adapter, "suite_name", None),
+                            "task_id": actual_task_id,
+                            "method_label": eds_eval_config.get("method_label"),
+                            "job_id": eds_eval_config.get("job_id"),
+                            "num_elites": eds_config.get("num_elites"),
+                            "renoise_t_max": eds_config.get("renoise_t_max"),
+                            "renoise_t_min": eds_config.get("renoise_t_min"),
+                            "select_action_latency_s": select_action_latency_s,
+                            "execution_horizon_resolved": int(resolved_action_horizon),
+                            "execution_horizon_reason": execution_horizon_reason,
+                            "execution_horizon_stage_change": bool(
+                                execution_horizon_stage_change
+                            ),
+                            "replan_count": int(replan_count),
+                            "chunk_boundary_action_jump": _chunk_boundary_action_jump(
+                                action_chunk,
+                                previous_executed_action,
+                            ),
+                            "gripper_qpos_violation_count": int(
+                                qpos_violations_since_last_metric
+                            ),
+                        }
+                    )
+                    if (
+                        eds_eval_config.get("save_qualitative", False)
+                        and qualitative_chunks_saved
+                        < int(eds_eval_config.get("max_visual_chunks_per_episode", 2))
+                        and hasattr(self.policy, "get_last_eds_artifacts")
+                    ):
+                        artifacts = self.policy.get_last_eds_artifacts()
+                        if artifacts is not None:
+                            visual_root = Path(
+                                eds_eval_config.get("output_dir", self.output_dir)
+                            ) / "qualitative"
+                            saved_artifacts = save_eds_qualitative_artifacts(
+                                output_dir=visual_root,
+                                adapter=self.adapter,
+                                keypoints=keypoints,
+                                mask_ids=mask_ids,
+                                artifacts=artifacts,
+                                episode=int(episode),
+                                global_step=int(global_steps),
+                                max_iters=int(
+                                    eds_config.get("cem_iters", 10)
+                                    if eds_eval_config.get("save_per_iter_best", True)
+                                    else 0
+                                ),
+                            )
+                            if saved_artifacts:
+                                eds_metrics["qualitative_artifacts"] = saved_artifacts
+                                qualitative_chunks_saved += 1
+                    metrics_path = (
+                        Path(eds_eval_config.get("output_dir", self.output_dir))
+                        / "eds_metrics.jsonl"
+                    )
+                    append_jsonl(metrics_path, eds_metrics)
+                    qpos_violations_since_last_metric = 0
+
+            if (
+                generate_new_chunk
+                and use_guidance
+                and guidance_type == "eds"
+                and eds_pretest_config.get("enabled", False)
+                and pretest_chunks_saved < int(eds_pretest_config.get("max_chunks", 1))
+                and hasattr(self.policy, "get_last_eds_mechanism_trace")
+            ):
+                trace = self.policy.get_last_eds_mechanism_trace()
+                if trace is not None:
+                    trace.suite = getattr(self.adapter, "suite_name", None)
+                    trace.task_id = actual_task_id
+                    trace.episode = int(episode)
+                    trace.execution_info = {
+                        "enabled": execution_mode == "adaptive_prefix",
+                        "execution_horizon_resolved": int(resolved_action_horizon),
+                        "execution_horizon_reason": execution_horizon_reason,
+                        "execution_horizon_stage_change": bool(
+                            execution_horizon_stage_change
+                        ),
+                        "replan_count": int(replan_count),
+                    }
+                    seed = int(eds_pretest_config.get("seed", 0))
+                    run_id = eds_pretest_config.get("run_id") or build_run_id(
+                        suite=str(trace.suite or "unknown_suite"),
+                        task_id=int(trace.task_id if trace.task_id is not None else -1),
+                        seed=seed,
+                        reward_mode=str(trace.reward_mode),
+                        population_size=int(trace.population_size),
+                        cem_iters=int(trace.cem_iters),
+                    )
+                    pretest_root = _eds_mechanism_pretest_output_root(
+                        eds_pretest_config=eds_pretest_config,
+                        eds_eval_config=eds_eval_config,
+                        run_id=str(run_id),
+                        output_dir=self.output_dir,
+                        episode=int(episode),
+                        global_step=int(global_steps),
+                    )
+                    saved_trace_paths = save_mechanism_trace(
+                        pretest_root,
+                        trace,
+                        save_tensors=bool(eds_pretest_config.get("save_tensors", True)),
+                    )
+                    saved_plot_paths = []
+                    if bool(eds_pretest_config.get("plot_3d", True)):
+                        saved_plot_paths = save_eds_mechanism_pretest_artifacts(
+                            pretest_root,
+                            trace,
+                        )
+                    log.info(
+                        f"[EDS_PRETEST] saved {len(saved_trace_paths)} trace artifacts "
+                        f"and {len(saved_plot_paths)} plot artifacts to {pretest_root}"
+                    )
+                    pretest_chunks_saved += 1
+
+            if generate_new_chunk:
+                self._append_phase_timing(episode=episode, global_step=global_steps,
+                    name="diagnostic_artifacts", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+
+            # Get image and add status overlay
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="debug_visualization_overlay", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
+            if self.config.get("debug_draw_trajectory", False):
+                from utils.vis_utils import draw_action_trajectory_on_vlm_image
+                visualization_action_chunk = _get_visualization_action_chunk(
+                    self.policy,
+                    self.adapter,
+                    action_chunk,
+                )
+                image = draw_action_trajectory_on_vlm_image(
+                    adapter=self.adapter,
+                    action_chunk=visualization_action_chunk[:, action_executed:],
+                    num_steps=resolved_action_horizon,
+                    global_step=global_steps,
+                    action_executed=action_executed,
+                )
+            else:
+                image = np.array(self.adapter.get_vlm_image())
+
+            # Draw keypoints on image for debugging (disabled by default)
+            if self.config.get("debug_draw_keypoints", False) and keypoints is not None:
+                from utils.vis_utils import draw_keypoints_on_image
+                image = draw_keypoints_on_image(
+                    adapter=self.adapter,
+                    image=image,
+                    keypoints=keypoints,
+                    mask_ids=mask_ids
+                )
+
+            # Add guidance status overlay
+            gripper_val = self._get_gripper_value(action_chunk, action_executed)
+            gripper_str = f"Grip:{'O' if gripper_val and gripper_val < 0 else 'C'}({gripper_val:.2f})" if gripper_val else "Grip:-"
+
+            status_text = [
+                f"Step:{global_steps} Stage:{current_stage}",
+                f"Guide:{'ON' if use_guidance else 'OFF'} {gripper_str}",
+            ]
+
+            # Add reward-based guidance info
+            if hasattr(self.policy, 'get_normalized_reward') and use_guidance:
+                norm_r = self.policy.get_normalized_reward()
+                scale = self.policy.get_last_scale()
+
+                # Use config values for consistent display
+                vls_config = _main_vls_config(self.config)
+                k = vls_config.get("sigmoid_k", 12.0)
+                x0 = vls_config.get("sigmoid_x0", 0.8)
+                sig_strength = 1.0 / (1.0 + np.exp(k * (norm_r - x0)))
+
+                # Show scale as "-" if not yet computed (first chunk before guidance runs)
+                scale_str = f"{scale:.1f}" if scale > 0 else "-"
+                status_text.extend([
+                    f"Norm_R: {norm_r:.2f}",
+                    f"Sig_Str: {sig_strength:.1%}",
+                    f"Scale: {scale_str}",
+                ])
+
+            image_with_status = add_text_to_image(image, status_text)
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="debug_visualization_overlay", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="video_add_frame", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
+            self.video_recorder.add_frame(self.adapter.vlm_camera, image_with_status)
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="video_add_frame", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="adapter_step", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
+            obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="adapter_step", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+            previous_executed_action = action_chunk[0][action_executed]
+            if torch.is_tensor(previous_executed_action):
+                previous_executed_action = previous_executed_action.detach().cpu().clone()
+            else:
+                previous_executed_action = np.asarray(
+                    previous_executed_action,
+                    dtype=np.float64,
+                ).copy()
+            previous_executed_gripper_command = gripper_val
+
+            action_executed += 1
+            if action_executed == resolved_action_horizon:
+                action_executed = 0
+
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="policy_observation", event="enter", elapsed_s=0.0)
+            phase_started_s = time.perf_counter()
+            observation = self._get_policy_observation()
+            self._append_phase_timing(episode=episode, global_step=global_steps,
+                name="policy_observation", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+            global_steps += 1
+            current_qpos_violations = _gripper_qpos_violation_count(observation)
+            qpos_violations_since_last_metric += current_qpos_violations
+            if current_qpos_violations:
+                self._append_safety_event(
+                    {
+                        "episode": int(episode),
+                        "global_step": int(global_steps),
+                        "event": "gripper_qpos_violation",
+                        "count": int(current_qpos_violations),
+                    }
+                )
+
+            if terminated or truncated:
+                is_success = info.get('success', False)
+                if is_success:
+                    done = True
+                    self.success_count += 1
+
+                behavior_name = info.get("behavior_name", "unknown")
+                video_path = os.path.join(episode_dir, f'episode_{episode+1}_{"success" if is_success else "fail"}')
+                self.video_recorder.save_video(save_path=video_path, success=is_success, behavior_name=behavior_name)
+                break
+
+        log.info(f"Episode {episode+1} finished, success: {info.get('success', False)}, steps: {global_steps}")
+
+    def _plot_behavior_stats(self):
+        """Draw behavior statistics plot."""
+        behavior_data = self.adapter.get_behavior_static()
+        labels = list(behavior_data.keys())
+        values = list(behavior_data.values())
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+        bars = ax.bar(labels, values, color='steelblue', edgecolor='black')
+
+        for bar, val in zip(bars, values):
+            height = bar.get_height()
+            ax.annotate(f'{val}',
+                       xy=(bar.get_x() + bar.get_width() / 2, height),
+                       xytext=(0, 3),
+                       textcoords="offset points",
+                       ha='center', va='bottom',
+                       fontsize=10, fontweight='bold')
+
+        ax.set_ylabel('Count', fontsize=12)
+        ax.set_title('Behavior Statistics', fontsize=14)
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        plt.savefig(os.path.join(self.output_dir, 'behavior_static.png'), dpi=150)
+        plt.close()
+
+    def run_test(self):
+        """Test segmentation and keypoint detection."""
+        self.adapter.reset()
+        rgb, depth, points, segmentation, segment_id_to_name = self.adapter.get_keypoint_detection_inputs()
+
+        # Save images
+        rgb_path = os.path.join(self.output_dir, 'rgb_static.png')
+        cv2.imwrite(rgb_path, cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
+        log.debug(f"Saved RGB image to: {rgb_path}")
+
+        # Visualize segmentation
+        unique_ids = np.unique(segmentation)
+        seg_colored = np.zeros((*segmentation.shape, 3), dtype=np.uint8)
+        np.random.seed(42)
+        for seg_idx in unique_ids:
+            if seg_idx == 0:
+                continue
+            color = np.random.randint(50, 255, 3).tolist()
+            seg_colored[segmentation == seg_idx] = color
+
+        seg_path = os.path.join(self.output_dir, 'segmentation.png')
+        cv2.imwrite(seg_path, seg_colored)
+        log.debug(f"Saved segmentation image to: {seg_path}")
+
+        log.info("Interactable objects:")
+        for seg_idx, name in segment_id_to_name.items():
+            if seg_idx > 0:
+                pixel_count = np.sum(segmentation == seg_idx)
+                if pixel_count > 0:
+                    log.debug(f"  [{seg_idx}] {name}: {pixel_count} pixels")
+
+        # Detect keypoints
+        log.info("Detecting keypoints...")
+        keypoints, projected_img, mask_ids, dino_vis = self.keypoint_detector.get_keypoints_with_visualization(
+            rgb=rgb,
+            points=points,
+            segmentation=segmentation,
+            segment_id_to_name=segment_id_to_name,
+            save_dir=self.output_dir
+        )
+
+        projected_path = os.path.join(self.output_dir, 'keypoints_projected.png')
+        cv2.imwrite(projected_path, cv2.cvtColor(projected_img, cv2.COLOR_RGB2BGR))
+        log.info(f"Saved keypoint projection to: {projected_path}")
+
+        log.info(f"Detected {len(keypoints)} keypoints:")
+        for i, (kp, mid) in enumerate(zip(keypoints, mask_ids)):
+            obj_name = segment_id_to_name.get(mid, f"unknown_{mid}")
+            log.info(f"  [{i}] {obj_name}: position=[{kp[0]:.4f}, {kp[1]:.4f}, {kp[2]:.4f}]")
+
+
+@hydra.main(version_base=None, config_path="configs", config_name="config")
+def main(cfg: DictConfig) -> None:
+    """
+    Main entry point with Hydra configuration.
+
+    Usage:
+        # CALVIN (uses task configs)
+        python main.py env=calvin task=drawer_open
+        python main.py env=calvin task=button_on
+
+        # LIBERO (uses suite_name directly, no task configs)
+        python main.py env=libero backend.libero.suite_name=libero_goal
+        python main.py env=libero env.libero.suite_name=libero_spatial
+
+        # Override parameters
+        python main.py main.episode_num=50 main.vls_config.guide_scale=120
+    """
+    # Print resolved config
+    log.info(f"Working directory: {os.getcwd()}")
+    log.info(f"Output directory: {hydra.core.hydra_config.HydraConfig.get().runtime.output_dir}")
+
+    env_backend = cfg.backend.backend
+    log.info(f"Using environment: {env_backend}")
+
+    # Backend-specific logging
+    if env_backend == "calvin":
+        target_behavior = cfg.backend.calvin.get("target_behavior")
+        log.info(f"Target behavior: {target_behavior or 'any'}")
+    elif env_backend == "libero":
+        log.info(f"Suite: {cfg.backend.libero.suite_name}")
+
+    # Initialize and run
+    runner = Main(cfg)
+    runner.run()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,42 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the chocolate pudding (keypoint 0).
+# Stage 2: Move the grasped chocolate pudding into the basket (keypoints 1, 2, 3, 4, 5). 
+# Note: As per instructions, for "pick something into basket" tasks, stage 2 guidance is not needed if no choice is involved.
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # Move gripper to chocolate pudding (keypoint 0)
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Emphasize the end of the trajectory
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Chocolate pudding is keypoint 0
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate distance to target
+    # For pick-and-place from above, emphasize XY accuracy
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+    
+    # Weighted sum of distances
+    total_dist = 2.0 * xy_dist + z_dist
+    
+    # Minimize distance squared (maximize negative squared distance)
+    reward = -(total_dist ** 2 * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # The instruction says for picking into a basket, stage 2 guidance is not needed 
+    # as the policy handles the placement automatically once the object is grasped.
+    return torch.tensor(0.0, device=action_sequence.device)
+
+```

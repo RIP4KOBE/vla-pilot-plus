@@ -1,0 +1,24 @@
+def stage1_guidance(keypoints, action_sequence):
+    # Move gripper to grasp the ketchup. Looking at the image and keypoint map, 
+    # keypoint 0 is at the top of the ketchup bottle, which is a good grasp point.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Increase weight for the end of the trajectory to ensure precise reaching
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Select the ketchup main keypoint (index 0)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance in 3D
+    # Per instructions: for pick-and-place from above, emphasize X-Y alignment.
+    # However, standard 3D norm is generally effective.
+    dist_sq = torch.norm(action_sequence - target_pos, dim=-1) ** 2
+    
+    # Reward is negative distance squared (maximizing reward = minimizing distance)
+    reward = -(dist_sq * weights).sum(dim=1)
+    return reward.mean()
+

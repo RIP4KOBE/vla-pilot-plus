@@ -1,0 +1,19 @@
+{
+  "source_video": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1s_dev_t00_c0__80e82d381eb9/episode_1/episode_1_fail_agentview.mp4",
+  "frame_count": 720,
+  "fps": 10.0,
+  "frames": [
+    {
+      "frame": 0,
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/n1s/c0-task0-video/frame-0000.png"
+    },
+    {
+      "frame": 360,
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/n1s/c0-task0-video/frame-0360.png"
+    },
+    {
+      "frame": 719,
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/analysis/n1s/c0-task0-video/frame-0719.png"
+    }
+  ]
+}

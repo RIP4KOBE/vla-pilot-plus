@@ -1,0 +1,18 @@
+{
+  "core/stage_failed_contact_recheck.py": {
+    "base_sha256": null,
+    "candidate_sha256": "a122c01fa3eccc7d2618741a16a2c5918b1414f96ac7c8bf91c4ae92c79b7224"
+  },
+  "core/stage_evidence.py": {
+    "base_sha256": "b4ebfde703daa1727146abcb6603217c77d4c861e2cbb1cacf947a908b718695",
+    "candidate_sha256": "7b335d0289dcd3f1fd33a466b7359a253f1cf14c6d5a6b1578cf32bd0b08a3da"
+  },
+  "scripts/stage_closed_loop_run.py": {
+    "base_sha256": "0d43541be2fe308eabaf1d44d55938b86d1f0d9f6620c2851c13162e50289f83",
+    "candidate_sha256": "32c9be3be5757c63533c217d22124ebce0a507212716ec4e2b3a529790592188"
+  },
+  "scripts/stage_closed_loop_deep_audit.py": {
+    "base_sha256": "1fbfe412e7474f617ddb659491d4a4b6e3281c5a24352b9277042e9a9b67795c",
+    "candidate_sha256": "565800e6da75b75bda32496ca258a9fc511de21919479210cd0b04bcd73167c0"
+  }
+}

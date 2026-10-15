@@ -1,0 +1,24 @@
+1036: 
+1037:         # Schmitt trigger on reward (only relevant when guidance is active)
+1038:         reward_rising = state['use_guidance'] and (prev_reward < upper_th and curr_reward >= upper_th)
+1039:         reward_falling = state['use_guidance'] and (prev_reward > lower_th and curr_reward <= lower_th)
+1040: 
+1041:         # Build trigger reason (priority: gripper > reward > chunk interval > periodic)
+1037:         # Schmitt trigger on reward (only relevant when guidance is active)
+1038:         reward_rising = state['use_guidance'] and (prev_reward < upper_th and curr_reward >= upper_th)
+1039:         reward_falling = state['use_guidance'] and (prev_reward > lower_th and curr_reward <= lower_th)
+1040: 
+1041:         # Build trigger reason (priority: gripper > reward > chunk interval > periodic)
+1042:         trigger_reason = None
+1354:                     action_chunk
+1355:                 )
+1356:                 gripper_val = self._get_gripper_value(action_chunk, action_executed)
+1357:                 stage_state.update({
+1358:                     'task_id': _adapter_actual_task_id(self.adapter),
+1359:                     'global_step': int(global_steps),
+1689: 
+1690:             # Add guidance status overlay
+1691:             gripper_val = self._get_gripper_value(action_chunk, action_executed)
+1692:             gripper_str = f"Grip:{'O' if gripper_val and gripper_val < 0 else 'C'}({gripper_val:.2f})" if gripper_val else "Grip:-"
+1693: 
+1694:             status_text = [

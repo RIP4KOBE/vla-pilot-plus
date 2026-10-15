@@ -1,0 +1,26 @@
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Increase weight for the end of the trajectory to ensure precise grasping
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(5.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Identify the keypoint for the bbq sauce from the map and image
+    # Keypoint 0 is identified as bbq_sauce_1_main
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate distance. Emphasize X-Y alignment for picking from above.
+    # action_sequence shape is (B, T, 3)
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1) # (B, T)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2]) # (B, T)
+    
+    # Reward is negative squared distance. Weighting XY more for vertical approach.
+    all_dists = xy_dist + 0.5 * z_dist
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    
+    return reward.mean()
+

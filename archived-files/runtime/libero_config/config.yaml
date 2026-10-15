@@ -1,0 +1,7 @@
+{
+  "assets": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/third_party/libero_pro/libero/libero/assets",
+  "bddl_files": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/libero_inputs/bddl_files",
+  "benchmark_root": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/third_party/libero_pro/libero/libero",
+  "datasets": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/datasets",
+  "init_states": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/libero_inputs/init_files"
+}

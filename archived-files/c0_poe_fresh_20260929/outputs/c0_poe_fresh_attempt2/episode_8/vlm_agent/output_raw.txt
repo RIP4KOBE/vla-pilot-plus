@@ -1,0 +1,53 @@
+# Task breakdown:
+# Stage 1: Move gripper to grasp the milk (keypoint 0), which is the milk carton identified in the scene.
+# Stage 2: Move the grasped milk to the basket (defined by the center of keypoints 3, 4, 5, 6).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Emphasize the final part of the trajectory for accurate reaching
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(5.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Identifying target: milk_1_main corresponds to keypoint 0 (bottom) and 1 (top). 
+    # Usually grasping the main body (0) is preferred.
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance
+    # For pick tasks from above, XY distance is often more critical for alignment
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+    
+    # Combined distance with slight weight on XY alignment
+    total_dist = 1.5 * xy_dist + z_dist
+    
+    reward = -(total_dist ** 2 * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # For tasks placing items into a single basket, the policy is generally robust.
+    # However, providing a target location at the center of the basket rim can help.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+    
+    # The basket is defined by keypoints 3, 4, 5, 6 representing its rim/top opening.
+    basket_indices = torch.tensor([3, 4, 5, 6], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[basket_indices].mean(dim=0)
+    
+    # Pull the trajectory towards the center of the basket
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)
+    
+    return reward.mean()

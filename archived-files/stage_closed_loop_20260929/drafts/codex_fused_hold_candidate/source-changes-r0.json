@@ -1,0 +1,10 @@
+{
+  "core/stage_evidence.py": {
+    "base_sha256": "b18fb3de7c1fba28d08325128c0326f987b3e018a8ac8dafcbc7ce4e64661acc",
+    "candidate_sha256": "b4ebfde703daa1727146abcb6603217c77d4c861e2cbb1cacf947a908b718695"
+  },
+  "core/stage_fused_carry_hold.py": {
+    "base_sha256": null,
+    "candidate_sha256": "1dd9a323ab58966449ef21a61b63b636644917bea18de111f45559aaadb33283"
+  }
+}

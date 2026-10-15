@@ -1,0 +1,18 @@
+{
+  "amendment_sha256": "24bdcf773e8b7d750e7499958839e5984ec77d9c0bd3ff8d8e71bc2eb9bf2121",
+  "model_request_payload_changed": false,
+  "original_manifest_sha256": "8a655c3a023b09c3f027c87bfdcfc5f670d52f5771143931d8ff1d5983f681cf",
+  "policy": {
+    "connect_seconds": 30.0,
+    "pool_seconds": 60.0,
+    "read_seconds": 180.0,
+    "sdk_max_retries": 5,
+    "write_seconds": 60.0
+  },
+  "probe_sha256": "53e03987f11b2d9aadec32cfdf8db58b5f1cc2dde6640d54a591f33c27865fe8",
+  "semantic_response_retry": false,
+  "source_sha256": {
+    "scripts/c0_poe_fresh_recovery.py": "98c6a8edcef53c6d5c20d01b8e7655288c3bb7039d3d0d20e362ec3c511f8244",
+    "scripts/c0_poe_resilient_worker.py": "abcac8a7e49bbc45a66837ada84061dd5943de5439d04413e4cb9792321afc4a"
+  }
+}

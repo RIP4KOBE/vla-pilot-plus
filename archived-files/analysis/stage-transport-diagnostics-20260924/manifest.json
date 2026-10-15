@@ -1,0 +1,51 @@
+{
+  "schema": "stage-transport-diagnostics-v1",
+  "created_at": "2026-09-24T04:38:27.210838+00:00",
+  "source_commit": "337196e8672a2309b06d221c9f3436bc81cf9083",
+  "source_sha256": {
+    "core/codex_stage.py": "850f7878c708b5fbea463478422ae3b18b87357dfdd3490f480da74f9d9a0a52",
+    "core/codex_stage_policy.py": "f85dcf28afa44ad421b306eccd8e6514cd993d9e830db6fcbdc872e38f80ebdd",
+    "core/gemini_grounder.py": "0d1a51c8dbd077f274235ae00c1b3ab538e0f9745d85fd12417e21f57980b1f6",
+    "vlm_query/stage_template.txt": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b",
+    "tests/test_codex_stage.py": "74e415b4325504c23fa35f53167e49b0e49eab33ff6763ed08baf9b9590fb757"
+  },
+  "script_sha256": "a6004bd4f93eb3b12087b3f61fe5b0a59275e4e99056e887f7dd6de622ad8a5b",
+  "runtime_manifest_sha256": "67ccf12f8bc318f1a860e4d0aa0088368e5334471fe6c9dbbecd9b3d8c362427",
+  "public_policy_sha256": "2bc3e8fcca7c3de0581d0a30478defcb4f6f944491fa3e5ba791642496e60980",
+  "input_png_sha256": [
+    "1e8843d457d45291917a27da52c0464641989ef4c6233c056ea4af6111155899",
+    "0e27d4ce648eec5cb700e2d9818e12d1140412e65fe86be8eddc69d5dce23c9d",
+    "bf457f313c13b3e724481a6f44a6cbb1016c1f174fc382623a4666dd8d050c2b"
+  ],
+  "maximum_calls": 6,
+  "input_order": [
+    0,
+    1,
+    2,
+    0,
+    1,
+    2
+  ],
+  "application_attempts_per_call": 1,
+  "timeout_seconds": 180,
+  "stop_at_first_failed_or_incomplete_call": true,
+  "gpu_used": false,
+  "episode_attempts": 0,
+  "gpu_hours": 0,
+  "purpose": "Observe current connectivity and redacted error categories; not a reliability certification or robot-policy evaluation.",
+  "instruction": "Pick up the red block and put it into the green tray.",
+  "stage_descriptions": "Stage 1: reach and grasp the red block.\nStage 2: transport the held block to the green tray and release it.",
+  "triggers": [
+    "initial query",
+    "gripper closed",
+    "gripper opened"
+  ],
+  "cpu_tests_passed": 153,
+  "concurrent_shared_dispatched": [
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n4_dev_t00_c0_20260924__abc31327e3aa",
+      "physical_gpu": 3,
+      "time_unix": 1790224112.2965224
+    }
+  ]
+}

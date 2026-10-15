@@ -1,0 +1,4 @@
+def stage2_guidance(keypoints, action_sequence):
+    # According to instructions, for placing tasks into a basket, return 0 for stage 2 guidance.
+    return torch.tensor(0.0, device=action_sequence.device)
+

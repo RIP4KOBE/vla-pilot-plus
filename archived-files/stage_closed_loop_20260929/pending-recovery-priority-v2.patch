@@ -1,0 +1,70 @@
+--- a/core/stage_robot_evidence.py
++++ b/core/stage_robot_evidence.py
+@@ -83,3 +83,18 @@
+         if 'empty_closed_fingers' in evidence['no_grasp_reasons']:
+             state['empty_release_until'] = step+16
+     return 'robot_observed_failed_grasp_reacquire'
++
++
++def enforce_recovery_priority(state, evidence, step):
++    """Resolve only an actual grace-vs-failure conflict after contact handoff.
++
++    Leave all non-conflicting state and the physical reopening cooldown intact.
++    This avoids restarting the approach clock on every far-from-target sample.
++    """
++    conflict=(evidence and evidence['no_grasp'] and evidence['outside_goal']
++              and state.get('current_stage')==1 and state.get('contact_phase')=='contact_grace')
++    if not conflict:
++        return False
++    state.update(contact_until=None,contact_phase='approach',recovery_approach_since=step,
++                 guidance_requested=True)
++    return True
+--- a/core/stage_evidence.py
++++ b/core/stage_evidence.py
+@@ -204,7 +204,7 @@
+                                width=width, distance=distance)
+     robot_evidence = None
+     if controller == "proprio_v4":
+-        from core.stage_robot_evidence import check, filter_observation, apply_recovery, target_goal_geometry
++        from core.stage_robot_evidence import check, filter_observation, apply_recovery, target_goal_geometry, enforce_recovery_priority
+         robot_evidence = check(state, step=int(state["global_step"]), width=width, distance=distance,
+             executed_gripper=gripper_command, geometry=target_goal_geometry(runner))
+     capabilities = {stage: assess_reward(fns, runner.stage_live_keypoints,
+@@ -258,6 +258,9 @@
+         from core.stage_contact_handoff import apply_handoff, target_distance
+         apply_handoff(state, step=int(state["global_step"]), reward=reward, was_guided=before_guidance,
+                       distance=distance, observation=result.get("observation"), config=runner.config)
++    recovery_priority_override = False
++    if robot_evidence is not None:
++        recovery_priority_override = enforce_recovery_priority(state, robot_evidence, int(state['global_step']))
+     capability = apply_guidance_gate(state, capabilities, master)
+     if before_stage != state["current_stage"] or before_guidance != state["use_guidance"]:
+         # Also rebase reward normalization on off->on; old reward is never evidence.
+@@ -284,7 +287,8 @@
+         event.update(gripper_width_m=width, control_observation=control_observation,
+                      sensor_consistency_reason=sensor_reason, visual_hold=state.get('visual_hold'))
+     if robot_evidence is not None:
+-        event.update(robot_evidence=robot_evidence, empty_release_until=state.get("empty_release_until"))
++        event.update(robot_evidence=robot_evidence, empty_release_until=state.get("empty_release_until"),
++                     recovery_priority_override=recovery_priority_override)
+     for key in ("identity_memory", "identity_generated_this_query", "validation_attempts", "observation_validation_retries", "api_request_attempts", "api_sdk_retry_attempts", "api_request_counter_available", "transport", "completion_metadata"):
+         if key in result:
+             event[key] = result[key]
+--- a/scripts/stage_closed_loop_run.py
++++ b/scripts/stage_closed_loop_run.py
+@@ -109,6 +109,15 @@
+         'reward_gate':all(not r['guidance_after'] or r['reward_capability']['available'] for r in events),
+         'source_unchanged':all(digest(STUDY/p)==h for p,h in manifest['source_sha256'].items())}
+     config=yaml.safe_load((folder/'resolved-config.yaml').read_text())
++    checks['policy_rng_mode']=all(r.get('episode_policy_rng_mode','continuous')==config['main']['episode_policy_rng_mode'] for r in meta)
++    if manifest['controller']=='proprio_v4':
++        checks['recovery_priority_logged']=bool(events) and all('recovery_priority_override' in r for r in events)
++        conflicts=[r for r in events if (r.get('robot_evidence') or {}).get('no_grasp') and
++            (r.get('robot_evidence') or {}).get('outside_goal') and r['stage_after']==1 and r.get('contact_phase')=='contact_grace']
++        checks['failure_recovery_not_overruled_by_grace']=not conflicts
++        checks['recovery_override_respects_guidance_gate']=all(r['guidance_requested'] and
++            r['contact_phase']=='approach' and r['guidance_after']==bool(config['main'].get('use_guidance',True)
++                and r['reward_capability']['available']) for r in events if r.get('recovery_priority_override'))
+     per_task=[]
+     for i,t in enumerate(manifest['tasks']):
+         videos=list((out/f'episode_{i+1}').glob('*agentview.mp4'))

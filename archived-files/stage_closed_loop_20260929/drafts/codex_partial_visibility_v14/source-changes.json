@@ -1,0 +1,14 @@
+{
+  "core/stage_evidence.py": {
+    "base_sha256": "6310aaff2c3b42ec0af98079f8c5d2a172458d0ce3d5b3a38ba45dc9e652314f",
+    "candidate_sha256": "b18fb3de7c1fba28d08325128c0326f987b3e018a8ac8dafcbc7ce4e64661acc"
+  },
+  "core/stage_grasp_guard.py": {
+    "base_sha256": "4f8b5fa8ce4e7b8b31b87b8e2bc77ec45276ed9b0351026d84e83d7f580f17b5",
+    "candidate_sha256": "fa71442760023819a72a4368429141145fe87d5fa8cbd9668f7e45d9936d4e3a"
+  },
+  "scripts/stage_closed_loop_run.py": {
+    "base_sha256": "a9421cef58ed96c36d80ab216381e0eacd9e7f13b04f7b086f3d65d40096d3fd",
+    "candidate_sha256": "e450a7bd31c43e864cb017b0f0023265f052d25bf0da62aa91b8445d08a8faa8"
+  }
+}

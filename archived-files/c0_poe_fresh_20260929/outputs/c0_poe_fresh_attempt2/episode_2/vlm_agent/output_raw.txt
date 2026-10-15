@@ -1,0 +1,37 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp the cream cheese (keypoint 0).
+# Stage 2: Move the grasped cream cheese into the basket (keypoints 1, 2, 3, 4, 5).
+
+num_stages = 2
+
+### stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    # Focus reward on the end of the trajectory
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(3.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Identify keypoint 0 as cream cheese from the map and image
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+
+    # Calculate distance for the gripper to reach the object
+    # For pick tasks, give more weight to XY alignment then descend in Z
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+    
+    # Combined distance reward
+    reward = -((xy_dist**2 + z_dist**2) * weights).sum(dim=1)
+    return reward.mean()
+
+### stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # For "pick something into basket" tasks, we don't need a specific placement guidance function
+    # The policy has enough information once the correct object is picked.
+    # We return a constant 0 as specified in the instructions for basket tasks.
+    return torch.tensor(0.0, device=action_sequence.device)
+```

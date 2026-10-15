@@ -1,0 +1,53 @@
+{
+  "cache_sha256": {
+    "metadata.json": "832bff62f9e3b2ec48cec82c99f082970b38c8169373aeb293d3c94a200a28ec",
+    "output_raw.txt": "159ba56eb5adfd729daf6737bc258c65d05b0f3b474cf267b1c988536067edd2",
+    "prompt.txt": "1786da1fed0329c9cd4b6bc88bfe39862f767a56dcdacd472f810c951643f560",
+    "query_img.png": "f415b4634b5ffdd01aeafd3e523e204333810a493b344a5b198d3f744acdc3bf",
+    "stage1_guidance.txt": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+    "stage2_guidance.txt": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84"
+  },
+  "cache_source": "/home/hynx/VLA-Pilot++/outputs/libero/2026-06-04_13-21-01/episode_1/vlm_agent",
+  "codex_cli": "/home/hynx/.codex/packages/standalone/releases/0.156.1-x86_64-unknown-linux-musl/bin/codex",
+  "codex_cli_version": "codex-cli 0.156.1",
+  "created_utc": "2026-09-25T01:27:07.960301+00:00",
+  "current_main_sha256": "d05c34167fb8a5f611920d4cd5b6f67833d694f8c91b638dea7e6cb8c4ae864e",
+  "current_policy_sha256": "82c8515542780acc5389d3043d7f25e14e9d23f6149fb067a6dfa99fb9aa584e",
+  "current_source_commit": "77761b4cda78ac3b6762a6aa60f97b07fde7c1dc",
+  "egl_device_index": 1,
+  "episode_seeds": [
+    44,
+    235,
+    43,
+    546,
+    6,
+    621,
+    197,
+    87,
+    151,
+    548
+  ],
+  "gpu_hour_cap_for_this_study": 11.5126573231,
+  "legacy_adapter_main_sha256": "2f71e0a72565f1288c80146e6b99071a9e722a471eac9c3c6c87c53bd3e98a7a",
+  "legacy_policy_sha256": "4e4a8a06385de2e193a369da44caa12470a22bf61eaad83e88eed1252be10f0c",
+  "legacy_source_commit": "53187e6ea8b69e9f830c10be0bc25757db5d2794",
+  "libero_config": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-quality-diversity/.libero_config/config.yaml",
+  "libero_config_sha256": "d2007d451a2dddd8a5ec710f8f7d2c29e8d355d82821c08762bb42486ec84a76",
+  "original_job_manifest": "/mnt/data/shared2/zhuoli/vla-pilot-plus-plus/eds-quality-diversity/outputs/formal/p2_stage_on_abs_rbf_control/job_manifest.json",
+  "original_job_sha256": "37a732e7ce98e4542ec0f63b660dd74faeaf1b29918029cb86f536f39702ebe6",
+  "physical_gpu": 2,
+  "schema": "c0-codex-repro-v1",
+  "stage_event_policy": "completed_known_startup_warnings_combo_v5",
+  "stage_format": "json_schema_v1",
+  "stage_min_query_gap_steps": 0,
+  "stage_model": "gpt-6-astra",
+  "stage_query_limit": 50,
+  "stage_reasoning_effort": "low",
+  "stage_template_sha256": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b",
+  "stage_timeout_seconds": 180,
+  "transport_source_sha256": {
+    "codex_stage.py": "6c3a810030c82a605796f31701eae902926acd6639e0dc85af3e68575a7615dc",
+    "codex_stage_policy.py": "747a8965414245fd9e74f030c4886cdc92c00c1b5f69b85bb525fa74ee4b8cb9",
+    "gemini_grounder.py": "0d1a51c8dbd077f274235ae00c1b3ab538e0f9745d85fd12417e21f57980b1f6"
+  }
+}

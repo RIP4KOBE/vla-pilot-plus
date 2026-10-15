@@ -1,0 +1,20 @@
+# @package _global_
+main:
+  stage_controller: proprio_v4
+  stage_min_query_gap_steps: 16
+  stage_recheck_steps: 32
+  stage_completion_gap_steps: 16
+  vlm_query_limit: 50
+  contact_reward_threshold: 0.8
+  contact_distance_m: 0.06
+  contact_min_approach_steps: 16
+  contact_grace_steps: 64
+  contact_require_measured_proximity: true
+  contact_reward_max_distance_m: 0.10
+  grasp_hold_max_steps: 80
+  grasp_contact_debounce_steps: 0
+  grasp_contact_distance_m: 0.10
+perception:
+  gemini:
+    output_format: stage_observation_v1
+    identity_memory_enabled: true

@@ -1,0 +1,26 @@
+def stage1_guidance(keypoints, action_sequence):
+    # ALL code must be inside this function - no external helpers!
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    
+    # Emphasize the final part of the trajectory for accurate reaching
+    final_start = int(0.7 * T)
+    weights = torch.where(timesteps >= final_start, torch.tensor(5.0, device=action_sequence.device), torch.tensor(1.0, device=action_sequence.device))
+    weights = weights / weights.sum()
+
+    # Identifying target: milk_1_main corresponds to keypoint 0 (bottom) and 1 (top). 
+    # Usually grasping the main body (0) is preferred.
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]
+    
+    # Calculate Euclidean distance
+    # For pick tasks from above, XY distance is often more critical for alignment
+    xy_dist = torch.norm(action_sequence[..., :2] - target_pos[:2], dim=-1)
+    z_dist = torch.abs(action_sequence[..., 2] - target_pos[2])
+    
+    # Combined distance with slight weight on XY alignment
+    total_dist = 1.5 * xy_dist + z_dist
+    
+    reward = -(total_dist ** 2 * weights).sum(dim=1)
+    return reward.mean()
+

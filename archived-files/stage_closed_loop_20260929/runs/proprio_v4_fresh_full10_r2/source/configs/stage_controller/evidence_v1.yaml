@@ -1,0 +1,11 @@
+# @package _global_
+# Add +stage_controller=evidence_v1 to a NEW C0-derived run; never an old manifest.
+main:
+  stage_controller: evidence_v1
+  stage_min_query_gap_steps: 16
+  stage_recheck_steps: 32
+  stage_completion_gap_steps: 16
+  vlm_query_limit: 50
+perception:
+  gemini:
+    output_format: stage_observation_v1
