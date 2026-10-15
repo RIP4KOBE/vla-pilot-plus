@@ -1,0 +1,237 @@
+{
+  "schema": "historical_supplemental_source_v1",
+  "date": "2026-10-15",
+  "source_root": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015",
+  "files": [
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/HANDOFF.md",
+      "published_path": "archived-files/HANDOFF.md",
+      "git_blob": "c0c1ee643efc29f03d214a95e681ac85d310fbbc",
+      "sha256": "c612faab092658536cbc2cdf9e6af958b851ddd8a02176ce996a8db8637bca68",
+      "bytes": 3361,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-eds/fixture-manifest.json",
+      "published_path": "archived-files/archive-support/low-eds/fixture-manifest.json",
+      "git_blob": "5462dc3a58d6d0dd9db2244d6a1d42dc82def7bf",
+      "sha256": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+      "bytes": 7369,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-eds/libero_suite_task_map.py",
+      "published_path": "archived-files/archive-support/low-eds/libero_suite_task_map.py",
+      "git_blob": "6eb74a4855fcdb72df3cb054221a74814c79e8b9",
+      "sha256": "0feec8499da91e25a134273b6624ffa7adb9c6dc7da23f8cb5e3cd8998d1c80f",
+      "bytes": 77821,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-eds/manifest.json",
+      "published_path": "archived-files/archive-support/low-eds/manifest.json",
+      "git_blob": "880784431641fee16d8e1405bf163c466b72e717",
+      "sha256": "6f1e2b6a66de0ca409563d60e2c320655459816bf8b392f0db3cbc6c8148832f",
+      "bytes": 859,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-eds_qd/fixture-manifest.json",
+      "published_path": "archived-files/archive-support/low-eds_qd/fixture-manifest.json",
+      "git_blob": "5462dc3a58d6d0dd9db2244d6a1d42dc82def7bf",
+      "sha256": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+      "bytes": 7369,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-eds_qd/libero_suite_task_map.py",
+      "published_path": "archived-files/archive-support/low-eds_qd/libero_suite_task_map.py",
+      "git_blob": "6eb74a4855fcdb72df3cb054221a74814c79e8b9",
+      "sha256": "0feec8499da91e25a134273b6624ffa7adb9c6dc7da23f8cb5e3cd8998d1c80f",
+      "bytes": 77821,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-eds_qd/manifest.json",
+      "published_path": "archived-files/archive-support/low-eds_qd/manifest.json",
+      "git_blob": "2bed3afeab3269276c5f91534a1fffa2115ab86b",
+      "sha256": "f436c25ddf7527c125e0c12008e2fbe779302d594a9b003bfbdf63f6b6a2cd6c",
+      "bytes": 868,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-vls/fixture-manifest.json",
+      "published_path": "archived-files/archive-support/low-vls/fixture-manifest.json",
+      "git_blob": "5462dc3a58d6d0dd9db2244d6a1d42dc82def7bf",
+      "sha256": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+      "bytes": 7369,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-vls/libero_suite_task_map.py",
+      "published_path": "archived-files/archive-support/low-vls/libero_suite_task_map.py",
+      "git_blob": "6eb74a4855fcdb72df3cb054221a74814c79e8b9",
+      "sha256": "0feec8499da91e25a134273b6624ffa7adb9c6dc7da23f8cb5e3cd8998d1c80f",
+      "bytes": 77821,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/low-vls/manifest.json",
+      "published_path": "archived-files/archive-support/low-vls/manifest.json",
+      "git_blob": "4f078d872db8ca7b78192da7f81c6e6def81d517",
+      "sha256": "6033456c02213f2f0d894e3732f090f1b0defe81945151fa7e09cb2dcde0ea76",
+      "bytes": 859,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-eds/fixture-manifest.json",
+      "published_path": "archived-files/archive-support/ultra-eds/fixture-manifest.json",
+      "git_blob": "5462dc3a58d6d0dd9db2244d6a1d42dc82def7bf",
+      "sha256": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+      "bytes": 7369,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-eds/libero_suite_task_map.py",
+      "published_path": "archived-files/archive-support/ultra-eds/libero_suite_task_map.py",
+      "git_blob": "6eb74a4855fcdb72df3cb054221a74814c79e8b9",
+      "sha256": "0feec8499da91e25a134273b6624ffa7adb9c6dc7da23f8cb5e3cd8998d1c80f",
+      "bytes": 77821,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-eds/manifest.json",
+      "published_path": "archived-files/archive-support/ultra-eds/manifest.json",
+      "git_blob": "6d63681b9ef1494c112d831b31c3b485a6af3ea3",
+      "sha256": "e7e0f84552287860aa03593bf7a95c8bab7a59a89c9cce792a07b9175d931633",
+      "bytes": 848,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-eds_qd/fixture-manifest.json",
+      "published_path": "archived-files/archive-support/ultra-eds_qd/fixture-manifest.json",
+      "git_blob": "5462dc3a58d6d0dd9db2244d6a1d42dc82def7bf",
+      "sha256": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+      "bytes": 7369,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-eds_qd/libero_suite_task_map.py",
+      "published_path": "archived-files/archive-support/ultra-eds_qd/libero_suite_task_map.py",
+      "git_blob": "6eb74a4855fcdb72df3cb054221a74814c79e8b9",
+      "sha256": "0feec8499da91e25a134273b6624ffa7adb9c6dc7da23f8cb5e3cd8998d1c80f",
+      "bytes": 77821,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-eds_qd/manifest.json",
+      "published_path": "archived-files/archive-support/ultra-eds_qd/manifest.json",
+      "git_blob": "b0a2bac947eb06f33a9193929e5ae5c4a77635c6",
+      "sha256": "833fc346720fa7d03c5dcfa8275ddfd3242f88e0a449916a0bf75363a74b8146",
+      "bytes": 857,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-vls/fixture-manifest.json",
+      "published_path": "archived-files/archive-support/ultra-vls/fixture-manifest.json",
+      "git_blob": "5462dc3a58d6d0dd9db2244d6a1d42dc82def7bf",
+      "sha256": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+      "bytes": 7369,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-vls/libero_suite_task_map.py",
+      "published_path": "archived-files/archive-support/ultra-vls/libero_suite_task_map.py",
+      "git_blob": "6eb74a4855fcdb72df3cb054221a74814c79e8b9",
+      "sha256": "0feec8499da91e25a134273b6624ffa7adb9c6dc7da23f8cb5e3cd8998d1c80f",
+      "bytes": 77821,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive-support/ultra-vls/manifest.json",
+      "published_path": "archived-files/archive-support/ultra-vls/manifest.json",
+      "git_blob": "d26caf332aa4cc763db34c28bf217b4a295fb122",
+      "sha256": "85eb750d262659a56d6c8d31cd98980c6fe921cf969590973f10b3452c928d1e",
+      "bytes": 848,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/archive_workspaces.py",
+      "published_path": "archived-files/archive_workspaces.py",
+      "git_blob": "825e8802404463e457013de6b6ef89c8f3cdb049",
+      "sha256": "6ddcf7bab3cb35dfe42a6e1bdf5f8114ed8d62a4c5d85024ff50a2d6ae995106",
+      "bytes": 3803,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/cleanup-plan.json",
+      "published_path": "archived-files/cleanup-plan.json",
+      "git_blob": "587265faecd5a114dc1ce06d2d92b5000ffd8d78",
+      "sha256": "3ef4085aaf479dafc9007a4037547fd706e8a89a4ea35086d7625364b76afd7d",
+      "bytes": 75708,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/preview-eds.yaml",
+      "published_path": "archived-files/preview-eds.yaml",
+      "git_blob": "e1eb251d479cb0ecbe37324b1823986f657a0943",
+      "sha256": "37d7827125492bcba9c1c9e37f7202b246c00913fab675b4c187eb66934f92ba",
+      "bytes": 8436,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/preview-eds_qd.yaml",
+      "published_path": "archived-files/preview-eds_qd.yaml",
+      "git_blob": "f984b8911741b371ca030cd65cc332b3a12727e5",
+      "sha256": "490e54dc0a9b164d14cbe070b373786d1f391613ba35be4ea0582645a15af1d2",
+      "bytes": 8458,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/preview-vls.yaml",
+      "published_path": "archived-files/preview-vls.yaml",
+      "git_blob": "aa760d06773767a0f596be44e97f6e22361ac289",
+      "sha256": "c4c5f6cc7eda63d32f37f9bc8b317133ad0297c24176d6c8c0372247d3d69ef2",
+      "bytes": 8551,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/retire_workspaces.py",
+      "published_path": "archived-files/retire_workspaces.py",
+      "git_blob": "6d221339c5531c73d88422ce65dd47d39dc01b00",
+      "sha256": "1927d44bdb13017ef2178332b056f1d526966d7474b9cf1c2dd188c36676e9f4",
+      "bytes": 3940,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/review_cohorts.py",
+      "published_path": "archived-files/review_cohorts.py",
+      "git_blob": "e4fc71ec61267a8bb501016f14224d7329dab116",
+      "sha256": "1a048e6bf8c707d671c60d4ad0ea930b3ee0472acc0879fc26effe268c17a693",
+      "bytes": 1899,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/source-and-protected-final.json",
+      "published_path": "archived-files/source-and-protected-final.json",
+      "git_blob": "4aac42b23f06295acf8a6558bd8c81d1e7f19767",
+      "sha256": "49bd754f9f495001c5fd509504cf639a4c8bcdf2cbed6ad214b0863315a5e303",
+      "bytes": 492,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/verify_relocated_cohort.py",
+      "published_path": "archived-files/verify_relocated_cohort.py",
+      "git_blob": "acfabf55e5c26bbc5127c50a9a17959616f5202b",
+      "sha256": "6535805a773c847ae0cd378847782037df05011996234ee9db88e49b76fd6dae",
+      "bytes": 1522,
+      "mode": "100644"
+    }
+  ],
+  "scope": "Source/configuration/documentation only. Raw videos/model weights/logs/captures and private files remain external. Source symlinks are materialized here and mapped to their observed targets.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
+    "overlay_redacted_paths": 0
+  }
+}

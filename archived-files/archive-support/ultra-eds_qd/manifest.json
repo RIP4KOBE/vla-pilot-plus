@@ -1,0 +1,15 @@
+{
+  "execution": {
+    "job_id": "eds_qd-ultra-recovery-full10-01",
+    "original_output_dir": "/mnt/data/shared2/hynx/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01/output",
+    "original_run_dir": "/mnt/data/shared2/hynx/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01"
+  },
+  "files": {
+    "fixture-manifest.json": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+    "libero_suite_task_map.py": "0feec8499da91e25a134273b6624ffa7adb9c6dc7da23f8cb5e3cd8998d1c80f"
+  },
+  "original_config_sha256": "816be21a26836b10d8a182f7aa12f59bb70754980e8ded58f3d253d0980bcc4b",
+  "original_environment_sha256": "c5bb50e42204a16b49272c9d038dabdd9dfecf11cd8ce75c9aa8f0c1d3e88d3e",
+  "original_manifest_sha256": "b1a5aa980ed2bf3c9e7f205f7b4115836fea919f7a56309bec0d5240cdb6ccbe",
+  "schema": "steering_archive_support_v1"
+}

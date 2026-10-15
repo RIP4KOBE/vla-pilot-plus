@@ -1,0 +1,15 @@
+{
+  "execution": {
+    "job_id": "eds_qd-common-20261013",
+    "original_output_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/eds_qd-common-20261013/output",
+    "original_run_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/runs/eds_qd-common-20261013"
+  },
+  "files": {
+    "fixture-manifest.json": "628c429d457def157c9163be94a1202721673f97f1e43aa6446e5a06889c6043",
+    "libero_suite_task_map.py": "0feec8499da91e25a134273b6624ffa7adb9c6dc7da23f8cb5e3cd8998d1c80f"
+  },
+  "original_config_sha256": "7d997b1f7245a50e9b22a587de07347bb63ae05bcf495437da2d4116fb30f4e6",
+  "original_environment_sha256": "c5bb50e42204a16b49272c9d038dabdd9dfecf11cd8ce75c9aa8f0c1d3e88d3e",
+  "original_manifest_sha256": "7cf7a18c79f36d25b219ebda3b554a0c3bfc3f59262e919b9dcfcbd81d9cbe50",
+  "schema": "steering_archive_support_v1"
+}

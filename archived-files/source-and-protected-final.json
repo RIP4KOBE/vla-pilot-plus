@@ -1,0 +1,12 @@
+{
+  "runtime_commit": "c99565de6e34278c14518748d7c608433a4c529a",
+  "runtime_checked": 116,
+  "runtime_mismatches": [],
+  "protected_files": {
+    "HANDOFF.md": true,
+    "HANDOFF_REBOOT_PAUSE_20260923.md": true,
+    "docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md": true,
+    "docs/01_specs/2026-09-22-rdt-qd-ed-object-swap-next-round-experiment-plan.md": true,
+    "docs/02_analysis/vls_guidance/2026-06-05-rdt-guided-denoise-loop-vls-steering-analysis.md": true
+  }
+}
