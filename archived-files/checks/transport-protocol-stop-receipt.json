@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-14T07:22:12.220798+00:00",
+  "reason": "Repeated HTTP429 exhausted unchanged 1-retry protocol. Supersede incomplete retests before freezing stronger bounded transport retry configuration for a new full three-mode cohort. No score-based selection.",
+  "runs": [
+    {
+      "run": "/mnt/data/shared2/hynx/steering-ultra-20261014/runs/eds-ultra-full10-retest-01",
+      "launcher_pid": 1849794,
+      "worker_pid": 1851994,
+      "create_time": 1791954873.67,
+      "command": [
+        "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+        "scripts/evaluate_steering.py",
+        "--method",
+        "eds",
+        "--local-config",
+        ".worktrees/exp/steering-integration/local-gpu0.yaml",
+        "--output-dir",
+        ".worktrees/exp/steering-ultra-20261014/runs/eds-ultra-full10-retest-01"
+      ],
+      "progress": {
+        "updated_at": "2026-10-14T07:22:07.202039+00:00",
+        "completed": 3,
+        "errors": 1,
+        "successes": 1,
+        "task_id": 4,
+        "step": 128,
+        "stage_queries": 117
+      }
+    },
+    {
+      "run": "/mnt/data/shared2/hynx/steering-ultra-20261014/runs/eds_qd-ultra-full10-retest-01",
+      "launcher_pid": 2123927,
+      "worker_pid": 2124796,
+      "create_time": 1791961934.13,
+      "command": [
+        "/home/hynx/miniconda3/envs/vla-pilot/bin/python",
+        "scripts/evaluate_steering.py",
+        "--method",
+        "eds_qd",
+        "--local-config",
+        ".worktrees/exp/steering-integration/local-gpu4.yaml",
+        "--output-dir",
+        ".worktrees/exp/steering-ultra-20261014/runs/eds_qd-ultra-full10-retest-01"
+      ],
+      "progress": {
+        "updated_at": "2026-10-14T07:22:12.138694+00:00",
+        "completed": 0,
+        "errors": 0,
+        "successes": 0,
+        "task_id": 0,
+        "step": 88,
+        "stage_queries": 5
+      }
+    }
+  ]
+}

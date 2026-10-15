@@ -1,0 +1,7 @@
+{
+  "original": ".worktrees/exp/steering-integration/checks/audit_completed_videos.py",
+  "original_sha256": "4ed89b71c08ff662790f3249f9401725d9f2e1fa933772f904d255df08293659",
+  "new": ".worktrees/exp/steering-ultra-20261014/checks/audit_completed_videos.py",
+  "new_sha256": "3fe75ffb02960e6cb20ec850fcf02101f54091098e523e4f324411a6a1a204eb",
+  "changes": "Only frozen commit and cohort paths; CPU-only delivery checks remain unchanged."
+}

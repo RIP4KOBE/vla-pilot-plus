@@ -1,0 +1,80 @@
+{
+  "eds": {
+    "configuration_equal_except_output_and_four_transport_fields": true,
+    "differences": {
+      "gemini": {
+        "retry_count": [
+          1,
+          8
+        ],
+        "backoff_seconds": [
+          2,
+          30.0
+        ]
+      },
+      "vlm_agent": {
+        "retry_count": [
+          1,
+          8
+        ],
+        "backoff_seconds": [
+          2,
+          30.0
+        ]
+      }
+    },
+    "run": "/mnt/data/shared2/hynx/steering-ultra-20261014/runs/eds-ultra-recovery-full10-01"
+  },
+  "vls": {
+    "configuration_equal_except_output_and_four_transport_fields": true,
+    "differences": {
+      "gemini": {
+        "retry_count": [
+          1,
+          8
+        ],
+        "backoff_seconds": [
+          2,
+          30.0
+        ]
+      },
+      "vlm_agent": {
+        "retry_count": [
+          1,
+          8
+        ],
+        "backoff_seconds": [
+          2,
+          30.0
+        ]
+      }
+    },
+    "run": "/mnt/data/shared2/hynx/steering-ultra-20261014/runs/vls-ultra-recovery-full10-01"
+  },
+  "eds_qd": {
+    "configuration_equal_except_output_and_four_transport_fields": true,
+    "differences": {
+      "gemini": {
+        "retry_count": [
+          1,
+          8
+        ],
+        "backoff_seconds": [
+          2,
+          30.0
+        ]
+      },
+      "vlm_agent": {
+        "retry_count": [
+          1,
+          8
+        ],
+        "backoff_seconds": [
+          2,
+          30.0
+        ]
+      }
+    },
+    "run": "/mnt/data/shared2/hynx/steering-ultra-20261014/runs/eds_qd-ultra-recovery-full10-01"
+  }
+}

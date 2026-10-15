@@ -1,0 +1,341 @@
+{
+  "schema": "historical_supplemental_source_v1",
+  "date": "2026-10-15",
+  "source_root": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014",
+  "files": [
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/HANDOFF.md",
+      "published_path": "archived-files/HANDOFF.md",
+      "git_blob": "945bdad857a87c8849cb5d5528068f6afa1680f4",
+      "sha256": "5ca124cc9b2eb46f3af8b9f1ec2ebf03f04711d42639f5e026dbbcd8ee8a84c5",
+      "bytes": 28602,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/aggregate-provenance.json",
+      "published_path": "archived-files/checks/aggregate-provenance.json",
+      "git_blob": "af2d4c085859c5867eef156562ce6692e482f6e3",
+      "sha256": "afbce1f49c69ba643caecc4b0e3ab37dd8d6abc3bf58a730b9418e274f754142",
+      "bytes": 486,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/aggregate_steering_cohorts.py",
+      "published_path": "archived-files/checks/aggregate_steering_cohorts.py",
+      "git_blob": "f9ed27904595d2db8f403302fa4079395cb34260",
+      "sha256": "7c007ce7238124b2c616d8e36b3e804c1efeafbb51c5afda697ca02d01093a10",
+      "bytes": 27960,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/audit_completed_videos.py",
+      "published_path": "archived-files/checks/audit_completed_videos.py",
+      "git_blob": "7abdd030ff4eded3a6569dcc2c1ec89233670905",
+      "sha256": "3fe75ffb02960e6cb20ec850fcf02101f54091098e523e4f324411a6a1a204eb",
+      "bytes": 12070,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/audit_final_videos.py",
+      "published_path": "archived-files/checks/audit_final_videos.py",
+      "git_blob": "593215114870ed2acc71077255f9fb7a1af1f4f0",
+      "sha256": "dfdf4d673b8f37554f17cceba55196b4d1eb608bf3bcc9ebccecc0fc9af6b0f1",
+      "bytes": 12097,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/audit_primary_videos.py",
+      "published_path": "archived-files/checks/audit_primary_videos.py",
+      "git_blob": "2882d0eb83b3a5923c270e0561cff9b1487c595a",
+      "sha256": "1b5f57fb7cc64f7f637a7351f9dca3a9105891ec2b30bc6a86a8d87badc06bc2",
+      "bytes": 12090,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/audit_recovery_videos.py",
+      "published_path": "archived-files/checks/audit_recovery_videos.py",
+      "git_blob": "6ba9a7f35fc3eef7782a7b5a882a2432d80007e1",
+      "sha256": "5caa26b5a3831b18975476e2a961367904ec723679bc9ff499a559cfb2ce8060",
+      "bytes": 12103,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/compare_control_traces.py",
+      "published_path": "archived-files/checks/compare_control_traces.py",
+      "git_blob": "a3cb234f50ad561240331278807e11d8235b6d33",
+      "sha256": "a8cff7b9f48b4fbc03183819aa1d0fbdd7adcf6ad60983219681cf678c898585",
+      "bytes": 7316,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/compare_efforts.py",
+      "published_path": "archived-files/checks/compare_efforts.py",
+      "git_blob": "327473f3e87d2f5994237495aa05603a7918fb3f",
+      "sha256": "9d5d431cd53f0c59343352cd2da1700f7c698fa4301e8db21fa7306ce1323684",
+      "bytes": 5569,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/compare_efforts_transport_recovery.py",
+      "published_path": "archived-files/checks/compare_efforts_transport_recovery.py",
+      "git_blob": "d130adcbf77ec4861acd84f763517107df06f897",
+      "sha256": "f35eade51114701435091b8ff5fd5060729151a8ec454bd9e0c2328fcc8fbdf2",
+      "bytes": 6686,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/eds-full-cohort-retest-registration.md",
+      "published_path": "archived-files/checks/eds-full-cohort-retest-registration.md",
+      "git_blob": "358e3efb8e4bd09cc8c43e1871121e22d943ec72",
+      "sha256": "bc65737fed0c37ba7547159398b846689704c59a3e0c263d2fbd9204bf7c3b0b",
+      "bytes": 1165,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/eds-recovery-resolved-preview.yaml",
+      "published_path": "archived-files/checks/eds-recovery-resolved-preview.yaml",
+      "git_blob": "33578ea23e5b6205213ddcabf5969979c363c929",
+      "sha256": "2c562892037a9fbf208bcce9035ad4fbb64a70464e3e38b0a018428459d3f2cf",
+      "bytes": 8444,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/eds-resolved-preview.yaml",
+      "published_path": "archived-files/checks/eds-resolved-preview.yaml",
+      "git_blob": "acac659fd7b0f3a19f0eb166046bdba45cbe66e5",
+      "sha256": "c41ee8bdfd9c81d87cecb91a3e93c424674a83b128a62105622ad5166ed5e19f",
+      "bytes": 8336,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/eds-retest-resolved-preview.yaml",
+      "published_path": "archived-files/checks/eds-retest-resolved-preview.yaml",
+      "git_blob": "257527ca293d005615d98274d98d7d7990b69851",
+      "sha256": "f455dfd0cf95df51e3f88dcb71b879a0229b694eb68dd216b474c8d346a322c3",
+      "bytes": 8356,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/eds_qd-recovery-resolved-preview.yaml",
+      "published_path": "archived-files/checks/eds_qd-recovery-resolved-preview.yaml",
+      "git_blob": "ae88e550a370f02a875693a3563f2c719046f8e5",
+      "sha256": "816be21a26836b10d8a182f7aa12f59bb70754980e8ded58f3d253d0980bcc4b",
+      "bytes": 8466,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/eds_qd-resolved-preview.yaml",
+      "published_path": "archived-files/checks/eds_qd-resolved-preview.yaml",
+      "git_blob": "8879d7aa2e7f09a53f83f8fa3aeae06bf174b3e4",
+      "sha256": "f2dc4f2571ace6619d2cc2802b64a7bb2901991b2109a931962500b222a45db4",
+      "bytes": 8358,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/final-video-helper-provenance.json",
+      "published_path": "archived-files/checks/final-video-helper-provenance.json",
+      "git_blob": "86753adc32fc7d63ff2663368a5f306bf7d6ed6a",
+      "sha256": "858a9bc89056a2d13d570d53c0bbd9294277e5ce9e0741da2ecae3674b3fc16c",
+      "bytes": 310,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/initial-ultra-with-infrastructure-errors.md",
+      "published_path": "archived-files/checks/initial-ultra-with-infrastructure-errors.md",
+      "git_blob": "6547d6f4f74724716d3e605a90425f70026f5812",
+      "sha256": "0c4d6f2bd52e0f7efaa7422f805ac9a19c1be8db6a78511abe6c7b647bc9752b",
+      "bytes": 1406,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/low-ultra-recovery-comparison.md",
+      "published_path": "archived-files/checks/low-ultra-recovery-comparison.md",
+      "git_blob": "2fb87d85f535be4b3320d880b1dc68cc8d703e6e",
+      "sha256": "bca783111361726e4e8bd869e1a989662377e7e9cecc37beb334e9ce37ebef1b",
+      "bytes": 1525,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/prepare_aggregation.py",
+      "published_path": "archived-files/checks/prepare_aggregation.py",
+      "git_blob": "ea9c65cd7dde91df8e6091081979ba0f5a48bcfe",
+      "sha256": "8004c875ffaee77b939e9b090641e26b04610e14c7525852242d1ab89e9aab36",
+      "bytes": 5243,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/primary-video-helper-provenance.json",
+      "published_path": "archived-files/checks/primary-video-helper-provenance.json",
+      "git_blob": "d343665eb053e47c47b8e7e029d7a566f120c315",
+      "sha256": "25be1b6e36a0decbf437477568af2a923e92748988d3f6ea6ca08188c2d4924a",
+      "bytes": 507,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/publish_comparison.py",
+      "published_path": "archived-files/checks/publish_comparison.py",
+      "git_blob": "34aea8d0e2d7620b6a0fbe651ae2c273d9f168cf",
+      "sha256": "e765271c11cd177cffb872e661158c88dd9130581a3edf9f431e4bfec5775839",
+      "bytes": 17045,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/qd-full-cohort-retest-registration.md",
+      "published_path": "archived-files/checks/qd-full-cohort-retest-registration.md",
+      "git_blob": "1af365b7ee650e6d29a1c0c246a2a22deda60788",
+      "sha256": "588a79b25f04c7eaea9914a2a245b2fcff71fc73ae2b9839e36610271adfc45d",
+      "bytes": 1232,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/qd-retest-resolved-preview.yaml",
+      "published_path": "archived-files/checks/qd-retest-resolved-preview.yaml",
+      "git_blob": "9a13525869c7258e0180891e0f990eef0f4692ef",
+      "sha256": "3ba03339299a3c4f818f4863b91bd6f0266ab5b2f1b264cbc79ab2520ccb3ae8",
+      "bytes": 8378,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/recovery-config-comparison.json",
+      "published_path": "archived-files/checks/recovery-config-comparison.json",
+      "git_blob": "a2bf2c65a3dedae28b002cc520c8e17f7135db3b",
+      "sha256": "508f23dff9afbd94ea53393a4036adbce0bb0540e757b34dc1328181801f32db",
+      "bytes": 1578,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/summarize_transport.py",
+      "published_path": "archived-files/checks/summarize_transport.py",
+      "git_blob": "87cd655de5b71f4ea298da80bd5dfbd1f8b6a79f",
+      "sha256": "c0379344c0e8148334b133f8c8698d9fd9ca462576fbc724eb7ab80525b235a4",
+      "bytes": 3296,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/test_aggregate_steering_cohorts.py",
+      "published_path": "archived-files/checks/test_aggregate_steering_cohorts.py",
+      "git_blob": "ded7c93349a53ef0e6d4f857cb5f6b9b2e0c948f",
+      "sha256": "b9b2f48252b39a7a2450d2f406b9ec0d1765dd3c53a64baff032e7d95d83b1cc",
+      "bytes": 13108,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/transport-protocol-stop-receipt.json",
+      "published_path": "archived-files/checks/transport-protocol-stop-receipt.json",
+      "git_blob": "cbcffd814904acfc61322914b2ea5bc1ed23ec14",
+      "sha256": "6ea57ecfe23e0aa87276937b842bb840805fe226f111f061e6ea2add081ca002",
+      "bytes": 1865,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/ultra-recovery-final.md",
+      "published_path": "archived-files/checks/ultra-recovery-final.md",
+      "git_blob": "42a0b75d3b755c9793d99e30934151d7ff83c8ef",
+      "sha256": "0b22afa2854173987cf080ec069fbe01e2da8e47bb9c37ecd64fadb683b921be",
+      "bytes": 1393,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/video-health/index.md",
+      "published_path": "archived-files/checks/video-health/index.md",
+      "git_blob": "9822d3a6843657b7c1a9264e377515556d10291e",
+      "sha256": "bd7d9d87cfb5c6d58ccfd88a37c4230c3d2db7092640088ee8052349bc912e91",
+      "bytes": 4500,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/video-health-primary/index.md",
+      "published_path": "archived-files/checks/video-health-primary/index.md",
+      "git_blob": "b32b256394de836b52654293fce55a10bc2ccda1",
+      "sha256": "382c5699029aa88178ce5096d72f238977214e97c291a89158cb97575ea58b3e",
+      "bytes": 4311,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/video-health-recovery/index.md",
+      "published_path": "archived-files/checks/video-health-recovery/index.md",
+      "git_blob": "6d6f04a84efc6dfa962d082c18b7995027b12cfe",
+      "sha256": "d146ffe768a32f5e30bc434167d66afc7decb3ff9651a4b628f3e2ad76132ef3",
+      "bytes": 6300,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/video-helper-provenance.json",
+      "published_path": "archived-files/checks/video-helper-provenance.json",
+      "git_blob": "334a4caefd554a1cd0ffd145b699f823371fa206",
+      "sha256": "b1f3559324b787dc31bac87fee66320a927e8af272e6f26b5279b896d20a80c9",
+      "bytes": 442,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/vls-recovery-resolved-preview.yaml",
+      "published_path": "archived-files/checks/vls-recovery-resolved-preview.yaml",
+      "git_blob": "45879146fae5c70d054add2d380fed70d09abd91",
+      "sha256": "2cd970b29f5da31544e0c6f480551bd4d8095c9a8afec834405437eeccb1dd15",
+      "bytes": 8559,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/checks/vls-resolved-preview.yaml",
+      "published_path": "archived-files/checks/vls-resolved-preview.yaml",
+      "git_blob": "893838653c22765b9ac48c1c0aaf64dd16599943",
+      "sha256": "e5450d047be4f452067c320aadbc42f4725de93a5ec9386fe7be0726f94f9586",
+      "bytes": 8451,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/monitor-final.py",
+      "published_path": "archived-files/monitor-final.py",
+      "git_blob": "9ce9915a17c085ed745d4f0845f1fd7c95b51d22",
+      "sha256": "a648ec5883896ab42f10afc31810bd7efb0756e7b560faf5b93da06f564c747c",
+      "bytes": 3141,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/monitor-primary.py",
+      "published_path": "archived-files/monitor-primary.py",
+      "git_blob": "2e47a510262b35a9d0873c98fcfa30eb9f64988b",
+      "sha256": "d09698f20ecba03d1fa0b3512a1b28dfe53f5e7fe0f8e0c844d745cf34b10a3c",
+      "bytes": 2830,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/monitor-recovery.py",
+      "published_path": "archived-files/monitor-recovery.py",
+      "git_blob": "cf780a2a78ba23bfe8a110c9c0ee050123893ca1",
+      "sha256": "12f8dc4b8566996ea83f1c75619f704c9261c8070323a77949d1bdfc3533f98d",
+      "bytes": 2503,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/monitor.py",
+      "published_path": "archived-files/monitor.py",
+      "git_blob": "821a53cfe3acdc30f1c14301b488b5d01e445545",
+      "sha256": "b707b8f818bfa0b6d8d16014c0caa09954a3ed6217483ad8163d10f2d6cfbfc9",
+      "bytes": 2454,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/preflight/api_requests/request_0000/codex_prompt.txt",
+      "published_path": "archived-files/preflight/api_requests/request_0000/codex_prompt.txt",
+      "git_blob": "afc1fbbb4882e342bfe050f3aa6e4411aadddb56",
+      "sha256": "97395dcd6b9aaa999ff28163072235fcec2b3158b00d1efe43bcd9e5e5a8ea15",
+      "bytes": 83,
+      "mode": "100644"
+    },
+    {
+      "source_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-ultra-20261014/preflight-transport-recovery/api_requests/request_0000/codex_prompt.txt",
+      "published_path": "archived-files/preflight-transport-recovery/api_requests/request_0000/codex_prompt.txt",
+      "git_blob": "afc1fbbb4882e342bfe050f3aa6e4411aadddb56",
+      "sha256": "97395dcd6b9aaa999ff28163072235fcec2b3158b00d1efe43bcd9e5e5a8ea15",
+      "bytes": 83,
+      "mode": "100644"
+    }
+  ],
+  "scope": "Source/configuration/documentation only. Raw videos/model weights/logs/captures and private files remain external. Source symlinks are materialized here and mapped to their observed targets.",
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
+    "overlay_redacted_paths": 0
+  }
+}

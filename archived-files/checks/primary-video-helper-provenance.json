@@ -1,0 +1,7 @@
+{
+  "original_helper": ".worktrees/exp/steering-ultra-20261014/checks/audit_completed_videos.py",
+  "original_sha256": "3fe75ffb02960e6cb20ec850fcf02101f54091098e523e4f324411a6a1a204eb",
+  "primary_helper": ".worktrees/exp/steering-ultra-20261014/checks/audit_primary_videos.py",
+  "primary_sha256": "1b5f57fb7cc64f7f637a7351f9dca3a9105891ec2b30bc6a86a8d87badc06bc2",
+  "changes": "Only input cohort selection root and separate output index directory; source/identity/full video decode checks unchanged."
+}

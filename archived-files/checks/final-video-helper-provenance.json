@@ -1,0 +1,6 @@
+{
+  "source": "checks/audit_primary_videos.py",
+  "new_helper": "checks/audit_final_videos.py",
+  "sha256": "dfdf4d673b8f37554f17cceba55196b4d1eb608bf3bcc9ebccecc0fc9af6b0f1",
+  "changes": "Final declared cohort selection, separate output index, and canonical real run paths; all delivery checks unchanged."
+}

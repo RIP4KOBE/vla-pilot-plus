@@ -1,0 +1,6 @@
+{
+  "base_helper": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/steering-integration/checks/aggregate_steering_cohorts.py",
+  "base_sha256": "b5a539a04207f9c994a29a4b515430eac7a2079ea9cec18ecb82a54a3abcd00a",
+  "new_sha256": "7c007ce7238124b2c616d8e36b3e804c1efeafbb51c5afda697ca02d01093a10",
+  "scope": "Copy of reviewed prior cohort aggregator. Require ultra; all validity gates preserved; EDS3/10 becomes a descriptive reference, not a completion criterion. Old files untouched."
+}
