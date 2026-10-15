@@ -1,0 +1,3 @@
+Verified authority, process identities and unchanged private ledgers. The existing N34 CPU executor remains active and is running release-boundary tests; no GPU cohort is active.
+
+Operational summary recorded for turn 564. Next: review the executor’s completed changes before GPU admission. Validation, formal evaluation and required ablation evidence remain outstanding; the driver continues.

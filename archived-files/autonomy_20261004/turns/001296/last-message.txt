@@ -1,0 +1,3 @@
+N36R2 passed full release verification and locked admission review. One controller is running on frozen source `30c6321`; all prior charges remain preserved.
+
+Operational handoff recorded. Next: monitor the existing runner and audited outcomes. Validation, formal, and required ablation evidence remain incomplete; autonomous continuation remains active.

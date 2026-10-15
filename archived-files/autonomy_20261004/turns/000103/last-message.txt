@@ -1,0 +1,3 @@
+Continued N32 preparation on source `abbdb3964390`: verified all 30 manifests and recorded finite budget authority with history and reserves preserved.
+
+No GPU cohort is active. Next is release validation, state adoption, then single-GPU dispatch. Operational handoff saved; validation, formal, and ablation goals remain unmet.

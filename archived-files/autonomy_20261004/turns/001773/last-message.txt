@@ -1,0 +1,3 @@
+Reconciled the completed CPU preparation: 18 artifact hashes verified, all four private ledgers unchanged, and owning state/checkpoint updated.
+
+Source remains `a5b32cdef`. Next: review recovery/controller bindings and deploy the reviewed source before measurement. No GPU dispatch occurred. Validation, formal evaluation, and required ablation evidence remain incomplete.

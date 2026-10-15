@@ -1,0 +1,32 @@
+import pathlib,json,hashlib,datetime,fcntl,os,yaml,subprocess
+W=pathlib.Path.cwd(); A=W.parent/'autonomy_20261004'; T=A/'turns/001615'; P=A/'turns/001611'; C=W/'.arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator'
+def read(p):return json.loads(p.read_text())
+def ref(p):return {'path':str(p),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+def write(p,v,y=False):
+ q=p.with_name(p.name+'.tmp-001615');q.write_text(yaml.safe_dump(v,sort_keys=False,allow_unicode=True) if y else json.dumps(v,indent=2)+'\n');os.replace(q,p)
+boot=pathlib.Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+def ident(h):
+ p=pathlib.Path('/proc')/str(h['pid'])/'stat';a=p.read_text().rsplit(')',1)[1].split() if p.exists() else [];m=bool(a and int(a[19])==h['start_ticks'] and h['boot_id']==boot);return {**h,'identity_matches':m,'live':bool(m and a[0]!='Z'),'observed_state':a[0] if a else None}
+prior=read(A/'turns/001614/operational-summary-v1.json');prefixes={}
+for name,r in prior['ledger_prefixes'].items():
+ b=pathlib.Path(r['path']).read_bytes();assert hashlib.sha256(b[:r['bytes']]).hexdigest()==r['sha256'];prefixes[name]=ref(pathlib.Path(r['path']))
+launch=read(P/'episode-operation-launch-v1.json')
+for k in ['plan','release']:
+ r=launch[k];assert ref(pathlib.Path(r['path']))['sha256']==r['sha256']
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=launch['cwd'],text=True).strip()==prior['current_source']
+rows=[json.loads(l) for l in (W/'data/attempt-ledger.jsonl').read_text().splitlines()];rows=[r for r in rows if r.get('attempt_id')=='n36_engineering_t00_c0_001479'];assert [r['event'] for r in rows]==['reserved','dispatched','aborted'];last=rows[-1];assert last['classification']=='INVALID';assert read(P/'episode-operation-exit-v1.json')['exit']==1
+handles={k:ident(v) for k,v in prior['live_handles'].items()};assert not any(h['live'] for h in handles.values())
+out=pathlib.Path(last['output_dir']);assert read(out/'attempt-result.json')['gpu_process_wall_seconds']==last['gpu_process_wall_seconds']
+now=datetime.datetime.now(datetime.timezone.utc).isoformat();nxt='Prepare a new prospective engineering recovery identity and bounded plan amendment using the canonical runtime manifest reference (same verified bytes), retaining the failed attempt and its charge. Diagnose binding consumers before release; preserve canonical-path/hash/native audits. CPU reproduction in turn001615 confirms current alias fails and canonical reference admits 157 DINO source files. No replay, automatic retry, scientific promotion, or protected evaluation; new execution requires frozen recovery gates and STOP/deadline/idle GPU7 checks.'
+r={'schema':'n36-engineering-episode-terminal-reconciliation-v1','at':now,'source':prior['current_source'],'exit':ref(P/'episode-operation-exit-v1.json'),'handles':handles,'ledger_prefixes_preserved':True,'ledger_prefixes':prefixes,'episode_events':rows,'artifacts':{n:ref(out/n) for n in ['attempt-result.json','process.json','command.json','runner.log','n36-worker-context.json']},'charge_gpu_seconds':last['gpu_process_wall_seconds'],'charge_gpu_hours':last['gpu_process_wall_seconds']/3600,'classification':'INVALID','ledger_reason':'ValueError','worker_error':'ImportError: N36 DINO manifest path not canonical','cost_telemetry_complete':False,'stage_query_events':0,'diagnosis':ref(T/'canonical-reference-diagnosis-v1.json'),'scientific_eligible':False,'target_met':False,'next_action':nxt};write(T/'episode-terminal-reconciliation-v1.json',r)
+d=read(A/'driver-status.json');s={'schema':'autonomy-operational-summary-v1','at':now,'turn':1615,'deadline':prior['deadline'],'stop_exists':(A/'STOP').exists(),'current_source':prior['current_source'],'owner_source':prior['owner_source'],'driver':ident(d['driver']),'coordinator':ident(d['process']),'live_handles':{},'terminal_handles':handles,'ledger_prefixes':prefixes,'prior_ledger_prefixes':prior['ledger_prefixes'],'ledger_prefixes_preserved':True,'completed_work':['Verified bound handoff/authority, current state/checkpoint, source/plan/release and previous normal turn receipt.','Reconciled terminal INVALID engineering attempt, exact charge and missing telemetry; all recorded experiment processes gone, no duplicate dispatch.','Reproduced canonical-path failure on CPU; unchanged DINO verifier accepts resolved reference to identical manifest bytes.'],'episode_terminal_reconciliation':ref(T/'episode-terminal-reconciliation-v1.json'),'operation_status':'TERMINAL_INVALID_CANONICAL_REFERENCE_RECOVERY_PENDING','next_bounded_step':nxt,'unresolved_evidence':['Prospective engineering recovery and native episode audit still pending.','First-C0 G3 evidence and development results unavailable.','Original matched validation/formal/required ablations remain incomplete.'],'target_met':False,'gpu_dispatch_this_turn':False,'controller_launched_this_turn':False};write(T/'operational-summary-v1.json',s);(T/'operational-summary-v1.sha256').write_text(ref(T/'operational-summary-v1.json')['sha256']+'  operational-summary-v1.json\n')
+with (C/'state.lock').open('a') as l:
+ fcntl.flock(l,fcntl.LOCK_EX)
+ with (W/'data/qd-ed-state.lock').open('a') as l2:
+  fcntl.flock(l2,fcntl.LOCK_EX)
+  for p,y in [(W/'research-state.yaml',True),(C/'checkpoint.json',False)]:
+   v=yaml.safe_load(p.read_text()) if y else read(p);v.update(status='N36_ENGINEERING_EPISODE_INVALID_CANONICAL_REFERENCE_RECOVERY_PENDING',phase='N36_ENGINEERING_EPISODE_INVALID_CANONICAL_REFERENCE_RECOVERY_PENDING',latest_operational_summary=ref(T/'operational-summary-v1.json'),n36_engineering_episode_terminal_reconciliation=ref(T/'episode-terminal-reconciliation-v1.json'),next_action=nxt,updated_at=now)
+   if 'n36_engineering_live_episode_operation' in v:v['n36_engineering_live_episode_operation'].update(status='TERMINAL_INVALID_RECONCILED',live_handles=[])
+   write(p,v,y)
+  p=C/'idea_tree.json';v=read(p);v['nodes']['15.6'].update(result='ENGINEERING_EPISODE_INVALID_CANONICAL_REFERENCE_RECOVERY_PENDING',insight='Engineering episode invalid before Stage: DINO requires canonical manifest reference. Same manifest bytes pass CPU admission under resolved path. Charge and unknown telemetry retained; new prospective recovery required; no scientific promotion.',n36_engineering_operational_summary=ref(T/'operational-summary-v1.json'));write(p,v)
+print(json.dumps({'summary':ref(T/'operational-summary-v1.json'),'charge_gpu_hours':r['charge_gpu_hours'],'terminal_handles':handles}))

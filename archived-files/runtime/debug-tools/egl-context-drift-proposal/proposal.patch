@@ -1,0 +1,394 @@
+--- /dev/null
++++ b/core/egl_context_drift.py
+@@ -0,0 +1,131 @@
++"""Diagnostic: at most three current-context observations per episode.
++
++Only two standard getters on an already-loaded EGL library may be called. Import
++and construction never query native state. No display/context creation, device
++lookup, string query, error query, make_current, or library load is performed.
++"""
++import ctypes
++import json
++from pathlib import Path
++import sys
++import threading
++import time
++
++UNKNOWN = "Unknown"
++BOUNDARIES = ("before_first_policy", "after_first_policy", "before_first_render")
++
++
++def _pointer(value):
++    if value is None:
++        return 0
++    if type(value) is int and value >= 0:
++        return value
++    return ctypes.cast(value, ctypes.c_void_p).value or 0
++
++
++def _cached_raw_query(name):
++    """Resolve only standard getters through an already-loaded EGL DLL handle."""
++    if name not in ("eglGetCurrentDisplay", "eglGetCurrentContext"):
++        raise LookupError("EGL entrypoint is outside the diagnostic surface")
++    module = sys.modules.get("OpenGL.platform")
++    platform = vars(module).get("PLATFORM") if module is not None else None
++    # vars() deliberately avoids the platform's lazy EGL property / DLL loader.
++    library = vars(platform).get("EGL") if platform is not None else None
++    handle = vars(library).get("_handle") if library is not None else None
++    if type(handle) is not int or handle == 0:
++        raise LookupError("An already-loaded EGL library handle is unavailable")
++    # ctypes resolves this symbol from the supplied library's existing handle;
++    # it does not dlopen a library. A fresh function view also avoids PyOpenGL's
++    # implicit error checks and never changes production function attributes.
++    return ctypes.CFUNCTYPE(ctypes.c_void_p)((name, library))
++
++
++def _reference_handles(sim):
++    context = sim._render_context_offscreen.gl_ctx
++    expected_context = _pointer(context._context)
++    module = sys.modules.get(type(context).__module__)
++    if module is None or "EGL_DISPLAY" not in vars(module):
++        expected_display = UNKNOWN
++    else:
++        expected_display = _pointer(vars(module)["EGL_DISPLAY"])
++    return expected_display, expected_context
++
++
++def observe_current_context(sim, *, query_factory=_cached_raw_query):
++    """Return nullable booleans, without exposing pointer values or input data."""
++    result = {
++        "current_display_is_null": UNKNOWN,
++        "current_context_is_null": UNKNOWN,
++        "display_matches_reference": UNKNOWN,
++        "context_matches_reference": UNKNOWN,
++        "reference_display_available": False,
++        "reference_context_available": False,
++    }
++    expected_display = expected_context = UNKNOWN
++    try:
++        expected_display, expected_context = _reference_handles(sim)
++    except Exception:
++        pass
++    for name, expected in (("display", expected_display), ("context", expected_context)):
++        available = type(expected) is int and expected != 0
++        result[f"reference_{name}_available"] = available
++        try:
++            query = query_factory("eglGetCurrent" + name.capitalize())
++            observed = _pointer(query())
++        except Exception:
++            continue
++        result[f"current_{name}_is_null"] = observed == 0
++        if available:
++            result[f"{name}_matches_reference"] = observed == expected
++    return result
++
++
++class ContextDriftObserver:
++    """Consume each named boundary once; missing entries remain Unknown."""
++    def __init__(self, path, sim, *, query=observe_current_context):
++        self.path = Path(path)
++        self.sim = sim
++        self.query = query
++        self._attempted = set()
++        self._started = False
++        self._write_failed = False
++        self._lock = threading.Lock()
++
++    def _write(self, record):
++        if self._write_failed:
++            return False
++        try:
++            self.path.parent.mkdir(parents=True, exist_ok=True)
++            # Preserve earlier artifacts if an identity is accidentally reused.
++            with self.path.open("a" if self._started else "x") as stream:
++                stream.write(json.dumps(record, sort_keys=True, allow_nan=False) + "\n")
++            self._started = True
++            return True
++        except Exception:
++            self._write_failed = True
++            return False
++
++    def observe(self, boundary):
++        if boundary not in BOUNDARIES or self._write_failed:
++            return
++        with self._lock:
++            if boundary in self._attempted:
++                return
++            self._attempted.add(boundary)
++        record = {
++            "schema": "qd-ed-egl-context-drift-v1", "boundary": boundary,
++            "thread_id": threading.get_ident(), "native_thread_id": threading.get_native_id(),
++        }
++        # If an extra native query itself fails fatally, leave an explicit
++        # observation-enter marker, not a misleading policy/render boundary.
++        if not self._write({**record, "event": "enter", "time_unix": time.time()}):
++            return
++        try:
++            observation = self.query(self.sim)
++        except Exception:
++            observation = {
++                "current_display_is_null": UNKNOWN, "current_context_is_null": UNKNOWN,
++                "display_matches_reference": UNKNOWN, "context_matches_reference": UNKNOWN,
++                "reference_display_available": UNKNOWN, "reference_context_available": UNKNOWN,
++            }
++        self._write({**record, "event": "exit", "time_unix": time.time(), **observation})
+--- a/core/render_phase_diagnostics.py
++++ b/core/render_phase_diagnostics.py
+@@ -6,6 +6,8 @@
+ import json
+ import time
+ from pathlib import Path
++
++from core.egl_context_drift import ContextDriftObserver
+ 
+ 
+ class RenderPhaseDiagnostics:
+@@ -20,8 +22,21 @@
+         self._io_elapsed_s = 0.0
+         self._record_count = 0
+         self._phase_baseline = (0.0, 0.0, 0)
++        self._context_drift = None
++
++    def _observe_context_drift(self, boundary):
++        if self._context_drift is not None:
++            try:
++                self._context_drift.observe(boundary)
++            except Exception:
++                pass
+ 
+     def set_phase(self, episode, global_step, name, event):
++        if name == "select_action_fresh":
++            if event == "enter":
++                self._observe_context_drift("before_first_policy")
++            elif event == "exit":
++                self._observe_context_drift("after_first_policy")
+         if event == "enter":
+             self._phase = (int(episode), int(global_step), name)
+             self._phase_baseline = (self._observer_elapsed_s, self._io_elapsed_s, self._record_count)
+@@ -127,6 +142,10 @@
+         setattr(obj, attribute, observed)
+         self._hooks.append((obj, attribute, had_own, own_value, observed))
+ 
++    def _before_sim_render(self, sim):
++        self._observe_context_drift("before_first_render")
++        self._render_context(sim)
++
+     def _render_context(self, sim):
+         context = sim._render_context_offscreen
+         if context is None:
+@@ -142,19 +161,22 @@
+             env = adapter._env[adapter.current_task_idx]
+             domain = env._env.env
+             sim = domain.sim
++            self._context_drift = ContextDriftObserver(
++                self.path.with_name("egl_context_drift.jsonl"), sim)
+             self._hook(env, "_format_raw_obs", "format_raw_obs")
+             self._hook(domain, "_pre_action", "controller_pre_action")
+             self._hook(domain, "_update_observables", "update_observables")
+             self._hook(sim, "forward", "physics_forward")
+             self._hook(sim, "step", "physics_step")
+             self._render_context(sim)
+-            self._hook(sim, "render", "sim_render_total", before=lambda: self._render_context(sim))
++            self._hook(sim, "render", "sim_render_total", before=lambda: self._before_sim_render(sim))
+         except Exception:
+             self.close()
+             raise
+ 
+     def close(self):
+         self._phase = None
++        self._context_drift = None
+         for obj, attribute, had_own, own_value, observed in reversed(self._hooks):
+             try:
+                 if vars(obj).get(attribute) is observed:
+--- /dev/null
++++ b/tests/test_egl_context_drift.py
+@@ -0,0 +1,189 @@
++"""CPU mocks only. No EGL imports, library loads, contexts or GPU calls."""
++import importlib.util
++import json
++from pathlib import Path
++import sys
++import threading
++from types import SimpleNamespace
++
++import pytest
++
++HERE = Path(__file__).resolve().parents[1] / "core"
++
++def load(name, filename):
++    spec = importlib.util.spec_from_file_location(name, HERE / filename)
++    module = importlib.util.module_from_spec(spec)
++    sys.modules[name] = module
++    spec.loader.exec_module(module)
++    return module
++
++module = load("core.egl_context_drift", "egl_context_drift.py")
++render_module = load("candidate_render_phase_diagnostics", "render_phase_diagnostics.py")
++
++
++def existing_sim(monkeypatch):
++    class GLContext:
++        _context = 44
++    GLContext.__module__ = "existing_egl_context"
++    monkeypatch.setitem(sys.modules, "existing_egl_context", SimpleNamespace(EGL_DISPLAY=22))
++    return SimpleNamespace(_render_context_offscreen=SimpleNamespace(gl_ctx=GLContext()))
++
++
++@pytest.mark.parametrize("display,context,null,match", [
++    (22,44,False,True), (22,99,False,False), (22,None,True,False),
++])
++def test_match_drift_and_null_are_distinct(monkeypatch, display, context, null, match):
++    sim = existing_sim(monkeypatch)
++    calls = []
++    def factory(name):
++        def query():
++            calls.append(name)
++            return {"eglGetCurrentDisplay":display,"eglGetCurrentContext":context}[name]
++        return query
++    result = module.observe_current_context(sim, query_factory=factory)
++    assert calls == ["eglGetCurrentDisplay", "eglGetCurrentContext"]
++    assert result["display_matches_reference"] is True
++    assert result["current_context_is_null"] is null
++    assert result["context_matches_reference"] is match
++    assert all(type(value) is bool or value == "Unknown" for value in result.values())
++
++
++def test_existing_handle_resolution_and_missing_entries_without_library_loading(monkeypatch):
++    class LazyPlatform:
++        @property
++        def EGL(self):
++            pytest.fail("must not call a lazy library loader")
++    monkeypatch.setitem(sys.modules,"OpenGL.platform",SimpleNamespace(PLATFORM=LazyPlatform()))
++    monkeypatch.setattr(module.ctypes,"CDLL",lambda *a,**k: pytest.fail("must not load DLL"))
++    sim = existing_sim(monkeypatch)
++    result = module.observe_current_context(sim)
++    assert result["current_context_is_null"] == "Unknown"
++    assert result["context_matches_reference"] == "Unknown"
++    assert result["reference_context_available"] is True
++
++    # A loaded DLL may have no cached getter attributes. Resolve exactly the two
++    # permitted symbols from that same handle using independent function views.
++    library = SimpleNamespace(_handle=123)
++    monkeypatch.setitem(sys.modules, "OpenGL.platform",
++                        SimpleNamespace(PLATFORM=SimpleNamespace(EGL=library)))
++    resolutions, queries = [], []
++    def function_type(restype):
++        assert restype is module.ctypes.c_void_p
++        def resolve(symbol_and_library):
++            name, observed_library = symbol_and_library
++            assert observed_library is library
++            resolutions.append(name)
++            def getter():
++                queries.append(name)
++                return {"eglGetCurrentDisplay": 22, "eglGetCurrentContext": 44}[name]
++            return getter
++        return resolve
++    monkeypatch.setattr(module.ctypes, "CFUNCTYPE", function_type)
++    observed = module.observe_current_context(sim)
++    assert observed["display_matches_reference"] is True
++    assert observed["context_matches_reference"] is True
++    assert resolutions == queries == ["eglGetCurrentDisplay", "eglGetCurrentContext"]
++    assert vars(library) == {"_handle": 123}
++    with pytest.raises(LookupError):
++        module._cached_raw_query("eglGetError")
++    assert len(resolutions) == 2
++    def missing_symbol(restype):
++        def resolve(symbol_and_library):
++            raise AttributeError("unavailable export")
++        return resolve
++    monkeypatch.setattr(module.ctypes, "CFUNCTYPE", missing_symbol)
++    missing = module.observe_current_context(sim)
++    assert missing["current_display_is_null"] == "Unknown"
++    assert missing["current_context_is_null"] == "Unknown"
++
++
++def test_missing_reference_does_not_turn_null_into_matching(monkeypatch):
++    sim = SimpleNamespace(_render_context_offscreen=None)
++    result = module.observe_current_context(sim,query_factory=lambda name: lambda: None)
++    assert result["current_display_is_null"] is True
++    assert result["current_context_is_null"] is True
++    assert result["context_matches_reference"] == "Unknown"
++    assert result["reference_context_available"] is False
++
++
++def test_three_boundaries_once_and_python_query_failure_is_isolated(tmp_path):
++    calls=[]
++    def query(sim):
++        calls.append(sim)
++        raise RuntimeError("secret-error-canary")
++    sim=object()
++    observer=module.ContextDriftObserver(tmp_path/'events.jsonl',sim,query=query)
++    assert calls==[] and not observer.path.exists()
++    for boundary in module.BOUNDARIES*2:
++        observer.observe(boundary)
++    observer.observe("unrecognized")
++    records=[json.loads(s) for s in observer.path.read_text().splitlines()]
++    assert len(records)==6
++    assert [r['event'] for r in records]==['enter','exit']*3
++    rows=[r for r in records if r['event']=='exit']
++    assert calls==[sim]*3
++    assert [r['boundary'] for r in rows]==list(module.BOUNDARIES)
++    assert all(r['thread_id']==threading.get_ident() for r in rows)
++    assert all(r['native_thread_id']==threading.get_native_id() for r in rows)
++    assert all(r['context_matches_reference']=='Unknown' for r in rows)
++    assert 'secret-error-canary' not in observer.path.read_text()
++
++
++def test_existing_artifact_is_preserved(tmp_path):
++    path=tmp_path/'events.jsonl'
++    path.write_text('existing\n')
++    observer=module.ContextDriftObserver(path,object(),query=lambda sim: {})
++    for boundary in module.BOUNDARIES: observer.observe(boundary)
++    assert path.read_text()=='existing\n'
++
++
++def test_proposed_integration_preserves_render_calls_result_and_exception(monkeypatch,tmp_path):
++    calls=[]
++    queries=[]
++    result=object()
++    failure=RuntimeError('original failure')
++    class Context:
++        def render(self,*args,**kwargs): calls.append(('draw',args,kwargs))
++        def read_pixels(self,*args,**kwargs):
++            calls.append(('pixels',args,kwargs))
++            if kwargs.get('fail'): raise failure
++            return result
++    class Sim:
++        _render_context_offscreen=Context()
++        def forward(self): pass
++        def step(self): pass
++        def render(self,*args,**kwargs):
++            calls.append(('render',args,kwargs))
++            self._render_context_offscreen.render(*args,**kwargs)
++            return self._render_context_offscreen.read_pixels(*args,**kwargs)
++    class Domain:
++        sim=Sim()
++        def _pre_action(self,*a,**k): pass
++        def _update_observables(self,*a,**k): pass
++    class Env:
++        _env=SimpleNamespace(env=Domain())
++        def _format_raw_obs(self,*a,**k): pass
++    adapter=SimpleNamespace(_env=[Env()],current_task_idx=0)
++    sim=adapter._env[0]._env.env.sim
++    def query(value):
++        queries.append(value)
++        return {'current_context_is_null':False,'context_matches_reference':True}
++    monkeypatch.setattr(render_module,'ContextDriftObserver',
++        lambda path,value: module.ContextDriftObserver(path,value,query=query))
++    observer=render_module.RenderPhaseDiagnostics(tmp_path/'render_phase_timing.jsonl')
++    observer.install(adapter)
++    assert queries==[]
++    observer.set_phase(0,0,'select_action_fresh','enter')
++    observer.set_phase(0,0,'select_action_fresh','exit')
++    observer.set_phase(0,0,'diagnostic_artifacts','enter')
++    assert sim.render(64,height=64) is result
++    with pytest.raises(RuntimeError) as caught:
++        sim.render(64,height=64,fail=True)
++    assert caught.value is failure
++    observer.set_phase(0,0,'diagnostic_artifacts','exit')
++    observer.close()
++    assert observer._context_drift is None
++    assert queries==[sim]*3
++    assert [call[0] for call in calls]==['render','draw','pixels']*2
++    assert all(call[1]==(64,) for call in calls)
++    assert all(call[2]=={'height':64} for call in calls[:3])

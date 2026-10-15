@@ -1,0 +1,3 @@
+Continuation verified and recorded. N36R1 preparation remains active; missing dependency source files currently block manifest generation and GPU release.
+
+All 503 attempts and 75.267794 GPU-hours remain preserved. Next: reconcile the executor’s final report and resolve source materialization before independent release review. Validation/formal/ablation completion remains unproven.

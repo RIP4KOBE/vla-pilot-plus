@@ -1,0 +1,3 @@
+Continuation remains active. Verified live repair-process identities and unchanged private ledgers; recorded the operational handoff.
+
+The CPU repair is still running. Next: review its results before GPU release. Validation, formal evaluation, and required ablation evidence remain outstanding.

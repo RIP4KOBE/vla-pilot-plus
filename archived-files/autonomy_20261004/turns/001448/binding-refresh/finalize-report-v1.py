@@ -1,0 +1,115 @@
+import os, sys, json, hashlib, datetime as dt, time, resource, subprocess, traceback, copy, signal
+from pathlib import Path
+OUT=Path(__file__).resolve().parent
+A=json.loads((OUT/'authority-v1.json').read_text()); ROOT=Path(A['worktree']); OWNER=Path('/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree'); BASE=OUT.parents[1]
+START=time.monotonic(); sys.dont_write_bytecode=True;sys.path.insert(0,str(ROOT))
+os.sched_setaffinity(0,sorted(os.sched_getaffinity(0))[:2]);resource.setrlimit(resource.RLIMIT_CPU,(600,600));signal.alarm(720)
+for key in ('OMP_NUM_THREADS','OPENBLAS_NUM_THREADS','MKL_NUM_THREADS','NUMEXPR_NUM_THREADS'):os.environ[key]='2'
+os.environ['CUDA_VISIBLE_DEVICES']='';os.environ['GIT_OPTIONAL_LOCKS']='0';os.environ['GIT_NO_LAZY_FETCH']='1'
+os.environ['TMPDIR']=str(OUT/'tmp')
+(OUT/'tmp').mkdir(exist_ok=True)
+from scripts import qd_ed_n36_stop as stop
+CHECKS={}; ART={}; INPUTS={}; COMMANDS=[]; ERRORS=[]
+def guard():
+ stop.check();assert time.monotonic()-START<720;assert time.time()-json.loads((OUT/'executor-process-v1.json').read_text())['started_unix']<900
+
+def audit(event,args):
+ if event in ('socket.connect','socket.getaddrinfo'):raise PermissionError('network forbidden')
+ if event=='subprocess.Popen':
+  argv=args[1];assert isinstance(argv,(list,tuple)) and Path(argv[0]).name=='git','only passive Git subprocesses permitted'
+  assert any(x in argv for x in ('rev-parse','status','diff','ls-tree','cat-file','config')),'non-read-only Git forbidden'
+ if event=='open' and isinstance(args[0],(str,bytes)):
+  name=os.path.abspath(os.fsdecode(args[0])); low=name.lower()
+  assert not any(x in low for x in ('/.codex/auth.json','/.git-credentials','credentials.json','2026-08-10-eds-qd-stage-guidance-transition-design.md')),'prohibited read'
+  assert not (('/validation/' in low or '/formal/' in low) and ('outcome' in low or '/artifacts/' in low)),'protected outcomes forbidden'
+  flags=args[2]
+  if isinstance(flags,int) and flags & (os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):
+   assert name == '/dev/null' or Path(name).resolve().is_relative_to(OUT),'write outside output forbidden'
+ if event in ('os.rename','os.remove','os.rmdir','os.mkdir'):
+  for name in args[:2] if event=='os.rename' else args[:1]:
+   if isinstance(name,(str,bytes)):assert Path(os.fsdecode(name)).resolve().is_relative_to(OUT),'mutation outside output forbidden'
+ if event=='exec' and getattr(args[0],'co_filename','')==str(ROOT/'main.py'):raise PermissionError('Main forbidden')
+sys.addaudithook(audit)
+def bind(p):
+ p=Path(p);h=hashlib.sha256()
+ with p.open('rb') as f:
+  for raw in iter(lambda:f.read(8*1024*1024),b''):h.update(raw)
+ return {'path':str(p),'bytes':p.stat().st_size,'sha256':h.hexdigest()}
+def read(ref):
+ b=bind(ref['path']);assert b['sha256']==ref['sha256'] and ('bytes' not in ref or b['bytes']==ref['bytes']);INPUTS[str(ref['path'])]=b
+ return json.loads(Path(ref['path']).read_text())
+def write(name,value):
+ guard();p=OUT/name;p.parent.mkdir(parents=True,exist_ok=True)
+ with p.open('x') as f:json.dump(value,f,indent=2,allow_nan=False);f.write('\n')
+ ART[name]=bind(p);return {'path':str(p),'sha256':ART[name]['sha256']}
+def git(root,*args):
+ guard();argv=['git','-C',str(root),*args];p=subprocess.run(argv,text=True,capture_output=True);COMMANDS.append({'argv':argv,'exit_code':p.returncode,'stdout':p.stdout,'stderr':p.stderr});assert p.returncode==0,p.stderr;return p.stdout.strip()
+def check(name,fn):
+ guard();t=time.monotonic()
+ try:v=fn();CHECKS[name]={'status':'PASS','seconds':time.monotonic()-t};print(name,'PASS',flush=True);return v
+ except Exception as e:CHECKS[name]={'status':'FAIL','error':str(e),'traceback':traceback.format_exc()};raise
+
+
+
+guard()
+checks=read(bind(OUT/'checks-results-v1.json'));extra=read(bind(OUT/'supplemental-checks-v1.json'))
+assert not checks['errors'] and extra['status']=='PASS_DISABLED_BINDINGS'
+plan=read(bind(OUT/'draft/plan.draft.json'));parent=read(A['parent_plan']);accept=read(A['repair_acceptance'])
+source_index={x['path']:x['sha256'] for x in plan['source']['files']}
+runtime=read(plan['runtime']);closure=read(plan['runtime_closure']);oldclosure=read(parent['runtime_closure'])
+changes=[]
+repair=read(A['repair_report'])
+for item in repair['changed_files']:
+ name=item['relative_path'];ref=bind(ROOT/name)
+ assert ref==item['after'] and ref['sha256']==source_index[name]
+ changes.append({'relative_path':name,'source':ref,'runtime_inventory_entries':[x for x in runtime['files'] if x['path']==str(ROOT/name)],'runtime_closure_modules':[k for k,v in closure['modules'].items() if v['path']==str(ROOT/name)]})
+assert closure.get('module_aliases')==oldclosure.get('module_aliases')
+assert closure.get('generated_modules')==oldclosure.get('generated_modules')
+write('runtime-input-bindings.disabled-v1.json',{'status':'DISABLED_CPU_BINDING_REFRESH','source':bind(OUT/'source.complete-v1.json'),'runtime':plan['runtime'],'runtime_closure':plan['runtime_closure'],'changes':changes,'all_changed_paths_in_exact_source':True,'inventory_entries_removed':False,'module_aliases_preserved':True,'generated_modules_preserved':True,'release_enabled':False})
+import ast
+callers=[]
+for file,fn in [('qd_ed_n36_healthcheck.py','run_healthcheck'),('qd_ed_n36_runner.py','execute_one')]:
+ p=ROOT/'scripts'/file;tree=ast.parse(p.read_text());node=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name==fn)
+ calls=[{'line':n.lineno,'call':ast.unparse(n)} for n in ast.walk(node) if isinstance(n,ast.Call) and isinstance(n.func,ast.Attribute) and n.func.attr=='attest']
+ assert calls
+ callers.append({'source':bind(p),'function':fn,'attestation_calls':calls,'validated_release_precedes_attestation':True})
+write('production-parent-attestation-feasibility-v1.json',{'schema':'n36r3-production-parent-cpu-attestation-feasibility-v1','status':'BLOCKED_BY_REQUIRED_PRODUCTION_GOVERNANCE','mode':'Static exact caller inspection and actual production release validators on disabled bindings','validators':{k:v for k,v in extra['checks'].items() if 'governance_gate' in k},'callers':callers,'production_parent_attestation_executed':False,'production_parent_imports_exercised':False,'source_only_bootstrap_exercised':False,'synthetic_governance_used':False,'reservation_reached':False,'runtime_closure_passive_check_passed':True,'native_inventory_passive_check_passed':True,'controller_root_review_required':True,'manifest_refresh_after_root_controller_review_required':True,'conclusion':'Passive CPU consistency is feasible and passed. Actual production-parent attestation cannot be reached with disabled bindings; no readiness or B5 inferred.'})
+immutable=read(bind(OUT/'immutable-before-v1.json'))
+for group in immutable.values():
+ for ref in group.values():assert bind(ref['path'])==ref
+assert git(ROOT,'rev-parse','HEAD')==A['source'] and not git(ROOT,'status','--porcelain','--untracked-files=no')
+assert git(OWNER,'rev-parse','HEAD')==checks['summary']['owner_head_observed']
+assert plan['episodes']==parent['episodes'] and len(plan['episodes'])==40
+assert plan['resource_routing']==parent['resource_routing']
+accounting=read(bind(OUT/'accounting-snapshot.disabled-v1.json'))
+assert accounting['arithmetic']['hours']['retained']=='75.53335346582918'
+assert accounting['snapshot']['dispatched']==505 and not plan['release_enabled']
+write('commands-results-v1.json',{'cwd':str(ROOT),'executed':[{'argv':[sys.executable,'-B',str(OUT/name)],'exit_code':0,'log':bind(OUT/log)} for name,log in [('refresh-bindings-v1.py','refresh-v1.log'),('complete-bindings-v1.py','complete-v1.log')]],'passive_git_commands':checks['commands']+extra['commands']+COMMANDS,'finalizer_argv':[sys.executable,'-B',str(OUT/'finalize-report-v1.py')],'finalizer_completion':'report and hash sidecar written only after assertions','inspection_commands':['Read hash-bound authority, acceptance and repair report; inspected actual changed_files schema','Read turn001429 refresh/complete/finalize tools and turn001432 manifest tool','Checked both canonical STOP paths and deadline','Inspected preparation/admission source and pure native manifest API; production attestation caller ordering'],'preparation_errors':[],'no_broad_tests':True,'cpu_threads':2})
+gates=[{'id':'ROOT_CONTROLLER_REVIEW_AND_MANIFEST_REFRESH','status':'REQUIRED','detail':'Root must review exact new controller/runtime/closure and evidence. Then refresh all 40 manifests and plan/bindings to that root-reviewed controller reference; these disabled drafts are not the final B5 target.'},{'id':'B5','status':'REQUIRED_INDEPENDENT','detail':'New independent exact B5 on repaired source and final root-reviewed bindings; none supplied or fabricated.'},{'id':'ROOT_ADOPTION','status':'REQUIRED','detail':'Root adoption of exact source/runtime and reconciliation of all three owner journals; no adoption here.'},{'id':'FINITE_ACCOUNTING','status':'REQUIRED','detail':'Root finite accounting and detached authority using retained 75.53335346582918 GPUh / 505 attempts. Arithmetic is prospective, current headroom remains null; no new spend authority.'},{'id':'FRESH_CHARGED_HEALTH','status':'REQUIRED_UNEXECUTED','detail':'Genuinely execute and durably charge n36_healthcheck_n36r3_preparation_001445 after root authority, with actual parent/import/controller/native/generated and GPU/provider evidence. Preserve prior charged health/failures; no replay.'},{'id':'FIRST_C0','status':'REQUIRED_UNRELEASED','detail':'Separate root episode authority after valid fresh health.'},{'id':'G3','status':'MANDATORY_FIRST_C0_TERMINAL_PAUSE','detail':'Root review of actual first-C0 production/audit evidence before any later cell; no retries or automatic recovery.'}]
+md=f"""# Leaf 15.6 — disabled CPU binding refresh
+
+Source: {A['source']}. Score: null. Goal incomplete. All new artifacts are disabled; no source adoption or execution authority is issued.
+
+Exact source ({checks['summary']['source_files']} files), runtime inventory ({checks['summary']['runtime_files']} files), runtime closure ({checks['summary']['runtime_modules']} modules), passive native inventory, inherited controller semantics, lexical owner routing, and all 40 manifests passed their consistency checks. Runtime inventory entries refreshed: {checks['summary']['runtime_rebound_entries']}; closure modules refreshed: {checks['summary']['closure_rebound_modules']}. All five accepted repair paths are hash-bound. The complete parent-to-current path delta is recorded separately. Frozen science, production Main/native audit requirements, all 40 episode identities, deadline 2026-10-11T11:13:13Z, and first-C0 G3 pause remain preserved.
+
+Retained accounting: 505 attempts / 75.53335346582918 GPUh, with exact complete snapshot comparison to accepted root reconciliation. Prior charged health 001426 remains in the unchanged journal. The prospective health identity is n36_healthcheck_n36r3_preparation_001445; its absence from the charged ledger is checked. Earlier readiness does not transfer. A later fresh identity is required through separately accepted repair and bindings if 001445 is attempted or charged; it must never be replayed.
+
+Finite arithmetic conservative-after: {accounting['arithmetic']['hours']['conservative_after']} GPUh. Prospective cohort: 21 GPUh; protected validation/formal: 44 GPUh. Current spendable headroom remains null.
+
+Production release validators reject the disabled bindings before attestation/reservation. Passive runtime feasibility passed; actual production-parent/import/controller/native/generated attestation was not executed. No readiness, score, or B5 claim is made.
+
+Remaining blockers: root review of the exact new controller/runtime/closure and consequent manifest/plan refresh; independent exact B5; separate root source/runtime adoption and finite accounting/journal reconciliation; separately authorized fresh charged health 001445; separate first-C0 release; mandatory terminal G3 pause before any later cell. If 001445 is consumed before a later release, a later fresh identity must be explicitly accepted and rebound.
+
+Inspected new copies derive from turn001429 tooling; current acceptance status/source/report and changed_files schema are used without altering acceptance. Manifest production API was cross-checked with turn001432 tooling. Exact commands, checks, logs, source/input provenance, and SHA-256 artifact bindings are in report-v1.json and commands-results-v1.json. report-v1.sha256 binds both reports.
+
+Two CPU threads; 900-second task cap; canonical STOP/deadline checks before work and reporting. No source edits, owning state/ledger changes, locks/leases, GPU/provider calls, release, replay, credentials, protected result reads, child agents, broad test repeats, or recursive historical rebuild. Official current-login gpt-6-astra launch is recorded in executor-process-v1.json; no alternate model was invoked.
+"""
+with (OUT/'report-v1.md').open('x') as f:f.write(md)
+names=['authority-v1.json','tooling-provenance-v1.json','executor-process-v1.json','refresh-bindings-v1.py','complete-bindings-v1.py','finalize-report-v1.py','source.complete-v1.json','scientific-source-provenance-v1.json','runtime.isolated.disabled-v1.json','runtime-closure.isolated.disabled-v1.json','runtime-rebinding-provenance-v1.json','runtime-input-bindings.disabled-v1.json','required-after.production-v1.json','native-build.disabled-v1.json','controller-semantics.disabled-v1.json','accounting-snapshot.disabled-v1.json','health-policy.disabled-v1.json','bindings.disabled-v1.json','draft/plan.draft.json','immutable-before-v1.json','checks-results-v1.json','supplemental-checks-v1.json','commands-results-v1.json','production-parent-attestation-feasibility-v1.json','refresh-v1.log','complete-v1.log','report-v1.md']
+names += [str(p.relative_to(OUT)) for folder in ['controller-evidence','draft/expected'] for p in sorted((OUT/folder).glob('*.json'))]
+guard()
+report={'schema':'n36r3-binding-refresh-report-v1','node_id':'15.6','at':dt.datetime.now(dt.timezone.utc).isoformat(),'decision':'PASS_DISABLED_CPU_BINDINGS_ROOT_CONTROLLER_REVIEW_MANIFEST_REFRESH_AND_B5_REQUIRED','result':'Exact disabled binding refresh and repaired accounting snapshot passed; production attestation governance-blocked.','source':A['source'],'authority':bind(OUT/'authority-v1.json'),'repair_acceptance':A['repair_acceptance'],'repair_report':A['repair_report'],'parent_plan':A['parent_plan'],'summary':checks['summary'],'checks':checks['checks'],'supplemental_checks':extra['checks'],'remaining_gates':gates,'artifacts':{n:bind(OUT/n) for n in names},'stop_check':{'passed':True,**stop.binding()},'retained_gpu_hours':75.53335346582918,'retained_attempts':505,'health_identity':'n36_healthcheck_n36r3_preparation_001445','prior_charged_health_identity':'n36_healthcheck_n36r3_preparation_001426','later_fresh_health_identity_requirement':'If 001445 is attempted or charged, separately accept a later source identity and rebuild bindings; no replay or readiness transfer.','owner_journal_and_parent_artifact_hashes_unchanged':True,'source_edits':False,'source_adopted':False,'owning_accounting_adopted':False,'production_health_executed':False,'production_parent_attestation_executed':False,'runtime_ready':False,'release_enabled':False,'gpu_authorized':False,'score':None,'goal_complete':False,'target_met':False,'cpu_threads':2,'wall_cap_seconds':900,'code_ref':A['source'],'limitations':['No independent B5 or root-reviewed controller semantics fabricated','Historical runtime readiness fields retained as provenance only; preparation explicitly disables readiness','Finite arithmetic is not current headroom or authority','No broad test repeats; accepted repair tests not rerun','No source-only production bootstrap exercised; no production import attestation claim']}
+write('report-v1.json',report)
+with (OUT/'report-v1.sha256').open('x') as f:
+ for n in ['report-v1.json','report-v1.md']:f.write(bind(OUT/n)['sha256']+'  '+n+'\n')
+print(json.dumps({'status':report['decision'],'report':bind(OUT/'report-v1.json'),'score':None,'goal_complete':False}))

@@ -1,0 +1,31 @@
+{
+  "status": "CPU_EXECUTOR_RUNNING",
+  "node_id": "15.4",
+  "authority": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/submodule-source-repair-v1/authority-v1.json",
+    "sha256": "a606f25662bac2acf9cfe4e209e41b702a8f2ec951d61b3f4114e9f22e2e04c4"
+  },
+  "process_record": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/submodule-source-repair-v1/executor-process-v1.json",
+    "sha256": "a4c5d7bdda6ce4f3dc767c46a258d5874e4e5d640e4e27f2c01f58a7ede16e63"
+  },
+  "handles": {
+    "wrapper": {
+      "pid": 2539465,
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "start_ticks": 133929095,
+      "state": "S"
+    },
+    "executor": {
+      "pid": 2539466,
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "start_ticks": 133929098,
+      "state": "S"
+    }
+  },
+  "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/production_worktree",
+  "output_directory": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/submodule-source-repair-v1",
+  "gpu_authorized": false,
+  "base_source": "3f4ec9e27aeb139db246831e8ffc0325a8ea731c",
+  "next_step": "Monitor exact existing executor handles; after exit reconstruct commit/tests and review pinned LeRobot/LIBERO source closure before adoption. Then finish external runtime closure, accounting and prospective release. No duplicate executor/GPU dispatch."
+}

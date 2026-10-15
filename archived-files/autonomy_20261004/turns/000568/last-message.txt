@@ -1,0 +1,3 @@
+Continued N34 release preparation on unchanged source `3acfda1`. Recorded the 30-attempt/5-GPU-hour authority and corrected missing release metadata.
+
+Full validation remains active as PID `2785670`; no GPU cohort was dispatched. Saved the operational handoff for continued monitoring, then admission after validation passes. Original validation/formal/ablation evidence remains outstanding.

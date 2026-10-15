@@ -1,0 +1,3 @@
+N32R2 remains live on source `1065f381`, with controller `1818171` and GPU7 worker `3171608`. Identities, frozen hashes and ledger continuity verified; no restart or duplicate dispatch.
+
+Turn 190 summary saved. Next: monitor task1 C0 and reconcile terminal evidence. Validation, formal evaluation and required ablations remain outstanding.

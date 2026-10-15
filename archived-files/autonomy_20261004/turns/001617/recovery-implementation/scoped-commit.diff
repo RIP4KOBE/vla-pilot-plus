@@ -1,0 +1,1568 @@
+commit f256fecedbcf0d47b807aeaa196407cb24933a41
+Author:     RIP4KOBE <1155207509@link.cuhk.edu.hk>
+AuthorDate: Sat Oct 10 20:46:03 2026 +0000
+Commit:     RIP4KOBE <1155207509@link.cuhk.edu.hk>
+CommitDate: Sat Oct 10 20:46:03 2026 +0000
+
+    Add hash-bound one-use N36 engineering R1 recovery adapter
+
+diff --git a/configs/qd_ed_final/n36_engineering_r1_spec.disabled.json b/configs/qd_ed_final/n36_engineering_r1_spec.disabled.json
+new file mode 100644
+index 0000000..c51b68e
+--- /dev/null
++++ b/configs/qd_ed_final/n36_engineering_r1_spec.disabled.json
+@@ -0,0 +1,198 @@
++{
++  "schema": "n36-engineering-r1-operational-spec-v1",
++  "status": "PREPARATION_ONLY_REQUIRES_INDEPENDENT_REVIEW",
++  "node_id": "15.6",
++  "source_base_commit": "b8d6b98164f24a599a9aa1fa6ce862b12cb2fcf6",
++  "release_enabled": false,
++  "root_adopted": false,
++  "gpu_authorized": false,
++  "not_a_released_plan": true,
++  "decision": "PROSPECTIVE_RECOVERY_EXECUTION_DISABLED",
++  "scope": {
++    "identity": "N36_ENGINEERING_R1_C0_TASK0_001616",
++    "purpose": "engineering_diagnostic_only",
++    "episode": {
++      "task_id": 0,
++      "env_seed": 1969522881,
++      "policy_seed": 1969522881,
++      "init_index": 0,
++      "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
++      "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
++      "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
++      "split": "dev",
++      "seed_block": "dev",
++      "iteration": "N36_ENGINEERING_R1_C0_TASK0_001616",
++      "profile": "C0",
++      "timeout_seconds": 1800,
++      "episode_key": "n36_engineering_r1_t00_c0_001616",
++      "budget_bucket": "baseline",
++      "replacement": null
++    },
++    "health_resource_id": "n36_healthcheck_engineering_r1_t00_c0_001616",
++    "health_kind": "n36_engineering_r1_resource_preparation_v1",
++    "max_attempts": 1,
++    "max_healthchecks": 1,
++    "scientific_eligible": false,
++    "matched_improvement_eligible": false,
++    "promotion_eligible": false,
++    "replace_or_truncate_full_cohort": false,
++    "pool_with_past_or_future_controls": false,
++    "automatic_continuation": false,
++    "deadline": "2026-10-11T11:13:13+00:00",
++    "future_output_requirement": "A new empty root explicitly bound by future engineering authority; it must be outside source and historical evidence. This preparation directory grants no execution write authority."
++  },
++  "full_audit_view": {
++    "immutable_original_plan": {
++      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001467/recovery-preparation/plan.draft.json",
++      "bytes": 424773,
++      "sha256": "64bb1abd42cf931e6622311f04914a8c1656e8f4957342152459745204233947"
++    },
++    "cohort": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
++    "episodes": 40,
++    "expected_manifests_required": 40,
++    "extra_engineering_manifest_required": 1,
++    "original_expected_manifests_count": 0,
++    "original_prospective_manifest_count": 40,
++    "original_frozen": false,
++    "original_release_enabled": false,
++    "refresh_required": true,
++    "dispatch_authority": false,
++    "rules": "Retain full task-major C0,Q0,N34,N36 matrix, original scientific protocol review, thresholds, fixed dev seeds/init rows, timeouts, audit contract and stopping rules. Refresh source/runtime/native/manifests for the future reviewed adapter commit in new artifacts only; do not modify the original plan."
++  },
++  "accounting_proposal": {
++    "equation": "(1800+40)+(20+40)+200=2100",
++    "episode_timeout_seconds": 1800,
++    "episode_cleanup_seconds": 40,
++    "health_timeout_seconds": 20,
++    "health_cleanup_seconds": 40,
++    "root_overhead_seconds": 200,
++    "wall_seconds": 2100,
++    "gpu_reservation_seconds": 1900,
++    "gpu_reservation_hours_exact": "19/36",
++    "gpu_reservation_hours_decimal": "0.5277777777777777777777777777777777777778",
++    "root_overhead_is_not_gpu_reservation": true,
++    "retained_attempts": 507,
++    "new_attempts_max": 1,
++    "prospective_attempts_max": 508,
++    "global_attempt_cap": 1800,
++    "remaining_attempts_after_max": 1292,
++    "retained_gpu_hours": "75.64264702604362",
++    "retained_admission_margin_gpu_hours": "0.23357169027962",
++    "conservative_before_gpu_hours": "75.87621871632324",
++    "conservative_after_gpu_hours_exact": "75.87621871632324 + 19/36",
++    "conservative_after_gpu_hours_decimal": "76.40399649410101777777777777777777777778",
++    "absolute_cap_gpu_hours": "224",
++    "effective_weekly_cap_gpu_hours": "221.08404692669838",
++    "absolute_remaining_after_gpu_hours": "147.5960035058989822222222222222222222222",
++    "effective_remaining_after_gpu_hours": "144.6800504325973622222222222222222222222",
++    "protected_remaining_gpu_hours": {
++      "validation": "24.2408240024308155",
++      "formal": "12.0"
++    },
++    "unprotected_effective_remaining_after_gpu_hours": "108.4392264301665467222222222222222222222",
++    "bucket_additions": {
++      "baseline": 1,
++      "development": 0,
++      "validation": 0,
++      "formal": 0,
++      "recovery": 0
++    },
++    "baseline_before_after_cap": [
++      107,
++      108,
++      400
++    ],
++    "baseline_remaining_after": 292,
++    "automatic_recoveries": 0,
++    "health_invocations_max": 1,
++    "health_aggregate_seconds": 60,
++    "history_policy": "Retain all 507 attempts, all health charges, missing telemetry and admission margin. No protected reserves borrowed.",
++    "conservative_after_gpu_hours": "76.40399649410101777777777777777777777778",
++    "bucket_reason": "One explicitly authorized new C0 engineering diagnostic retains the parent baseline bucket; prior failed attempt remains charged. This is not an automatic retry or a scientific control.",
++    "wall_equation": "(1800+40)+(20+40)+200=2100"
++  },
++  "retained_ledger_prefixes": {
++    "attempt-ledger.jsonl": {
++      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
++      "sha256": "501510963420bacc7b680044d040ca2ba0883a89c907646db70f947b2575d8af",
++      "bytes": 7572377
++    },
++    "gpu-healthcheck-ledger.jsonl": {
++      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
++      "sha256": "9dd949d47ffbc3549eaf0ee6638833ec7a6123f7ad71d895a73e45e1f753e793",
++      "bytes": 114767
++    },
++    "gpu-hour-reservation-ledger.jsonl": {
++      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
++      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
++      "bytes": 401
++    }
++  },
++  "retained_snapshot_reference": {
++    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/retained-snapshot-v1.json",
++    "sha256": "67eff7abfa6e08e089ed671874ae1b1d52ef7584b7df33d04235068bb20250d9"
++  },
++  "binding_requirements": {
++    "schema_prefix": "n36-engineering",
++    "mandatory": [
++      "exact scope and accounting hashes",
++      "full audit-only plan hash and all 40 expected manifests",
++      "extra engineering manifest and exact audit-row mapping",
++      "final reviewed adapter source inventory and scientific-source equivalence",
++      "runtime and runtime closure",
++      "native build and controller semantics",
++      "strict lexical source/owner/output routing and both STOP entries",
++      "independent engineering B5 acceptance",
++      "root engineering protocol acceptance",
++      "root source adoption",
++      "owning accounting adoption with prefixes, whole snapshot and retained margin",
++      "distinct health root review/release and terminal readiness",
++      "distinct episode root review/release",
++      "official current-login codex_cli gpt-6-astra route",
++      "deadline and hard one-use resource caps"
++    ],
++    "dag": "disabled scope/accounting -> implementation and refreshed full audit view plus engineering manifest -> exact independent B5 -> root source/accounting/scope adoption -> bound engineering execution plan -> health root review/release -> fresh terminal health readiness -> episode root review/release -> single diagnostic context/receipt/terminal -> durable exhausted stop",
++    "forbidden": "No self-approved root/B5 records, no cyclic self-hash plan, no fake enabled plan, no blanket legacy release, no existing protocol digest replacement."
++  },
++  "unchanged_files_and_rules": "No scientific configs/core/controller thresholds, original full contract IDENTITIES/LIMITS/expected_rows, existing pinned protocol/accounting hashes, existing supervisor stopping logic, or DINO/native audit weakening. Any shared refactor must be behavior-preserving for existing full cohorts.",
++  "prospective_amendment": {
++    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json",
++    "sha256": "fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba"
++  },
++  "parent_specification": {
++    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001479/bounded-engineering-preparation/engineering-adapter-spec-v1.json",
++    "sha256": "9df1dbbbe985df1d02e88770356b59e47d346a9f546629e0d7262cb9e51ecd15"
++  },
++  "canonical_runtime": {
++    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001597/runtime.readiness-verified-v1.json",
++    "sha256": "d68870143e68008352710bec1f97db4fe1a3dae9c77ca2dd0ba6162262a5acfe"
++  },
++  "retained_snapshot": {
++    "dispatched": 507,
++    "aborted": 26,
++    "valid": 463,
++    "invalid": 18,
++    "completed": 481,
++    "running": 0,
++    "gpu_hours_consumed": 75.64264702604362,
++    "by_bucket": {
++      "baseline": 107,
++      "development": 313,
++      "validation": 60,
++      "formal": 0,
++      "recovery": 27
++    },
++    "reserved_attempts": 507,
++    "gpu_hours_by_bucket": {
++      "baseline": 15.785846603268592,
++      "development": 48.05656184449396,
++      "validation": 7.7591759975691845,
++      "formal": 0.0,
++      "recovery": 4.041062580711839
++    },
++    "gpu_healthcheck_hours": 0.24847032518900042,
++    "gpu_healthcheck_inflight": 0
++  },
++  "deployment_source_cwd": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
++  "source_adoption_required": true
++}
+diff --git a/scripts/qd_ed_n36_bridge.py b/scripts/qd_ed_n36_bridge.py
+index 9a05eea..cfd36e8 100644
+--- a/scripts/qd_ed_n36_bridge.py
++++ b/scripts/qd_ed_n36_bridge.py
+@@ -50,7 +50,8 @@ def command(plan,runtime,row):
+     from scripts import qd_ed_n36r4_admission as successor
+     audit_only = plan.get('schema') == 'n36-engineering-audit-view-v1'
+     if audit_only:
+-        from scripts.qd_ed_n36_engineering import validate_audit_view
++        from scripts.qd_ed_n36_engineering_api import for_plan
++        validate_audit_view = for_plan(plan).validate_audit_view
+         validate_audit_view(plan, require_manifests=False)
+     if not audit_only and (c.cohort(plan) == c.DRAFT_N36R4_COHORT
+             or (plan.get('protocol') or {}).get('sha256') == successor.PROTOCOL_SHA
+@@ -140,7 +141,8 @@ _ENGINEERING_IDENTITIES = ('main.eds_eval.job_id', 'main.eds_mechanism_pretest.r
+ 
+ def engineering_command(plan, runtime, row, *, audit=None):
+     """Map the audited C0 command; only two identity and four output overrides."""
+-    from scripts import qd_ed_n36_engineering as engineering
++    from scripts.qd_ed_n36_engineering_api import for_plan
++    engineering = for_plan(plan)
+     audit = engineering.read(plan['audit_plan']) if audit is None else audit
+     audited_row = engineering.audit_mapping(plan, audit, row)
+     argv, _ = command(audit, runtime, audited_row)
+@@ -156,7 +158,8 @@ def engineering_command(plan, runtime, row, *, audit=None):
+ 
+ 
+ def engineering_manifest(plan, runtime, row, *, audit=None):
+-    from scripts import qd_ed_n36_engineering as engineering
++    from scripts.qd_ed_n36_engineering_api import for_plan
++    engineering = for_plan(plan)
+     audit = engineering.read(plan['audit_plan']) if audit is None else audit
+     audited_row = engineering.audit_mapping(plan, audit, row)
+     original = manifest(audit, runtime, audited_row)
+diff --git a/scripts/qd_ed_n36_engineering_api.py b/scripts/qd_ed_n36_engineering_api.py
+new file mode 100644
+index 0000000..1739650
+--- /dev/null
++++ b/scripts/qd_ed_n36_engineering_api.py
+@@ -0,0 +1,17 @@
++"""Closed engineering-family routing; selection never grants admission."""
++from scripts import qd_ed_n36_engineering as parent
++
++
++def for_plan(plan):
++    from scripts import qd_ed_n36_engineering_r1 as recovery
++    if plan.get('schema') == parent.PLAN_SCHEMA:
++        for api in (parent, recovery):
++            if plan.get('cohort') == api.IDENTITY:
++                return api
++    elif plan.get('schema') == parent.AUDIT_SCHEMA:
++        scope = parent.read(plan['scope'])
++        for api in (parent, recovery):
++            if scope.get('specification') == api.SPECIFICATION:
++                api.validate_scope_reference(plan['scope'])
++                return api
++    raise ValueError('unknown engineering identity/specification')
+diff --git a/scripts/qd_ed_n36_engineering_r1.py b/scripts/qd_ed_n36_engineering_r1.py
+new file mode 100644
+index 0000000..fa58902
+--- /dev/null
++++ b/scripts/qd_ed_n36_engineering_r1.py
+@@ -0,0 +1,832 @@
++"""Prospective R1 fork of the frozen parent engineering adapter.
++
++Parent source remains unchanged; only exact amended terminal history is admitted.
++One-use N36 engineering diagnostic, separate from scientific cohort authority.
++
++This module consumes external, hash-bound approvals. It never creates an
++approval, adopts source/accounting, or supplies a continuation/retry entrypoint.
++Disabled scope/accounting and the full audit view do not authorize execution.
++Dispatch requires the complete detached release, source/runtime closure,
++owning-state adoption and bounded one-use admission below. CPU verification
++does not create those authorities or establish scientific success.
++"""
++import datetime as dt
++import hashlib
++import json
++from pathlib import Path
++import subprocess
++import time
++from decimal import Decimal
++
++from scripts import qd_ed_n23_worker as w, qd_ed_final_runner as r
++from scripts import qd_ed_n36_contract as c, qd_ed_n36_stop as stop
++from scripts import qd_ed_n36_bridge as b, qd_ed_n36_release as full
++from scripts import qd_ed_n36_accounting as accounting
++from scripts.qd_ed_n36r2_admission import OWNER, SESSION
++
++BASE = 'b8d6b98164f24a599a9aa1fa6ce862b12cb2fcf6'
++SOURCE = SESSION / 'variants/n36_engineering_adapter_001482/implementation_worktree'
++PREPARATION = OWNER.parent / 'autonomy_20261004/turns/001479/bounded-engineering-preparation'
++# Existing lexical mapping bound by the 001352 owner-alias repair authority
++# (ae1cf552f52c9083fff2b0bb98c076d86d03b12993725e08ae2812e5d6084a78).
++# This is route provenance only, never engineering adoption or dispatch authority.
++OWNER_ROUTE_MAPPING = {
++    'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
++    'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
++HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
++SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001617/recovery-implementation/engineering-r1-spec.disabled-v1.json', 'sha256': 'ccd1991b59cdc30043d6b7061cf4ad73f0ae6c867dd6ae0a9f3e72b1d71d6162'}
++AMENDMENT = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json', 'sha256': 'fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba'}
++IDENTITY = 'N36_ENGINEERING_R1_C0_TASK0_001616'
++EPISODE_KEY = 'n36_engineering_r1_t00_c0_001616'
++HEALTH_ID = 'n36_healthcheck_engineering_r1_t00_c0_001616'
++HEALTH_KIND = "n36_engineering_r1_resource_preparation_v1"
++PURPOSE = 'engineering_diagnostic_only'
++PLAN_SCHEMA = 'n36-engineering-execution-plan-v1'
++AUDIT_SCHEMA = 'n36-engineering-audit-view-v1'
++CONTEXT_SCHEMA = 'n36-engineering-worker-context-v1'
++LIMITS = {'attempts': 1, 'healthchecks': 1, 'episode_seconds': 1800,
++          'cleanup_seconds': 40, 'health_seconds': 20, 'health_cleanup_seconds': 40,
++          'gpu_seconds': 1900, 'health_aggregate_seconds': 60, 'root_overhead_seconds': 200,
++          'wall_seconds': 2100, 'automatic_recoveries': 0}
++JOURNALS = ('attempt-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl', 'gpu-hour-reservation-ledger.jsonl')
++BINDINGS = ('scope', 'accounting', 'audit_plan', 'engineering_manifest', 'source',
++            'scientific_source', 'scientific_equivalence', 'runtime', 'runtime_closure',
++            'native_build', 'controller_semantics', 'deployment')
++RUNTIME_INPUTS = ('run_name', 'runtime_inventory_path', 'runtime_inventory_sha256',
++                  'seed_plan_path', 'seed_plan_sha256', 'input_contract_label')
++# Changes outside these operational files require a different specification.
++OPERATIONAL_FILES = frozenset({
++    'scripts/qd_ed_n36_engineering_r1.py', 'scripts/qd_ed_n36_engineering_api.py',
++    'configs/qd_ed_final/n36_engineering_r1_spec.disabled.json', 'tests/test_n36_engineering_r1.py', 'scripts/qd_ed_n36_release.py',
++    'scripts/qd_ed_n36_bridge.py', 'scripts/qd_ed_n36_worker.py',
++    'scripts/qd_ed_n36_runner.py', 'scripts/qd_ed_n36_healthcheck.py',
++    'scripts/qd_ed_n36_report.py', 'tests/test_n36_engineering.py', 'tests/test_n36_stop_guard.py',
++    'tests/test_n36_engineering_integration.py', 'tests/n36_engineering_cpu_fixture.py'})
++
++
++def exact(actual, expected, label):
++    # Canonical JSON equality also distinguishes bool/int/float and rejects NaN.
++    w.require(w.canonical_sha(actual) == w.canonical_sha(expected), label)
++
++
++def reference(value):
++    w.require(isinstance(value, dict) and set(value) == {'path', 'sha256'}
++              and isinstance(value['path'], str) and Path(value['path']).is_absolute()
++              and str(Path(value['path'])) == value['path']
++              and isinstance(value['sha256'], str) and len(value['sha256']) == 64
++              and all(x in '0123456789abcdef' for x in value['sha256']), 'engineering exact reference')
++    return value
++
++
++def read(reference_value):
++    return w.read_ref(reference(reference_value))
++
++
++def specification():
++    spec = read(SPECIFICATION)
++    exact(spec['prospective_amendment'], AMENDMENT, 'R1 pinned amendment')
++    read(AMENDMENT)
++    return spec
++
++
++def terminal_parent_prefix():
++    """Read exact bytes, never infer permission by filtering old identities.
++
++    This is historical evidence only. Every new event is checked separately;
++    no historical outcome is replayed or subtracted from global accounting.
++    """
++    from scripts import qd_ed_n36_engineering as parent
++    amendment = read(AMENDMENT)
++    terminal = read(amendment['parent_terminal'])
++    parent_plan = read(amendment['parent_plan'])
++    spec = specification()
++    exact(spec['retained_ledger_prefixes'], amendment['ledger_prefixes'], 'R1 amended prefixes')
++    exact(terminal['ledger_prefixes'], amendment['ledger_prefixes'], 'R1 terminal prefixes')
++    exact(parent_plan['cohort'], parent.IDENTITY, 'R1 parent identity')
++    baseline = {}
++    for name in JOURNALS:
++        anchor = amendment['ledger_prefixes'][name]
++        path = Path(anchor['path'])
++        full.prefix(path, anchor)
++        with path.open('rb') as stream:
++            data = stream.read(anchor['bytes'])
++        w.require(len(data) == anchor['bytes']
++                  and hashlib.sha256(data).hexdigest() == anchor['sha256'],
++                  'R1 historical ledger prefix changed during read')
++        w.require(data.endswith(b'\n'), 'R1 complete journal prefix')
++        baseline[name] = [json.loads(line) for line in data.splitlines() if line.strip()]
++    groups = r.event_groups(baseline[JOURNALS[0]])
++    w.require(all(group[-1]['event'] in r.TERMINAL for group in groups.values()),
++              'R1 live parent attempt')
++    old = [event for event in baseline[JOURNALS[0]]
++           if str(event.get('attempt_id', '')).startswith('n36_engineering_')
++           or str(event.get('cohort', '')).startswith('N36_ENGINEERING')]
++    exact(old, terminal['episode_events'], 'R1 known parent terminal events only')
++    parent.episode_events(parent_plan, old)
++    w.require(old and old[-1]['event'] == 'aborted'
++              and terminal['classification'] == 'INVALID'
++              and terminal['scientific_eligible'] is False,
++              'R1 exact terminal parent failure')
++    health_groups = {}
++    for event in baseline[JOURNALS[1]]:
++        health_groups.setdefault(event['resource_id'], []).append(event)
++    w.require(all(group[-1]['event'] in ('completed', 'aborted')
++                  for group in health_groups.values()), 'R1 live parent health')
++    snapshot = r.budget_snapshot(baseline[JOURNALS[0]], baseline[JOURNALS[1]])
++    exact(snapshot, spec['retained_snapshot'], 'R1 charged terminal snapshot')
++    return baseline
++
++
++def row():
++    return specification()['scope']['episode']
++
++
++def disabled_scope():
++    """Pure disabled document; not a release or authority factory."""
++    return {'schema': 'n36-engineering-scope-v1', 'specification': dict(SPECIFICATION),
++            'scope': specification()['scope'], 'release_enabled': False}
++
++
++def disabled_accounting():
++    spec = specification()
++    return {'schema': 'n36-engineering-accounting-v1', 'specification': dict(SPECIFICATION),
++            'accounting': spec['accounting_proposal'],
++            'retained_ledger_prefixes': spec['retained_ledger_prefixes'],
++            'retained_snapshot_reference': spec['retained_snapshot_reference'],
++            'release_enabled': False, 'root_adopted': False}
++
++
++def validate_disabled_scope(document):
++    exact(document, disabled_scope(), 'exact disabled engineering scope')
++    return document
++
++
++def validate_disabled_accounting(document):
++    exact(document, disabled_accounting(), 'exact disabled engineering accounting')
++    return document
++
++
++
++def validate_scope_reference(value):
++    w.require(reference(value)['sha256'] == w.canonical_sha(disabled_scope()),
++              'pinned engineering scope canonical bytes')
++    return validate_disabled_scope(read(value))
++
++
++def validate_accounting_reference(value):
++    w.require(reference(value)['sha256'] == w.canonical_sha(disabled_accounting()),
++              'pinned engineering accounting canonical bytes')
++    return validate_disabled_accounting(read(value))
++
++def require_row(value):
++    exact(value, row(), 'exact engineering task0/C0 row')
++
++
++def deployment(plan):
++    value = read(plan['deployment'])
++    w.require(set(value) == {'schema', 'source_cwd', 'owner_root', 'output_root', 'stop_authority'}
++              and value['schema'] == 'n36-engineering-deployment-v1'
++              and value['source_cwd'] == str(SOURCE) and value['owner_root'] == str(OWNER)
++              and value['stop_authority'] == stop.binding(), 'engineering lexical deployment')
++    output = Path(value['output_root'])
++    # New execution space, never a checkout or historical evidence directory.
++    # The exact leaf is separately bound in B5 and all root approvals.
++    parent = SESSION / 'engineering-executions'
++    w.require(output.is_absolute() and str(output) == value['output_root']
++              and output.parent == parent and output.name == EPISODE_KEY
++              and output.resolve() == output and not output.is_symlink()
++              and SOURCE.resolve() == SOURCE and OWNER.resolve() == OWNER,
++              'engineering isolated output/source/owner route')
++    return value
++
++
++def owner_root(plan):
++    deployment(plan)
++    w.require(plan['worktree'] == str(SOURCE), 'engineering source cwd')
++    return OWNER
++
++
++def operational_binding(plan):
++    w.require(plan.get('schema') == PLAN_SCHEMA and plan.get('cohort') == IDENTITY
++              and plan.get('purpose') == PURPOSE, 'engineering operational identity')
++    return {'cohort': IDENTITY, 'purpose': PURPOSE, 'scope': plan['scope'],
++            'accounting': plan['accounting'], 'audit_plan': plan['audit_plan'],
++            'engineering_manifest': plan['engineering_manifest'], 'deployment': plan['deployment'],
++            'scientific_eligible': False, 'matched_improvement_eligible': False,
++            'promotion_eligible': False, 'continuation_authorized': False}
++
++
++def validate_audit_view(plan, *, require_manifests=True):
++    """Keep all forty scientific rows and gates in a disabled audit-only view."""
++    spec = specification()
++    exact(plan['runtime'], spec['canonical_runtime'], 'R1 canonical runtime reference')
++    original_ref = {k: spec['full_audit_view']['immutable_original_plan'][k] for k in ('path', 'sha256')}
++    original = read(original_ref)
++    fields = {'schema', 'original_plan', 'dispatch_authority', 'frozen', 'release_enabled',
++              'worktree', 'artifact_root', 'source', 'scientific_source', 'runtime', 'native_build',
++              'runtime_closure', 'controller_semantics', 'episodes', 'limits', 'worker_contract',
++              'deadline', 'stop_path', 'stop_authority', 'phase_authorization', 'expected_manifests',
++              'cohort', 'protocol', 'protocol_review', 'accounting', 'deployment', 'scope',
++              'attempt_identity', *RUNTIME_INPUTS}
++    w.require(set(plan) == fields and plan['schema'] == AUDIT_SCHEMA
++              and plan['dispatch_authority'] is False and plan['release_enabled'] is False
++              and plan['frozen'] is True and plan['attempt_identity'] == 'episode_key',
++              'disabled full audit view fields')
++    exact(plan['original_plan'], original_ref, 'immutable original plan anchor')
++    for key in ('cohort', 'episodes', 'limits', 'worker_contract', 'deadline', 'protocol', 'protocol_review', 'accounting'):
++        exact(plan[key], original[key], 'immutable audit science: ' + key)
++    exact(plan['episodes'], c.expected_rows(SOURCE, cohort=c.DRAFT_N36R4_COHORT), 'full audit matrix')
++    w.require(plan['limits'] == c.LIMITS and plan['worker_contract'] == c.WORKER_CONTRACT
++              and plan['protocol_review']['sha256'] == c.PROTOCOL_REVIEW_SHA, 'full audit gates')
++    validate_scope_reference(plan['scope'])
++    route = deployment(plan)
++    w.require(plan['worktree'] == str(SOURCE) and plan['artifact_root'] == str(Path(route['output_root']) / 'audit-only')
++              and plan['phase_authorization'] == {'dev': False, 'validation': False, 'formal': False},
++              'audit-only routing/phase')
++    c.validate_stop_binding(plan)
++    keys = {x['episode_key'] for x in plan['episodes']}
++    w.require(set(plan['expected_manifests']) == keys if require_manifests else
++              set(plan['expected_manifests']) <= keys, 'all40 engineering audit manifests')
++    w.require(plan['source'] == plan['scientific_source'], 'single reviewed adapter source')
++    for key in ('runtime', 'native_build', 'runtime_closure', 'controller_semantics', 'protocol', 'protocol_review', 'accounting'):
++        reference(plan[key])
++    return plan
++
++
++def audit_mapping(plan, audit, engineering_row):
++    require_row(engineering_row)
++    validate_plan_shape(plan)
++    exact(audit, read(plan['audit_plan']), 'hash-bound full audit view differs')
++    validate_audit_view(audit)
++    w.require(plan['schema'] == PLAN_SCHEMA and plan['episodes'] == [row()]
++              and plan['cohort'] == IDENTITY and plan['purpose'] == PURPOSE,
++              'separate engineering plan identity')
++    original = audit['episodes'][0]
++    exact({**original, 'iteration': IDENTITY, 'episode_key': EPISODE_KEY}, engineering_row,
++          'only audited task0/C0 identity may map to engineering')
++    for key in ('scope', 'deployment', 'source', 'scientific_source', 'runtime', 'runtime_closure',
++                'native_build', 'controller_semantics', 'worktree', *RUNTIME_INPUTS):
++        exact(plan[key], audit[key], 'engineering/audit binding: ' + key)
++    w.require(plan['artifact_root'] == deployment(plan)['output_root'], 'engineering output binding')
++    return original
++
++
++def validate_plan_shape(plan, *, released=False):
++    """Closed schema also used by disabled command/manifest preparation."""
++    fields = {'schema', 'frozen', 'release_enabled', 'cohort', 'purpose', 'episodes',
++              'limits', 'worker_contract', 'deadline', 'stop_path', 'stop_authority',
++              'phase_authorization', 'attempt_identity', 'worktree', 'artifact_root',
++              'authority', 'b5_review', 'expected_manifests', *BINDINGS, *RUNTIME_INPUTS}
++    w.require(set(plan) == fields and plan['schema'] == PLAN_SCHEMA
++              and type(plan['frozen']) is bool and type(plan['release_enabled']) is bool
++              and plan['frozen'] is plan['release_enabled']
++              and (not released or plan['release_enabled'] is True)
++              and plan['cohort'] == IDENTITY and plan['purpose'] == PURPOSE,
++              'distinct released engineering plan required')
++    exact(plan['runtime'], specification()['canonical_runtime'], 'R1 canonical runtime reference')
++    exact(plan['limits'], LIMITS, 'engineering finite limits')
++    exact(plan['episodes'], [row()], 'one engineering episode')
++    exact(plan['worker_contract'], c.WORKER_CONTRACT, 'unchanged worker gates')
++    w.require(plan['deadline'] == c.DEADLINE and plan['attempt_identity'] == 'episode_key'
++              and plan['phase_authorization'] == {'engineering': plan['release_enabled'], 'dev': False, 'validation': False, 'formal': False}
++              and (plan['expected_manifests'] == {EPISODE_KEY: plan['engineering_manifest']}
++                   or (not released and plan['release_enabled'] is False and plan['expected_manifests'] == {})),
++              'engineering phase/manifest authority')
++    owner_root(plan)
++    c.validate_stop_binding(plan)
++    validate_scope_reference(plan['scope'])
++    validate_accounting_reference(plan['accounting'])
++    return plan
++
++
++def validate_plan(plan):
++    validate_plan_shape(plan, released=True)
++    audit_mapping(plan, read(plan['audit_plan']), row())
++    return plan
++
++
++def scientific_equivalence(plan):
++    evidence = read(plan['scientific_equivalence'])
++    command = ['git', '-C', str(SOURCE), 'diff', '--name-only', BASE, plan['source']['commit'], '--']
++    changed = subprocess.check_output(command, text=True).splitlines()
++    w.require(set(changed) <= OPERATIONAL_FILES, 'scientific source changed outside operational adapter')
++    w.require(subprocess.run(['git', '-C', str(SOURCE), 'merge-base', '--is-ancestor', BASE,
++                             plan['source']['commit']], check=False, capture_output=True).returncode == 0,
++              'adapter source base ancestry')
++    exact(evidence, {'schema': 'n36-engineering-scientific-equivalence-v1', 'base_commit': BASE,
++          'source': plan['source'], 'changed_paths': sorted(changed), 'scientific_changes': False},
++          'exact reviewed scientific equivalence')
++
++
++def review_bindings(plan):
++    return {key: plan[key] for key in BINDINGS}
++
++
++def validate_authority(plan, authority):
++    """Validate separate approvals and retained prefixes, never write owner state."""
++    validate_plan(plan)
++    bindings = review_bindings(plan)
++    exact(read(plan['b5_review']), {'schema': 'n36-engineering-independent-b5-review-v1',
++          'decision': 'PASS_PREPARATION_REQUIRES_ROOT_RELEASE', **bindings,
++          'worker_receipts_are_future': True, 'release_enabled': False}, 'exact independent engineering B5')
++    fixed = {'schema': 'n36-engineering-budget-authority-v1', 'approved': True,
++             'cohort': IDENTITY, 'purpose': PURPOSE, **bindings, 'b5_review': plan['b5_review'],
++             'caps': c.CAPS, 'limits': LIMITS, 'automatic_recoveries': 0,
++             'validation_authorized': False, 'formal_authorized': False,
++             'coordinator_ends_at': c.DEADLINE}
++    variable = {'starts_at', 'weekly_window', 'approval_basis', 'protocol_acceptance',
++                'source_adoption', 'amendment', 'ledger_prefixes', 'margin_reference'}
++    w.require(set(authority) == set(fixed) | variable, 'engineering authority fields')
++    for key, value in fixed.items():
++        exact(authority[key], value, 'engineering authority binding: ' + key)
++    full.validate_caps(authority['caps'])
++    window = authority['weekly_window']
++    exact(window, {'origin_gpu_hours': 53.08404692669838, 'increment_gpu_hours': 168.,
++                   'ends_at': c.DEADLINE}, 'unchanged weekly cap/deadline')
++    starts = dt.datetime.fromisoformat(authority['starts_at'].replace('Z', '+00:00'))
++    w.require(starts.tzinfo is not None and starts < dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00')),
++              'engineering authority start')
++    read(authority['approval_basis'])
++    exact(read(authority['protocol_acceptance']), {
++          'schema': 'n36-engineering-root-protocol-acceptance-v1', 'approved': True,
++          **bindings, 'b5_review': plan['b5_review'], 'limits': LIMITS}, 'root engineering protocol acceptance')
++    exact(read(authority['source_adoption']), {
++          'schema': 'n36-engineering-source-adoption-v1', 'approved': True, **bindings,
++          'b5_review': plan['b5_review'], 'protocol_acceptance': authority['protocol_acceptance'],
++          'owner_root': str(OWNER), 'source_cwd': str(SOURCE)}, 'root engineering source adoption')
++    scientific_equivalence(plan)
++    spec = specification()
++    exact(authority['ledger_prefixes'], spec['retained_ledger_prefixes'], 'all three retained engineering prefixes')
++    retained = read({key: spec['retained_snapshot_reference'][key] for key in ('path', 'sha256')})
++    amendment = read(authority['amendment'])
++    exact(amendment, {'schema': 'n36-engineering-owning-accounting-v1', 'approved': True,
++          **bindings, 'source_adoption': authority['source_adoption'], 'caps': c.CAPS,
++          'limits': LIMITS, 'ledger_prefixes': authority['ledger_prefixes'],
++          'snapshot': spec['retained_snapshot'], 'arithmetic': spec['accounting_proposal'],
++          'margin_reference': authority['margin_reference'], 'automatic_recoveries': 0},
++          'owning engineering accounting adoption')
++    baseline = {}
++    for name in JOURNALS:
++        anchor = authority['ledger_prefixes'][name]
++        path = OWNER / 'data' / name
++        w.require(anchor['path'] == str(path), 'engineering owner prefix route')
++        full.prefix(path, anchor)
++        with path.open('rb') as stream:
++            baseline[name] = [json.loads(line) for line in stream.read(anchor['bytes']).splitlines() if line.strip()]
++    snap = r.budget_snapshot(baseline[JOURNALS[0]], baseline[JOURNALS[1]])
++    exact(snap, spec['retained_snapshot'], 'whole retained snapshot')
++    w.require(snap['reserved_attempts'] == snap['dispatched'] == 507
++              and snap['gpu_hours_consumed'] == 75.64264702604362
++              and all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(baseline[JOURNALS[0]]).values()),
++              'retained charges/unsettled attempts')
++    margin = accounting.retained_margin(OWNER, authority['margin_reference'])
++    w.require(Decimal(str(margin)) == Decimal('0.23357169027962'), 'unchanged retained margin')
++    exact(baseline, terminal_parent_prefix(), 'R1 authority terminal parent prefix')
++    return baseline
++
++
++def _verify_release_transaction(plan_ref, release_ref, *, health=False):
++    with b.closure.verification_phase('engineering_release'):
++        plan = validate_plan(read(plan_ref))
++        authority = read(plan['authority'])
++        validate_authority(plan, authority)
++        release = read(release_ref)
++        kind = 'health' if health else 'episode'
++        expected = {'schema': 'n36-engineering-' + kind + '-release-v1', 'approved': True,
++                    'plan': plan_ref, 'authority': plan['authority'], 'b5_review': plan['b5_review'],
++                    **review_bindings(plan), 'limits': LIMITS, 'purpose': PURPOSE,
++                    'issued_at': release.get('issued_at')}
++        if not health:
++            expected['readiness'] = release.get('readiness')
++        w.require(set(release) == set(expected) | {'root_review'}, 'engineering detached release fields')
++        exact({k: release[k] for k in expected}, expected, 'engineering detached release differs')
++        exact(read(release['root_review']), {**expected,
++              'schema': 'n36-engineering-root-' + kind + '-review-v1', 'decision': 'APPROVED'},
++              'engineering root review differs')
++        issued = dt.datetime.fromisoformat(release['issued_at'].replace('Z', '+00:00'))
++        starts = dt.datetime.fromisoformat(authority['starts_at'].replace('Z', '+00:00'))
++        end = dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00'))
++        w.require(issued.tzinfo is not None and starts <= issued <= dt.datetime.now(dt.timezone.utc)
++                  and (end - issued).total_seconds() >= 2100, 'engineering release full 2100-second envelope')
++        audit = read(plan['audit_plan'])
++        evidence = full.verify_audit_closure(audit)
++        runtime = evidence.runtime
++        mapping = audit_mapping(plan, audit, row())
++        manifest = b.verify_engineering_manifest(plan['engineering_manifest'], plan, runtime, row(), audit=audit)
++        w.require(evidence.manifests[mapping['episode_key']]['row'] == mapping, 'verified audit row binding')
++        if not health:
++            terminal = validate_readiness(plan_ref, release)
++            w.require(terminal['time_unix'] <= issued.timestamp(),
++                      'engineering episode release predates settled health')
++        return plan, runtime, authority, {EPISODE_KEY: manifest}
++
++
++def validate_engineering_release(plan_ref, release_ref):
++    return _verify_release_transaction(plan_ref, release_ref)[:3]
++
++
++def validate_engineering_health_release(plan_ref, release_ref):
++    return _verify_release_transaction(plan_ref, release_ref, health=True)[:3]
++
++
++validate_release = validate_engineering_release
++validate_health_release = validate_engineering_health_release
++
++
++def _identity(value):
++    return {key: value[key] for key in ('split', 'iteration', 'profile', 'task_id', 'env_seed', 'policy_seed', 'init_index')}
++
++
++def episode_events(plan, events):
++    """Every supplied event is a prospective suffix, never a historical filter."""
++    binding = operational_binding(plan)
++    selected = row()
++    immutable = ('attempt_id', 'episode_key', 'identity', 'budget_bucket', 'replacement',
++                 'plan_sha256', 'release', 'source_commit', 'runtime_manifest_sha256',
++                 'runtime_inventory_sha256', 'init_row_sha256', 'output_dir', 'physical_gpu',
++                 'ledger_prefix', 'context', 'reserved_gpu_seconds', 'accounting_admission', *binding)
++    for event in events:
++        w.require(event.get('attempt_id') == event.get('episode_key') == EPISODE_KEY
++                  and event.get('identity') == _identity(selected), 'engineering journal identity')
++        exact(event.get('identity'), _identity(selected), 'engineering exact typed journal identity')
++        c.event_binding(selected, event)
++        for key, value in binding.items():
++            exact(event.get(key), value, 'engineering journal binding: ' + key)
++        w.require(event.get('source_commit') == plan['source']['commit']
++                  and event.get('runtime_manifest_sha256') == plan['runtime']['sha256']
++                  and event.get('runtime_inventory_sha256') == plan['runtime_inventory_sha256']
++                  and event.get('init_row_sha256') == selected['init_row_sha256']
++                  and event.get('output_dir') == str(Path(plan['artifact_root']) / 'attempts' / EPISODE_KEY)
++                  and type(event.get('physical_gpu')) is int and event['physical_gpu'] == 7
++                  and type(event.get('reserved_gpu_seconds')) is int and event['reserved_gpu_seconds'] == 1840
++                  and event.get('accounting_admission', {}).get('reserved_gpu_seconds') == 1840,
++                  'engineering episode full reservation binding')
++    if events:
++        w.require(all(all(key in event and event[key] == events[0][key] for key in immutable)
++                      for event in events), 'engineering episode lifecycle binding changed')
++        kinds = [event['event'] for event in events]
++        w.require(kinds in (['reserved'], ['reserved', 'dispatched'],
++                            ['reserved', 'dispatched', 'valid'], ['reserved', 'dispatched', 'aborted']),
++                  'engineering one-use episode lifecycle/replay')
++        if 'dispatched' in kinds:
++            w.require(type(events[1].get('timeout_seconds')) is int and events[1]['timeout_seconds'] == 1800,
++                      'engineering exact dispatched timeout')
++        if kinds[-1] in r.TERMINAL:
++            w.require(c.finite(events[-1]['gpu_process_wall_seconds'], 'engineering episode charge') <= 1840,
++                      'engineering episode exceeds reservation')
++    return events
++
++
++def resource_events(plan, events):
++    binding = operational_binding(plan)
++    for event in events:
++        w.require(event.get('resource_id') == HEALTH_ID and event.get('kind') == HEALTH_KIND,
++                  'engineering sole health identity')
++        for key, value in binding.items():
++            exact(event.get(key), value, 'engineering health binding: ' + key)
++        exact({key: event.get(key) for key in ('timeout_seconds', 'cleanup_seconds', 'reserved_gpu_seconds', 'physical_gpu', 'gpu_uuid')},
++              {'timeout_seconds': 20, 'cleanup_seconds': 40, 'reserved_gpu_seconds': 60,
++               'physical_gpu': 7, 'gpu_uuid': c.GPU_UUID}, 'engineering health full reservation')
++        w.require(event.get('source_commit') == plan['source']['commit'] and event.get('runtime') == plan['runtime']
++                  and read(event['plan']) == plan
++                  and event['accounting_admission']['reserved_gpu_seconds'] == 60, 'engineering health source/plan')
++    if events:
++        immutable = ('plan', 'release', 'source_commit', 'runtime', 'accounting_admission', *binding)
++        w.require(all(all(key in event and event[key] == events[0][key] for key in immutable) for event in events),
++                  'engineering health lifecycle binding changed')
++        kinds = [event['event'] for event in events]
++        w.require(kinds in (['reserved'], ['reserved', 'dispatched'], ['reserved', 'aborted'],
++                            ['reserved', 'dispatched', 'completed'], ['reserved', 'dispatched', 'aborted']),
++                  'engineering one-use health lifecycle/replay')
++        if kinds[-1] in ('completed', 'aborted'):
++            w.require(c.finite(events[-1]['gpu_process_wall_seconds'], 'engineering health charge') <= 60,
++                      'engineering health exceeds reservation')
++    return events
++
++
++def live_journals(plan, authority, events, resources, reservations):
++    baseline = validate_authority(plan, authority)
++    return _journal_suffixes(plan, baseline, events, resources, reservations)
++
++
++def _journal_suffixes(plan, baseline, events, resources, reservations):
++    # Pure comparison after live authority/prefix validation; no admission token.
++    exact(baseline, terminal_parent_prefix(), 'R1 exact terminal baseline required')
++    suffix = {}
++    for name, current in zip(JOURNALS, (events, resources, reservations)):
++        old = baseline[name]
++        exact(current[:len(old)], old, 'engineering retained prefix snapshot')
++        suffix[name] = current[len(old):]
++    w.require(not suffix[JOURNALS[2]], 'engineering foreign reservation suffix')
++    local = episode_events(plan, suffix[JOURNALS[0]])
++    health = resource_events(plan, suffix[JOURNALS[1]])
++    if local:
++        w.require(health and health[-1]['event'] == 'completed'
++                  and health[-1]['time_unix'] <= local[0]['time_unix'],
++                  'engineering health must finish before sole episode reservation')
++        release = read(local[0]['release'])
++        w.require(release['schema'] == 'n36-engineering-episode-release-v1'
++                  and read(release['plan']) == plan
++                  and local[0]['plan_sha256'] == release['plan']['sha256'],
++                  'engineering episode journal release/plan binding')
++        issued = dt.datetime.fromisoformat(release['issued_at'].replace('Z', '+00:00'))
++        times = [c.finite(event['time_unix'], 'engineering episode event time') for event in local]
++        end = dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00'))
++        w.require(issued.tzinfo is not None and health[-1]['time_unix'] <= issued.timestamp()
++                  <= times[0] and times == sorted(times)
++                  and times[-1] <= min(end.timestamp(), dt.datetime.now(dt.timezone.utc).timestamp()),
++                  'engineering episode prospective lifecycle timestamps')
++    return local, health
++
++
++def reconcile(plan, events, verify_terminal, *, live_handles=()):
++    """A reservation exhausts the scope forever, independently of pause flags."""
++    require_row(plan['episodes'][0])
++    w.require(plan['episodes'] == [row()], 'engineering single row reconciliation')
++    baseline = terminal_parent_prefix()
++    old = baseline[JOURNALS[0]]
++    exact(events[:len(old)], old, 'R1 exact terminal parent prefix required')
++    local = events[len(old):]
++    episode_events(plan, local)
++    result = {'purpose': PURPOSE, 'scope_exhausted': bool(local), 'continuation_authorized': False,
++              'scientific_eligible': False, 'next_row': None, 'outcomes': []}
++    if live_handles or (local and local[-1]['event'] not in r.TERMINAL):
++        return {**result, 'status': 'LIVE_OR_UNSETTLED'}
++    if not local:
++        return {**result, 'status': 'READY_FOR_ROOT_RELEASE', 'next_row': row()}
++    final = local[-1]
++    if final['event'] != 'valid':
++        return {**result, 'status': 'INVALID_STOP', 'terminal': final}
++    try:
++        w.require(final.get('outcome_valid') is True and final.get('required_cost_telemetry_complete') is True
++                  and type(final.get('success')) is bool, 'engineering valid terminal gates')
++        verify_terminal(row(), final)
++    except (ValueError, KeyError, IndexError, TypeError, OSError, RuntimeError, ArithmeticError) as exc:
++        return {**result, 'status': 'INVALID_STOP', 'terminal': final, 'reason': str(exc)}
++    return {**result, 'status': 'PAUSED_FOR_ROOT_G3', 'terminal': final}
++
++
++
++def launch_guard(plan, authority, *, need=1840, now=None):
++    validate_plan_shape(plan, released=True)
++    owner_root(plan)
++    c.validate_stop_binding(plan)
++    now = now or dt.datetime.now(dt.timezone.utc)
++    w.require(dt.datetime.fromisoformat(authority['starts_at'].replace('Z', '+00:00')) <= now,
++              'engineering authority has not started')
++    stop.check(now=now, ends_at=authority['weekly_window']['ends_at'], need=need)
++
++
++def validate_owner_route(state):
++    """Preserve historical spelling; neither resolution nor state grants a route."""
++    w.require(state.get('canonical_worktree') == str(OWNER),
++              'engineering owning state canonical worktree differs')
++    lexical = state.get('worktree')
++    w.require(lexical in (str(OWNER), HISTORICAL_OWNER),
++              'engineering owning state lexical worktree differs')
++    if lexical == HISTORICAL_OWNER:
++        mapping = read(OWNER_ROUTE_MAPPING)
++        w.require(mapping.get('schema') == 'n36r3-owner-alias-evidence-v1'
++                  and mapping.get('lexical_worktree') == HISTORICAL_OWNER
++                  and mapping.get('canonical_worktree') == str(OWNER)
++                  and mapping.get('resolved_worktree') == str(OWNER)
++                  and mapping.get('samefile') is True,
++                  'engineering authorized owner mapping differs')
++        alias = Path(lexical)
++        try:
++            matches = (alias.resolve(strict=True) == OWNER
++                       and alias.is_dir() and alias.samefile(OWNER))
++        except (OSError, RuntimeError):
++            matches = False
++        w.require(matches, 'engineering owning state alias identity differs')
++
++
++def validate_state(plan, authority, state):
++    validate_owner_route(state)
++    w.require(state.get('n36_engineering_budget_authority') == plan['authority'],
++              'engineering state adoption missing')
++    caps, budget = authority['caps'], state['budget']
++    full.validate_caps(caps)
++    w.require(r.authorized_gpu(state) == 7 and budget['max_episode_attempts'] == caps['attempts']
++              and budget['max_gpu_hours'] == caps['gpu_hours'] and budget['reserved'] == caps['buckets']
++              and budget['gpu_hour_reservations'] == caps['protected_gpu_hours']
++              and budget['amendment'] == authority['amendment'], 'engineering owning budget differs')
++    isolation = state.get('resource_isolation', {})
++    w.require(isolation.get('status') == 'ACTIVE' and isolation.get('validation_status') == 'PASS'
++              and isolation.get('private_budget') is True
++              and not state.get('external_resource_hold', {}).get('do_not_auto_resume', False),
++              'engineering private resource admission')
++
++
++def headroom(snap, local, *, health, margin, protected):
++    """Unchanged global gates AND one-use diagnostic bounds; no global mutation."""
++    need = 60 if health else 1840
++    w.require(Decimal(str(margin)) == Decimal('0.23357169027962'), 'engineering retained margin required')
++    result = accounting.headroom(snap, local, retained_margin_hours=margin,
++                                 protected_hours=protected, healthcheck=health, need=need)
++    w.require(accounting.seconds(local['gpu_hours_consumed']) + need <= 1900,
++              'engineering 1900-second GPU scope cap')
++    w.require(accounting.seconds(local['gpu_healthcheck_hours']) + (60 if health else 0) <= 60,
++              'engineering 60-second health cap')
++    w.require(local['reserved_attempts'] == 0, 'engineering attempt slot consumed')
++    # Before health, reserve room for the full episode too; root overhead is
++    # wall-only and is never counted toward available GPU capacity.
++    if health:
++        charge = accounting.seconds(snap['gpu_hours_consumed']) + accounting.seconds(margin)
++        reserved = accounting.seconds(protected)
++        w.require(min(accounting.ABSOLUTE_HOURS, accounting.WEEKLY_HOURS) * 3600 - charge - reserved >= 1900,
++                  'engineering full health plus episode headroom')
++    return result
++
++
++def admission(plan, authority, state, events, resources, reservations, selected, *, now, gpu_idle, release_refs=None):
++    require_row(selected)
++    w.require(release_refs is not None and gpu_idle is True, 'engineering detached admission and idle device')
++    verified, _, approved = validate_release(*release_refs)
++    exact(verified, plan, 'engineering admission plan changed')
++    exact(approved, authority, 'engineering admission authority changed')
++    local, health = live_journals(plan, authority, events, resources, reservations)
++    w.require(not local and health and health[-1]['event'] == 'completed', 'engineering one-use/health readiness')
++    validate_readiness(release_refs[0], read(release_refs[1]), resources=resources)
++    validate_state(plan, authority, state)
++    w.require(all(group[-1]['event'] in r.TERMINAL for group in r.event_groups(events).values()),
++              'engineering unsettled global attempts')
++    snap = r.budget_snapshot(events, resources)
++    for cap in (224., float(accounting.WEEKLY_HOURS)):
++        effective_state = {**state, 'budget': {**state['budget'], 'max_gpu_hours': cap}}
++        w.require(r.check_budget_limits(effective_state, snap, selected, reservations,
++                  bucket_caps=c.CAPS['buckets'], amendment=authority['amendment']) == 1800,
++                  'engineering full 1840-second global admission')
++    protected = sum(max(0., hours - snap['gpu_hours_by_bucket'][key])
++                    for key, hours in c.CAPS['protected_gpu_hours'].items())
++    reservation = headroom(snap, r.budget_snapshot(local, health), health=False,
++        margin=accounting.retained_margin(OWNER, authority['margin_reference']), protected=protected)
++    launch_guard(plan, authority, now=now)
++    return {**snap, 'n36_reservation': reservation}
++
++
++def child_environment(plan, runtime):
++    owner_root(plan)
++    env = r.child_environment(runtime)
++    env['PYTHONPATH'] = ':'.join(str(SOURCE / p) for p in
++                               ('', 'third_party/lerobot/src', 'third_party/rdt', 'third_party/libero_pro'))
++    env['PYTHONNOUSERSITE'] = '1'
++    return env
++
++
++def reserve_health(plan_ref, release_ref, resource_id, *, timeout_seconds):
++    return reserve_health_handoff(plan_ref, release_ref, resource_id,
++                                  timeout_seconds=timeout_seconds)[0]
++
++
++def health_handoff_binding(plan, runtime, authority, state):
++    """Local comparison digest, never a dispatch or reusable admission token."""
++    return w.canonical_sha([plan, runtime, authority, state])
++
++
++def validate_health_handoff(root, plan_ref, release_ref, record, binding):
++    """Caller holds runner lock; recheck the spent admission under state lock.
++
++    Failure leaves the original reservation unsettled. No output, second
++    reservation, device observation or child work belongs in this check.
++    """
++    from scripts import qd_ed_n36_runner as runner
++    with r.locked(root / 'data/qd-ed-state.lock'):
++        plan, runtime, authority = validate_health_release(plan_ref, release_ref)
++        w.require(owner_root(plan) == root, 'engineering health owner changed')
++        state, events, resources, reservations = runner.snapshot(root, authority)
++        local, health = live_journals(plan, authority, events, resources, reservations)
++        validate_state(plan, authority, state)
++        w.require(not local and len(health) == 1 and record['event'] == 'reserved',
++                  'engineering health handoff requires sole original reservation')
++        exact(health, [record], 'engineering health handoff reservation changed')
++        w.require(state['run_name'] == plan['run_name'] and state['artifacts'] == runtime['artifact_root'],
++                  'engineering owning run identity')
++        w.require(health_handoff_binding(plan, runtime, authority, state) == binding,
++                  'engineering health handoff bindings/state changed')
++        w.require(all(group[-1]['event'] in r.TERMINAL for group in r.event_groups(events).values()),
++                  'engineering health global unsettled attempt')
++        r.runtime_gpu(runtime, state)
++        return plan, runtime, authority
++
++
++def reserve_health_handoff(plan_ref, release_ref, resource_id, *, timeout_seconds):
++    """Consume the sole health slot durably under both existing runner locks."""
++    import os
++    from scripts import qd_ed_n36_runner as runner
++    w.require(resource_id == HEALTH_ID and type(timeout_seconds) is int and timeout_seconds == 20,
++              'engineering sole 20-second health probe')
++    runner.source_execution.active()
++    plan, runtime, authority = validate_health_release(plan_ref, release_ref)
++    runner.source_execution.attest(SOURCE, plan['source'], read(plan['runtime_closure']),
++        binding=runner.worker.runtime_receipt_binding(release_ref, plan, w.process_identity(), 'runtime_before'))
++    root = owner_root(plan)
++    with r.locked(root / 'data/qd-ed-runner.lock', nonblocking=True):
++        with r.locked(root / 'data/qd-ed-state.lock'):
++            plan, runtime, authority = validate_health_release(plan_ref, release_ref)
++            state, events, resources, reservations = runner.snapshot(root, authority)
++            local, health = live_journals(plan, authority, events, resources, reservations)
++            validate_state(plan, authority, state)
++            w.require(not local and not health, 'engineering health/episode identity consumed forever')
++            w.require(state['run_name'] == plan['run_name'] and state['artifacts'] == runtime['artifact_root'],
++                      'engineering owning run identity')
++            w.require(all(group[-1]['event'] in r.TERMINAL for group in r.event_groups(events).values()),
++                      'engineering health global unsettled attempt')
++            output = Path(plan['artifact_root'])
++            w.require(not output.is_symlink() and (not output.exists() or (output.is_dir() and not any(output.iterdir()))),
++                      'engineering new empty output root required')
++            w.require(not runner.existing_handles(plan, events), 'engineering orphan output')
++            snap = r.budget_snapshot(events, resources)
++            for cap in (224., float(accounting.WEEKLY_HOURS)):
++                effective_state = {**state, 'budget': {**state['budget'], 'max_gpu_hours': cap}}
++                w.require(r.check_budget_limits(effective_state, snap, row(), reservations,
++                    bucket_caps=c.CAPS['buckets'], amendment=authority['amendment']) == 1800,
++                    'engineering full prospective episode headroom')
++            protected = sum(max(0., hours - snap['gpu_hours_by_bucket'][key])
++                            for key, hours in c.CAPS['protected_gpu_hours'].items())
++            reservation = headroom(snap, r.budget_snapshot(local, health), health=True,
++                margin=accounting.retained_margin(root, authority['margin_reference']), protected=protected)
++            launch_guard(plan, authority, need=2100)
++            device = runner.device_check()
++            launch_guard(plan, authority, need=2100)
++            record = {**operational_binding(plan), 'resource_id': resource_id, 'event': 'reserved',
++                      'kind': HEALTH_KIND, 'plan': plan_ref, 'release': release_ref,
++                      'source_commit': plan['source']['commit'], 'runtime': plan['runtime'],
++                      'physical_gpu': 7, 'gpu_uuid': c.GPU_UUID, 'timeout_seconds': 20,
++                      'cleanup_seconds': 40, 'reserved_gpu_seconds': 60,
++                      'accounting_admission': reservation, 'admission': device, 'time_unix': time.time()}
++            r.budget_snapshot(events, [*resources, record])
++            with (root / 'data/gpu-healthcheck-ledger.jsonl').open('a') as stream:
++                stream.write(json.dumps(record, sort_keys=True, allow_nan=False) + '\n')
++                stream.flush(); os.fsync(stream.fileno())
++            r.sync_state_from_journal(root, events)
++            # Bind the post-sync state, including accounting updates made by
++            # this reservation, before releasing either lock.
++            binding = health_handoff_binding(plan, runtime, authority,
++                                            r.read_state(root / 'research-state.yaml'))
++            return record, binding
++
++
++def validate_readiness(plan_ref, release_record, *, resources=None):
++    from scripts import qd_ed_gpu_probe as probe
++    ready = release_record['readiness']
++    w.require(isinstance(ready, dict) and set(ready) == {'health_release', 'terminal'}, 'engineering readiness fields')
++    plan, runtime, authority = validate_health_release(plan_ref, ready['health_release'])
++    terminal = read(ready['terminal'])
++    output = Path(plan['artifact_root']) / 'healthchecks' / HEALTH_ID
++    w.require(terminal['output_dir'] == str(output) and ready['terminal']['path'] == str(output / 'healthcheck-result.json')
++              and terminal['plan'] == plan_ref and terminal['release'] == ready['health_release']
++              and terminal['source_commit'] == plan['source']['commit'] and terminal['runtime'] == plan['runtime']
++              and terminal['event'] == 'completed' and terminal.get('provider_verified') is True
++              and terminal['source_script_sha256'] == w.sha(SOURCE / 'scripts/qd_ed_gpu_probe.py'),
++              'engineering terminal readiness binding')
++    # Validate terminal fields using the same strict lifecycle validator below;
++    # the real durable sequence, never a synthetic prefix, is mandatory here.
++    if resources is None:
++        resources = r.read_events(OWNER / 'data/gpu-healthcheck-ledger.jsonl')
++    baseline = terminal_parent_prefix()[JOURNALS[1]]
++    exact(resources[:len(baseline)], baseline, 'R1 readiness terminal parent prefix')
++    group = resources[len(baseline):]
++    resource_events(plan, group)
++    w.require([event['event'] for event in group] == ['reserved', 'dispatched', 'completed']
++              and group[-1] == terminal, 'engineering health not durably settled')
++    evidence = r.read_json(output / 'probe-evidence.json')
++    observed = c.finite(evidence['time_unix'], 'engineering health observation time')
++    completed = c.finite(terminal['time_unix'], 'engineering health completion time')
++    starts = dt.datetime.fromisoformat(authority['starts_at'].replace('Z', '+00:00')).timestamp()
++    end = dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00')).timestamp()
++    dispatched = c.finite(group[1]['time_unix'], 'engineering health dispatch time')
++    reserved = c.finite(group[0]['time_unix'], 'engineering health reservation time')
++    issued = dt.datetime.fromisoformat(read(ready['health_release'])['issued_at'].replace('Z', '+00:00')).timestamp()
++    w.require(starts <= issued <= reserved <= dispatched <= observed <= completed <= min(end, dt.datetime.now(dt.timezone.utc).timestamp()),
++              'engineering fresh health authority timestamps')
++    w.require(evidence['resource_id'] == HEALTH_ID and w.sha(output / 'probe-frame.png') == evidence['frame_png_sha256']
++              and all(terminal.get(key) == value for key, value in evidence.items() if key != 'time_unix'),
++              'engineering health evidence binding')
++    probe.validate_probe_evidence(evidence, runtime['gpu_mapping'])
++    return terminal
++
++
++def execute_one(plan_ref, release_ref):
++    from scripts.qd_ed_n36_runner import execute_one as run_reserved_episode
++    return run_reserved_episode(plan_ref, release_ref, _engineering=True)
++
++
++
++def main():
++    """Explicit one-shot engineering entry; no loop, retry or adoption command."""
++    import argparse
++    import sys
++    w.require('_n36_source_bootstrap' in sys.modules, 'engineering source-only bootstrap required')
++    parser = argparse.ArgumentParser(description=__doc__)
++    for name in ('plan', 'plan-sha256', 'release', 'release-sha256'):
++        parser.add_argument('--' + name, required=True)
++    args = parser.parse_args()
++    result = execute_one({'path': args.plan, 'sha256': args.plan_sha256},
++                         {'path': args.release, 'sha256': args.release_sha256})
++    print(result['status'])
++    return 0 if result['status'] == 'PAUSED_FOR_ROOT_G3' else 1
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+diff --git a/scripts/qd_ed_n36_healthcheck.py b/scripts/qd_ed_n36_healthcheck.py
+index 00a9339..726ed39 100644
+--- a/scripts/qd_ed_n36_healthcheck.py
++++ b/scripts/qd_ed_n36_healthcheck.py
+@@ -43,7 +43,8 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
+     """One bounded probe, no retry, no episode attempt, no readiness mutation."""
+     engineering = w.read_ref(plan_ref).get('schema') == 'n36-engineering-execution-plan-v1'
+     if engineering:
+-        from scripts import qd_ed_n36_engineering as api
++        from scripts.qd_ed_n36_engineering_api import for_plan
++        api = for_plan(w.read_ref(plan_ref))
+         validate, reserve = api.validate_health_release, api.reserve_health_handoff
+         owner, environment, guard = api.owner_root, api.child_environment, api.launch_guard
+         n36r3 = True  # same separate-health process mechanics, distinct authority
+diff --git a/scripts/qd_ed_n36_release.py b/scripts/qd_ed_n36_release.py
+index e077930..f632949 100644
+--- a/scripts/qd_ed_n36_release.py
++++ b/scripts/qd_ed_n36_release.py
+@@ -167,7 +167,8 @@ def verify_audit_closure(plan):
+     view remains disabled and cannot be passed through validate_plan.
+     """
+     if plan.get('schema') == 'n36-engineering-audit-view-v1':
+-        from scripts.qd_ed_n36_engineering import validate_audit_view
++        from scripts.qd_ed_n36_engineering_api import for_plan
++        validate_audit_view = for_plan(plan).validate_audit_view
+         validate_audit_view(plan)
+     w.require(plan['episodes'] == c.plan_rows(plan)
+               and len(plan['episodes']) == 40
+diff --git a/scripts/qd_ed_n36_runner.py b/scripts/qd_ed_n36_runner.py
+index 6e68251..189fdff 100644
+--- a/scripts/qd_ed_n36_runner.py
++++ b/scripts/qd_ed_n36_runner.py
+@@ -69,7 +69,8 @@ def execute_one(plan_ref, release_ref, *, _engineering=False):
+     """
+     engineering = _engineering
+     if engineering:
+-        from scripts import qd_ed_n36_engineering as api
++        from scripts.qd_ed_n36_engineering_api import for_plan
++        api = for_plan(w.read_ref(plan_ref))
+         lifecycle = api
+         get_owner, environment = api.owner_root, api.child_environment
+         binding, guard = api.operational_binding, api.launch_guard
+diff --git a/scripts/qd_ed_n36_worker.py b/scripts/qd_ed_n36_worker.py
+index 4c2bc72..1417255 100644
+--- a/scripts/qd_ed_n36_worker.py
++++ b/scripts/qd_ed_n36_worker.py
+@@ -75,7 +75,8 @@ def release_api(plan_ref):
+     """Use only the N36 detached release family, never a predecessor release."""
+     plan = w.read_ref(plan_ref)
+     if plan.get('schema') == 'n36-engineering-execution-plan-v1':
+-        from scripts import qd_ed_n36_engineering as release
++        from scripts.qd_ed_n36_engineering_api import for_plan
++        release = for_plan(plan)
+     else:
+         w.require(plan.get('schema') == 'n36-released-plan-v1', 'unsupported worker release schema')
+         from scripts import qd_ed_n36_release as release
+@@ -131,7 +132,8 @@ def context_for(plan_ref, row, release_ref=None):
+ 
+ def operational_binding(plan):
+     if plan.get('schema') == 'n36-engineering-execution-plan-v1':
+-        from scripts.qd_ed_n36_engineering import operational_binding as binding
++        from scripts.qd_ed_n36_engineering_api import for_plan
++        binding = for_plan(plan).operational_binding
+         return binding(plan)
+     return c.operational_binding(plan)
+ 
+@@ -364,6 +366,9 @@ def verify_receipt(context_ref, receipt_ref, process_record):
+             required |= {'scripts.qd_ed_n36_engineering', 'scripts.qd_ed_n36_release',
+                          'scripts.qd_ed_n36_accounting', 'scripts.qd_ed_n36_stop',
+                          'scripts.qd_ed_n36_source'}
++            from scripts.qd_ed_n36_engineering_api import for_plan
++            required.add('scripts.qd_ed_n36_engineering_api')
++            required.add(for_plan(plan).__name__)
+         if phase == 'loaded_after' and row['profile']=='N36':
+             required.add('scripts.qd_ed_n36_response')
+         if phase == 'loaded_after':
+@@ -375,7 +380,10 @@ def verify_receipt(context_ref, receipt_ref, process_record):
+         if plan['schema'] == 'n36-engineering-execution-plan-v1':
+             compiled = {(v['module'], v['path'], v['sha256'])
+                         for v in receipt[phase.replace('loaded_', 'execution_')]['compiled']}
+-            for name in ('engineering', 'release', 'accounting', 'stop'):
++            names = ['engineering', 'release', 'accounting', 'stop', 'engineering_api']
++            if for_plan(plan).__name__.endswith('_r1'):
++                names.append('engineering_r1')
++            for name in names:
+                 module = 'scripts.qd_ed_n36_' + name
+                 path = 'scripts/qd_ed_n36_' + name + '.py'
+                 w.require(path in index and inventory[module] == {'path': path, 'sha256': index[path]},
+@@ -438,7 +446,9 @@ def verify_terminal(plan_ref, row, terminal, release_ref=None):
+               'generic terminal identity/cost differs')
+     c.event_binding(row, terminal)
+     if plan.get('schema') == 'n36-engineering-execution-plan-v1':
+-        from scripts.qd_ed_n36_engineering import operational_binding as terminal_binding, require_row
++        from scripts.qd_ed_n36_engineering_api import for_plan
++        api = for_plan(plan)
++        terminal_binding, require_row = api.operational_binding, api.require_row
+         require_row(row)
+     else:
+         terminal_binding = c.operational_binding
+diff --git a/tests/n36_engineering_cpu_fixture.py b/tests/n36_engineering_cpu_fixture.py
+index eccf15b..57c9721 100644
+--- a/tests/n36_engineering_cpu_fixture.py
++++ b/tests/n36_engineering_cpu_fixture.py
+@@ -123,7 +123,7 @@ class Graph:
+         required = set(r.REQUIRED_CODE) | set(b.RUNTIME_SOURCES)
+         required |= {'scripts/qd_ed_n36_' + name + '.py' for name in
+                      ('worker', 'bridge', 'contract', 'native', 'build', 'lifecycle', 'arithmetic',
+-                      'reference', 'source', 'bootstrap', 'engineering', 'release', 'accounting', 'stop')}
++                      'reference', 'source', 'bootstrap', 'engineering', 'engineering_api', 'engineering_r1', 'release', 'accounting', 'stop')}
+         required |= {'scripts/' + name + '.py' for name in
+                      ('qd_ed_n23_worker', 'audit_decision_evidence', 'qd_ed_n31_native',
+                       'qd_ed_n34_controller', 'qd_ed_n34_source', 'qd_ed_n34_worker', 'qd_ed_n34_native')}
+@@ -604,7 +604,7 @@ class Graph:
+         source_index = {v['path']: v['sha256'] for v in self.source_record['files']}
+         names = {'scripts.qd_ed_n36_' + name for name in
+                  ('worker', 'bridge', 'contract', 'native', 'build', 'lifecycle', 'arithmetic', 'reference',
+-                  'source', 'engineering', 'release', 'accounting', 'stop')}
++                  'source', 'engineering', 'engineering_api', 'engineering_r1', 'release', 'accounting', 'stop')}
+         names |= {'scripts.' + name for name in ('qd_ed_n23_worker', 'audit_decision_evidence',
+                  'qd_ed_n31_native', 'qd_ed_n34_controller', 'qd_ed_n34_source', 'qd_ed_n34_worker', 'qd_ed_n34_native')}
+         names |= {name.removesuffix('.py').replace('/', '.') for name in b.RUNTIME_SOURCES if name != 'main.py'}
+diff --git a/tests/test_n36_engineering.py b/tests/test_n36_engineering.py
+index f3c6851..0c2d796 100644
+--- a/tests/test_n36_engineering.py
++++ b/tests/test_n36_engineering.py
+@@ -370,6 +370,14 @@ def test_live_suffixes_exact_and_no_foreign_accounting(prepared, tmp_path, mutat
+     local = episode_fixture(plan)
+     health = health_fixture(plan, tmp_path)
+     for event in health: event['time_unix'] = 90
++    # The suffix validator also binds the detached plan and prospective time.
++    # This disabled fixture is never submitted to release/admission validators.
++    plan_ref = put(tmp_path, 'suffix-disabled-plan', plan)
++    release_ref = put(tmp_path, 'suffix-disabled-release', {
++        'schema': 'n36-engineering-episode-release-v1', 'plan': plan_ref,
++        'issued_at': '1970-01-01T00:01:35+00:00', 'release_enabled': False})
++    for event in local:
++        event.update(release=release_ref, plan_sha256=plan_ref['sha256'])
+     events, resources, reservations = [old.copy(), *local], [old.copy(), *health], [old.copy()]
+     if mutation == 'prefix': events[0]['event'] = 'rewritten'
+     elif mutation == 'foreign_attempt': events.append({**local[0], 'attempt_id': 'foreign'})
+diff --git a/tests/test_n36_engineering_r1.py b/tests/test_n36_engineering_r1.py
+new file mode 100644
+index 0000000..b14bb39
+--- /dev/null
++++ b/tests/test_n36_engineering_r1.py
+@@ -0,0 +1,293 @@
++"""CPU-only prospective recovery tests. No releases, device or model execution."""
++import copy
++import hashlib
++import json
++from pathlib import Path
++
++import pytest
++
++from scripts import qd_ed_n36_engineering as parent
++from scripts import qd_ed_n36_engineering_r1 as e
++from scripts import qd_ed_n36_engineering_api as routing
++from scripts import qd_ed_n36_bridge as b, qd_ed_n36_worker as worker
++from scripts.qd_ed_n36_dino import DinoSources
++from test_n36_engineering import documents as parent_documents, put
++
++
++@pytest.fixture(scope='module')
++def baseline():
++    return e.terminal_parent_prefix()
++
++
++@pytest.fixture(scope='module')
++def documents(tmp_path_factory):
++    plan, audit, _, _ = parent_documents.__wrapped__(tmp_path_factory)
++    plan, audit = copy.deepcopy((plan, audit))
++    root = tmp_path_factory.mktemp('r1-disabled')
++    route = e.read(plan['deployment'])
++    route.update(source_cwd=str(e.SOURCE), output_root=str(e.SESSION / 'engineering-executions' / e.EPISODE_KEY))
++    common = dict(worktree=str(e.SOURCE), runtime=e.specification()['canonical_runtime'],
++                  deployment=put(root, 'route', route), scope=put(root, 'scope', e.disabled_scope()))
++    audit.update(common, artifact_root=route['output_root'] + '/audit-only', expected_manifests={})
++    runtime = e.read(audit['runtime'])
++    for i, row in enumerate(audit['episodes']):
++        audit['expected_manifests'][row['episode_key']] = put(root, f'audit-{i}', b.manifest(audit, runtime, row))
++    plan.update(common, cohort=e.IDENTITY, episodes=[e.row()], artifact_root=route['output_root'],
++                accounting=put(root, 'accounting', e.disabled_accounting()),
++                audit_plan=put(root, 'audit', audit), expected_manifests={})
++    manifest = b.engineering_manifest(plan, runtime, e.row())
++    plan['engineering_manifest'] = put(root, 'manifest', manifest)
++    plan['expected_manifests'] = {e.EPISODE_KEY: plan['engineering_manifest']}
++    return plan, audit, runtime
++
++
++def episode(plan):
++    row = e.row()
++    base = {**e.operational_binding(plan), 'attempt_id': e.EPISODE_KEY, 'episode_key': e.EPISODE_KEY,
++            'identity': e._identity(row), 'budget_bucket': 'baseline', 'replacement': None,
++            'plan_sha256': '0' * 64, 'release': {'disabled_fixture': True},
++            'source_commit': plan['source']['commit'], 'runtime_manifest_sha256': plan['runtime']['sha256'],
++            'runtime_inventory_sha256': plan['runtime_inventory_sha256'],
++            'init_row_sha256': row['init_row_sha256'], 'output_dir': plan['artifact_root'] + '/attempts/' + e.EPISODE_KEY,
++            'physical_gpu': 7, 'ledger_prefix': {'disabled_fixture': True}, 'context': {'disabled_fixture': True},
++            'reserved_gpu_seconds': 1840, 'accounting_admission': {'reserved_gpu_seconds': 1840},
++            'time_unix': 100, 'timeout_seconds': 1800, 'gpu_process_wall_seconds': 12,
++            'outcome_valid': True, 'required_cost_telemetry_complete': True, 'success': False}
++    return [{**base, 'event': kind} for kind in ('reserved', 'dispatched', 'valid')]
++
++
++def test_exact_terminal_history_retains_charges_and_parent_exhaustion(baseline):
++    amendment = e.read(e.AMENDMENT)
++    old_plan = e.read(amendment['parent_plan'])
++    old = baseline[e.JOURNALS[0]]
++    result = parent.reconcile(old_plan, old, lambda *args: pytest.fail('parent invalid outcome replay'))
++    assert result['status'] == 'INVALID_STOP' and result['scope_exhausted']
++    assert result['next_row'] is None and result['outcomes'] == []
++    snap = e.r.budget_snapshot(old, baseline[e.JOURNALS[1]])
++    assert snap['reserved_attempts'] == snap['dispatched'] == 507
++    assert snap['gpu_hours_consumed'] == 75.64264702604362
++    assert snap['gpu_healthcheck_hours'] == .24847032518900042
++    assert old[-1]['required_cost_telemetry_complete'] is False
++    assert e.disabled_accounting()['accounting']['retained_admission_margin_gpu_hours'] == '0.23357169027962'
++    assert e.disabled_accounting()['root_adopted'] is False
++
++
++@pytest.mark.parametrize('length,status', [(0, 'READY_FOR_ROOT_RELEASE'), (1, 'LIVE_OR_UNSETTLED'),
++    (2, 'LIVE_OR_UNSETTLED'), (3, 'PAUSED_FOR_ROOT_G3')])
++def test_fresh_one_use_and_no_parent_outcome_replay(documents, baseline, length, status):
++    plan = documents[0]
++    checked = []
++    result = e.reconcile(plan, baseline[e.JOURNALS[0]] + episode(plan)[:length], lambda row, final: checked.append(final))
++    assert result['status'] == status
++    assert result['scope_exhausted'] == bool(length)
++    assert (result['next_row'] is None) == bool(length)
++    assert len(checked) == (length == 3)
++    assert result['outcomes'] == [] and not result['scientific_eligible']
++    assert not result['continuation_authorized']
++
++
++@pytest.mark.parametrize('mutation', ['absent', 'truncated', 'tampered', 'live_parent', 'foreign_parent',
++    'unknown_suffix', 'foreign_live_suffix', 'old_replay', 'r1_replay'])
++def test_history_and_suffix_fail_closed(documents, baseline, mutation):
++    plan = documents[0]
++    events = copy.deepcopy(baseline[e.JOURNALS[0]])
++    if mutation == 'absent': events = []
++    elif mutation == 'truncated': events.pop()
++    elif mutation == 'tampered': events[-1]['gpu_process_wall_seconds'] = 0
++    elif mutation == 'live_parent': events[-1]['event'] = 'dispatched'
++    elif mutation == 'foreign_parent': events[-1]['attempt_id'] = 'foreign'
++    elif mutation == 'unknown_suffix': events.append({'event': 'aborted', 'attempt_id': 'unknown'})
++    elif mutation == 'foreign_live_suffix': events.append({'event': 'reserved', 'attempt_id': 'foreign'})
++    elif mutation == 'old_replay': events += copy.deepcopy(events[-3:])
++    else: events += episode(plan) * 2
++    with pytest.raises(ValueError):
++        e.reconcile(plan, events, lambda *args: pytest.fail('must not replay'))
++
++
++def test_invalid_r1_and_live_handle_never_continue(documents, baseline):
++    plan = documents[0]
++    old = baseline[e.JOURNALS[0]]
++    events = episode(plan)
++    events[-1]['event'] = 'aborted'
++    result = e.reconcile(plan, old + events, lambda *args: pytest.fail('invalid replay'))
++    assert result['status'] == 'INVALID_STOP' and result['next_row'] is None
++    result = e.reconcile(plan, old, lambda *args: None, live_handles=[{'unknown': True}])
++    assert result['status'] == 'LIVE_OR_UNSETTLED' and result['next_row'] is None
++
++
++@pytest.mark.parametrize('journal', e.JOURNALS)
++def test_exact_byte_proof_required_even_when_parsed_history_unchanged(tmp_path, monkeypatch, journal):
++    amendment = e.read(e.AMENDMENT)
++    spec = e.specification()
++    anchor = amendment['ledger_prefixes'][journal]
++    path = tmp_path / journal
++    path.write_bytes(b' ' + Path(anchor['path']).read_bytes())
++    anchor['path'] = str(path)  # retain the original hash/size: lexical data is not proof
++    terminal = e.read(amendment['parent_terminal'])
++    terminal['ledger_prefixes'] = copy.deepcopy(amendment['ledger_prefixes'])
++    amendment['parent_terminal'] = put(tmp_path, 'terminal', terminal)
++    spec['retained_ledger_prefixes'] = amendment['ledger_prefixes']
++    amendment_ref = put(tmp_path, 'amendment', amendment)
++    spec['prospective_amendment'] = amendment_ref
++    monkeypatch.setattr(e, 'AMENDMENT', amendment_ref)
++    monkeypatch.setattr(e, 'SPECIFICATION', put(tmp_path, 'spec', spec))
++    with pytest.raises(ValueError, match='historical ledger prefix changed'):
++        e.terminal_parent_prefix()
++
++
++@pytest.mark.parametrize('journal', e.JOURNALS)
++def test_foreign_suffix_all_journals_rejected(documents, baseline, journal):
++    current = copy.deepcopy(baseline)
++    current[journal].append({'event': 'reserved', 'attempt_id': 'foreign', 'resource_id': 'foreign'})
++    with pytest.raises(ValueError):
++        e._journal_suffixes(documents[0], baseline, *(current[name] for name in e.JOURNALS))
++
++
++def test_exact_empty_suffix_admissible(documents, baseline):
++    assert e._journal_suffixes(documents[0], baseline, *(baseline[n] for n in e.JOURNALS)) == ([], [])
++
++
++def test_original_science_and_full_audit_preserved(documents):
++    plan, audit, runtime = documents
++    original = e.audit_mapping(plan, audit, e.row())
++    assert {**original, 'iteration': e.IDENTITY, 'episode_key': e.EPISODE_KEY} == e.row()
++    assert len(audit['expected_manifests']) == 40
++    old = b.command(audit, runtime, original)[0]
++    new = b.engineering_command(plan, runtime, e.row())[0]
++    assert {a.split('=')[0] for a, v in zip(old, new) if a != v} == set(b._ENGINEERING_ROUTES + b._ENGINEERING_IDENTITIES)
++    assert b.verify_engineering_manifest(plan['engineering_manifest'], plan, runtime, e.row())['scientific_eligible'] is False
++    assert routing.for_plan(plan) is e and routing.for_plan(audit) is e
++
++
++@pytest.mark.parametrize('field,value', [('task_id', 1), ('profile', 'Q0'), ('env_seed', 0),
++    ('policy_seed', 0), ('init_index', 1), ('timeout_seconds', 1799), ('iteration', parent.IDENTITY),
++    ('episode_key', parent.EPISODE_KEY), ('budget_bucket', 'recovery')])
++def test_recovery_science_mutations_rejected(documents, field, value):
++    plan, audit, _ = documents
++    row = e.row()
++    row[field] = value
++    with pytest.raises(ValueError): e.audit_mapping(plan, audit, row)
++
++
++def test_disabled_and_cross_family_plans_rejected(documents, tmp_path):
++    plan, audit, _ = documents
++    e.validate_plan_shape(plan)
++    ref = put(tmp_path, 'disabled', plan)
++    assert worker.release_api(ref) is e
++    for api in (parent, e):
++        with pytest.raises(ValueError): api.validate_release(ref, ref)
++    bad = {**plan, 'cohort': 'N36_ENGINEERING_UNKNOWN'}
++    with pytest.raises(ValueError): routing.for_plan(bad)
++    bad = {**audit, 'scope': put(tmp_path, 'foreign-scope', {'specification': {'path': '/foreign', 'sha256': '0'*64}})}
++    with pytest.raises(ValueError): routing.for_plan(bad)
++
++
++def test_real_dino_consumer_canonical_reference_and_unchanged_bytes():
++    reference = e.specification()['canonical_runtime']
++    before = Path(reference['path']).read_bytes()
++    consumer = DinoSources(reference)
++    assert len(consumer.files) == 157
++    alias = e.read(e.read(e.AMENDMENT)['parent_plan'])['runtime']
++    assert alias['sha256'] == reference['sha256'] and alias['path'] != reference['path']
++    with pytest.raises(ImportError, match='manifest path not canonical'): DinoSources(alias)
++    assert Path(reference['path']).read_bytes() == before
++    assert hashlib.sha256(before).hexdigest() == reference['sha256']
++
++
++def test_real_dino_synthetic_source_bytes_and_alias(tmp_path):
++    home = tmp_path / 'torch'
++    root = home / 'hub/facebookresearch_dinov2_main'
++    files = []
++    for name in ('hubconf.py', 'dinov2/__init__.py'):
++        path = root / name
++        path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_text('# synthetic CPU source\n')
++        files.append(dict(path=str(path), resolved_path=str(path), sha256=e.w.sha(path), size_bytes=path.stat().st_size))
++    ref = put(tmp_path, 'runtime', dict(schema='qd-ed-runtime-setup-v1', environment={'TORCH_HOME': str(home)}, files=files))
++    consumer = DinoSources(ref)
++    consumer.check_file('hubconf.py', str(root / 'hubconf.py'))
++    alias = tmp_path / 'alias.json'
++    alias.symlink_to(ref['path'])
++    with pytest.raises(ImportError, match='not canonical'): DinoSources({**ref, 'path': str(alias)})
++    (root / 'hubconf.py').write_text('# tampered\n')
++    with pytest.raises(ImportError, match='source bytes differ'): consumer.check_file('hubconf.py', str(root / 'hubconf.py'))
++
++
++def test_plan_runtime_alias_rejected_before_dispatch(documents):
++    plan, audit, _ = copy.deepcopy(documents)
++    alias = e.read(e.read(e.AMENDMENT)['parent_plan'])['runtime']
++    plan['runtime'] = audit['runtime'] = alias
++    with pytest.raises(ValueError, match='canonical runtime'): e.validate_plan_shape(plan)
++    with pytest.raises(ValueError, match='canonical runtime'): e.validate_audit_view(audit)
++
++
++def test_parent_source_and_shared_safety_predicates_unchanged():
++    import ast
++    parent_path = Path(parent.__file__)
++    assert e.w.sha(parent_path) == 'd93eed25e93fb4a211180cc9abdc76d767ca278a7663dbedd1f29aee53874af1'
++    def functions(path):
++        return {node.name: ast.dump(node, include_attributes=False)
++                for node in ast.parse(Path(path).read_text()).body if isinstance(node, ast.FunctionDef)}
++    old, new = functions(parent_path), functions(e.__file__)
++    intentional = {'specification', 'validate_audit_view', 'validate_plan_shape', 'validate_authority',
++                   '_journal_suffixes', 'reconcile', 'validate_readiness'}
++    assert set(old) == set(new) - {'terminal_parent_prefix'}
++    for name in old.keys() - intentional:
++        assert new[name] == old[name], name
++    assert e.LIMITS == parent.LIMITS
++    assert e.c.WORKER_CONTRACT == parent.c.WORKER_CONTRACT
++
++
++@pytest.mark.parametrize('mutation', ['old_identity', 'old_kind', 'replay', 'short_timeout', 'short_cleanup', 'excess_cost'])
++def test_fresh_health_is_distinct_and_one_use(documents, tmp_path, mutation):
++    plan = documents[0]
++    plan_ref = put(tmp_path, 'health-disabled-plan', plan)
++    base = {**e.operational_binding(plan), 'resource_id': e.HEALTH_ID, 'kind': e.HEALTH_KIND,
++            'source_commit': plan['source']['commit'], 'runtime': plan['runtime'], 'plan': plan_ref,
++            'release': {'disabled_fixture': True}, 'timeout_seconds': 20, 'cleanup_seconds': 40,
++            'reserved_gpu_seconds': 60, 'physical_gpu': 7, 'gpu_uuid': e.c.GPU_UUID,
++            'accounting_admission': {'reserved_gpu_seconds': 60}, 'gpu_process_wall_seconds': 10}
++    events = [{**base, 'event': kind} for kind in ('reserved', 'dispatched', 'completed')]
++    assert e.resource_events(plan, events) == events
++    if mutation == 'old_identity': events[0]['resource_id'] = parent.HEALTH_ID
++    elif mutation == 'old_kind': events[0]['kind'] = parent.HEALTH_KIND
++    elif mutation == 'replay': events += copy.deepcopy(events)
++    elif mutation == 'short_timeout': events[0]['timeout_seconds'] = 19
++    elif mutation == 'short_cleanup': events[0]['cleanup_seconds'] = 39
++    else: events[-1]['gpu_process_wall_seconds'] = 61
++    with pytest.raises(ValueError): e.resource_events(plan, events)
++
++
++def test_r1_non_c0_manifest_still_verified(documents, tmp_path):
++    _, audit, runtime = documents
++    row = audit['episodes'][1]
++    manifest = e.read(audit['expected_manifests'][row['episode_key']])
++    manifest['resolved_config']['nonprogress_tangent_mode'] = 'tampered'
++    with pytest.raises(ValueError, match='external manifest differs'):
++        b._verify_manifest_bound(put(tmp_path, 'corrupt-q0', manifest), audit, runtime, row)
++
++
++def test_terminal_report_hash_cannot_be_substituted(tmp_path, monkeypatch):
++    amendment = e.read(e.AMENDMENT)
++    spec = e.specification()
++    terminal_ref = amendment['parent_terminal']
++    forged = e.read(terminal_ref)
++    forged['classification'] = 'VALID'
++    path = tmp_path / 'forged-terminal.json'
++    path.write_text(json.dumps(forged))
++    amendment['parent_terminal'] = {**terminal_ref, 'path': str(path)}
++    amref = put(tmp_path, 'amendment', amendment)
++    spec['prospective_amendment'] = amref
++    monkeypatch.setattr(e, 'AMENDMENT', amref)
++    monkeypatch.setattr(e, 'SPECIFICATION', put(tmp_path, 'spec', spec))
++    with pytest.raises(ValueError, match='hash/path differs'): e.terminal_parent_prefix()
++
++
++def test_health_alone_does_not_remove_retained_cost_or_allow_second_use(baseline):
++    snap = e.r.budget_snapshot(baseline[e.JOURNALS[0]], baseline[e.JOURNALS[1]])
++    local = {'gpu_hours_consumed': 60 / 3600, 'gpu_healthcheck_hours': 60 / 3600, 'reserved_attempts': 0}
++    kw = dict(margin=.23357169027962, protected=36.2408240024308155)
++    assert e.headroom(snap, local, health=False, **kw)['reserved_gpu_seconds'] == 1840
++    with pytest.raises(ValueError): e.headroom(snap, local, health=True, **kw)
++    with pytest.raises(ValueError): e.headroom(snap, {**local, 'reserved_attempts': 1}, health=False, **kw)
++    with pytest.raises(ValueError): e.headroom(snap, local, health=False, margin=0, protected=kw['protected'])
+diff --git a/tests/test_n36_stop_guard.py b/tests/test_n36_stop_guard.py
+index aa03e3c..d6ef816 100644
+--- a/tests/test_n36_stop_guard.py
++++ b/tests/test_n36_stop_guard.py
+@@ -146,7 +146,7 @@ def test_stop_after_worker_entry_prevents_main_and_retains_receipt(tmp_path,monk
+     monkeypatch.setattr(stop,'STOP_PATHS',paths)
+     root=tmp_path/'study_worktree'; root.mkdir()
+     output=root/'output'; (output/'eds_eval').mkdir(parents=True)
+-    plan={'worktree':str(root),'stop_path':c.stop_path(root),'stop_authority':stop.binding(),
++    plan={'schema':'n36-released-plan-v1','worktree':str(root),'stop_path':c.stop_path(root),'stop_authority':stop.binding(),
+           'source':{},'scientific_source':{},'runtime_closure':{},'controller_semantics':{},'runtime':{},'native_build':{}}
+     authority={'coordinator_ends_at':c.DEADLINE,'weekly_window':{'ends_at':c.DEADLINE}}
+     context={'plan':{},'expected_manifest':{},'attempt_id':'cpu-fixture','main_argv':[str(root/'main.py')]}
+@@ -159,7 +159,7 @@ def test_stop_after_worker_entry_prevents_main_and_retains_receipt(tmp_path,monk
+         Path(stop.STOP_PATHS[location]).touch()
+         return {}
+     namespace=dict(Path=Path,c=c,sys=SimpleNamespace(argv=[]),os=os,time=time,validate_context=validate,
+-        source_execution=SimpleNamespace(active=lambda:None,attest=lambda *a,**kw:{},
++        source_execution=SimpleNamespace(active=lambda:None,bind_dino=lambda _:None,attest=lambda *a,**kw:{},
+                                          run_main=lambda *a:pytest.fail('STOP must prohibit Main')),
+         verify_dispatch_record=lambda *a:None,
+         w=SimpleNamespace(process_identity=lambda:{},require=w.require,atomic_json=w.atomic_json,read_ref=lambda _:{}),

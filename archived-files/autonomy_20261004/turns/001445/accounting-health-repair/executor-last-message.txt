@@ -1,0 +1,7 @@
+Committed narrow repair as `711602acc32031cfd977a2b3ec2e7ef0582e7377`.
+
+Exact accounting and prospective `001445` identity updated; guards and prior charges preserved. 31 focused CPU tests passed; 22 affected tests passed again after the final fixture correction. Owner ledgers unchanged; no health execution.
+
+Reports with hashes saved as requested: [report-v1.md](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001445/accounting-health-repair/report-v1.md) and sibling JSON.
+
+Score null; goal incomplete; release disabled. Root review, fresh bindings, B5 and adoption remain separate.

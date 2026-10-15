@@ -1,0 +1,5 @@
+N32R2 controller 1818171 remains live on frozen source `1065f381`. Process identities, frozen hashes, and ledger continuity verified; no restart needed.
+
+Dev tasks 0–2: all arms 0/3. Task 3 N32 remains pending. Next: monitor its outcome and native audits.
+
+Turn 301 operational summary saved. Driver continuation remains active; validation/formal/ablation completion is still unevidenced.

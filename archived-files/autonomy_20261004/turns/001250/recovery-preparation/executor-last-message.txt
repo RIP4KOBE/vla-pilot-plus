@@ -1,0 +1,10 @@
+Committed `88b3c28` and preserved disabled N36R2 drafts for review.
+
+- 12 focused tests passed; v3 runtime parent checks passed.
+- Accounting remains **504 dispatches / 75.49265038509455 GPUh**.
+- Blocked by STOP binding, incomplete permitted-source inventory, runtime relocation, and `posixpath` source-receipt verification.
+- Owner unchanged; no GPU or release activated.
+
+The interrupted test fixture’s possible prohibited-file hashing is disclosed.
+
+[Report and artifact bindings](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001250/recovery-preparation/report-v1.md)

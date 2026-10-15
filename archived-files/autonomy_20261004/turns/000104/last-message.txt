@@ -1,0 +1,3 @@
+Continued autonomously. N32 release validation caught a runtime-path compatibility bug before GPU dispatch; an isolated CPU repair executor is running.
+
+Source remains `abbdb396`. Ledger history is intact. Operational handoff recorded; next is repair review and release revalidation. Validation/formal/ablation goals remain unmet.

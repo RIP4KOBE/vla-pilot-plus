@@ -1,0 +1,10 @@
+Completed bounded G2 CPU repair at commit `bb20aedb952638548dd347b9705dab2beba176c5`.
+
+- Restored 537 source and 697 runtime files.
+- Added disabled N36R3 preparation; admission remains blocked.
+- Passed 16 targeted tests and all 10 production CPU checks.
+- Prepared 40 manifests; checks took 37 seconds.
+
+Root review/adoption/accounting/release remain outstanding. No G3/G4 evidence was produced. `score=null`, `production_accepted=false`, `release_enabled=false`.
+
+Reports: [JSON](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001317/closure-repair/report-v1.json>) · [Markdown](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001317/closure-repair/report-v1.md>)

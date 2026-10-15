@@ -1,0 +1,5 @@
+Placed the exact accepted commit and generated all 41 disabled manifests. Checks: 14 passed; complete graph validation blocked by `reviewed controller semantics required`.
+
+No measurements, acceptance, or ledger changes occurred.
+
+[report-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001682/disabled-graph-preparation/report-v1.json) records hashes, receipts, blocker, and smallest next step.

@@ -1,0 +1,3 @@
+Adopted repair `ca4e6a96` and exact N36R1 accounting references. Six focused CPU tests passed; all historical charges remain intact.
+
+Driver identity verified; no GPU cohort is active. Next: update runtime/release bindings and complete independent review before dispatch. Validation, formal evaluation and ablations remain unfulfilled. Operational summary saved for continuation.

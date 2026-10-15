@@ -1,0 +1,48 @@
+{
+  "schema": "n36-exact-reviewed-source-placement-authority-v1",
+  "at": "2026-10-11T00:10:09.601078+00:00",
+  "standing_authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "bytes": 1942,
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c"
+  },
+  "independent_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001703/preparation-accounting-review/review-v1.json",
+    "bytes": 28155,
+    "sha256": "4427e0fc7444f6c287506d75dc528d9a387fef42a64018118f75709f17835abd"
+  },
+  "prior_reconciliation": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001705/terminal-reconciliation-v1.json",
+    "bytes": 7816,
+    "sha256": "db66fb500b2dd861b183f4d0d73495e5411af4d6b6046903a0d4754318c80acc"
+  },
+  "scope": "Exact fast-forward placement of independently CPU-reviewed commit into pinned adapter checkout; no source edits, production adoption, release, graph refresh, provider call or GPU work.",
+  "target": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "from_commit": "a14f3a8b9dff175145504c7ca9ed8569a9b3dafb",
+  "to_commit": "d3225489f6edfd2e49f472dc1ea9307f14f8be70",
+  "expected_tree": "2bd7e6b976c4d504680b52d7a7766ce5ea2fdf35",
+  "stop_paths_absent": [
+    "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/STOP",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/STOP"
+  ],
+  "deadline": "2026-10-11T11:13:13Z",
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "bytes": 7572377,
+      "sha256": "501510963420bacc7b680044d040ca2ba0883a89c907646db70f947b2575d8af"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "bytes": 114767,
+      "sha256": "9dd949d47ffbc3549eaf0ee6638833ec7a6123f7ad71d895a73e45e1f753e793"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    }
+  },
+  "gpu_authorized": false,
+  "release_enabled": false
+}

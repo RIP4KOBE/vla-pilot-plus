@@ -1,0 +1,3 @@
+Continuation recorded. The official gpt-6-astra executor is repairing N36’s preparation-binding verifier in an isolated worktree; both process identities are verified.
+
+Private ledgers remain unchanged. Next: reconcile the repair and tests, then independently review before adoption. Validation, formal evaluation, and required ablation evidence remain incomplete.

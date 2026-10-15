@@ -1,0 +1,5 @@
+N32R2 remains active under controller PID 1818171 on frozen source `1065f381`. Identity, hashes, and ledger continuity verified.
+
+Task 0: C0/Q0/N32 each 0/1. Task 1 C0 reports failure; audit acceptance is pending. No restart or duplicate dispatch.
+
+Operational summary saved for turn 192. Next: monitor audit completion. Validation, formal, and ablation evidence remain outstanding.

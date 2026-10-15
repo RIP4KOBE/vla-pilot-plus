@@ -1,0 +1,3 @@
+N32R2 controller identity and ledger continuity verified; frozen source remains `1065f381`. No restart or duplicate dispatch.
+
+Tasks 0–2 remain 0/3 per arm; task 3 N32 is pending. Monitoring continues through the existing driver. Turn 306 operational summary recorded; validation, formal, and ablation completion remain unevidenced.

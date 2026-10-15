@@ -1,0 +1,37 @@
+Updating ca4e6a9..30c6321
+Fast-forward
+ docs/n36-leaf-15-6-engineering-repair.md |  49 ++++++
+ scripts/qd_ed_n34_source.py              | 153 +++++++++++++++--
+ scripts/qd_ed_n36_accounting.py          |  19 ++-
+ scripts/qd_ed_n36_bootstrap.py           |  16 +-
+ scripts/qd_ed_n36_contract.py            |  46 ++++-
+ scripts/qd_ed_n36_cpu_receipt.py         |  56 ++++++
+ scripts/qd_ed_n36_healthcheck.py         |  13 +-
+ scripts/qd_ed_n36_prepare.py             |  11 +-
+ scripts/qd_ed_n36_release.py             |  31 +++-
+ scripts/qd_ed_n36_runner.py              |  30 ++--
+ scripts/qd_ed_n36_source.py              | 107 +++++++++++-
+ scripts/qd_ed_n36_stop.py                |  36 ++++
+ scripts/qd_ed_n36_worker.py              |  47 +++++-
+ scripts/qd_ed_n36r2_admission.py         | 171 +++++++++++++++++++
+ scripts/qd_ed_n36r2_draft.py             |  67 ++++++++
+ tests/test_n36_audit_repair.py           |   8 +-
+ tests/test_n36_composition.py            |   2 +-
+ tests/test_n36_cyutility_alias.py        | 282 +++++++++++++++++++++++++++++++
+ tests/test_n36_frozen_alias.py           | 188 +++++++++++++++++++++
+ tests/test_n36_release.py                |   2 +-
+ tests/test_n36_runner.py                 |  20 ++-
+ tests/test_n36_stop_guard.py             | 183 ++++++++++++++++++++
+ tests/test_n36r2_admission.py            | 159 +++++++++++++++++
+ tests/test_n36r2_draft.py                |  47 ++++++
+ 24 files changed, 1660 insertions(+), 83 deletions(-)
+ create mode 100644 docs/n36-leaf-15-6-engineering-repair.md
+ create mode 100644 scripts/qd_ed_n36_cpu_receipt.py
+ create mode 100644 scripts/qd_ed_n36_stop.py
+ create mode 100644 scripts/qd_ed_n36r2_admission.py
+ create mode 100644 scripts/qd_ed_n36r2_draft.py
+ create mode 100644 tests/test_n36_cyutility_alias.py
+ create mode 100644 tests/test_n36_frozen_alias.py
+ create mode 100644 tests/test_n36_stop_guard.py
+ create mode 100644 tests/test_n36r2_admission.py
+ create mode 100644 tests/test_n36r2_draft.py

@@ -1,0 +1,3 @@
+Recorded turn 1595: accepted the bounded engineering protocol and isolated source `b8d6b981`. Driver identity verified; no GPU worker is running. Ledgers and prior charges remain unchanged.
+
+Next: accounting adoption, runtime readiness, and release checks. Validation, formal, and required ablation evidence remain incomplete.

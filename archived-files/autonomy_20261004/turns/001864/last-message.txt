@@ -1,0 +1,3 @@
+Continued N36 recovery on source `808e27f`. Rebound all 41 manifests, corrected canonical serialization, and started production CPU admission checks.
+
+Live audit PIDs: `4005935/4005936`. State and hash-bound operational summary saved. Next step: monitor this audit. No GPU dispatched; validation, formal, and ablation evidence remains incomplete.

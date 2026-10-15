@@ -1,0 +1,3 @@
+Reconciled the completed N36R3 CPU preparation and recorded its blockers: missing pinned files and unsupported recovery identity preparation. No GPU dispatch occurred; charges remain 505 attempts / 75.5273 GPU-hours.
+
+State, checkpoint and operational summary now identify the bounded repair next. Validation, formal and ablation completion remain unproven.

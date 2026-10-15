@@ -1,0 +1,23 @@
+{
+  "schema": "n36-reviewed-source-placement-result-v1",
+  "at": "2026-10-11T07:20:37.836999+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001839/source-placement-authority-v1.json",
+    "sha256": "02dbf79d14918eb75e3d5a7297a00b43b1c11ca88c97754ad2a322ed354e2a70"
+  },
+  "before": "cd6c969cbfdf006fd017553448bed2e61fc0380e",
+  "after": "808e27f702564fe51db45016e139b68ecb476f8c",
+  "destination": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "tracked_clean": true,
+  "merge_output": "Updating cd6c969..808e27f\nFast-forward\n scripts/qd_ed_n36_engineering_r1.py |  90 +++++++++++++++++++++++-\n tests/test_n36_engineering_r1.py    | 136 +++++++++++++++++++++++++++++++++++-\n 2 files changed, 224 insertions(+), 2 deletions(-)",
+  "gpu_dispatches": 0,
+  "measurement_authorized": false,
+  "remaining_gates": [
+    "complete_graph",
+    "controller_bindings",
+    "retained_parity_failure",
+    "finite_release",
+    "native_readiness",
+    "scientific_promotion"
+  ]
+}

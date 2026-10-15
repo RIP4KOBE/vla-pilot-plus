@@ -1,0 +1,3 @@
+Recorded N36 repair completion at `969b71f9`: 91 focused CPU tests passed; owning ledgers remain unchanged.
+
+Next is independent review and the identified accounting repair before live measurements. The driver remains active. Validation, formal evaluation, and required ablation evidence are still unmet.

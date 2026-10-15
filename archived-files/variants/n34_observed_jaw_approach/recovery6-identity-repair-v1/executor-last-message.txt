@@ -1,0 +1,7 @@
+Committed `cf0362af77867dc67b8aa814d345781a8a1ab892`. Worktree clean; 377 focused tests passed.
+
+N34R6 identities and turn664 recovery binding updated. All six invalid histories retained; scientific behavior unchanged.
+
+[Implementation result](../recovery6-identity-repair-v1/implementation-result-v1.json) · [Report](../recovery6-identity-repair-v1/report-v1.md)
+
+Ready for root review/adoption. No GPU launches or runtime preparation performed.

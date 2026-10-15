@@ -1,0 +1,3 @@
+Continuation is active. Verified authority, process identities and unchanged private ledgers. A bounded CPU-only N36R3 accounting/health-identity repair is running; its handles and operational handoff are recorded.
+
+Next: review the repair, refresh affected bindings, then perform governed health checks. Validation, formal and ablation evidence remain outstanding; no completion claimed.

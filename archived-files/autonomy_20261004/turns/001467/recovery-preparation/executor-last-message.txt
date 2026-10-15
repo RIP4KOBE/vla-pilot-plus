@@ -1,0 +1,5 @@
+Prepared disabled N36R4 artifacts and 40 prospective command drafts. Focused CPU consistency checks passed.
+
+**Blocked:** frozen source lacks N36R4 identity, accounting, and health-release support. No source edits, GPU execution, or owner-state changes occurred. N36R3 remains terminal INVALID. Score null; goal incomplete.
+
+Hash-bound reports: [JSON](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001467/recovery-preparation/report-v1.json) · [Markdown](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001467/recovery-preparation/report-v1.md).

@@ -1,0 +1,5 @@
+Created [report-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/report-v1.json) with hash-bound DISABLED artifacts, exact boundaries, validation results, and next command. Packet verification passed.
+
+Admission remains blocked by specification/amendment policy constraints, source placement, and fresh controller/B5 review.
+
+Scientific source and thresholds preserved. No source adoption, owner-state writes, measurement, or release.

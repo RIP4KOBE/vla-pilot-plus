@@ -1,0 +1,3 @@
+Verified live identities and unchanged private ledgers. Existing CPU executor remains active; repair commit is `cd6c969`, with terminal report and root review pending.
+
+No duplicate or GPU dispatch occurred. Turn 1824’s hash-bound operational summary is saved. Validation, formal evaluation, and required ablation evidence remain incomplete.

@@ -1,0 +1,3 @@
+Continued the owning study and launched the bounded independent N36R2 review. Live process identities and the operational handoff are recorded.
+
+Accounting remains 504 attempts / 75.49265 GPU-hours. No GPU job or source adoption occurred. Validation, formal evaluation and required ablation evidence remain outstanding.

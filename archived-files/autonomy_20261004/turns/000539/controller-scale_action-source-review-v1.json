@@ -1,0 +1,25 @@
+{
+  "kind": "deployed_source_review",
+  "at": "2026-10-08T16:11:51.549008+00:00",
+  "runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/root-recovery-release-v2/runtime.owning-v1.json",
+    "sha256": "f5e07434eed3af61a71ce9944e2682995656d6069f659f2057860733ebe53513"
+  },
+  "fixture_only": false,
+  "source_commit": "68c341ef6357887c4ae33ddafad00fab17582302",
+  "sources": [
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/base_controller.py",
+      "sha256": "61f99a2daeb4eb6e39bfb996d94c5a5689ef3bc771d030d070193ea56d6a8332"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/config/osc_pose.json",
+      "sha256": "07f3a8b41d3eecc8a36700a85bd8207ee3fbc36eb73f6a2248340c96770d1e45"
+    }
+  ],
+  "findings": [
+    "Input clips to [-1,1], affine output scales translation by .05 and rotation by .5; symmetric limits preserve zero.",
+    "Config selects OSC_POSE, fixed impedance, delta actions, uncoupled position/orientation and no interpolation."
+  ],
+  "native_execution_observed": false
+}

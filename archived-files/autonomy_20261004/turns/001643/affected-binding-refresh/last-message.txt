@@ -1,0 +1,5 @@
+Prepared the disabled graph for `bd5dd4d`: all 40 audit manifests plus the distinct R1 manifest passed helper certification. Input/output hashes, scientific settings, accounting, and ledger prefixes were preserved.
+
+Production acceptance remains blocked on deployment reconciliation, controller review, readiness amendment, final B5, and root adoption. No source changes, GPU calls, or evaluators; release remains disabled.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001643/affected-binding-refresh/report-v1.json>) includes all outcomes and the retained, corrected supplemental-check failure.

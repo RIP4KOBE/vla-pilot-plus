@@ -1,0 +1,5 @@
+Wrote [report-final-v1.json](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001876/canonical-successor/report-final-v1.json) and `last-message`.
+
+Disabled successor composed; all 41 scientific payloads preserved. Direct release paths and hashes passed checks.
+
+Admission remains blocked by pending recovery/controller reviews and eight inherited noncanonical specification pins. Exact next strict admission command is recorded. Full audit was not run. No GPU, provider calls, measurements, or source/state/ledger edits.

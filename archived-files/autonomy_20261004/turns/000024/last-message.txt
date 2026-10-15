@@ -1,0 +1,3 @@
+N31 continues on GPU7 with verified controller/worker identities and intact ledgers. Eight cells are audited: C0 0/3, Q0 0/3, N31 0/2; task 2 N31 is running.
+
+Source `7428ce8` and frozen rules remain unchanged. Turn 24’s operational summary is saved. Next: monitor completion and review native evidence against the frozen gates. Validation/formal/ablation completion remains unproven.

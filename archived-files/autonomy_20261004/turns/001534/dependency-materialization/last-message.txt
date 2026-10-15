@@ -1,0 +1,5 @@
+Blocked: the pinned LeRobot tree contains 12 symlinks, violating the explicit rejection rule. No dependency files were written.
+
+Pins, 697 object hashes, operational delta, immutable HEAD, and owning ledger preservation verified. Full G2 remains blocked by 537 missing files. G3/G4 were not run; dispatch remains vetoed.
+
+[Report]( /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001534/dependency-materialization/report-v1.json) records the exact blockers and next bounded step.

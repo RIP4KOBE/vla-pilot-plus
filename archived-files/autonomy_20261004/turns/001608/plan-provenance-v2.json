@@ -1,0 +1,23 @@
+{
+  "parent_disabled_plan": {
+    "bytes": 386914,
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001601/attested-readiness-consumers/engineering-plan.disabled-v1.json",
+    "sha256": "bcc7a57c0a4028467c9bf588f433342066855faa427a14958235c963ded28a62"
+  },
+  "plan": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001608/engineering-plan.frozen-v2.json",
+    "sha256": "7b0a003e1675acddcb94a3737f2990fb530d196b0deaf79284c9ed8029c2106f"
+  },
+  "root_reattestation": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001607/root-final-binding-reattestation-v1.json",
+    "sha256": "0d3587dfc2a8fe935e82ea6120f9e90694f3b6db8e39383f23a6883aa6dff948"
+  },
+  "changed_fields": [
+    "frozen",
+    "release_enabled",
+    "authority",
+    "b5_review",
+    "phase_authorization.engineering"
+  ],
+  "gpu_dispatch": false
+}

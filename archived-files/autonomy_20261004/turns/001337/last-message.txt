@@ -1,0 +1,3 @@
+Continuation recorded. One official gpt-6-astra CPU executor is repairing the eight test-fixture failures; its live identities are saved for monitoring.
+
+Production code, scientific gates, budgets, and ledgers remain unchanged. No GPU dispatch or completion claim; validation, formal evaluation, and ablation evidence remain outstanding.

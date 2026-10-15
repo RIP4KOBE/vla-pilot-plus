@@ -1,0 +1,3 @@
+N32’s CPU executor finished, reporting 95 additional eligible proposals across 808 best-member abstentions. Output hashes verified; source and private ledgers remain unchanged.
+
+Operational summary saved. Next: review reconstruction and audit requirements before integration. No GPU worker is running; validation, formal evaluation and required ablation goals remain unmet.

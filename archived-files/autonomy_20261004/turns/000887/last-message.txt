@@ -1,0 +1,3 @@
+N35’s CPU implementation executor remains live and progressing; its identity is verified. Owning source and all accounting ledgers are unchanged.
+
+Recorded turn 887’s operational summary. Next: review the executor’s report, commit, audits, and tests before GPU release. Validation, formal evaluation, and required ablation evidence remain incomplete.

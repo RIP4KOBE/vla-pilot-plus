@@ -1,0 +1,5 @@
+Reconciled N35 repair commit `52a87af`; its final 22 CPU tests passed. Independent audit review is running as PID `2584851`.
+
+Owning source remains `969d5fb`. Ledgers and reserves are unchanged; no GPU was dispatched. State, checkpoint, and operational summary are saved.
+
+Next: reconcile the review before source adoption and runtime verification. Validation, formal evaluation, and required ablation evidence remain outstanding.

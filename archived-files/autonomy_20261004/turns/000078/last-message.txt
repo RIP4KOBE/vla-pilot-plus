@@ -1,0 +1,3 @@
+N32’s CPU integration executor remains live; focused tests are progressing. N31 closed for numeric futility. Ledger history and source `7428ce8` remain unchanged.
+
+Recorded turn 78’s operational summary. Next: review the completed runtime adapter, auditor and test evidence before GPU release. Validation, formal evaluation and required ablations remain unachieved.

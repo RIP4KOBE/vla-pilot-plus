@@ -1,0 +1,5 @@
+Verified and preserved the running N36 CPU evidence refresh. Ledger charges remain unchanged; no duplicate work launched.
+
+Next: reconcile its result, then obtain independent B5 review before GPU release. Validation/formal/ablation completion remains unproven.
+
+Hash-bound operational summary recorded for turn 001580.

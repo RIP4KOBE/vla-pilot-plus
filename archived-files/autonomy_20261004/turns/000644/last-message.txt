@@ -1,0 +1,5 @@
+N34R3 stopped on a strict runtime audit failure. I preserved all charges, reconciled state/checkpoint, and reproduced the missing serialization imports with a CPU-only probe.
+
+Total: 446 dispatches, 63.600177 GPU-hours; no worker running. Next: repair the prospective runtime inventory before a reviewed recovery release. Scientific gates remain unchanged; completion is not evidenced.
+
+Operational summary saved in `turns/000644/operational-summary.md`.

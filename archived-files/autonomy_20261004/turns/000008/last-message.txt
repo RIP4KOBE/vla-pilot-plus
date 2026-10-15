@@ -1,0 +1,5 @@
+N31 continues on GPU7 with frozen source `7428ce8`. Verified controller `203563`, monitor `203562`, and task-1 C0 worker `317136`.
+
+Task 0: C0/Q0/N31 each 0/1, all valid. Ledger history is preserved; no duplicate dispatch or restart occurred.
+
+Turn 8’s operational summary is saved. Next: monitor the existing cohort and apply its frozen gate at termination. Validation, formal and required ablation completion remain unproven.

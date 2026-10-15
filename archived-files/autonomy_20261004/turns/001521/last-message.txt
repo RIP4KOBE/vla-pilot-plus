@@ -1,0 +1,3 @@
+Reconciled the completed CPU executor and started one focused rerun of the corrected abort test. Saved the hash-bound turn 001521 summary and live handles.
+
+GPU dispatch remains blocked. Ledgers are unchanged; validation/formal/ablation completion remains unproven. The driver can continue monitoring the recorded test.

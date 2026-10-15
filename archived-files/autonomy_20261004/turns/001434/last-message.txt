@@ -1,0 +1,3 @@
+N36R3’s independent CPU review remains live with verified process identities. Source revisions and private ledgers are unchanged; no duplicate work was launched.
+
+Recorded the hash-bound turn 1434 operational summary. Next step is to reconcile the review before GPU release. Validation, formal evaluation, and required ablation evidence remain outstanding.

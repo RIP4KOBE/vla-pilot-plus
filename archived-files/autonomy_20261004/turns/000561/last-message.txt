@@ -1,0 +1,3 @@
+Continued on source `e660da4`. Verified driver identity, CPU runtime imports, post-exit receipt handling, and 30 disabled N34 manifests. Accounting reconciles; protected reserves remain intact.
+
+No GPU worker is active. Next: finish runtime coverage and release checks. Validation, formal evaluation, and ablation evidence remain unresolved. Operational handoff recorded; driver continues.

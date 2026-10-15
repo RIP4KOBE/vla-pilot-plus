@@ -1,0 +1,3 @@
+N36R3 remains waiting for assigned GPU7, occupied by PID1128889. No study worker is active; source and ledger prefixes are unchanged.
+
+Recorded the hash-bound turn 001400 summary. Next: charged readiness check when GPU7 becomes idle, then gated first-C0 execution. Validation, formal evaluation, and required ablation evidence remain incomplete.

@@ -1,0 +1,5 @@
+Wrote [review-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001711/independent-graph-review/review-v1.json), its SHA256, and `last-summary.txt`.
+
+Decision: **PASS_STATIC_GRAPH_REVIEW_ROOT_ATTESTATION_PENDING**.
+
+No graph defect found within scope. The validator’s missing-controller-attestation rejection is expected. Source remains unchanged; GPU, readiness and production eligibility remain false. This is not scientific success evidence.

@@ -1,0 +1,3 @@
+Reconciled live handles and preserved all private ledger prefixes. N36’s repair passed scoped static review; adoption remains blocked by the integration fixture failure and source-scope amendment.
+
+Recorded the operational handoff. Next: bounded CPU fixture repair and focused verification. No GPU work dispatched; the original research goal remains unproven.

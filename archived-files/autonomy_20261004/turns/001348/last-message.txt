@@ -1,0 +1,3 @@
+Continued N36R3 on source `bee9f6a`. Independent CPU binding review is running under verified PIDs `1076521/1076522`; its handles and next steps are recorded in the owning state and checkpoint.
+
+No GPU dispatched; costs and protected reserves remain unchanged. Next: reconcile the review before release preparation. Validation, formal evaluation and required ablation evidence remain outstanding.

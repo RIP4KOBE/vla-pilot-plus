@@ -1,0 +1,3 @@
+Confirmed a bootstrap defect requiring bounded policy/code repair. Preparation requires production adoption, while policy places readiness before final B5/adoption. No legitimate document-only workaround exists.
+
+Wrote `review-v1.json` and verified `review-v1.sha256` in the requested directory, including evidence, minimal remedy, and targeted tests. No implementation or runtime actions performed.

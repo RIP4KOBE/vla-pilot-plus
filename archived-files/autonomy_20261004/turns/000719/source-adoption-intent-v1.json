@@ -1,0 +1,27 @@
+{
+  "schema": "n34r11-source-adoption-v1",
+  "at": "2026-10-09T02:04:00.227586+00:00",
+  "source_before": "1151333e4cca32376afa2252e57a142411011f9b",
+  "candidate": "79ed3cd928bd9d1cc8277aeccf905e5a541678b8",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000719/engineering-review-v1.json",
+    "sha256": "1947b7536428abcff5493dd5b237efd74e0a0ee9d0392283a0a6b25ccc56e3f8"
+  },
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6804440,
+      "sha256": "ea5f6cda17e9eb84cb603bf225da0f81dc366e0cd5488f3a0daa31949ea383b9"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    }
+  },
+  "gpu_dispatch": false,
+  "scientific_promotion": false,
+  "next_step": "Regenerate N34R11 runtime closure and 30 fresh manifests on adopted source using turn716 corrected qualitative-image/video inventory. Freeze prospective accounting/protocol/root review/release and pass full public validation before idle GPU7 admission. Preserve eleven invalid N34 charges, unknown telemetry, protected reserves and scientific gates."
+}

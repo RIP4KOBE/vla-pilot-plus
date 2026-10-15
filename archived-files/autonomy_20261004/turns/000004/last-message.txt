@@ -1,0 +1,5 @@
+N31 continues on GPU7 with verified controller `203563`, monitor `203562`, and worker `250338`. Source `7428ce8a51f7` and frozen rules remain unchanged.
+
+C0 task 0 failed validly; Q0 task 0 is progressing. Ledger history is intact. Operational summary saved for driver continuation.
+
+Next: monitor native audited outcomes. Validation, formal evaluation, and required ablations remain unproven.

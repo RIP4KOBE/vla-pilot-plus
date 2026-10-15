@@ -1,0 +1,5 @@
+Verified coordinator identity, terminal controller, and unchanged ledgers. GPU7 remains occupied; no dispatch or preemption occurred.
+
+N36R3 awaits idle-GPU admission and a fresh charged healthcheck. Validation, formal evaluation, and required ablation evidence remain incomplete.
+
+[Operational summary](../autonomy_20261004/turns/001384/operational-summary-v1.json) saved for driver continuation.

@@ -1,0 +1,3 @@
+Reconciled CPU repair commit `bd5dd4d`: 35 artifact hashes verified; recorded tests report 257 passes. Repair processes have exited, ledgers remain unchanged, and no GPU job was dispatched.
+
+Owning state and operational handoff are updated. Next: independent source/runtime review. Validation, formal evaluation, and required ablation evidence remain incomplete.

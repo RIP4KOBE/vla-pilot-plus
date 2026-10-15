@@ -1,0 +1,53 @@
+artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001327/admission-implementation/pytest-final-v3/test_release_fail_closed_hash_0/artifacts
+budget:
+  amendment:
+    path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001327/admission-implementation/pytest-final-v3/test_release_fail_closed_hash_0/refs/owning-accounting.json
+    sha256: 36e7560d6410b970488a9333b7dd165e833265561fd12c5550f6b77208597536
+  dispatched: 505
+  gpu_hour_reservations:
+    formal: 12.0
+    validation: 32.0
+  gpu_hours_consumed: 75.52725337439337
+  max_episode_attempts: 1800
+  max_gpu_hours: 224.0
+  reserved:
+    baseline: 400
+    development: 1120
+    formal: 40
+    recovery: 60
+    validation: 180
+  aborted: 505
+  valid: 0
+  invalid: 0
+  completed: 0
+  running: 0
+gpu_pool:
+- 7
+max_concurrent_gpu_workers: 1
+n36_budget_authority:
+  path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001327/admission-implementation/pytest-final-v3/test_release_fail_closed_hash_0/refs/authority.json
+  sha256: 0b8e18ba4e5064b076d1c53ec1efffdeba99aaa6231381a59ad30dab33212dcd
+resource_isolation:
+  private_budget: true
+  status: ACTIVE
+  validation_status: PASS
+run_name: cpu-only
+worktree: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001327/admission-implementation/pytest-final-v3/test_release_fail_closed_hash_0/owner/study_worktree
+runner:
+  by_bucket:
+    baseline: 105
+    development: 313
+    validation: 60
+    formal: 0
+    recovery: 27
+  reserved_attempts: 505
+  gpu_hours_by_bucket:
+    baseline: 0.24885727293582424
+    development: 0.0
+    validation: 0.0
+    formal: 0.0
+    recovery: 75.27839610145755
+  gpu_healthcheck_hours: 5.07978580167724e-07
+  gpu_healthcheck_inflight: 0
+  last_attempt_id: historical_504
+  last_event: aborted

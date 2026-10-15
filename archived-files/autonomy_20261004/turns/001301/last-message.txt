@@ -1,0 +1,3 @@
+N36R3’s existing CPU repair remains active. Focused checks recorded 52 passes and one bootstrap timeout; acceptance remains pending.
+
+Source and ledger are unchanged, with prior charges preserved. Operational summary saved for continued monitoring and independent review. Validation, formal and ablation completion remains unproven.

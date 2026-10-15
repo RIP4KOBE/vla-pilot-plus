@@ -1,0 +1,5 @@
+Reattested N36 source `b8d6b981`, protocol, and finite accounting; saved the hash-bound operational summary and checkpoint.
+
+Driver remains active; no experiment worker is running. Ledgers and protected reserves are unchanged.
+
+Next: actual runtime/audit closure, then gated health and episode releases. Validation, formal evaluation, and required ablation evidence remain incomplete.

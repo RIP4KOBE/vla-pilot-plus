@@ -1,0 +1,8 @@
+Committed test-only repair: `ea5d7646f1d64531e6aec1f4b7abc5455af93b5a`.
+
+- Exact frozen-parent AST parity and call/signature checks.
+- 30 targeted CPU tests passed, including 28 mutation negatives.
+- Historical failure preserved; production sources unchanged.
+- No provenance rebuild.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001842/parity-test-repair/report-v1.json>)

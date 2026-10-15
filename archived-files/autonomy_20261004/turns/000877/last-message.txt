@@ -1,0 +1,5 @@
+Continued and recorded the bounded diagnosis. All 50 sampled actions matched decoded commands; task6 closed, then reopened, without proven grasp.
+
+Source and ledgers remain unchanged. No cohort is running or duplicated. Next: assess a falsifiable closure-persistence experiment through Arbor’s scientific gates. Validation/formal/ablation completion remains unmet.
+
+[Operational summary](../autonomy_20261004/turns/000877/operational-summary.md)

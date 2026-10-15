@@ -1,0 +1,23 @@
+import pathlib,json,hashlib,datetime,fcntl,os,yaml
+W=pathlib.Path.cwd();A=W.parent/'autonomy_20261004';T=A/'turns/001608';C=W/'.arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator'
+def read(p):return json.loads(p.read_text())
+def ref(p):return {'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+def replace(p,v,y=False):
+ q=p.with_name(p.name+'.tmp-001608');q.write_text(yaml.safe_dump(v,sort_keys=False,allow_unicode=True) if y else json.dumps(v,indent=2)+'\n');os.replace(q,p)
+old=read(A/'turns/001607/operational-summary-v1.json');result=read(T/'pre-release-closure-v2.json');boot=pathlib.Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+def ident(h):
+ p=pathlib.Path('/proc')/str(h['pid'])/'stat';a=p.read_text().rsplit(')',1)[1].split() if p.exists() else None;t=int(a[19]) if a else None;m=bool(a and t==h['start_ticks'] and h['boot_id']==boot);return {**h,'observed_start_ticks':t,'state':a[0] if a else None,'identity_matches':m,'live':bool(m and a[0]!='Z')}
+ds=read(A/'driver-status.json');assert ds['turn']==1608
+for v in old['ledger_prefixes'].values():assert ref(pathlib.Path(v['path']))['sha256']==v['sha256']
+nextstep=('Actual unmodified production authority/state/runtime/audit and engineering manifest closure passed on turn001608 plan v2. Prepare separate detached health release for this exact plan using frozen production release schema; check STOP/deadline, fresh GPU7 idleness and retained headroom, execute one metered healthcheck and settle, then separately gate episode release. Preserve one-C0 engineering-only scope and all charges; no scientific promotion or automatic recovery.' if result['decision']=='PASS' else 'Diagnose exact turn001608 pre-release-closure-v2.json production failure using current frozen source and existing evidence; preserve failed artifacts and keep releases disabled until actual closure passes. No scientific promotion or automatic recovery.')
+now=datetime.datetime.now(datetime.timezone.utc).isoformat()
+summary={**old,'at':now,'turn':1608,'driver':ident(ds['driver']),'coordinator':ident(ds['process']),'live_handles':{k:ident(v) for k,v in old['live_handles'].items()},'prior_cohort_handles':{k:ident(v) for k,v in old['prior_cohort_handles'].items()},'next_bounded_step':nextstep,'completed_work':['Verified hash-bound handoff/authority, normal prior completion, live driver boot/start identity, absent historical workers, resource isolation and unchanged private ledger prefixes.','Constructed separate prospective production plan from exact reviewed turn001601 disabled plan and turn001607 authority.','Retained v1 reference-schema failure; corrected only extra B5 reference metadata in separate v2 artifact.','Ran unmodified production plan, authority, owning-state, deadline, and runtime/audit closure: '+result['decision']+'.'],'unresolved_evidence':['Separate health release, fresh metered healthcheck and episode release pending.','Original validation/formal/required ablation evidence incomplete.']+([] if result['decision']=='PASS' else [result.get('error','closure failed')]),'production_plan':ref(T/'engineering-plan.frozen-v2.json'),'pre_release_closure':ref(T/'pre-release-closure-v2.json'),'gpu_dispatch':False,'ledgers_unchanged':True,'target_met':False}
+replace(T/'operational-summary-v1.json',summary);(T/'operational-summary-v1.sha256').write_text(ref(T/'operational-summary-v1.json')['sha256']+'\n')
+with (C/'state.lock').open('a') as lock:
+ fcntl.flock(lock,fcntl.LOCK_EX)
+ for v in old['ledger_prefixes'].values():assert ref(pathlib.Path(v['path']))['sha256']==v['sha256']
+ for file,is_yaml in [(W/'research-state.yaml',True),(C/'checkpoint.json',False)]:
+  d=yaml.safe_load(file.read_text()) if is_yaml else read(file);assert not d.get('current_owned_workers') and not d.get('in_flight_executor')
+  d.update(n36_engineering_production_plan=ref(T/'engineering-plan.frozen-v2.json'),n36_engineering_pre_release_closure=ref(T/'pre-release-closure-v2.json'),phase='N36_ENGINEERING_PRODUCTION_CLOSURE_'+result['decision'],next_action=nextstep,latest_operational_summary=ref(T/'operational-summary-v1.json'),updated_at=now);replace(file,d,is_yaml)
+ tree=read(C/'idea_tree.json');tree['nodes']['15.6'].update(result='ENGINEERING_PRODUCTION_CLOSURE_'+result['decision'],insight='Turn001608 actual unmodified production closure '+result['decision']+'. Separate metered health and episode releases remain gated. No GPU dispatch, source edit, ledger change or scientific promotion.',n36_engineering_pre_release_closure=ref(T/'pre-release-closure-v2.json'));replace(C/'idea_tree.json',tree)
+print(json.dumps({'summary':ref(T/'operational-summary-v1.json'),'decision':result['decision'],'next_step':nextstep}))

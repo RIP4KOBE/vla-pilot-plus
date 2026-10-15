@@ -1,0 +1,3 @@
+Reconciled N36R2’s partial preparation and launched the focused CPU review; its live identity is verified. No GPU cohort is running. All 504 dispatches and 75.49265038509455 GPU-hours remain charged.
+
+Operational summary saved. Next: resolve the five reviewed engineering blockers before release. Validation, formal, and ablation completion remains unproven.

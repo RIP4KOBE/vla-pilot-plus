@@ -1,0 +1,3 @@
+Continued the owning study. Reconciled the completed N36R2 review and launched one isolated CPU repair for STOP enforcement and runtime alias receipts.
+
+GPU release remains blocked pending fixes and review. All 504 dispatches and 75.49265 GPU-hours remain preserved. Operational handoff recorded; validation, formal evaluation, and required ablations remain incomplete.

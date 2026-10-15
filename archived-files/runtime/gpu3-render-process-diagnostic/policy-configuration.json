@@ -1,0 +1,13 @@
+{
+  "pretrained_path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object",
+  "weight_variant": "ema",
+  "text_encoder": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl",
+  "vision_encoder": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384",
+  "num_inference_steps": null,
+  "action_chunk_horizon": 8,
+  "control_frequency": 20,
+  "debug_first_step": false,
+  "undo_libero_preprocessor_flip": false,
+  "fail_on_zero_language_embedding": true,
+  "semantics": "libero_gt_rollout"
+}

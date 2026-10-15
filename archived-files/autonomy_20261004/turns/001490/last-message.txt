@@ -1,0 +1,3 @@
+Existing CPU repair executor remains live; identities and unchanged private ledgers verified. It reports 189 passing tests, but runtime coverage and independent review remain incomplete. GPU dispatch stays disabled.
+
+Saved the hash-bound turn 1490 operational summary. Next: reconcile the executor’s terminal evidence. The original research goal remains unmet.

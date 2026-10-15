@@ -1,0 +1,3 @@
+Reconciled N34’s terminal result: 1/7 successes versus 0/7 for both controls. Its frozen futility gate failed; no promotion.
+
+Recorded closure, preserved all 474 attempts and 69.996 GPU-hours, and confirmed no active GPU worker. Next: bounded Dev-only diagnosis of task5 success versus task6 failure. Validation, formal evaluation, and ablation evidence remain outstanding.

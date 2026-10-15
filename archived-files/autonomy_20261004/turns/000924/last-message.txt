@@ -1,0 +1,3 @@
+N35 remains active on GPU7: controller `2632351`, Q0 worker `2677189`. Source `52a87af` and frozen plan hashes match; ledger history is intact.
+
+C0 task0 completed validly without success; Q0 is running. Saved turn924’s operational summary. Next: monitor and reconcile native results. Validation, formal, and ablation evidence remain outstanding; the driver continues.

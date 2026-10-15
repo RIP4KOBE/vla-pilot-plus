@@ -1,0 +1,5 @@
+Prepared the exact recovery contract, v2 policy/specification, command receipts, and [report with output hashes](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001730/recovery-prefix-contract/report-v1.json).
+
+Verified the report SHA sidecar and 74 fresh, nonexistent downstream slots. Retained charge, incomplete telemetry, and historical prefixes are preserved.
+
+B2/B3 remain blocked pending source repair/review. No source edits, tests, GPU/provider calls, audit freeze, or graph generation occurred.

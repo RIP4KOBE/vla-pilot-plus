@@ -1,0 +1,3 @@
+Reconciled N36R3’s completed CPU preparation and saved the operational handoff. No GPU cohort is running; all charges remain preserved.
+
+Next: implement and review the missing admission/release support. Validation, formal evaluation, and required ablations remain unproven.

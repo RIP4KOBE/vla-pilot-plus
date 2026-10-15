@@ -1,0 +1,3 @@
+N36’s strict admission audit passed all 41 entries. Recorded the result and interrupted-check history; source and private ledgers remain unchanged.
+
+No GPU cohort is running. Next: fresh readiness, accounting, release, and independent review. Validation/formal/ablation evidence remains incomplete; authorization ends at 11:13:13 UTC.

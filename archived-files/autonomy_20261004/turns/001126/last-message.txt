@@ -1,0 +1,3 @@
+N35 has 28 valid completed attempts. The controller remains live between episodes; ledger continuity and frozen source/plan/release hashes pass.
+
+Saved turn 001126’s operational summary. Next: monitor the existing controller and reconcile terminal evidence. Validation, formal evaluation, and required ablations remain unresolved.

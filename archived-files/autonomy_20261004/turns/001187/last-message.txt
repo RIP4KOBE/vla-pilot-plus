@@ -1,0 +1,3 @@
+N36 runtime preparation remains active on verified processes 81030/81032, source `ab8e8c6`. No duplicate dispatch occurred; ledgers remain unchanged at 502 attempts and 75.2438 GPU-hours.
+
+Operational summary saved for turn 001187. Next: reconcile executor results and review runtime/accounting evidence. Validation, formal evaluation, and required ablations remain incomplete.

@@ -1,0 +1,3 @@
+Accepted the independently reviewed STOP/alias engineering repair. CPU source/runtime preparation is running with verified process identities.
+
+No GPU dispatch; ledgers remain unchanged at 504 attempts and 75.49265 GPU-hours. Operational handoff recorded. Validation, formal evaluation and required ablations remain unproven.

@@ -1,0 +1,3 @@
+N34 controller identity verified; release checks remain active. Private ledgers are unchanged, with no new episode dispatched.
+
+Turn 586 operational summary recorded. The local driver continues monitoring; validation, formal evaluation, and required ablation evidence remain outstanding.

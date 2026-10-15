@@ -1,0 +1,3 @@
+N36 CPU preparation completed successfully; terminal records and owning state are reconciled. Source remains `ab8e8c6`; no GPU controller is active and ledgers are unchanged.
+
+Next: independent runtime/accounting review before release. Live audits and validation/formal/ablation evidence remain outstanding. The driver remains active.

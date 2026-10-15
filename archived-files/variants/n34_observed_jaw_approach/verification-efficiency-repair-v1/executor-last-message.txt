@@ -1,0 +1,8 @@
+Committed **`83b4ceb`**: batched Git reads, transaction-scoped closure verification, and early phase timing.
+
+- **85 CPU tests passed**; worktree clean.
+- Audit boundaries and timeout1800 preserved.
+- Full measurement deferred pending new source-bound authority; bounded command included.
+- Old invalid attempt and charges untouched. No recovery authorization or scientific-success claim.
+
+Artifacts: [report](../verification-efficiency-repair-v1/report-v1.md) · [implementation result](../verification-efficiency-repair-v1/implementation-result-v1.json).

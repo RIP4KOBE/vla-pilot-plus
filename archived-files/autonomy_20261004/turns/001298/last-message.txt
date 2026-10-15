@@ -1,0 +1,3 @@
+N36R2 stopped invalid because its import audit rejected a PyTorch-generated temporary module. All worker handles have exited; charges and ledger history are preserved.
+
+Recorded terminal reconciliation and the next CPU repair step. Validation, formal, and ablation evidence remain incomplete; the local driver continues coordination.

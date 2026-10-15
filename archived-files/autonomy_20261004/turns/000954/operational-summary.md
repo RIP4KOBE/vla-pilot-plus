@@ -1,0 +1,5 @@
+Source: `52a87af0bf11f95b21ce17aba456dc98944d9774`. N35 controller {'pid': 2632351, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 141061885, 'state': 'S', 'ppid': 12479}; direct worker handles: [{'pid': 2846753, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 141610137, 'state': 'S', 'ppid': 2632351}].
+
+Verified handoff/authority and frozen launch/plan/release hashes; prior turn953 completed normally, retained owning ledger prefix verified. STOP absent: True; deadline 2026-10-11T11:13:13Z. 6 valid cohort episodes, 0 successes; active attempts: ['n35_dev_t01_n34_20261009']. Terminal result present: False. No dispatch, restart, source/plan change, ledger rewrite or protected-result access performed.
+
+Next bounded step: monitor the existing N35 cohort and reconcile native terminal/ledger evidence under its frozen prospective protocol when available. Historical next_action text does not supersede active_controller and live ledger. Validation/formal/required-ablation completion evidence remains outstanding; no completion claimed.

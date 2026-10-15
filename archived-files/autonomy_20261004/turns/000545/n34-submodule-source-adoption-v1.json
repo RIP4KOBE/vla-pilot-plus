@@ -1,0 +1,20 @@
+{
+  "schema": "n34-submodule-source-adoption-v1",
+  "at": "2026-10-08T16:34:38.486427+00:00",
+  "source_before": "68c341ef6357887c4ae33ddafad00fab17582302",
+  "source_after": "45f9d06acc34749f4b0de86ffcbf9d849a9e70ce",
+  "implementation_commit": "9f817b7c6b7c3861f4789a2d2ad1ab65af7a66a4",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000544/n34-submodule-terminal-reconciliation-v1.json",
+    "sha256": "a6a385dce011e6476f81636363f9debdcef1798f2e4e943d9e953b61ef9b52e5"
+  },
+  "identical_integrated_files": [
+    "scripts/qd_ed_n34_bridge.py",
+    "scripts/qd_ed_n34_source.py",
+    "tests/test_n34_dependency_source.py"
+  ],
+  "validation": "96 focused passing CPU tests retained; exact integrated file bytes verified; diff whitespace check passed; scientific code unchanged.",
+  "gpu_dispatched": false,
+  "scientific_promotion": false,
+  "next_step": "Provision exact pinned LeRobot object database offline under documented owning maintenance scope, preserving adjacent checkout and peer state. Verify all 682 dependency files in owning checkout, then actual external loaded-runtime closure, finite accounting and 30 fresh prospective manifests/release. GPU dispatch and scientific promotion remain closed."
+}

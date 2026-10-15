@@ -1,0 +1,3 @@
+N32 release rebuilt and validated at `c427e7a`. One controller is running (PID `1136447`), revalidating before GPU dispatch. History and protected reserves remain intact.
+
+Operational handoff recorded. Next: monitor that controller; validation, formal, and ablation goals remain unmet.

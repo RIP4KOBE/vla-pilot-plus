@@ -1,0 +1,3 @@
+N32R3 remains active: controller PID1070042 and task5 worker PID1975059 have verified identities. Source `04d12550`, frozen records, and ledger prefix are intact; no restart was needed.
+
+Turn 501 operational summary recorded. Next: monitor the cohort and reconcile terminal evidence. Validation, formal, and required ablation goals remain unproven.

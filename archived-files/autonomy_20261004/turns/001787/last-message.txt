@@ -1,0 +1,3 @@
+Recorded acceptance of the independent N36 review: 139 scoped checks passed. Source and private ledgers remain unchanged; no GPU cohort is active.
+
+Next: finite preparation release and measured readiness checks. Validation, formal evaluation, and required ablations remain unproven. The local driver remains active.

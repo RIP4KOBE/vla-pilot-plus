@@ -1,0 +1,3 @@
+Continuation recorded. N36’s independent CPU review is running; the scoped accounting/release review passed. No GPU dispatch or ledger changes occurred.
+
+Next: reconcile review findings before source adoption and runtime release. Validation, formal evaluation, and required ablation evidence remain outstanding.

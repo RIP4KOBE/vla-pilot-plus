@@ -1,0 +1,9 @@
+Turn 481 — 2026-10-08T12:43:02.869391+00:00
+
+Current source: 04d1255016fa13a2d467995b9e37a6a829356a1c; scientific source: 1065f38122379a515b60a9a424f574330405b66f. N32R3 controller PID1070042/start132379221 remains live under boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7; driver268073/start97715947 and coordinator1410516/start132608701 identities verified. Current worker n32r3_dev_t05_c0_20261008 PID1408569/start132605681: {"pid": 1408569, "alive": true, "start_ticks": "132605681", "state": "S", "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7", "identity_matches": true}. GPU7 telemetry sampled at 0 MiB/0% with no compute process; this alone is not a failure diagnosis.
+
+Verified bound handoff/authorization, current launch/plan/release hashes, owning ACTIVE/PASS isolation, state/checkpoint and prior turn480 normal exit. Prior 5936139-byte ledger prefix preserved; current ledger 6091397 bytes/1319 rows SHA256 acbfc281fcd54277e5c731dfa57db18ede7554808ae873477b7300f539fada9c. Controller progressed beyond the prior post-cell audit interval and reserved/dispatched task5 C0; task4 N32 recovery remains valid unsuccessful. No duplicate dispatch, replay, source/plan/state/budget changes or protected-result reads. STOP=False; deadline reached=False.
+
+Next bounded step: monitor the existing controller and task5 C0 worker through native startup/evaluation and terminal accounting. On controller termination reconcile native receipts and complete/partial denominators before scientific disposition. Frozen source/rules, all historical charges, unknown telemetry and protected reserves remain intact. Original validation/formal/required ablation evidence remains outstanding; no completion record warranted.
+
+Observation: controller-observation-v1.json SHA256 4cc4ee7a22211924e6948f5b53a412ee9f159292e78e00414e1200347b7c5235.

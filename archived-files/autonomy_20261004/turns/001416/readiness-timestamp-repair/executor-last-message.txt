@@ -1,0 +1,8 @@
+Committed `4e632c3bf1afe682d9287a518e531e6f2a6eba42` on the existing isolated branch.
+
+- Enforces finite, ordered probe/completion timestamps within authority deadlines.
+- Preserves strict non-time checks and existing evidence.
+- All 60 CPU test cases have passing evidence across the final full run and targeted correction rerun.
+- Worktree clean; no launch or G3/research-success claim.
+
+[Report with exact diff, test history, and unresolved gates](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001416/readiness-timestamp-repair/report-v1.md). JSON report also written. Root adoption and fresh, lawfully authorized source-bound readiness remain required.

@@ -1,0 +1,27 @@
+{
+  "schema": "n36-prospective-canonical-path-recovery-plan-v1",
+  "at": "2026-10-11T10:07:09.312131+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c"
+  },
+  "diagnosis": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001875/path-blocker-reconciliation-v1.json",
+    "sha256": "a09c2b09216ea2cd7ea8513c490724d95d4e73f29089ccfa5e71a180ea3aa6f1"
+  },
+  "adopted": false,
+  "dispatch_authorized": false,
+  "source_change_required": false,
+  "steps": [
+    "Prepare a fresh disabled successor for the noncanonical released plan reference documented in turn001875/path-blocker-reconciliation-v1.json. Canonicalize prospective output paths at creation (resolve the turn directory before ref construction); preserve historical release/proof/charges and all41 scientific payloads. Use a fresh readiness resource identity and proof/acceptance/runtime destinations; verify canonical reference closure before bounded production admission and independent release review. Reconcile the completed preparation as predecessor; document finite accounting before any fresh measurement. Never patch the historical release or relax _preparation_reference. No new dispatch after 2026-10-11T11:13:13Z."
+  ],
+  "required_checks": [
+    "All externally supplied preparation pins are absolute canonical paths with exact hashes, including release.graph.plan.",
+    "All41 scientific payloads unchanged; only prospective operational paths, fresh resource identity and dependency pins rebound.",
+    "Existing source verifier accepts graph; no audit weakening.",
+    "Fresh measurement at most600 GPU seconds and one official gpt-6-astra provider call, zero automatic retries, only after exact accounting and independently reviewed release.",
+    "Readiness producer and consumer must both PASS before downstream measured-graph admission."
+  ],
+  "historical_measurement_reusable_as_accepted_readiness": false,
+  "deadline": "2026-10-11T11:13:13Z"
+}

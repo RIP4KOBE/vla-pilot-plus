@@ -1,0 +1,9 @@
+Committed as `a4edcfd650f94d5e40ab437c46d591058ccb6e73`; working tree clean.
+
+- Separate opt-in N34 implementation and independent native audit.
+- All 84 N34 CPU cases passed; N31/N32 regressions passed.
+- Hashed evidence, results, and integration notes delivered.
+
+[Report](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/implementation-v1/report-v1.md) · [Result JSON](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/implementation-v1/implementation-result-v1.json)
+
+Root release integration remains pending. No GPU dispatch or research-state edits; physical success remains Unknown.

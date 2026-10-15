@@ -1,0 +1,3 @@
+Continued N34 with an isolated CPU source-provenance repair executor. Recorded live handles and the next review step in the operational handoff.
+
+Accounting and scientific gates remain unchanged. No GPU dispatched; validation, formal evaluation, and required ablations remain outstanding.

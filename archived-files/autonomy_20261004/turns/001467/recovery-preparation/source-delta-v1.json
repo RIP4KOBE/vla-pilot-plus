@@ -1,0 +1,21 @@
+{
+  "parent_source": "711602acc32031cfd977a2b3ec2e7ef0582e7377",
+  "source": "80a9d945e688da17485239b3d5bb11c558c214d6",
+  "changed_paths": [
+    "scripts/qd_ed_n36_bootstrap.py",
+    "scripts/qd_ed_n36_dino.py",
+    "scripts/qd_ed_n36_source.py",
+    "scripts/qd_ed_n36_worker.py",
+    "scripts/test_n36_dino_import.py"
+  ],
+  "accepted_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001466/root-review-v1.json",
+    "bytes": 3671,
+    "sha256": "1307883e0ddc74b0ecf1ef2b777dc30da2ad4f7d3239e7be854ca0d0f7a87be3"
+  },
+  "inventory": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001467/recovery-preparation/source.complete-v1.json",
+    "sha256": "f81fd43447379bb8da5ae1ca8e21fe314af2a618edf002a03a8529a8dfe02b76"
+  },
+  "source_edited": false
+}

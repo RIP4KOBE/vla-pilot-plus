@@ -1,0 +1,7 @@
+Canonical-path repair completed; all 41 manifest consumers passed. `verify_graph` remains blocked by `reviewed controller semantics required`. No approval was transferred.
+
+Source, scientific settings, identities, charges, reserves, and original STOP bindings were preserved. Release and readiness/provider flags remain false.
+
+[Report](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/report-v1.json>) · [Artifact manifest](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/artifact-manifest-v1.json>)
+
+Next bounded step: root review of the changed controller bindings, then focused verification.

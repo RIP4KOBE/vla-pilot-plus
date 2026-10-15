@@ -1,0 +1,3 @@
+N36R1’s existing CPU repair remains live with verified process identities. Source and ledgers are unchanged; no duplicate was launched.
+
+Recorded turn 1207’s operational summary. Next: reconcile the repair’s report and commit, then independent review. Validation, formal and required ablation evidence remain outstanding.

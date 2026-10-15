@@ -1,0 +1,3 @@
+N34R7 stopped invalid: the runtime audit rejected an unfrozen SentencePiece module. Terminal evidence and all charges are preserved; no GPU worker remains running.
+
+Saved the operational handoff. The driver continues with bounded CPU diagnosis before any fresh recovery release. Validation, formal evaluation, and required ablations remain incomplete.

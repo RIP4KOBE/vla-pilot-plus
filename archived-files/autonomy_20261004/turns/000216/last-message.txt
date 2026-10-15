@@ -1,0 +1,3 @@
+N32R2 remains live on frozen source `1065f381`; controller and worker identities match. Five accepted development episodes failed; task 1 N32 reports failure but awaits audit and ledger settlement.
+
+Operational summary saved. Next: monitor settlement and reconcile evidence. Validation, formal evaluation, and required ablations remain outstanding.

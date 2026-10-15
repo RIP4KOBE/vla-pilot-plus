@@ -1,0 +1,31 @@
+{
+  "schema": "n34-production-source-adoption-v1",
+  "at": "2026-10-08T15:51:08.122445+00:00",
+  "source_before": "71ffff1a0f70d9874b309db9ef1843c02bf17ebf",
+  "source_after": "c14e1e92870a51b92d70d21e01a0ffaf1a14534b",
+  "implementation_commit": "d93129b24d09711458975c5964c2127e01442a4f",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000534/n34-production-root-source-review-v1.json",
+    "sha256": "09d18cd13f890936a853390cd772797ad8989b7e80a5ee2136aef0f24a3722bb"
+  },
+  "identical_integrated_files": [
+    "docs/experiments/n34_production_integration.md",
+    "scripts/qd_ed_n34_bridge.py",
+    "scripts/qd_ed_n34_contract.py",
+    "scripts/qd_ed_n34_controller.py",
+    "scripts/qd_ed_n34_prepare.py",
+    "scripts/qd_ed_n34_release.py",
+    "scripts/qd_ed_n34_report.py",
+    "scripts/qd_ed_n34_runner.py",
+    "scripts/qd_ed_n34_source.py",
+    "scripts/qd_ed_n34_supervise.py",
+    "scripts/qd_ed_n34_worker.py",
+    "tests/test_n34_lifecycle.py",
+    "tests/test_n34_production_integration.py",
+    "tests/test_n34_source_controller.py",
+    "tests/test_n34_worker_entrypoint.py"
+  ],
+  "gpu_dispatched": false,
+  "scientific_promotion": false,
+  "next_step": "Materialize and verify missing pinned RDT files locally without fetching; inspect deployed OSC/controller/wrapper source and freeze external runtime/module closure. Then reconcile finite N34 accounting/fresh IDs, wire reviewed release validation via isolated executor, freeze 30 prospective manifests and detached release. N34 disabled CPU integration adopted; no GPU release or scientific promotion."
+}

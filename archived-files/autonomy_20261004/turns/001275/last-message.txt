@@ -1,0 +1,3 @@
+Reconciled the completed N36R2 review and recorded limited CPU evidence acceptance. All 504 attempts and 75.492650385 GPU-hours remain preserved.
+
+Next: prospective admission/accounting preparation and worker runtime evidence. GPU release remains gated; validation, formal evaluation, and required ablations remain unproven. Driver continuation remains active.

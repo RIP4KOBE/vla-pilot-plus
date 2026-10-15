@@ -1,0 +1,9 @@
+# Turn 001060 operational summary
+
+Frozen source `52a87af0bf11f95b21ce17aba456dc98944d9774`. Verified N35 controller PID 2632351, boot `2a1fa95f-ab0d-488c-a298-fc488ddd2af7`, start ticks 141061885; driver PID 268073/start 97715947 remains live. Previous turn completed normally; no recovery required. Controller children: [{'pid': 3556861, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 143328543, 'state': 'R', 'ppid': 2632351, 'cpu_ticks': 15334}, {'pid': 3561864, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 143343937, 'state': 'R', 'ppid': 2632351, 'cpu_ticks': 77}]. Bound launch/plan/release, authority, continuation and completion contract hashes verified. Resource isolation ACTIVE/PASS. STOP present: False; deadline elapsed: False (window ends 2026-10-11T11:13:13Z).
+
+Owning ledger retained prefix verified; 1484 rows, 7399909 bytes, SHA256 `d2b50f9f73d884207cf5eb058f1edc2efb26d19169eedeaf91d1f86bcc8ae293`. Interim Dev counts: {"C0": {"valid": 5, "success": 0}, "Q0": {"valid": 5, "success": 0}, "N34": {"valid": 5, "success": 0}, "N35": {"valid": 5, "success": 0}}. In flight: ['n35_dev_t05_c0_20261009']. Terminal result exists: False. GPU observation shows one study worker PID 3556861 on assigned UUID GPU-48473162-9548-1a19-04aa-ea86c5349187.
+
+No source/protocol/state/ledger changes, new dispatch, process signals or protected-result access. Next bounded step: monitor existing N35 controller; on termination reconcile native audits, complete/partial denominators and retained costs before scientific disposition. Original validation/formal/required ablation goal remains unproven. Preserve frozen thresholds and protected reserves.
+
+Reconciliation: `end-reconciliation-v1.json`, SHA256 `8d7e52307221af7d3a2a30f7f84e57460e94eb0b58652581f563117353f81eae`.

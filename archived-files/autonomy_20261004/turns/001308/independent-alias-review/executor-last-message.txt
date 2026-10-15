@@ -1,0 +1,5 @@
+Scoped engineering **PASS**. Primary run: **132 passed, 1 deselected**. Legacy fixture failure reproduced separately; cumulative CPU test time: **31.70 seconds**.
+
+Reports: [Markdown](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001308/independent-alias-review/report-v1.md>) · [JSON](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001308/independent-alias-review/report-v1.json>)
+
+Production closure and worker before/after gates remain open. Scientific goal remains unproven; no release authorization. No source changes. Review stopped.

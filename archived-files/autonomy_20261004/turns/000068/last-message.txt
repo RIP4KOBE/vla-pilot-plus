@@ -1,0 +1,3 @@
+N32’s CPU executor remains live with verified identity; synthetic testing is underway. N31 closed for numeric futility, with all three arms at 0/6.
+
+Turn 68’s operational summary is recorded. Source and private ledgers remain unchanged. Next: review N32’s delivery and audit design before GPU release. Validation, formal and ablation evidence remains incomplete.

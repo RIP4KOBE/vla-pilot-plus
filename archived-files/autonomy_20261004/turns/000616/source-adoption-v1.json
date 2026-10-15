@@ -1,0 +1,49 @@
+{
+  "schema": "n34-verification-efficiency-source-adoption-v1",
+  "at": "2026-10-08T20:15:30.940756+00:00",
+  "source_before": "3acfda1adea7b4d9880c81dab7e3882f1587d4d0",
+  "candidate": "83b4ceba312835410200713e3d65a03de89f0931",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000615/engineering-review-v1.json",
+    "sha256": "59e9f10f04fe2e40a087d0c3544767bc99e0725d25f290c703d0925625588cc0"
+  },
+  "gpu_dispatch": false,
+  "source_after": "2d61cff3f4f0530e89294567586569e2b3bbfd72",
+  "tree": "9870d48409d0402c1caac56706507adadc11d340",
+  "implementation_result": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/verification-efficiency-repair-v1/implementation-result-v1.json",
+    "sha256": "06a9a8fd4ea7f1bab4e8d275363b764e8da2c8be89150ad10be41f7b4fa6b8e3"
+  },
+  "executor_exit": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/verification-efficiency-repair-v1/executor-exit-v1.json",
+    "sha256": "858f2de63eaf7d9b66f2155dc09c43cee49e5a54b44a91781633b27a66ef87a3"
+  },
+  "identical_integrated_files": [
+    "docs/experiments/n34-verification-efficiency-repair-v1.md",
+    "scripts/qd_ed_n34_bridge.py",
+    "scripts/qd_ed_n34_release.py",
+    "scripts/qd_ed_n34_source.py",
+    "scripts/qd_ed_n34_worker.py",
+    "tests/test_n34_release_boundary.py",
+    "tests/test_n34_verification_efficiency.py"
+  ],
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6665435,
+      "sha256": "fa460c62818cc45c123a529b783eaedeb726ff93a0a4b068442410e5877644e5",
+      "unchanged": true
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7",
+      "unchanged": true
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+      "unchanged": true
+    }
+  },
+  "scientific_promotion": false,
+  "next_step": "Prepare distinct N34 recovery amendment and fresh identities preserving invalid first attempt/unknown telemetry; regenerate source/runtime/30 manifests and detached release on adopted repair, then bounded full CPU production verification before GPU admission. Scientific thresholds and protected gates unchanged."
+}

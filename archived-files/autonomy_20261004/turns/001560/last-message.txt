@@ -1,0 +1,3 @@
+Continued the authorized study and launched one isolated CPU-only executor for the dispatch-lifecycle repair. Recorded live handles and a hash-bound operational handoff.
+
+Private ledgers remain unchanged. GPU release remains disabled pending review; validation, formal evaluation, and required ablation evidence remain incomplete.

@@ -1,0 +1,239 @@
+diff --git a/scripts/qd_ed_n36_engineering_r1.py b/scripts/qd_ed_n36_engineering_r1.py
+index 2be9cb9..6de8201 100644
+--- a/scripts/qd_ed_n36_engineering_r1.py
++++ b/scripts/qd_ed_n36_engineering_r1.py
+@@ -608,6 +608,19 @@ def _recovery_specification(spec):
+         projected[key] = historical[key]
+     for key in ('preparation', 'runtime_path', 'source_record_path'):
+         projected['runtime_binding'][key] = historical['runtime_binding'][key]
++    if spec['runtime_binding'].get('amendment') != historical['runtime_binding'].get('amendment'):
++        from scripts import qd_ed_n36_readiness_prepare as preparation_api
++        # Validate the owning scope and its exact composition before projecting
++        # only these two operational fields. All scientific/accounting fields,
++        # repair authority, base, limits and recovery checks remain immutable.
++        preparation_api.policy(spec)
++        amendment = _recovery_json(_recovery_read(spec['runtime_binding']['amendment']))
++        exact(amendment['schema'], 'n36-disabled-source-scope-composition-v1',
++              'prospective scope composition required')
++        exact(amendment['previous_runtime_amendment'], historical['runtime_binding']['amendment'],
++              'historical scope amendment lineage')
++        for key in ('amendment', 'source_change_allowlist'):
++            projected['runtime_binding'][key] = historical['runtime_binding'][key]
+     exact(projected, historical, 'immutable scientific and accounting specification')
+     w.require(spec['runtime_binding']['preparation']['path'] !=
+               historical['runtime_binding']['preparation']['path'], 'fresh preparation policy path')
+diff --git a/scripts/qd_ed_n36_readiness_prepare.py b/scripts/qd_ed_n36_readiness_prepare.py
+index 30311bc..1c1b258 100644
+--- a/scripts/qd_ed_n36_readiness_prepare.py
++++ b/scripts/qd_ed_n36_readiness_prepare.py
+@@ -57,11 +57,55 @@ def policy(spec):
+     e.w.require(binding['schema'] == SCHEMA, 'readiness policy version')
+     authority = e.read(binding['repair_authority'])
+     amendment = e.read(binding['amendment'])
+-    e.exact(authority['amendment'], binding['amendment'], 'readiness amendment authority')
++    prospective = amendment.get('schema') == 'n36-disabled-source-scope-composition-v1'
++    if prospective:
++        # This wrapper is a composition, never a replacement repair authority.
++        # Pin the owning approval, not the source-bound wrapper (which would
++        # introduce a source/commit hash cycle when this implementation changes).
++        turns = '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/'
++        scope_ref = {'path': turns + '001804/source-scope-amendment-v1.json',
++                     'sha256': '6f08e5fb20b9a863ae90fee725a90ad4d8d90699162c148d2d129fda53660178'}
++        e.exact(amendment['approved_prospective_scope'], scope_ref, 'pinned prospective scope authority')
++        scope = e.read(scope_ref)
++        owner_turns = '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/'
++        e.exact(binding['repair_authority'], {
++            'path': owner_turns + '001651/readiness-implementation/authority-v1.json',
++            'sha256': '1da564c70827ed7acfc47e121f67e015b17f86e018c67a3c0c6ac35d5cb45692'},
++            'pinned historical readiness authority')
++        e.exact(amendment['previous_runtime_amendment'], authority['amendment'],
++                'prospective amendment lineage')
++        previous = e.read(authority['amendment'])
++        e.exact(scope['authority'], previous['authority'], 'same owning scope authority')
++        e.read({k: scope['authority'][k] for k in ('path', 'sha256')})
++        delta = ['scripts/qd_ed_n36_source.py', 'tests/test_n36_preparation_binding.py']
++        e.exact(scope['additional_allowed_source_paths'], delta, 'exact prospective scope delta')
++        expected = {x['file'] for x in previous['code_change_scope'][:3]} | set(previous['new_allowed_entrypoints']) | set(delta)
++        # All composition fields are closed; only the final source reference is
++        # rebound by the graph builder. Source adoption/review remains separate.
++        e.read(amendment['source'])
++        e.exact(amendment['source']['path'], binding['source_record_path'], 'prospective source record path')
++        e.exact(amendment, dict(
++            schema='n36-disabled-source-scope-composition-v1', node_id='15.6',
++            approved_prospective_scope=scope_ref,
++            previous_runtime_amendment=authority['amendment'],
++            code_change_scope=previous['code_change_scope'][:3],
++            new_allowed_entrypoints=sorted(set(previous['new_allowed_entrypoints']) | set(delta)),
++            exact_source_change_allowlist=sorted(expected), source_base=authority['source_base'],
++            source=amendment['source'], scientific_source_anchor='1065f38122379a515b60a9a424f574330405b66f',
++            implementation_review={
++                'path': turns + '001807/scoped-root-review-v1.json',
++                'sha256': 'c0abe1ad8f42bdb3e421f8148e1b0c8187ba4c44e9f9ba113bc90066e3fe463c'},
++            new_repair_authority=None, status='DISABLED_PENDING_POLICY_ADMISSION',
++            limitation='Prospective composition only. Existing repair authority pins the old amendment; this document is not a replacement approval.',
++            deployment_authorized=False, gpu_authorized=False, provider_measurement_authorized=False,
++            release_enabled=False, scientific_changes_authorized=False, source_adopted=False),
++            'exact prospective amendment composition')
++    else:
++        e.exact(authority['amendment'], binding['amendment'], 'readiness amendment authority')
++        expected = {x['file'] for x in amendment['code_change_scope'][:3]} | set(amendment['new_allowed_entrypoints'])
+     e.exact(authority['source_base'], binding['source_base'], 'readiness source authority')
+     e.exact(amendment['source_base'], binding['source_base'], 'readiness amendment base')
+     e.exact(binding['mutable_runtime_fields'], FIELDS, 'readiness exact mutable fields')
+-    expected = {x['file'] for x in amendment['code_change_scope'][:3]} | set(amendment['new_allowed_entrypoints'])
+     e.exact(sorted(binding['source_change_allowlist']), sorted(expected), 'readiness scoped changes')
+     value = e.read(binding['preparation'])
+     closed(value, ('schema', 'baseline', 'previous_specification', 'disabled_runtime_path',
+diff --git a/tests/test_n36_engineering_r1.py b/tests/test_n36_engineering_r1.py
+index 65df195..dc9e47c 100644
+--- a/tests/test_n36_engineering_r1.py
++++ b/tests/test_n36_engineering_r1.py
+@@ -1211,3 +1211,109 @@ def test_recovery_prospective_cpu_process_selection(recovery_cpu):
+         SOURCE=f.root, SPECIFICATION=selected, reference=f.e.reference, json=json)
+     exec(compile(ast.Module(body=[child], type_ignores=[]), str(source), 'exec'), env)
+     assert json.loads(env['child_environment']({}, {})['QD_ED_N36_R1_SPECIFICATION']) == selected
++
++
++PROPOSED_SCOPE_SPECIFICATION = {
++    'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/specification.prospective-disabled-v1.json',
++    'sha256': 'd983afb6285c19f7b720b0313316cfb6fc686c5c53dcfe94bac852c09f6d2e6a'}
++
++
++def test_exact_proposed_scope_policy_retains_unassigned_recovery_block(monkeypatch):
++    from scripts import qd_ed_n36_readiness_prepare as preparation
++    spec = e.read(PROPOSED_SCOPE_SPECIFICATION)
++    # Actual proposed bytes and owning approvals, no policy/allowlist mocks.
++    assert preparation.policy(spec)['resource_id'] is None
++    monkeypatch.setattr(e, 'SPECIFICATION', PROPOSED_SCOPE_SPECIFICATION)
++    monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', PINNED_SPECIFICATION)
++    with pytest.raises(ValueError, match='prospective specification lineage'):
++        e._recovery_specification(spec)
++
++
++@pytest.fixture
++def prospective_scope_cpu(recovery_multi_cpu):
++    """Real 001808 composition + isolated synthetic recovery, never live proof.
++
++    The exact proposed specification/authority path is exercised by both real
++    admission functions. Only recovery/accounting fixture bytes are substituted,
++    identically in both projections, to avoid reading any owning journal.
++    """
++    f = recovery_multi_cpu
++    synthetic = copy.deepcopy(f.spec)
++    f.spec.clear()
++    f.spec.update(e.read(PROPOSED_SCOPE_SPECIFICATION))
++    historical = e.read(PINNED_SPECIFICATION)
++    for key in ('prospective_amendment', 'retained_ledger_prefixes', 'retained_snapshot_reference'):
++        historical[key] = f.spec[key] = synthetic[key]
++    for key in ('readiness_recovery', 'recovery_prefix_contract'):
++        f.spec[key] = synthetic[key]
++    f.historical = f.put('SYNTHETIC-scope-historical-spec', historical)
++    prep = e.read(f.spec['runtime_binding']['preparation'])
++    prep.update(resource_id='new', previous_specification=f.historical)
++    f.spec['runtime_binding']['preparation'] = f.put('SYNTHETIC-scope-preparation', prep)
++    f.repin()
++    f.env['HISTORICAL_SPECIFICATION'] = f.historical
++    # Admission starts before any successor measurement or engineering health.
++    f.current.clear()
++    f.health.clear()
++    f.sync()
++    return f
++
++
++@pytest.mark.parametrize('fault', [None, 'extra_path', 'omitted_path', 'duplicate_path',
++    'expanded_amendment', 'extra_amendment_key', 'scope_authority', 'repair_authority',
++    'wrapper_hash', 'scope_hash', 'old_amendment', 'source_path', 'source_hash',
++    'science', 'accounting', 'measurement_limits', 'release', 'old_resource',
++    'historical_proof', 'policy_deadline'])
++def test_prospective_scope_actual_composition_admission(prospective_scope_cpu, monkeypatch, fault):
++    f = prospective_scope_cpu
++    binding = f.spec['runtime_binding']
++    amendment = f.e.read(binding['amendment'])
++    if fault == 'extra_path': binding['source_change_allowlist'].append('scripts/unapproved.py')
++    elif fault == 'omitted_path': binding['source_change_allowlist'].remove('scripts/qd_ed_n36_source.py')
++    elif fault == 'duplicate_path': binding['source_change_allowlist'].append(binding['source_change_allowlist'][0])
++    elif fault == 'expanded_amendment':
++        for key in ('new_allowed_entrypoints', 'exact_source_change_allowlist'):
++            amendment[key].append('scripts/unapproved.py')
++        binding['source_change_allowlist'].append('scripts/unapproved.py')
++    elif fault == 'extra_amendment_key': amendment['approved'] = True
++    elif fault == 'scope_authority':
++        scope = f.e.read(amendment['approved_prospective_scope'])
++        scope['additional_allowed_source_paths'].append('scripts/unapproved.py')
++        amendment['approved_prospective_scope'] = f.put('SYNTHETIC-forged-scope', scope)
++    elif fault == 'repair_authority':
++        authority = f.e.read(binding['repair_authority'])
++        authority['source_base'] = '0' * 40
++        binding['repair_authority'] = f.put('SYNTHETIC-forged-authority', authority)
++    elif fault == 'scope_hash': amendment['approved_prospective_scope']['sha256'] = '0' * 64
++    elif fault == 'source_path': amendment['source']['path'] = '/synthetic/foreign-source.json'
++    elif fault == 'source_hash': amendment['source']['sha256'] = '0' * 64
++    elif fault == 'science': f.spec['scope']['episode']['policy_seed'] += 1
++    elif fault == 'accounting': f.spec['retained_snapshot']['gpu_hours_consumed'] = 0
++    elif fault == 'measurement_limits': binding['measurement_contract']['provider_calls'] = 2
++    elif fault == 'release': f.spec['release_enabled'] = True
++    if fault in ('old_resource', 'historical_proof', 'policy_deadline'):
++        prep = f.e.read(binding['preparation'])
++        historical = f.e.read(f.historical)
++        old_prep = f.e.read(historical['runtime_binding']['preparation'])
++        if fault == 'old_resource': prep['resource_id'] = old_prep['resource_id']
++        elif fault == 'historical_proof': prep['proof_path'] = old_prep['proof_path']
++        else: prep['deadline'] = '2099-01-01T00:00:00Z'
++        binding['preparation'] = f.put('SYNTHETIC-mutated-preparation', prep)
++    binding['amendment'] = f.put('SYNTHETIC-scope-composition', amendment)
++    if fault == 'wrapper_hash': binding['amendment']['sha256'] = '0' * 64
++    elif fault == 'old_amendment': binding['amendment'] = amendment['previous_runtime_amendment']
++    f.repin()
++    f.env['HISTORICAL_SPECIFICATION'] = f.historical
++    monkeypatch.setattr(e, 'SPECIFICATION', f.env['SPECIFICATION'])
++    monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', f.historical)
++    monkeypatch.setattr(e, 'AMENDMENT', f.env['AMENDMENT'])
++    before = {path: path.read_bytes() for path in f.data.iterdir()}
++    if fault is None:
++        assert e.specification() == f.spec
++        assert not f.spec['scope']['scientific_eligible']
++        assert not f.spec['release_enabled']
++        assert f.old[-1]['provider_calls'] is None
++    else:
++        with pytest.raises((ValueError, FileNotFoundError)):
++            e.specification()
++    assert {path: path.read_bytes() for path in f.data.iterdir()} == before
+diff --git a/tests/test_n36_readiness_prepare.py b/tests/test_n36_readiness_prepare.py
+index ac97b63..f47721f 100644
+--- a/tests/test_n36_readiness_prepare.py
++++ b/tests/test_n36_readiness_prepare.py
+@@ -124,7 +124,7 @@ def preparation_authority(root, spec, release):
+ 
+ 
+ @pytest.fixture
+-def measured(tmp_path, monkeypatch):
++def measured(tmp_path, monkeypatch, request):
+     root = tmp_path / 'SYNTHETIC_NOT_AUTHORITY'
+     root.mkdir()
+     spec, retained_raw = measured_specification(root, monkeypatch)
+@@ -153,6 +153,17 @@ def measured(tmp_path, monkeypatch):
+     source = e.b.closure.source_record(e.b.ROOT, e.b.source_paths(e.b.ROOT))
+     monkeypatch.setattr(e, 'SOURCE', e.b.ROOT)
+     source_ref = put(root, 'source', source)
++    if getattr(request, 'param', None) == 'prospective_scope':
++        # Current source requires the actual owning prospective scope approval;
++        # the historical allowlist correctly cannot admit its two extra paths.
++        from test_n36_engineering_r1 import PROPOSED_SCOPE_SPECIFICATION
++        proposed = e.read(PROPOSED_SCOPE_SPECIFICATION)['runtime_binding']
++        composition = e.read(proposed['amendment'])
++        composition['source'] = source_ref
++        binding['amendment'] = put(root, 'SYNTHETIC-prospective-composition', composition)
++        binding['source_change_allowlist'] = proposed['source_change_allowlist']
++        monkeypatch.setattr(e, 'SPECIFICATION', put(root, 'spec', spec))
++        monkeypatch.setattr(e, 'HISTORICAL_SPECIFICATION', e.SPECIFICATION)
+     issued = max(p.timestamp(prep['not_before']), p.timestamp(p.MEASUREMENT_CONTRACT['not_before']),
+                  p.timestamp(e.read(binding['accounting_contract'])['not_before'])) + 1
+     def iso(t): return dt.datetime.fromtimestamp(t, dt.timezone.utc).isoformat()
+@@ -397,6 +408,7 @@ def test_missing_real_graph_fails_without_devices(measured,monkeypatch):
+         p.verify_graph(measured['release'],measured['source'],e.read(measured['spec']['canonical_runtime']))
+ 
+ 
++@pytest.mark.parametrize('measured', ['prospective_scope'], indirect=True)
+ @pytest.mark.parametrize('mutation', ['valid', 'unlisted', 'boolean_only', 'gpu_mapping', 'provider', 'wrong_source'])
+ def test_engineering_admission_of_exact_measured_projection(measured, monkeypatch, mutation):
+     m = measured

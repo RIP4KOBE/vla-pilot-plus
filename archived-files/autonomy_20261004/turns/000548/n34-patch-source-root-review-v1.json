@@ -1,0 +1,55 @@
+{
+  "schema": "n34-patch-source-root-review-v1",
+  "at": "2026-10-08T16:49:20.650254+00:00",
+  "decision": "PASS_OPERATIONAL_REPAIR_ONLY",
+  "source_before": "45f9d06acc34749f4b0de86ffcbf9d849a9e70ce",
+  "implementation_commit": "fac4719a3acd5e6ba0ef8d2d0033d7ccfff39c45",
+  "exit": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/patch-source-repair-v1/executor-exit-v1.json",
+    "sha256": "d0596557856c1ae8205605a27970bc575138efef4896fbe882f1d595b0e68da2"
+  },
+  "report": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/patch-source-repair-v1/implementation-result-v1.json",
+    "sha256": "7cdadd83efbbd460654b40c0a81e2669a0ca0c4ee4b8a3f44ac056dc377c516d"
+  },
+  "events": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/patch-source-repair-v1/executor-events.jsonl",
+    "sha256": "7af83ec900f90c8804bf993b858187e148cc846015667117788ffbac95456d68"
+  },
+  "test_evidence": [
+    {
+      "id": "item_10",
+      "exit_code": 0,
+      "output": ".............................................                            [100%]\n45 passed in 12.59s\n"
+    }
+  ],
+  "handles": {
+    "driver": {
+      "pid": 268073,
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "start_ticks": 97715947,
+      "state": "R",
+      "observed_state": "S"
+    },
+    "process": {
+      "pid": 2596023,
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "start_ticks": 134085708,
+      "state": "R",
+      "observed_state": "S"
+    }
+  },
+  "executor_handles_absent": [
+    2588010,
+    2588013
+  ],
+  "review": "Six-line operational inventory union covers HEAD tracked and on-disk recursive patch Python files. Missing committed and uncommitted new files remain visible to unchanged strict source checks. Reviewed 19 new adversarial tests and 26 dependency regressions. No scientific, runtime attestor, threshold or release-gate changes.",
+  "prior_turn_exit": 0,
+  "ledger": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+    "sha256": "229878bc3a9d99fd596f363835f4ef1ae3c2757b7f34aa43e0aef985de1aa0f2"
+  },
+  "gpu_dispatched": false,
+  "scientific_promotion": false,
+  "remaining": "Torch generated-module origin binding and complete prospective runtime closure; then accounting/fresh manifests/release."
+}

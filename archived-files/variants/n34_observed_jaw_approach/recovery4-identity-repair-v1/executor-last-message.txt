@@ -1,0 +1,5 @@
+Committed `b9f20b8a25766138843b691136ce143566567d3c`; Git is clean.
+
+N34R4 identities and turn644 binding updated. All four invalid histories remain charged; science and audits are unchanged. **230 focused CPU tests passed.**
+
+Wrote `implementation-result-v1.json` and `report-v1.md` in the authorized output directory. No runtime preparation or GPU calls. Ready for root review/adoption.

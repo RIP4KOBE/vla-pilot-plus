@@ -1,0 +1,3 @@
+Reconciled the completed N36 repair at `a5b32cde`: executor exited successfully; 85 CPU tests reported passing. Private ledgers remain unchanged, and no GPU job was dispatched.
+
+Recorded the operational summary and checkpoint. Next: independent scoped review, then fresh bindings. Validation, formal evaluation, and required ablation evidence remain incomplete.

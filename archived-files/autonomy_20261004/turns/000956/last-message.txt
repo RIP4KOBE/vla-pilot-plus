@@ -1,0 +1,3 @@
+N35 remains active with verified controller/worker identities and intact frozen artifacts. Six valid episodes have completed with zero successes; the current worker is progressing.
+
+Recorded turn 956 reconciliation and operational summary. Next step is continued monitoring, then terminal audit. Validation, formal and required-ablation evidence remain outstanding.

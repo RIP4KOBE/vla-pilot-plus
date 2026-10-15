@@ -1,0 +1,3 @@
+Verified authorization, live process identities, and unchanged ledgers. N36R3 remains pending because GPU7 is occupied; no experiment was dispatched.
+
+The driver remains active. Next step is a fresh readiness check once GPU7 is idle. Validation/formal/ablation completion remains unproven. Saved the hash-bound turn 001383 operational summary.

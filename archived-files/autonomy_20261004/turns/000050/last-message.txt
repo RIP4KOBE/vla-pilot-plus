@@ -1,0 +1,3 @@
+N31 remains under its valid controller with frozen source unchanged. Ledger history is intact.
+
+Five matched Dev triples remain 0/5 for every arm; task 5 C0 also failed, and Q0 is reserved next. Operational summary saved. Monitoring continues; validation, formal evaluation, and ablation completion remain unevidenced.

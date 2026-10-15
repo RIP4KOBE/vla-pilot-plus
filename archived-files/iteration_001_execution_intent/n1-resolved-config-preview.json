@@ -1,0 +1,258 @@
+{
+  "backend": {
+    "backend": "libero",
+    "libero": {
+      "auto_apply_perturbations": true,
+      "camera_name": "agentview_image, robot0_eye_in_hand_image",
+      "init_states": true,
+      "max_episode_steps": 720,
+      "num_steps_wait": 5,
+      "obs_type": "pixels_agent_pos",
+      "observation_height": 128,
+      "observation_width": 128,
+      "render_mode": "rgb_array",
+      "strict_perturbations": true,
+      "suite_name": "libero_object_swap",
+      "task_id": 0,
+      "task_ids_filter": [
+        0
+      ],
+      "visualization_height": 640,
+      "visualization_width": 640,
+      "vlm_camera": "agentview"
+    }
+  },
+  "device": "cuda",
+  "experiment": {
+    "name": "libero",
+    "tags": [
+      "libero"
+    ]
+  },
+  "main": {
+    "cached_functions_dir": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_0",
+    "debug_draw_trajectory": true,
+    "eds_config": {
+      "adaptive_early_stop_patience": 2,
+      "adaptive_min_cem_iters": 4,
+      "adaptive_reward_improvement_eps": 0.001,
+      "cem_iters": 10,
+      "chunk_memory_fraction": 0.0,
+      "chunk_memory_renoise_steps": 2,
+      "chunk_memory_reward_guard_quantile": 0.25,
+      "chunk_population_mode": "fresh",
+      "direction_rbf_direction_weight": 0.6,
+      "direction_rbf_distance_epsilon": 1e-06,
+      "direction_rbf_endpoint_scale_m": 0.05,
+      "direction_rbf_endpoint_weight": 0.1,
+      "direction_rbf_path_epsilon": 1e-06,
+      "direction_rbf_shape_weight": 0.3,
+      "ed_population_cache": null,
+      "elite_carryover_count": 0,
+      "initial_cache_metadata": true,
+      "initial_diversity_descriptor_mode": "absolute_eef",
+      "initial_diversity_fallback": "iid",
+      "initial_diversity_scale": 20.0,
+      "initial_diversity_start_ratio": 0.8,
+      "initial_population_cache": null,
+      "initial_sampling_mode": "rbf_diverse_denoise",
+      "num_elites": 16,
+      "parent_anchor_count": 0,
+      "parent_anchor_reward_quantile": 0.5,
+      "parent_coverage_mode": "none",
+      "parent_weighting_mode": "legacy_temperature",
+      "population_size": 16,
+      "qd_archive_mode": "grid_archive",
+      "qd_bounds_expand_fraction": 0.1,
+      "qd_bounds_quantiles": [
+        0.05,
+        0.95
+      ],
+      "qd_bounds_update_policy": "fixed_initial",
+      "qd_cell_capacity": 1,
+      "qd_degenerate_fallback_policy": "none",
+      "qd_descriptor": "target_distance_gripper_duty_v1",
+      "qd_global_quality_anchor_count": 0,
+      "qd_grid_shape": [
+        4,
+        4
+      ],
+      "qd_metrics_observer": true,
+      "qd_min_axis_span_m": 0.08,
+      "qd_overflow_policy": "clamp_edge",
+      "qd_parent_sampling": "sparse_priority",
+      "qd_secondary_lane_mode": "none",
+      "qd_sparse_exponent": 1.0,
+      "qd_tie_break": "stable_fingerprint",
+      "renoise_t_max": 3,
+      "renoise_t_min": 1,
+      "rollout_diversity_band_ratio": 0.2,
+      "rollout_diversity_control_mode": "fixed",
+      "rollout_diversity_decay_floor": 0.25,
+      "rollout_diversity_descriptor_mode": "absolute_eef",
+      "rollout_diversity_iters": "all",
+      "rollout_diversity_scale": 20.0,
+      "rollout_diversity_scale_max": 20.0,
+      "rollout_diversity_scale_min": 0.0,
+      "rollout_diversity_skip_final_steps": 0,
+      "rollout_diversity_start_ratio": 0.6,
+      "rollout_diversity_target_ratio": 1.0,
+      "save_ed_cache": false,
+      "save_initial_cache": false,
+      "search_schedule_mode": "legacy_linear",
+      "selection_beta_max": 100.0,
+      "selection_bisection_steps": 24,
+      "selection_ess_target_ratio": 0.6,
+      "temperature": 0.1,
+      "truncated_rollout_mode": "rbf_diverse",
+      "use_cem": false,
+      "use_initial_cache": false
+    },
+    "eds_eval": {
+      "enabled": true,
+      "job_id": "PREVIEW_N1",
+      "max_visual_chunks_per_episode": 2,
+      "method_label": "N1__input_repaired",
+      "output_dir": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/PREVIEW_N1/eds_eval",
+      "report_dir": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final",
+      "reward_mode": "normal",
+      "save_initial_vs_final": true,
+      "save_per_iter_best": true,
+      "save_population_cloud": true,
+      "save_qualitative": true,
+      "shuffle_seed": 0,
+      "write_metrics": true
+    },
+    "eds_mechanism_pretest": {
+      "enabled": true,
+      "first_chunk_only": false,
+      "max_chunks": 2,
+      "max_full_process_iters": 10,
+      "output_dir": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/PREVIEW_N1/mechanism",
+      "output_mode": "qualitative_chunk",
+      "plot_3d": true,
+      "run_id": "PREVIEW_N1",
+      "save_full_process": true,
+      "save_single_step": true,
+      "save_tensors": true
+    },
+    "episode_num": 1,
+    "episode_seed_schedule": [
+      1969522881
+    ],
+    "episode_start_index": 0,
+    "execution_contact_distance": 0.04,
+    "execution_horizon_contact": 2,
+    "execution_horizon_far": 8,
+    "execution_horizon_mode": "fixed",
+    "execution_horizon_near": 4,
+    "execution_near_distance": 0.08,
+    "guidance_type": "eds",
+    "keypoint_detection_max_attempts": 3,
+    "max_episode_steps": 240,
+    "output_dir": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/PREVIEW_N1",
+    "render": true,
+    "require_task_cache_identity": true,
+    "use_guidance": true,
+    "use_vlm_stage_recognition": true,
+    "visualize_trajectory": true,
+    "vlm_query_limit": 50,
+    "vls_config": {
+      "MCMC_steps": 4,
+      "diversity_scale": 10.0,
+      "fkd": {
+        "adaptive_resampling": true,
+        "lmbda": 10.0,
+        "potential_type": "max",
+        "resample_frequency": 5
+      },
+      "guide_scale": 40.0,
+      "sample_batch_size": 20,
+      "sigmoid_k": 25.0,
+      "sigmoid_x0": 0.75,
+      "start_ratio": null,
+      "use_diversity": true,
+      "use_fkd": true
+    }
+  },
+  "perception": {
+    "gemini": {
+      "api_key": null,
+      "model": "gemini-2.5-flash"
+    },
+    "gemini_grounding": {
+      "api_key": null,
+      "default_objects": [
+        "drawer handle",
+        "sliding handle",
+        "slider handle",
+        "black switch",
+        "red cube",
+        "blue cube",
+        "pink cube"
+      ],
+      "enabled": false,
+      "model": "gemini-2.5-flash"
+    },
+    "keypoint_detector": {
+      "bounds_max": [
+        1.0,
+        0.75,
+        1.2
+      ],
+      "bounds_min": [
+        -1.0,
+        -0.75,
+        -0.1
+      ],
+      "device": "cuda",
+      "feature_extractor": "dinov2_vitb14",
+      "max_mask_ratio": 0.5,
+      "min_dist_bt_keypoints": 0.05,
+      "num_candidates_per_mask": 5,
+      "seed": 1969522881
+    },
+    "sam3": {
+      "enabled": false
+    },
+    "vlm_agent": {
+      "api_key": null,
+      "api_max_retries": 8,
+      "api_retry_backoff_seconds": 5.0,
+      "api_retry_max_backoff_seconds": 30.0,
+      "base_url": null,
+      "max_completion_tokens": 2000,
+      "model": "gpt-4o",
+      "query_template_dir": "vlm_query/",
+      "temperature": 1.0
+    }
+  },
+  "policy": {
+    "diffusion": {
+      "action_chunk_horizon": 16,
+      "n_obs_steps": 2,
+      "num_inference_steps": 100,
+      "pretrained_path": "Vision-Language-Steering/vls_calvin_base"
+    },
+    "pi05": {
+      "action_chunk_horizon": 10,
+      "num_inference_steps": 10,
+      "pretrained_path": "lerobot/pi05_libero_finetuned_v044"
+    },
+    "rdt": {
+      "action_chunk_horizon": 8,
+      "control_frequency": 20,
+      "debug_first_step": false,
+      "fail_on_zero_language_embedding": true,
+      "num_inference_steps": null,
+      "pretrained_path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object",
+      "semantics": "libero_gt_rollout",
+      "text_encoder": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl",
+      "undo_libero_preprocessor_flip": false,
+      "vision_encoder": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384",
+      "weight_variant": "ema"
+    },
+    "type": "rdt"
+  },
+  "seed": 1969522881
+}

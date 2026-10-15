@@ -1,0 +1,3 @@
+N32R1’s first C0 cell is running under controller `1348389`, worker `1460701`, on frozen source `531477e9`. Authorization, process identities, frozen hashes, and ledger continuity verified; operational summary saved.
+
+Next: monitor terminal audits and accounting. Validation, formal, and required ablation evidence remain incomplete.

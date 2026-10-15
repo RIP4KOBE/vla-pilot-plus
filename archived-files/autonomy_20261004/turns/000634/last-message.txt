@@ -1,0 +1,3 @@
+N34R2 stopped on a strict runtime-audit failure: missing `dotenv` inventory entries. Reconciled its termination, preserved all charges, and recorded the CPU diagnosis and operational summary.
+
+The driver remains active. Next: prospective inventory repair and a fresh recovery release. Validation, formal evaluation, and required ablations remain unproven.

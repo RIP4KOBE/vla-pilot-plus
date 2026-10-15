@@ -1,0 +1,3 @@
+Adopted N34R7 repair as `5dcbd06d` after source review and verification of 430 passing tests. All ledger charges remain unchanged; no GPU cohort is running.
+
+Recorded the operational handoff. Next: regenerate runtime manifests and verify the prospective release. Validation, formal evaluation, and ablation evidence remain outstanding; the driver continues.

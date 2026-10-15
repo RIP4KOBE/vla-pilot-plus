@@ -1,0 +1,8 @@
+Committed G1-only repair as `dcd890474b733743414d2a7711069bb0d2b0337e`.
+
+- Pinned existing owner mapping; preserved historical spelling and rejected foreign routes.
+- Focused CPU tests: **37 passed**.
+- Dispatch veto and scientific gates unchanged; no GPU, adoption, or owner-state/ledger writes.
+- G2–G7 remain open. No production or scientific success claimed.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001528/owner-route-repair/report-v1.json>)

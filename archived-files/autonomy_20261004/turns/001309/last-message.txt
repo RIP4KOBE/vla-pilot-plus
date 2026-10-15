@@ -1,0 +1,1 @@
+Independent review finished: alias repair passed its scoped checks, but the parent-identity test harness still fails. Recorded the terminal evidence and next repair step. GPU recovery remains unreleased; all charges are preserved. Validation, formal evaluation, and ablation goals remain unproven.

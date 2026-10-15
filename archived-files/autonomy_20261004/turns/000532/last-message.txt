@@ -1,0 +1,3 @@
+N34 integration remains live with verified process identities. Latest logs report 79 integration checks and 55 targeted checks passing. Ledger history is unchanged.
+
+Recorded turn 532’s operational summary. Next: reconcile the terminal report and review source, protocol and accounting before GPU release. Validation, formal evaluation and required ablations remain incomplete.

@@ -1,0 +1,82 @@
+{
+  "source_commit": "88b3c28cb49f610be382b24cce4c5df57bc41661",
+  "accepted_base": "e95745853ec2fbb95e55915e99644a4dc0443261",
+  "source_record": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001250/recovery-preparation/source.permitted-only-v1.json",
+    "sha256": "7cb389ee948ae6c83f5cf35528447391fea0e7c69ff29e782ddbc8645d9159d0"
+  },
+  "source_coverage_complete": false,
+  "changed_source_files": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r2_alias_recovery_001250/implementation_worktree/scripts/qd_ed_n36_contract.py",
+      "sha256": "79f008a8de9cd4c8c6fe2eb0ca226730c601415bafb9c0b935ae342b3fc8aa9f",
+      "bytes": 9904
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r2_alias_recovery_001250/implementation_worktree/scripts/qd_ed_n36_cpu_receipt.py",
+      "sha256": "013b1d9aceb82caaa9780e137640815af6101dbebaa4506918176b01eeceb3c5",
+      "bytes": 2582
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r2_alias_recovery_001250/implementation_worktree/scripts/qd_ed_n36_prepare.py",
+      "sha256": "0df7a96071f896ab073d10abd268f252f8b3c7a98d8232d49f9ffb4b4795f453",
+      "bytes": 4765
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r2_alias_recovery_001250/implementation_worktree/scripts/qd_ed_n36_release.py",
+      "sha256": "58967e3af5c2dd14e2378c2a9778e4ef67a2c8a04e4a9bd37d81bcdbb45cee5d",
+      "bytes": 15629
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r2_alias_recovery_001250/implementation_worktree/scripts/qd_ed_n36r2_draft.py",
+      "sha256": "d2dda0e4257ec3526ecde1f4f16086beed90e381966cfae8497d67163c41f6ee",
+      "bytes": 3701
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r2_alias_recovery_001250/implementation_worktree/tests/test_n36r2_draft.py",
+      "sha256": "64b9c239a88b54d8ad51ae430e48e91ecb6f8c719f60cb2338b33730996e61b9",
+      "bytes": 2274
+    }
+  ],
+  "runtime_closure": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001250/recovery-preparation/runtime-closure.n36r2.draft-v1.json",
+    "sha256": "98a53634b33f47fbd2a4bff24431c4202ede9111ed9aa1b56e034ebe877009c0"
+  },
+  "runtime_payload": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001229/runtime-rebind/runtime.owner-ready-v1.json",
+    "sha256": "2c2bb7a0ddb114187134dc4cf406ecbda63181656591f44e708e3a8388f8caa0"
+  },
+  "native_build": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001203/recovery-preparation/native-build-n36r1.draft-v1.json",
+    "sha256": "3e7e4f522f8d463671e7fe83bef4762f45f0ab0e32298959e38b8357998052d7"
+  },
+  "accounting": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001250/recovery-preparation/accounting.n36r2.draft-v1.json",
+    "sha256": "8689d0b788b3062e031d71b46030100f4578312292ec495bb99d494c77d4581d"
+  },
+  "allocation": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001250/recovery-preparation/allocation.n36r2.draft-v1.json",
+    "sha256": "1c91bdf57c50ecc117f9fa7c2cd929e01ec0ae17fb14af668759b8a536f19fd9"
+  },
+  "protocol": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001250/recovery-preparation/protocol.n36r2.draft-v1.json",
+    "sha256": "4539214d9f3a831e370baa81eafeb057d63fc90b2ebe1253bc1dbd11fb907f2e"
+  },
+  "plan": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001250/recovery-preparation/draft/plan.partial.draft-v1.json",
+    "sha256": "bd6009cbe1ef67922f6f2134342bad14c2101e1d862ae7f68ca3688c806d3ed3"
+  },
+  "cpu_context": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001250/recovery-preparation/cpu-context-v1.json",
+    "sha256": "ebc497981d0afc47c3e391d64089e3bf634cb81a6718a939859a0476b7ea6e2e"
+  },
+  "cpu_receipt": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001250/recovery-preparation/cpu-receipt-v1.json",
+    "sha256": "b09337a761e1a39b451ea625bd8149731dd5fc74175528914195f68e35fc51c5",
+    "bytes": 2304760
+  },
+  "runtime_closure_accepted": false,
+  "source_adopted": false,
+  "gpu_authorized": false,
+  "release_enabled": false
+}

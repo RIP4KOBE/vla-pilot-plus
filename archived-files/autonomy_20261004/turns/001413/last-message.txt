@@ -1,0 +1,3 @@
+Accepted the completed N36R3 independent review and recorded source/runtime adoption for `4347951`. State, checkpoint, tree, and hash-bound operational summary are updated; ledgers remain unchanged.
+
+Next: accounting reconciliation, fresh health check, then separately released first C0 with mandatory review. Validation/formal/ablation evidence remains outstanding. The driver remains active.

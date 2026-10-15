@@ -1,0 +1,7 @@
+Committed G7-R1 repair as `b8d6b98164f24a599a9aa1fa6ce862b12cb2fcf6`.
+
+Four focused CPU tests passed, including 33 new negative cases. Worker `__main__` support, existing audits, and prior failure logs are preserved.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001572/g7-r1-repair/report-v1.json>)
+
+Engineering evidence only; scientific success, target met, and release enabled remain false. Independent review and affected graph/B5 refresh remain coordinator obligations.

@@ -1,0 +1,3 @@
+Verified authority, live process identities, and unchanged private ledgers. The existing N36R3 CPU repair continues; no duplicate or GPU dispatch occurred.
+
+Recorded turn 1329’s operational summary. Next: reconcile the repair report and review its exact source before GPU release. Validation, formal, and ablation evidence remain outstanding.

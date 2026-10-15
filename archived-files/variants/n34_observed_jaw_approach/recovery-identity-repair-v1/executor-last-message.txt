@@ -1,0 +1,9 @@
+Committed `908efa454450a079c5ed6a1b10eff1eb9ef290c1`; worktree clean.
+
+Implemented fresh N34R1 identities, exact 9/20/1 accounting, pinned replacement provenance, and retained invalid charges. Automatic recovery remains disabled; scientific rules unchanged.
+
+128 distinct focused CPU tests passed. No GPU launch or operational release created.
+
+[Implementation result](../recovery-identity-repair-v1/implementation-result-v1.json) · [Report](../recovery-identity-repair-v1/report-v1.md)
+
+Root review/adoption and regenerated detached closure remain required.

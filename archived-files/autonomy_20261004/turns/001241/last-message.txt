@@ -1,0 +1,3 @@
+Reconciled N36R1’s invalid stop: `_cyutility` failed the runtime audit after the episode finished. All charges remain recorded; no cohort is running.
+
+State and checkpoint now direct bounded CPU diagnosis before any prospective recovery. Validation, formal evaluation, and required ablation evidence remain incomplete.

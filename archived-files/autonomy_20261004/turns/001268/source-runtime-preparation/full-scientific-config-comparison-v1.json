@@ -1,0 +1,372 @@
+{
+  "status": "PASS",
+  "count": 40,
+  "normalization_only": [
+    "exact per-manifest output_dir prefix",
+    "exact per-manifest source.commit"
+  ],
+  "rows": [
+    {
+      "episode_key": "n36r2_dev_t00_c0_001250",
+      "old_composed_config_sha256": "092c8022076c6bde0db3c1a783bb1f3f6b21e7fb30c554c2be76988a444bb472",
+      "new_composed_config_sha256": "d119b60b5166e1a9cddbf79b6bd1820dbd4a5ffaf76a060a5ffcd48ac4de01b0",
+      "normalized_composed_config_sha256": "58fd5476ebca54001572bdccd340b4b27acc33ce9da6f86208da68590bbece06",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t00_q0_001250",
+      "old_composed_config_sha256": "08da40f9da85d768d385df02eba0ff3dd0d7b66e9a2b7da60eb047c8ad5d71f4",
+      "new_composed_config_sha256": "3e04141747c1a1502364a647dd43e802a1856e284a4081d728b6a15fe32a80f5",
+      "normalized_composed_config_sha256": "617f6860f1e9bb72e1c9fc52112cec7821a32f2a58ade19b79f97eb774cb79df",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t00_n34_001250",
+      "old_composed_config_sha256": "dc386fa99adb359bf754e4cb0c72f779ae9c5a4b5b351ca056a5fb41bc318654",
+      "new_composed_config_sha256": "672bff663d11b6a79ebe5e8f54b180e49b966a9f612811d9335830f5323a21bf",
+      "normalized_composed_config_sha256": "e80a9f0121489ac807fb2f24dc3fa69e7bec7bb034771929d57f781c5e7e6d9e",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t00_n36_001250",
+      "old_composed_config_sha256": "cfc7ebac7371e2ef880c404b8dc979129b4238af5aca21d022711616c322cfd3",
+      "new_composed_config_sha256": "a7a3df93a72c258cd320a2de46e214fb6902644bfdb99d9caa3ef412a7878a92",
+      "normalized_composed_config_sha256": "cad9b6fd52f7c62cd8c13d52caf8190189167f5487d68b0889d91234d8c059e5",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t01_c0_001250",
+      "old_composed_config_sha256": "cabaca80226d5d3618fe3b43ed66026af00ad03e2db7f018564f2f00c7e3bf65",
+      "new_composed_config_sha256": "2c9b227785f9afdfa9f7d11a0126d30452eb23bb5418ead21de56863aa3c2992",
+      "normalized_composed_config_sha256": "4c79055531a9ce1738a8a9d04f1418c8e34c9b3b67fc1213eb4dd2a02bd8cd43",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t01_q0_001250",
+      "old_composed_config_sha256": "5c4b9a70a19b5216501e3bd86a3e087c23b572b9e2eb2b83c5db7528b6714054",
+      "new_composed_config_sha256": "59fcd12c5986fa176e16877dcc11701255f47b683507426e27a95152c601e7ae",
+      "normalized_composed_config_sha256": "a5eae3b964c1a01278052fb02fb466807132217a51d39f00a9d5acec5a9c4db3",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t01_n34_001250",
+      "old_composed_config_sha256": "75e9685a639b82513dbcbe385ab5d5b732f4babe112aabb7a2ae73649e9cadf9",
+      "new_composed_config_sha256": "8dac4664b0360cb4ae13f8595053559c30df81e57216645225379273f8fe46e4",
+      "normalized_composed_config_sha256": "aed3c0040d888f786cea8b18e489c967461171f35a6feb9e993fe3ed064776c0",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t01_n36_001250",
+      "old_composed_config_sha256": "acbac0cf75db9a18dc8964f275dfbc7a4958f3b02945a1039081eb472b939331",
+      "new_composed_config_sha256": "2befc080e69d97a8c155d4d8c37f294bcdc394ac87f86a50e40715b0896dd3e9",
+      "normalized_composed_config_sha256": "4c4e5f2e0bb1aab66cf15bb3be806db0230bb10ac3172e52921f7aa7e4781444",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t02_c0_001250",
+      "old_composed_config_sha256": "3dde6b5d9167fa5b1ca4af4369e437da1f7f323e05048f538ffb065cfee368f3",
+      "new_composed_config_sha256": "5f1f0849d52009c024439d1d0687b1c0b51c98838ea9f10b7080d43fcfc1366c",
+      "normalized_composed_config_sha256": "3ac2723196cac615a75d2fbdd461a7a5d2f68f793f089d9b84e2dd48c79665d0",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t02_q0_001250",
+      "old_composed_config_sha256": "cc94ecef110eb2e9ef79f1f98802363e30684574b096b25d3644540ca6437bd8",
+      "new_composed_config_sha256": "9374a3c89aa17b496f1bb8d8b9a92ea21f114e33e0d398ab62c882cb52f54e4d",
+      "normalized_composed_config_sha256": "792a50d9c279d2c8b865a7da718696c9894bc4eaedd5f4c7723fe5b4950ce60a",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t02_n34_001250",
+      "old_composed_config_sha256": "d676f98f3cb3775e72bfbc06ed65cf07c04a18821b492773a4e7badb53cb4cd8",
+      "new_composed_config_sha256": "4e9d7debd59f145cf8d2b05c6cc1823b59edb15b5e3987115cd94235e17a047d",
+      "normalized_composed_config_sha256": "20e4d6184be606fabb7897903db59c491d7547d24c7f564f31424aa2428f6d34",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t02_n36_001250",
+      "old_composed_config_sha256": "9b43b57a37f20c6d8158d28ef3cb2ae6abe4e11b01433c4ec2a93f22321b050e",
+      "new_composed_config_sha256": "55f932f6dc8ec5c64e834c6015df3c27227928ff8851254d51c90dd7d46f28b9",
+      "normalized_composed_config_sha256": "14c3f3289a7cd7c99d8e8d459265b9d7d896076b530a03b250b96f831f9e7644",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t03_c0_001250",
+      "old_composed_config_sha256": "ca43a524f769bfa6336ff45c737ef4c994bc284face7002e875db6d4d5dd670b",
+      "new_composed_config_sha256": "b1906df84a2a5a4a6e24579a332e56d8157ff59d7d6ad433382c2018f961acb8",
+      "normalized_composed_config_sha256": "7c478d31b9cd3d31ffb9e6f249869789a2280247a512412877ee641bb33e9a5e",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t03_q0_001250",
+      "old_composed_config_sha256": "ac0bc200071836cfdfbd05dcf9f416f56d7979718c466a8cbc66d19eb66b2858",
+      "new_composed_config_sha256": "bd18e42844814c4ac64219396d3851ab7a547ae19b8e5551e5f660bcc50c6b31",
+      "normalized_composed_config_sha256": "88b94d814050e446d22cd3faa5301c83aa8cb04d78cd1d1bdd44a02d62a22397",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t03_n34_001250",
+      "old_composed_config_sha256": "0645a783c7d47c6fa3714b92169d418b1ef34bbf7214198dcf881d9153c0a1f1",
+      "new_composed_config_sha256": "a5c84fd4bb5e33030a027bdec61483c41ccb7d0ca41ec1bfe04c5df4a7acb8ef",
+      "normalized_composed_config_sha256": "f2f7db3d592832d5e7e98100e5d05f1d83b7f789d3db17630cc91eff08425dea",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t03_n36_001250",
+      "old_composed_config_sha256": "dacf1b861c71218249114a96631dcff36779e303bdfc6acaa804fe7354bcb840",
+      "new_composed_config_sha256": "4a3f5657980c253b50f252396ab5f7155b0d9c715bbffe3b7fc70f05b24670ea",
+      "normalized_composed_config_sha256": "8e7ad4a0eb1091142bbfae8346ac0d5a6409f4b27618395c83dd5c2eb31d48cc",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t04_c0_001250",
+      "old_composed_config_sha256": "ed7c7f14c39f852d3498042fd845d31d511dfc2818b7c8a114adc8e5342c0370",
+      "new_composed_config_sha256": "81f4be4b2e0e838b8e3e963af1c207b9968aac7b9acb96dc9cc197c05d401d05",
+      "normalized_composed_config_sha256": "c7fec099010295886a2988e8a1a7c5dc064939dca350629b3b17f7be2f5b3de7",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t04_q0_001250",
+      "old_composed_config_sha256": "a766309385841a180046ffda1d5d4f4fd69604eec251474ae393120f11f2f60d",
+      "new_composed_config_sha256": "617722024c04ae0758944d0bc4bf8a9d22902f949f874a07ac77645b8af3124d",
+      "normalized_composed_config_sha256": "c15a62e7ac0d0e0e882a8228684bac38068a428a0c840681274a16574ce95441",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t04_n34_001250",
+      "old_composed_config_sha256": "f1c6b663b8764229f3fc0f2445bcf14757ecf074212c40c32589daac8c4dce27",
+      "new_composed_config_sha256": "a7f2520e9e558995faa339e9183ce5dd3d09feb04ee12d005a5e304d428ae9b9",
+      "normalized_composed_config_sha256": "4629d4ce1e64cd9cd5b93208de6a35882de38eefe5a1fb07734ceedcbbfdb686",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t04_n36_001250",
+      "old_composed_config_sha256": "a265ba9ba38b84f54d6269494895f82bb8a9c135e268504def0647c6ee51042f",
+      "new_composed_config_sha256": "a8cc9b3bc209bade2e73788b7a07486a1cb2f8fd3443ae34d2072bf9b179ce0e",
+      "normalized_composed_config_sha256": "1d4470a8536d2696d6d7a47a797bb56eba6308fc1b5b2b223d7ae3a7829b671c",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t05_c0_001250",
+      "old_composed_config_sha256": "f38632374c250c2a32fe426f27679a9284197305316548c5419c37dd66bee559",
+      "new_composed_config_sha256": "97d5a9ed54014cafa80179644bca5c09a2327c2dddde763ea0d6451d6b99813b",
+      "normalized_composed_config_sha256": "408bec77299e3990976b43b3eefe0180668f8ebaa0089ca8fcfdcab209d53472",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t05_q0_001250",
+      "old_composed_config_sha256": "c1113162bc12ee980f91fe7de9bb22f5c7c13155a5a8a1e63bbb99167c1dce26",
+      "new_composed_config_sha256": "bf0101fbfefd78cbf76d6dde3d5b2cfd36845abe54aa8577297e5e9adee372f3",
+      "normalized_composed_config_sha256": "1c51a8a72e6a1195720eaf8606af0352f7673df59e9ffe9f996e1de039f1e629",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t05_n34_001250",
+      "old_composed_config_sha256": "002a67afbc1df7066363f118d0565b569b396169de145a375ef13b52082d53f7",
+      "new_composed_config_sha256": "69fc50744dcfdbeabe9cc61d88f439fb638f6b5020e5433751855b5efb798495",
+      "normalized_composed_config_sha256": "b645ff1de8a3a2e54b151f3148141c8427d8f2604f1e5b0e51f6aa5311a38c89",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t05_n36_001250",
+      "old_composed_config_sha256": "cb51fd5ba41f38adae3b8486e959f336ccb9971a4e6bb14e472cb6ae9266397e",
+      "new_composed_config_sha256": "4453640fe0a701b7f7e167a6add6abfb39236b610492c95cb880925420ed693b",
+      "normalized_composed_config_sha256": "fdc3722ddc08bae357eecad54d2abcfa291e789751aff4c5d4f56b353745f4b5",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t06_c0_001250",
+      "old_composed_config_sha256": "e235213c11457097026d8edac1be1a343b387d2aa621804e10ff276e1b8edf02",
+      "new_composed_config_sha256": "5ba8211ede262d13ecbe323b57da4625352c4423d8932679376d3fa5ef419431",
+      "normalized_composed_config_sha256": "55374559e795bd3f95bab28a1c4a2e0fae3012e09fccad6f87f2f162936761ee",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t06_q0_001250",
+      "old_composed_config_sha256": "5869b22c136c1a4a0e086b1d4a0a2477bdd0cda93e01e00f8d8911bf8e6dbc6d",
+      "new_composed_config_sha256": "8acca626ab5fbfaacc568a92b625471e03c2d11c09f757125613e70950222918",
+      "normalized_composed_config_sha256": "4928047568f25e06608ee54f318aa01a75753b091ceccf63e21ef17c622fe3b1",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t06_n34_001250",
+      "old_composed_config_sha256": "7bff19e1f94c886c2d6a077975eaa81fa5d7b7a4a52102826b29984ed1ad4819",
+      "new_composed_config_sha256": "cb90421c4026e6725e64257b6a5fe6c2a07678881dd45353063aada5d3c14674",
+      "normalized_composed_config_sha256": "2d6ab279ff1aa2a2b7a05fe2b9e8c674862a2db618d1a51dd5aefa3263b568ef",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t06_n36_001250",
+      "old_composed_config_sha256": "703c508a56dfae6073b38bcb19292fce87128ba4f615940d8669686a73551127",
+      "new_composed_config_sha256": "58f04f64b9e0870dabd136261c620eca0267055a07694ecaf0a4d4d492c2abab",
+      "normalized_composed_config_sha256": "920a1215ff85d8bf3a2c8c6fb3155c6013a625451bcaf4384603e8bcc81f0d74",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t07_c0_001250",
+      "old_composed_config_sha256": "19586af40a50d4e5d8b48d84882eb9c543d51837ecf7cb8ee880708fb44bfe69",
+      "new_composed_config_sha256": "fb5b279fa8eb8faf64707b54626d953d00a757900aa7d11e68753ff52974c50c",
+      "normalized_composed_config_sha256": "4e8fe0e88220f0eaf57138e3482f75de7b2cf9fd6a40c368f70068c4e08587d4",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t07_q0_001250",
+      "old_composed_config_sha256": "1290c05abbf591bd594f99bc1724bef0d28735cb7224c01fa38a83f53d7232ff",
+      "new_composed_config_sha256": "9e23d20db04f86d880a7d4ea580a09a20091dc50beeef1a9aafe52da1d7f28c5",
+      "normalized_composed_config_sha256": "5cfb964f01864013b3071ecbe298d8411434181c892836f256c52366005fb3be",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t07_n34_001250",
+      "old_composed_config_sha256": "0ed2d1376dbe4e8521676d09507a8a868be9d8c56e0289d9a8ee0c3bd84ba321",
+      "new_composed_config_sha256": "d8890f247d0e1569caf956d494b1a8b64e752bb4be9d9b28406f6c8799714a48",
+      "normalized_composed_config_sha256": "beb63c5c34689eaf75efe6ab2dc1e456b7ffd09a42556d710681f98b4832483a",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t07_n36_001250",
+      "old_composed_config_sha256": "b01ccdc143ecc1895b4d5c85098fb6f09749de7cd515bc194f4be8a65f98d1f9",
+      "new_composed_config_sha256": "08c86cf5b8230c5c18bba4d0e02a741a4d214f662d0fd17b4bf8cab4cef1db31",
+      "normalized_composed_config_sha256": "7caa75f196b0f4062045cd34f54e68c643a6276784bcdc2e8d4bc9b480d864c3",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t08_c0_001250",
+      "old_composed_config_sha256": "689fc2def7dd153c014fd3ecbb88a0167ac607c65e78fc5e1b900b0042c81721",
+      "new_composed_config_sha256": "36497f58f2932438966433855adcdbe98326bc29928c9a3f8d29bae4c73900c2",
+      "normalized_composed_config_sha256": "c34015ed5fd051d7957b716adbd1a992691d588d98cc33c6e807b955429d8a96",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t08_q0_001250",
+      "old_composed_config_sha256": "78b20c567fd7a286ad709128d0b1c57524f1c2372cdd8ca0b8ac83a2c4ab59fe",
+      "new_composed_config_sha256": "2529465890ffc95e732af5c8eaa1fec6b1c44b2f1e1130283336ef0c9d549350",
+      "normalized_composed_config_sha256": "93454e427c89b4c301468fe0025c89d99f0a7c7d7cb73c21cc99568d26039774",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t08_n34_001250",
+      "old_composed_config_sha256": "52667709d44bafdb98a4d7a0c78abe02abb6909d0c2d991d8b96bd960390318c",
+      "new_composed_config_sha256": "b28bcc4f794428825945181f251df5b904304e379a58af1d5d6e6e9ef72c084a",
+      "normalized_composed_config_sha256": "d644cc1d32be5d161a40e40e6aed763c78f8f8365ca13dfe98b4199af8050d6f",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t08_n36_001250",
+      "old_composed_config_sha256": "c79f868bb4f33e095b5c1d63e4ec1d01b77398330a87c36d8cb0a48457da1108",
+      "new_composed_config_sha256": "68144e757ff9760201de291b854f7fac1e2b452ca1d7b7469e0a34d16e20fd05",
+      "normalized_composed_config_sha256": "9cd83abefcb07d8f9f58ba479cba4eb2e98381287239608722f7cff7e37d00f9",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t09_c0_001250",
+      "old_composed_config_sha256": "d53bc902a80620890e8c77f19a3928414b20fe5ca9d89885a4600744afc70d67",
+      "new_composed_config_sha256": "5a996c8a3244728c0b308a2f4bc2bb089ec1afbf4d1fa78936ecd000ca3125d3",
+      "normalized_composed_config_sha256": "4426bedc351e40dc854dd2354ef922022eba62773a1c86d45fe3b8bff9a92a69",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t09_q0_001250",
+      "old_composed_config_sha256": "803e78447228bd14e730cc4f2ebc36fa419528b3730b4b648a23c53d92389c08",
+      "new_composed_config_sha256": "35489be9d8d7b0596e5f7ebc3b79d4ebb426d3a12b437294cb3cc157c719221d",
+      "normalized_composed_config_sha256": "2d170ae944c5c9e99c03e3e868094658bc9d81d77e1fe8ae187c58eb4c3687ba",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t09_n34_001250",
+      "old_composed_config_sha256": "5e139dbab916fc0ffe3a15ae8135d965aaf6cc02d560bd15fa4cfad7b0a79021",
+      "new_composed_config_sha256": "7a5b5ed2bdac974045d23a1ad0d4d4be27d6164c384d6ad31222679f36b3a3a6",
+      "normalized_composed_config_sha256": "975d0117b1bd487fb90d9f8893452a6bf6dfbdfe6975140dbd77114c0a4d4c3b",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    },
+    {
+      "episode_key": "n36r2_dev_t09_n36_001250",
+      "old_composed_config_sha256": "dd3ef244f7e2a27f899441ca1eff2cddcf08eb828599b259145cc5a30ede1d60",
+      "new_composed_config_sha256": "9956986405b2e529d605bc0cfa51c32e8e689c3749542f6a9e6e4332d06537cb",
+      "normalized_composed_config_sha256": "678c4a7db0a4ba0d10134de9ddada5cb1b578b1b2d902f29cc5e76f6163c1cc0",
+      "argv_equal_except_exact_output_prefix_and_source_commit": true,
+      "complete_config_equal_except_exact_output_prefix_and_source_commit": true,
+      "row_exact": true
+    }
+  ],
+  "wall_seconds": 19.500568838091567,
+  "release_enabled": false
+}

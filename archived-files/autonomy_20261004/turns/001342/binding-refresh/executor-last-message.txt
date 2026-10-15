@@ -1,0 +1,5 @@
+Created the new disabled binding set; CPU checks passed for all 40 manifests. Source, owner state, ledgers, and old artifacts remain unchanged. No GPU/provider calls or adoption occurred.
+
+B5/controller review, root accounting/adoption, health/release, and first-C0 G3 requirements remain open. `target_met: false`, `score: null`.
+
+[JSON report](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001342/binding-refresh/report-v1.json) · [Concise report](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001342/binding-refresh/report-v1.md)

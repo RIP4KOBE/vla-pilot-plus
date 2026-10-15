@@ -1,0 +1,3 @@
+Continued N36 recovery on source `f256fec…`. One CPU executor is refreshing artifact bindings; its verified live handles and next monitoring step are recorded in turn `001632`.
+
+GPU release remains disabled. All charges are preserved. Validation, formal evaluation, and required ablation evidence remain incomplete.

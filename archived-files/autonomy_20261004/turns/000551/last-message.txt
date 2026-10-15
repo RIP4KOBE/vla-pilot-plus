@@ -1,0 +1,3 @@
+Verified authority, live process identities, and unchanged ledgers. N34’s existing repair executor remains active; its fresh-process Torch test passed.
+
+Saved turn 551’s operational summary. Next is terminal repair review and runtime verification. Validation, formal evaluation, and ablation evidence remain outstanding; the existing driver continues.

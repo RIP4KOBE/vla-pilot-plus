@@ -1,0 +1,5 @@
+N32R2 controller 1818171 remains live on frozen source `1065f381`. Release hashes and ledger continuity verified; no restart or duplicate dispatch.
+
+C0/Q0/N32 remain 0/3 on complete matched tasks. Validation, formal, and ablation completion remains unproven.
+
+Turn 291 operational summary saved. Next step: monitor the existing controller for the next outcome or terminal evidence.

@@ -1,0 +1,5 @@
+N32R2 remains active on source `1065f381`; controller PID `1818171` and worker PID `3171608` verified. Frozen hashes and ledger history are intact.
+
+Task 0: all three arms recorded valid failures. Task 1 C0 is pending. Next step is continued controller monitoring; validation, formal, and ablation evidence remain outstanding.
+
+Turn 187 operational summary saved.

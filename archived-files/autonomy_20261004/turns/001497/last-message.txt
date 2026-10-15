@@ -1,0 +1,3 @@
+Continuation verified and recorded. The existing CPU reviewer remains active; its provisional report identifies a health-handoff validation defect. GPU dispatch stays disabled pending terminal review and bounded repair.
+
+Ledger history is preserved. Validation, formal, and ablation completion remain unproven. Turn 1497’s hash-bound operational summary is saved for the driver’s next turn.

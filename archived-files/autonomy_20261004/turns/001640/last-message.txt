@@ -1,0 +1,3 @@
+Continued the owning study and launched the independent CPU review of repair `bd5dd4d`. Reviewer PID `2707345` is verified live.
+
+Owning source and ledgers remain unchanged; no GPU dispatched. The hash-bound operational summary records the next step: reconcile the review before refreshing affected bindings. Validation, formal evaluation and ablation evidence remain outstanding.

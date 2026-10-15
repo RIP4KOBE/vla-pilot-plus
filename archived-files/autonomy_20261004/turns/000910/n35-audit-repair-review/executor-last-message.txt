@@ -1,0 +1,5 @@
+PASS: N35-IR-001 and N35-IR-002 are fixed. Verified hashes and existing 22-case evidence; one targeted CPU test also passed.
+
+Reports: [Markdown](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000910/n35-audit-repair-review/report-v1.md) · [JSON](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000910/n35-audit-repair-review/report-v1.json)
+
+Source unchanged. Scientific score null. Installed-runtime and release obligations remain; PASS authorizes no GPU execution or scientific promotion.

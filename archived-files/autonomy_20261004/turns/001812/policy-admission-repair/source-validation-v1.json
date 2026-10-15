@@ -1,0 +1,22 @@
+{
+  "source_functions_changed": {
+    "scripts/qd_ed_n36_engineering_r1.py": [
+      "_recovery_specification"
+    ],
+    "scripts/qd_ed_n36_readiness_prepare.py": [
+      "policy"
+    ]
+  },
+  "all_other_source_ast_unchanged": true,
+  "files": [
+    "scripts/qd_ed_n36_engineering_r1.py",
+    "scripts/qd_ed_n36_readiness_prepare.py",
+    "tests/test_n36_engineering_r1.py",
+    "tests/test_n36_readiness_prepare.py"
+  ],
+  "scope_matches": true,
+  "additional_runtime_allowlist_delta": [],
+  "diff_sha256": "4ed9b95e91349bcc64573a97ce63ec5e462d4db5bec02bc8856ecefe0f510281",
+  "tracked_status": "",
+  "untracked_status": ".scope-admission-001805/\n"
+}

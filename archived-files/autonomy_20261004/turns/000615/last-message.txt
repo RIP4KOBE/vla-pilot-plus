@@ -1,0 +1,5 @@
+N34’s CPU repair finished successfully. Independent diff and provenance review passed; 85 focused tests are recorded passing.
+
+No GPU cohort is active; charges and ledgers remain unchanged. Next: adopt the reviewed repair, prepare a distinct recovery release, and measure full CPU verification before dispatch.
+
+Operational handoff recorded. Validation, formal evaluation, and ablation goals remain unmet; the driver continues.

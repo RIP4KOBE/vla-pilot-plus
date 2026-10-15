@@ -1,0 +1,3 @@
+Reconciled repair commit `f5fc546e`: 88 tests passed; one legacy fixture error remains. Ledger hashes are unchanged, with no GPU dispatch or source adoption.
+
+Recorded the operational handoff. Next: independent review before adoption. The driver remains active; the original research goal is not yet met.

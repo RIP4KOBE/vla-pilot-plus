@@ -1,0 +1,5 @@
+Committed SR-01/SR-02 repairs as `ab8e8c6`. Worktree clean; targeted CPU checks passed, using 91.03 CPU seconds.
+
+[Report](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001171/audit-repair/report-v1.md>) records coverage, failures, hashes, and remaining obligations.
+
+No adoption or runtime release. Independent repair review required. Stopped.

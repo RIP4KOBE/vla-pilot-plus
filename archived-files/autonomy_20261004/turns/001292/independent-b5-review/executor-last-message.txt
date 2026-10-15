@@ -1,0 +1,9 @@
+PASS — `PASS_PREPARATION_REQUIRES_ROOT_RELEASE`.
+
+- [Report JSON](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001292/independent-b5-review/report-v1.json)
+- [Report Markdown](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001292/independent-b5-review/report-v1.md)
+- [External B5 record](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001292/independent-b5-review/external-b5-review-v1.json)
+
+All40 checks passed; normalization preserved scientific values. Actual B5 verifier accepted the record. Focused checks: 35.98 seconds.
+
+`score: null`, `target_met: false`, `release_enabled: false`. Production byte checks, release/admission, and future worker receipts remain mandatory.

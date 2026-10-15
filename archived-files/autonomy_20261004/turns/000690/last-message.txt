@@ -1,0 +1,3 @@
+N34R8 passed full release validation. One controller is running, and its first GPU7 cell has dispatched. Source, scientific gates, historical charges, and protected reserves remain intact.
+
+Operational handoff recorded. Monitoring continues through the local driver; validation, formal evaluation, and ablation evidence remain outstanding.

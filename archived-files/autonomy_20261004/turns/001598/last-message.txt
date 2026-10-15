@@ -1,0 +1,3 @@
+Continuation recorded. One CPU-only executor is refreshing N36 readiness bindings; source and ledgers remain unchanged. No GPU experiment was launched.
+
+The driver will monitor that executor, then reconcile its artifacts and release checks. Validation, formal evaluation and required ablation evidence remain incomplete.

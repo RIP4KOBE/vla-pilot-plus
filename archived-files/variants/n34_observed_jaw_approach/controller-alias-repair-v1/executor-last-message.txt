@@ -1,0 +1,5 @@
+Committed bounded repair as `3f4ec9e` on the existing branch. Canonical proof fields and strict checks are preserved; 62 focused CPU tests passed with two threads. Worktree is clean.
+
+[Report](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/controller-alias-repair-v1/report-v1.md) · [Implementation result](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/controller-alias-repair-v1/implementation-result-v1.json)
+
+Release/runtime closure remains pending. GPU boundary stayed closed; no scientific score or promotion. Bounded task complete and stopped.

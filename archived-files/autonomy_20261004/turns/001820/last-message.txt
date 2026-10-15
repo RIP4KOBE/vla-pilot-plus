@@ -1,0 +1,3 @@
+Continued the owning study. Current-runtime controller review passed and was recorded in state/checkpoint.
+
+No GPU cohort is running; ledgers remain unchanged. Next: fresh recovery accounting and remaining release review. Validation/formal/ablation completion remains unproven. Operational handoff saved for the driver.

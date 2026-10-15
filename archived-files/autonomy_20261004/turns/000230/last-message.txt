@@ -1,0 +1,3 @@
+N32R2 remains active on GPU7 with verified controller identity, frozen source, and intact ledger prefixes. Six completed outcomes are valid failures; task2 C0 is running.
+
+Saved turn 230’s operational summary. Next step is continued monitoring; validation, formal, and ablation evidence remain outstanding.

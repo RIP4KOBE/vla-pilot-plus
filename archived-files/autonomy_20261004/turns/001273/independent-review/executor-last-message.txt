@@ -1,0 +1,7 @@
+Wrote [report-v1.json](./report-v1.json) and [report-v1.md](./report-v1.md) in the requested independent-review directory.
+
+- **B2:** prospective source-freeze claims supported.
+- **B4:** passive CPU composition supported; production worker evidence remains absent.
+- **B5:** hard rejected; release disabled.
+
+All 40 composition joins passed. Checks took 33.48 seconds. Score remains `null`; `target_met` remains `false`.

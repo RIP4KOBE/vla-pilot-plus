@@ -1,0 +1,29 @@
+{
+  "status": "DISABLED_PENDING_ROOT_REVIEW",
+  "release_enabled": false,
+  "production_accepted": false,
+  "score": null,
+  "source_adopted": false,
+  "automatic_recoveries": 0,
+  "deadline": "2026-10-11T11:13:13Z",
+  "schema": "n36r3-review-package-v1",
+  "source_after": "b86ac1291b08ba2b6bf33e7a6e19326016f4c40e",
+  "created_at": "2026-10-10T06:20:01.229620+00:00",
+  "bindings": {
+    "accounting": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001323/release-preparation/review-package-v2/accounting.disabled-v1.json",
+      "bytes": 5007,
+      "sha256": "0453f3a27c495b3840f3ba22709ce543e01ee8868be08e1aa25ae6b83ef9e039"
+    },
+    "adoption": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001323/release-preparation/review-package-v2/adoption.disabled-v1.json",
+      "bytes": 4436,
+      "sha256": "a482802e819b3ddd3ee44b5f93a2788efa9f977198f28afaf41347a2aa3c8429"
+    },
+    "release": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001323/release-preparation/review-package-v2/release.disabled-v1.json",
+      "bytes": 31344,
+      "sha256": "0d2091d20fef4616330ac8198ff982e33bd42c9426486809e00a9049f785106c"
+    }
+  }
+}

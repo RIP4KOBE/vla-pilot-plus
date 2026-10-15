@@ -1,0 +1,3 @@
+N36 readiness measurement remains running with verified process identities. Source and all four ledger prefixes are unchanged; no duplicate launched.
+
+Saved turn 001790 summary and checkpoint. Next: reconcile the measurement’s terminal evidence and costs. Validation, formal evaluation, and required ablations remain incomplete.

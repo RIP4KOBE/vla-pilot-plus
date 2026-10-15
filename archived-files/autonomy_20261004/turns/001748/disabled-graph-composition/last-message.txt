@@ -1,0 +1,5 @@
+PASS_COMPLETE_DISABLED_GRAPH: 40 audit manifests plus a separate engineering manifest passed unmodified production validation. No composition blockers remain.
+
+[Final report + SHA and artifact index](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001748/disabled-graph-composition/final-composition-index-v1.json)
+
+Source and existing artifacts remain unchanged. All execution/readiness authorizations remain false/null. B5, root accounting/adoption, and fresh readiness remain future gates.

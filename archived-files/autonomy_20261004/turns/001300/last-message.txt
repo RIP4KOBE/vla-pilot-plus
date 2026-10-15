@@ -1,0 +1,3 @@
+Verified authority, live process identities, and owning ledger. N36R3 CPU repair remains active; N36R2’s invalid attempt stays charged.
+
+Next: reconcile the repair and focused checks, then independent review before GPU release. Operational summary saved. Validation/formal/ablation completion remains unproven.

@@ -1,0 +1,3 @@
+N31 closed under its frozen futility rule: C0, Q0, and N31 each scored 0/6. No GPU worker remains active.
+
+Indexed twelve development manifests and froze a bounded CPU decode scope. Source and ledgers remain unchanged. Turn 61’s operational summary records the next step: verify actual close/dwell execution and target motion. Validation, formal evaluation, and required ablation evidence remain unmet.

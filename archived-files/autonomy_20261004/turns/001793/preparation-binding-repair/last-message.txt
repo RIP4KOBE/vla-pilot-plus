@@ -1,0 +1,7 @@
+Engineering repair committed: `f5fc546e08d41049949bbcbaecb79515c822e0e9`.
+
+- 88 committed CPU tests passed; one legacy fixture remains blocked by recovery-partition validation.
+- Retained proof was not accepted. Current source bindings require fresh prospective preparation.
+- Independent review and root adoption remain pending.
+
+[Report with exact provenance and next bounded step](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001793/preparation-binding-repair/report-v1.json)

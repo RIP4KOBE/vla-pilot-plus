@@ -1,0 +1,11 @@
+Turn703 — 2026-10-09T01:06:58.005401+00:00
+
+Current source 921019185ac9df6dec758200e857f80f33024272 unchanged. Handoff/authorization and launch/plan/release hashes verified; owning state/checkpoint controller agree; prior turn702 exited normally; all ledger prefixes preserved. Resource isolation ACTIVE/PASS. STOP absent; window ends 2026-10-11T11:13:13Z.
+
+N34R9 controller1160497/start136983808 and worker1163170/start136992657 terminated naturally after task0 C0. End handles: {"268073": {"pid": 268073, "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7", "start_ticks": 97715947, "state": "S", "identity_matches": true}, "1194059": {"pid": 1194059, "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7", "start_ticks": 137058774, "state": "S", "identity_matches": true}, "1160497": {"pid": 1160497, "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7", "start_ticks": null, "state": "absent", "identity_matches": false}, "1163170": {"pid": 1163170, "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7", "start_ticks": null, "state": "absent", "identity_matches": false}}. Driver retains coordination/locks. Controller result INVALID_STOP; native receipt accepted=false, ValueError: loaded runtime not frozen: PIL._imagingmath. Raw episode logged failure at720 steps, but outcome invalid and success null: do not count it as a valid scientific denominator.
+
+452 dispatches retained. Attempt appended aborted terminal event. Additional charged780.9267369199079 seconds = 0.216924093588863 GPUh; prior64.35541576467786 + this = 64.572339858266716 GPUh (arithmetic pending authoritative budget reconciliation). Unknown HTTP telemetry remains Unknown. Terminal evidence hashes in end-reconciliation-v1.json. No dispatch/restart, source change, audit weakening, or protected evaluation access performed.
+
+Next bounded step: reconcile terminal state/checkpoint under owning operation lock, inspect PIL._imagingmath closure omission with isolated CPU executor, then review corrected inventory/source and fresh prospective release before any replacement. Current checkpoint still records now-terminal controller; do not mistake it for live or dispatch without closure. Preserve all prior failures and charges.
+
+Unresolved: valid matched Dev efficacy/promotion, validation20/formal10/required ablations, and original-goal hash-bound completion. Goal incomplete.

@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "scope": "Readiness-only release and prospective accounting review; no adoption or dispatch.",
+  "reviewed_sha256": {
+    "release-validation-v1.json": "8bbe43a5a7f13b368d273f6ec9aeaf2e408020c31fe0ce408cfd7e996b785dea",
+    "pending-release.json": "6401cceb7f255673a6e79e1b6bb44e29b7784ed02d6914f827b9d49f04fb5b2b",
+    "accounting-authority-v1.json": "0c1399c27835033458eacaf92108842b59688ebcae28878b63727cf4bbb5ef4f",
+    "prospective-arithmetic-v1.json": "eb995da21c25505053906ad19371065c4819f07b4958699f4792fab3916191df",
+    "graph.complete-disabled-v1.json": "023e45ef35313864803cb37747f3d5c71c8cd46c4356f25aa4ef42721e086925",
+    "strict-production-admission-result-v1.json": "c799dc3bf797c1c24095e396d2e4e0bc3a31cfdbcef49b8e8f2eab698d55c990",
+    "001870/accounting-reconciliation-v1.json": "30cd5da104648b689d9d1ea7cf25eb5b34c77a2d1937dc36bca7e5c55e4f7770"
+  },
+  "checks": [
+    "All direct release/accounting reference hashes and retained journal prefixes match; root reviews bind exact authority bodies.",
+    "Strict admission PASS binds the accepted graph hash; release specification, source, plan and runtime bindings match.",
+    "Deadline is consistently 2026-10-11T11:13:13Z and was unexpired at review; limits are 600 seconds, 1 provider call, zero episodes, zero health invocations and zero automatic recoveries.",
+    "n36_readiness_preparation_recovery_001876 is absent from all four complete owning journals.",
+    "Prospective snapshot equals reconciliation 001870; all five historical preparation charges totaling 0.3226946055226856 GPU-hours remain included.",
+    "Committed upper bound is 112.6064039909434 GPU-hours, including protected reserves, margin and 600/3600 hours; effective cap is 221.0840469266984, leaving 108.47764293575499 within floating-point tolerance.",
+    "Preparation semantics distinguish historical prefix accounting from current charged accounting and enforce deadline headroom.",
+    "Source HEAD remains 808e27f702564fe51db45016e139b68ecb476f8c with no tracked changes; accepted graph retains scientific anchor 1065f38122379a515b60a9a424f574330405b66f."
+  ],
+  "blockers": [],
+  "scope_limitations": [
+    "Accepted full graph audit reused; no recursive provenance reconstruction or independent scientific-equivalence audit.",
+    "Journal access limited to hashes and resource-identity absence; protected outcomes, credentials and prohibited document were not inspected.",
+    "No files written, locks acquired, delegation, GPU/provider calls or execution tests.",
+    "No native readiness or scientific success claim; this PASS does not adopt or dispatch the release."
+  ]
+}

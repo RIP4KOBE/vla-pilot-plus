@@ -1,0 +1,5 @@
+N35 remains active on GPU7: controller `2632351`, worker `3086181`, frozen source `52a87af0`.
+
+Verified authorization hashes, process identities, release bindings, and ledger continuity. Ten development cells are valid; task2/N34 is running. No recovery was needed.
+
+Saved turn989’s operational summary and hash-bound monitoring record. Next: monitor the existing controller. Validation, formal, and required-ablation evidence remains incomplete.

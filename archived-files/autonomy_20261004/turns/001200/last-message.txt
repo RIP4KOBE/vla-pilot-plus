@@ -1,0 +1,3 @@
+N36’s frozen development cohort is now running; the first attempt was dispatched on GPU7. Controller identities, ledger snapshot and next monitoring step are recorded.
+
+Scientific gates remain unchanged. Validation, formal and required ablation evidence are still outstanding.

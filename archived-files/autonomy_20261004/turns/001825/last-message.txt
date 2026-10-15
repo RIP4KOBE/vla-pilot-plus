@@ -1,0 +1,3 @@
+Reconciled the CPU repair’s normal completion at `cd6c969`. Verified source/artifact hashes and unchanged private ledgers; cleared the stale executor record.
+
+Next: scoped repair review and release prerequisites, including the pre-existing parity-test failure. No GPU dispatch occurred. Validation, formal, and ablation evidence remain outstanding. Operational summary saved for driver continuation.

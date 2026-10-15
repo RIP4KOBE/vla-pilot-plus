@@ -1,0 +1,3 @@
+Reconciled the failed health check: it stopped before GPU dispatch; all private ledgers remain unchanged.
+
+A bounded CPU-only repair is running for the missing attestation bindings. Saved the hash-bound operational handoff for continued monitoring and review. Validation, formal evaluation and required ablation evidence remain incomplete.

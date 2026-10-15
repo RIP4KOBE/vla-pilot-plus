@@ -1,0 +1,5 @@
+Committed `1f0e8becba733dc174e78b9248567feafbc052d7`.
+
+N34R7 identities and turn674 binding updated; invalid history and scientific behavior preserved. All 430 focused tests passed. Git is clean.
+
+Wrote `implementation-result-v1.json` and `report-v1.md` in the authorized output directory. Ready for root review/adoption; no runtime preparation or GPU launches.

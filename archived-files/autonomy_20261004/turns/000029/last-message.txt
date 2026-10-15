@@ -1,0 +1,5 @@
+N31 continues under frozen source `7428ce8a`; controller and monitor identities verified, ledger history intact.
+
+Audited outcomes: C0 0/4, Q0 0/4, N31 0/3. No promotion established.
+
+Turn 29 operational summary saved. Next: monitor the existing controller and audit completed cohort evidence. Validation, formal, and ablation goals remain unproven.

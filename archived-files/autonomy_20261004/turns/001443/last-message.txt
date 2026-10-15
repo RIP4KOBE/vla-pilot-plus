@@ -1,0 +1,3 @@
+Continued N36R3 with one bounded CPU binding executor (PID 1575592). Owning source and ledgers remain unchanged; no GPU experiment was dispatched.
+
+Operational summary saved. Next: reconcile bindings, complete required reviews, then assess release readiness. Validation, formal evaluation and ablation evidence remain outstanding.

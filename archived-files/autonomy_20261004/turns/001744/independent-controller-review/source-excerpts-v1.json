@@ -1,0 +1,345 @@
+{
+  "schema": "n36-controller-source-excerpts-v1",
+  "excerpts": [
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/osc.py",
+        "bytes": 20265,
+        "sha256": "cfa62a0e719bc53ef0c701efa66f7b3e2272d4fca2150ec73c05bb145eba85cb"
+      },
+      "start_line": 108,
+      "end_line": 200,
+      "text": "108:     def __init__(\n109:         self,\n110:         sim,\n111:         eef_name,\n112:         joint_indexes,\n113:         actuator_range,\n114:         input_max=1,\n115:         input_min=-1,\n116:         output_max=(0.05, 0.05, 0.05, 0.5, 0.5, 0.5),\n117:         output_min=(-0.05, -0.05, -0.05, -0.5, -0.5, -0.5),\n118:         kp=150,\n119:         damping_ratio=1,\n120:         impedance_mode=\"fixed\",\n121:         kp_limits=(0, 300),\n122:         damping_ratio_limits=(0, 100),\n123:         policy_freq=20,\n124:         position_limits=None,\n125:         orientation_limits=None,\n126:         interpolator_pos=None,\n127:         interpolator_ori=None,\n128:         control_ori=True,\n129:         control_delta=True,\n130:         uncouple_pos_ori=True,\n131:         **kwargs,  # does nothing; used so no error raised when dict is passed with extra terms used previously\n132:     ):\n133: \n134:         super().__init__(\n135:             sim,\n136:             eef_name,\n137:             joint_indexes,\n138:             actuator_range,\n139:         )\n140:         # Determine whether this is pos ori or just pos\n141:         self.use_ori = control_ori\n142: \n143:         # Determine whether we want to use delta or absolute values as inputs\n144:         self.use_delta = control_delta\n145: \n146:         # Control dimension\n147:         self.control_dim = 6 if self.use_ori else 3\n148:         self.name_suffix = \"POSE\" if self.use_ori else \"POSITION\"\n149: \n150:         # input and output max and min (allow for either explicit lists or single numbers)\n151:         self.input_max = self.nums2array(input_max, self.control_dim)\n152:         self.input_min = self.nums2array(input_min, self.control_dim)\n153:         self.output_max = self.nums2array(output_max, self.control_dim)\n154:         self.output_min = self.nums2array(output_min, self.control_dim)\n155: \n156:         # kp kd\n157:         self.kp = self.nums2array(kp, 6)\n158:         self.kd = 2 * np.sqrt(self.kp) * damping_ratio\n159: \n160:         # kp and kd limits\n161:         self.kp_min = self.nums2array(kp_limits[0], 6)\n162:         self.kp_max = self.nums2array(kp_limits[1], 6)\n163:         self.damping_ratio_min = self.nums2array(damping_ratio_limits[0], 6)\n164:         self.damping_ratio_max = self.nums2array(damping_ratio_limits[1], 6)\n165: \n166:         # Verify the proposed impedance mode is supported\n167:         assert impedance_mode in IMPEDANCE_MODES, (\n168:             \"Error: Tried to instantiate OSC controller for unsupported \"\n169:             \"impedance mode! Inputted impedance mode: {}, Supported modes: {}\".format(impedance_mode, IMPEDANCE_MODES)\n170:         )\n171: \n172:         # Impedance mode\n173:         self.impedance_mode = impedance_mode\n174: \n175:         # Add to control dim based on impedance_mode\n176:         if self.impedance_mode == \"variable\":\n177:             self.control_dim += 12\n178:         elif self.impedance_mode == \"variable_kp\":\n179:             self.control_dim += 6\n180: \n181:         # limits\n182:         self.position_limits = np.array(position_limits) if position_limits is not None else position_limits\n183:         self.orientation_limits = np.array(orientation_limits) if orientation_limits is not None else orientation_limits\n184: \n185:         # control frequency\n186:         self.control_freq = policy_freq\n187: \n188:         # interpolator\n189:         self.interpolator_pos = interpolator_pos\n190:         self.interpolator_ori = interpolator_ori\n191: \n192:         # whether or not pos and ori want to be uncoupled\n193:         self.uncoupling = uncouple_pos_ori\n194: \n195:         # initialize goals based on initial pos / ori\n196:         self.goal_ori = np.array(self.initial_ee_ori_mat)\n197:         self.goal_pos = np.array(self.initial_ee_pos)\n198: \n199:         self.relative_ori = np.zeros(3)\n200:         self.ori_ref = None"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/osc.py",
+        "bytes": 20265,
+        "sha256": "cfa62a0e719bc53ef0c701efa66f7b3e2272d4fca2150ec73c05bb145eba85cb"
+      },
+      "start_line": 218,
+      "end_line": 266,
+      "text": "218:         \"\"\"\n219:         # Update state\n220:         self.update()\n221: \n222:         # Parse action based on the impedance mode, and update kp / kd as necessary\n223:         if self.impedance_mode == \"variable\":\n224:             damping_ratio, kp, delta = action[:6], action[6:12], action[12:]\n225:             self.kp = np.clip(kp, self.kp_min, self.kp_max)\n226:             self.kd = 2 * np.sqrt(self.kp) * np.clip(damping_ratio, self.damping_ratio_min, self.damping_ratio_max)\n227:         elif self.impedance_mode == \"variable_kp\":\n228:             kp, delta = action[:6], action[6:]\n229:             self.kp = np.clip(kp, self.kp_min, self.kp_max)\n230:             self.kd = 2 * np.sqrt(self.kp)  # critically damped\n231:         else:  # This is case \"fixed\"\n232:             delta = action\n233: \n234:         # If we're using deltas, interpret actions as such\n235:         if self.use_delta:\n236:             if delta is not None:\n237:                 scaled_delta = self.scale_action(delta)\n238:                 if not self.use_ori and set_ori is None:\n239:                     # Set default control for ori since user isn't actively controlling ori\n240:                     set_ori = np.array([[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, -1.0]])\n241:             else:\n242:                 scaled_delta = []\n243:         # Else, interpret actions as absolute values\n244:         else:\n245:             if set_pos is None:\n246:                 set_pos = delta[:3]\n247:             # Set default control for ori if we're only using position control\n248:             if set_ori is None:\n249:                 set_ori = (\n250:                     T.quat2mat(T.axisangle2quat(delta[3:6]))\n251:                     if self.use_ori\n252:                     else np.array([[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, -1.0]])\n253:                 )\n254:             # No scaling of values since these are absolute values\n255:             scaled_delta = delta\n256: \n257:         # We only want to update goal orientation if there is a valid delta ori value OR if we're using absolute ori\n258:         # use math.isclose instead of numpy because numpy is slow\n259:         bools = [0.0 if math.isclose(elem, 0.0) else 1.0 for elem in scaled_delta[3:]]\n260:         if sum(bools) > 0.0 or set_ori is not None:\n261:             self.goal_ori = set_goal_orientation(\n262:                 scaled_delta[3:], self.ee_ori_mat, orientation_limit=self.orientation_limits, set_ori=set_ori\n263:             )\n264:         self.goal_pos = set_goal_position(\n265:             scaled_delta[:3], self.ee_pos, position_limit=self.position_limits, set_pos=set_pos\n266:         )"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/osc.py",
+        "bytes": 20265,
+        "sha256": "cfa62a0e719bc53ef0c701efa66f7b3e2272d4fca2150ec73c05bb145eba85cb"
+      },
+      "start_line": 367,
+      "end_line": 381,
+      "text": "367:         \"\"\"\n368:         Resets the goal to the current state of the robot\n369:         \"\"\"\n370:         self.goal_ori = np.array(self.ee_ori_mat)\n371:         self.goal_pos = np.array(self.ee_pos)\n372: \n373:         # Also reset interpolators if required\n374: \n375:         if self.interpolator_pos is not None:\n376:             self.interpolator_pos.set_goal(self.goal_pos)\n377: \n378:         if self.interpolator_ori is not None:\n379:             self.ori_ref = np.array(self.ee_ori_mat)  # reference is the current orientation at start\n380:             self.interpolator_ori.set_goal(\n381:                 orientation_error(self.goal_ori, self.ori_ref)"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/base_controller.py",
+        "bytes": 10496,
+        "sha256": "61f99a2daeb4eb6e39bfb996d94c5a5689ef3bc771d030d070193ea56d6a8332"
+      },
+      "start_line": 104,
+      "end_line": 123,
+      "text": "104:     def scale_action(self, action):\n105:         \"\"\"\n106:         Clips @action to be within self.input_min and self.input_max, and then re-scale the values to be within\n107:         the range self.output_min and self.output_max\n108: \n109:         Args:\n110:             action (Iterable): Actions to scale\n111: \n112:         Returns:\n113:             np.array: Re-scaled action\n114:         \"\"\"\n115: \n116:         if self.action_scale is None:\n117:             self.action_scale = abs(self.output_max - self.output_min) / abs(self.input_max - self.input_min)\n118:             self.action_output_transform = (self.output_max + self.output_min) / 2.0\n119:             self.action_input_transform = (self.input_max + self.input_min) / 2.0\n120:         action = np.clip(action, self.input_min, self.input_max)\n121:         transformed_action = (action - self.action_input_transform) * self.action_scale + self.action_output_transform\n122: \n123:         return transformed_action"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/config/osc_pose.json",
+        "bytes": 466,
+        "sha256": "07f3a8b41d3eecc8a36700a85bd8207ee3fbc36eb73f6a2248340c96770d1e45"
+      },
+      "start_line": 1,
+      "end_line": 18,
+      "text": "1: {\n2:   \"type\": \"OSC_POSE\",\n3:   \"input_max\": 1,\n4:   \"input_min\": -1,\n5:   \"output_max\": [0.05, 0.05, 0.05, 0.5, 0.5, 0.5],\n6:   \"output_min\": [-0.05, -0.05, -0.05, -0.5, -0.5, -0.5],\n7:   \"kp\": 150,\n8:   \"damping_ratio\": 1,\n9:   \"impedance_mode\": \"fixed\",\n10:   \"kp_limits\": [0, 300],\n11:   \"damping_ratio_limits\": [0, 10],\n12:   \"position_limits\": null,\n13:   \"orientation_limits\": null,\n14:   \"uncouple_pos_ori\": true,\n15:   \"control_delta\": true,\n16:   \"interpolation\": null,\n17:   \"ramp_ratio\": 0.2\n18: }"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/control_utils.py",
+        "bytes": 10243,
+        "sha256": "1d0f1a063894b1e8289339e223665e14e8aec492c31e9e00f42edea8dc735f43"
+      },
+      "start_line": 114,
+      "end_line": 147,
+      "text": "114: def set_goal_position(delta, current_position, position_limit=None, set_pos=None):\n115:     \"\"\"\n116:     Calculates and returns the desired goal position, clipping the result accordingly to @position_limits.\n117:     @delta and @current_position must be specified if a relative goal is requested, else @set_pos must be\n118:     specified to define a global goal position\n119: \n120:     Args:\n121:         delta (np.array): Desired relative change in position\n122:         current_position (np.array): Current position\n123:         position_limit (None or np.array): 2d array defining the (min, max) limits of permissible position goal commands\n124:         set_pos (None or np.array): If set, will ignore @delta and set the goal position to this value\n125: \n126:     Returns:\n127:         np.array: calculated goal position in absolute coordinates\n128: \n129:     Raises:\n130:         ValueError: [Invalid position_limit shape]\n131:     \"\"\"\n132:     n = len(current_position)\n133:     if set_pos is not None:\n134:         goal_position = set_pos\n135:     else:\n136:         goal_position = current_position + delta\n137: \n138:     if position_limit is not None:\n139:         if position_limit.shape != (2, n):\n140:             raise ValueError(\n141:                 \"Position limit should be shaped (2,{}) \" \"but is instead: {}\".format(n, position_limit.shape)\n142:             )\n143: \n144:         # Clip goal position\n145:         goal_position = np.clip(goal_position, position_limit[0], position_limit[1])\n146: \n147:     return goal_position"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/control_utils.py",
+        "bytes": 10243,
+        "sha256": "1d0f1a063894b1e8289339e223665e14e8aec492c31e9e00f42edea8dc735f43"
+      },
+      "start_line": 150,
+      "end_line": 177,
+      "text": "150: def set_goal_orientation(delta, current_orientation, orientation_limit=None, set_ori=None):\n151:     \"\"\"\n152:     Calculates and returns the desired goal orientation, clipping the result accordingly to @orientation_limits.\n153:     @delta and @current_orientation must be specified if a relative goal is requested, else @set_ori must be\n154:     an orientation matrix specified to define a global orientation\n155: \n156:     Args:\n157:         delta (np.array): Desired relative change in orientation, in axis-angle form [ax, ay, az]\n158:         current_orientation (np.array): Current orientation, in rotation matrix form\n159:         orientation_limit (None or np.array): 2d array defining the (min, max) limits of permissible orientation goal commands\n160:         set_ori (None or np.array): If set, will ignore @delta and set the goal orientation to this value\n161: \n162:     Returns:\n163:         np.array: calculated goal orientation in absolute coordinates\n164: \n165:     Raises:\n166:         ValueError: [Invalid orientation_limit shape]\n167:     \"\"\"\n168:     # directly set orientation\n169:     if set_ori is not None:\n170:         goal_orientation = set_ori\n171: \n172:     # otherwise use delta to set goal orientation\n173:     else:\n174:         # convert axis-angle value to rotation matrix\n175:         quat_error = trans.axisangle2quat(delta)\n176:         rotation_mat_error = trans.quat2mat(quat_error)\n177:         goal_orientation = np.dot(rotation_mat_error, current_orientation)"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/controller_factory.py",
+        "bytes": 6422,
+        "sha256": "1dab09602c41dcf3749bed43dd3bc4e098040cabc8f7fbfd030d9008bd3d5776"
+      },
+      "start_line": 63,
+      "end_line": 91,
+      "text": "63:     # First check if default controller is not None; if it is not, load the appropriate controller\n64:     if default_controller is not None:\n65: \n66:         # Assert that requested default controller is in the available default controllers\n67:         from robosuite.controllers import ALL_CONTROLLERS\n68: \n69:         assert (\n70:             default_controller in ALL_CONTROLLERS\n71:         ), \"Error: Unknown default controller specified. Requested {}, \" \"available controllers: {}\".format(\n72:             default_controller, list(ALL_CONTROLLERS)\n73:         )\n74: \n75:         # Store the default controller config fpath associated with the requested controller\n76:         custom_fpath = os.path.join(\n77:             os.path.dirname(__file__), \"..\", \"controllers/config/{}.json\".format(default_controller.lower())\n78:         )\n79: \n80:     # Assert that the fpath to load the controller is not empty\n81:     assert custom_fpath is not None, \"Error: Either custom_fpath or default_controller must be specified!\"\n82: \n83:     # Attempt to load the controller\n84:     try:\n85:         with open(custom_fpath) as f:\n86:             controller_config = json.load(f)\n87:     except FileNotFoundError:\n88:         print(\"Error opening controller filepath at: {}. \" \"Please check filepath and try again.\".format(custom_fpath))\n89: \n90:     # Return the loaded controller\n91:     return controller_config"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/controller_factory.py",
+        "bytes": 6422,
+        "sha256": "1dab09602c41dcf3749bed43dd3bc4e098040cabc8f7fbfd030d9008bd3d5776"
+      },
+      "start_line": 113,
+      "end_line": 129,
+      "text": "113:     interpolator = None\n114:     if params[\"interpolation\"] == \"linear\":\n115:         interpolator = LinearInterpolator(\n116:             ndim=params[\"ndim\"],\n117:             controller_freq=(1 / params[\"sim\"].model.opt.timestep),\n118:             policy_freq=params[\"policy_freq\"],\n119:             ramp_ratio=params[\"ramp_ratio\"],\n120:         )\n121: \n122:     if name == \"OSC_POSE\":\n123:         ori_interpolator = None\n124:         if interpolator is not None:\n125:             interpolator.set_states(dim=3)  # EE control uses dim 3 for pos and ori each\n126:             ori_interpolator = deepcopy(interpolator)\n127:             ori_interpolator.set_states(ori=\"euler\")\n128:         params[\"control_ori\"] = True\n129:         return OperationalSpaceController(interpolator_pos=interpolator, interpolator_ori=ori_interpolator, **params)"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/grippers/panda_gripper.py",
+        "bytes": 1817,
+        "sha256": "a3760a8fc4599fa6f79914304b82466f3c1bda1a945943ca693bb57f00dc59eb"
+      },
+      "start_line": 38,
+      "end_line": 66,
+      "text": "38: class PandaGripper(PandaGripperBase):\n39:     \"\"\"\n40:     Modifies PandaGripperBase to only take one action.\n41:     \"\"\"\n42: \n43:     def format_action(self, action):\n44:         \"\"\"\n45:         Maps continuous action into binary output\n46:         -1 => open, 1 => closed\n47: \n48:         Args:\n49:             action (np.array): gripper-specific action\n50: \n51:         Raises:\n52:             AssertionError: [Invalid action dimension size]\n53:         \"\"\"\n54:         assert len(action) == self.dof\n55:         self.current_action = np.clip(\n56:             self.current_action + np.array([-1.0, 1.0]) * self.speed * np.sign(action), -1.0, 1.0\n57:         )\n58:         return self.current_action\n59: \n60:     @property\n61:     def speed(self):\n62:         return 0.01\n63: \n64:     @property\n65:     def dof(self):\n66:         return 1"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/robots/single_arm.py",
+        "bytes": 19104,
+        "sha256": "d233b1b785e8f88ffb5df1357666b02a397ae930ce98181b079e0496ab35fc57"
+      },
+      "start_line": 118,
+      "end_line": 135,
+      "text": "118:         # Add to the controller dict additional relevant params:\n119:         #   the robot name, mujoco sim, eef_name, joint_indexes, timestep (model) freq,\n120:         #   policy (control) freq, and ndim (# joints)\n121:         self.controller_config[\"robot_name\"] = self.name\n122:         self.controller_config[\"sim\"] = self.sim\n123:         self.controller_config[\"eef_name\"] = self.gripper.important_sites[\"grip_site\"]\n124:         self.controller_config[\"eef_rot_offset\"] = self.eef_rot_offset\n125:         self.controller_config[\"joint_indexes\"] = {\n126:             \"joints\": self.joint_indexes,\n127:             \"qpos\": self._ref_joint_pos_indexes,\n128:             \"qvel\": self._ref_joint_vel_indexes,\n129:         }\n130:         self.controller_config[\"actuator_range\"] = self.torque_limits\n131:         self.controller_config[\"policy_freq\"] = self.control_freq\n132:         self.controller_config[\"ndim\"] = len(self.robot_joints)\n133: \n134:         # Instantiate the relevant controller\n135:         self.controller = controller_factory(self.controller_config[\"type\"], self.controller_config)"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/robots/single_arm.py",
+        "bytes": 19104,
+        "sha256": "d233b1b785e8f88ffb5df1357666b02a397ae930ce98181b079e0496ab35fc57"
+      },
+      "start_line": 231,
+      "end_line": 256,
+      "text": "231:         # clip actions into valid range\n232:         assert len(action) == self.action_dim, \"environment got invalid action dimension -- expected {}, got {}\".format(\n233:             self.action_dim, len(action)\n234:         )\n235: \n236:         gripper_action = None\n237:         if self.has_gripper:\n238:             gripper_action = action[self.controller.control_dim :]  # all indexes past controller dimension indexes\n239:             arm_action = action[: self.controller.control_dim]\n240:         else:\n241:             arm_action = action\n242: \n243:         # Update the controller goal if this is a new policy step\n244:         if policy_step:\n245:             self.controller.set_goal(arm_action)\n246: \n247:         # Now run the controller for a step\n248:         torques = self.controller.run_controller()\n249: \n250:         # Clip the torques\n251:         low, high = self.torque_limits\n252:         self.torques = np.clip(torques, low, high)\n253: \n254:         # Get gripper action, if applicable\n255:         if self.has_gripper:\n256:             self.grip_action(gripper=self.gripper, gripper_action=gripper_action)"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/robots/manipulator.py",
+        "bytes": 5300,
+        "sha256": "d37ff4c00112cfba9bf4b96bf48ad5664422fd824dd4fbcd1eebda650a451b64"
+      },
+      "start_line": 16,
+      "end_line": 31,
+      "text": "16:     def grip_action(self, gripper, gripper_action):\n17:         \"\"\"\n18:         Executes @gripper_action for specified @gripper\n19: \n20:         Args:\n21:             gripper (GripperModel): Gripper to execute action for\n22:             gripper_action (float): Value between [-1,1] to send to gripper\n23:         \"\"\"\n24:         actuator_idxs = [self.sim.model.actuator_name2id(actuator) for actuator in gripper.actuators]\n25:         gripper_action_actual = gripper.format_action(gripper_action)\n26:         # rescale normalized gripper action to control ranges\n27:         ctrl_range = self.sim.model.actuator_ctrlrange[actuator_idxs]\n28:         bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])\n29:         weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])\n30:         applied_gripper_action = bias + weight * gripper_action_actual\n31:         self.sim.data.ctrl[actuator_idxs] = applied_gripper_action"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/environments/robot_env.py",
+        "bytes": 27172,
+        "sha256": "a0b39012c175272a2037a7a66a771d416b905a5a7b847e53c60a0588407398af"
+      },
+      "start_line": 558,
+      "end_line": 584,
+      "text": "558:     def _pre_action(self, action, policy_step=False):\n559:         \"\"\"\n560:         Overrides the superclass method to control the robot(s) within this enviornment using their respective\n561:         controllers using the passed actions and gripper control.\n562: \n563:         Args:\n564:             action (np.array): The control to apply to the robot(s). Note that this should be a flat 1D array that\n565:                 encompasses all actions to be distributed to each robot if there are multiple. For each section of the\n566:                 action space assigned to a single robot, the first @self.robots[i].controller.control_dim dimensions\n567:                 should be the desired controller actions and if the robot has a gripper, the next\n568:                 @self.robots[i].gripper.dof dimensions should be actuation controls for the gripper.\n569:             policy_step (bool): Whether a new policy step (action) is being taken\n570: \n571:         Raises:\n572:             AssertionError: [Invalid action dimension]\n573:         \"\"\"\n574:         # Verify that the action is the correct dimension\n575:         assert len(action) == self.action_dim, \"environment got invalid action dimension -- expected {}, got {}\".format(\n576:             self.action_dim, len(action)\n577:         )\n578: \n579:         # Update robot joints based on controller actions\n580:         cutoff = 0\n581:         for idx, robot in enumerate(self.robots):\n582:             robot_action = action[cutoff : cutoff + robot.action_dim]\n583:             robot.control(robot_action, policy_step=policy_step)\n584:             cutoff += robot.action_dim"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/environments/robot_env.py",
+        "bytes": 27172,
+        "sha256": "a0b39012c175272a2037a7a66a771d416b905a5a7b847e53c60a0588407398af"
+      },
+      "start_line": 198,
+      "end_line": 210,
+      "text": "198:         if robot_configs is None:\n199:             robot_configs = [{} for _ in range(self.num_robots)]\n200:         self.robot_configs = [\n201:             dict(\n202:                 **{\n203:                     \"controller_config\": controller_configs[idx],\n204:                     \"mount_type\": mount_types[idx],\n205:                     \"initialization_noise\": initialization_noise[idx],\n206:                     \"control_freq\": control_freq,\n207:                 },\n208:                 **robot_config,\n209:             )\n210:             for idx, robot_config in enumerate(robot_configs)"
+    },
+    {
+      "source": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/robots/manipulators/panda_robot.py",
+        "bytes": 1504,
+        "sha256": "cedaeef03d4c01b6a76a56838f9cf8f68b34f85bac823cb2c76543492553c736"
+      },
+      "start_line": 25,
+      "end_line": 31,
+      "text": "25:     @property\n26:     def default_gripper(self):\n27:         return \"PandaGripper\"\n28: \n29:     @property\n30:     def default_controller_config(self):\n31:         return \"default_panda\""
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/core/env_adapters/libero_adapter.py",
+        "bytes": 72647,
+        "sha256": "17fb74b3d475c91bc015222d4b61989c82a57f83935581b54935bab8080be26d"
+      },
+      "start_line": 41,
+      "end_line": 75,
+      "text": "41: # __file__ is in core/env_adapters/, so need .parent.parent.parent to get project root\n42: LEROBOT_PATH = Path(__file__).parent.parent.parent / \"third_party\" / \"lerobot\" / \"src\"\n43: if LEROBOT_PATH.exists() and str(LEROBOT_PATH) not in sys.path:\n44:     sys.path.insert(0, str(LEROBOT_PATH))\n45: \n46: \n47: # import lerobot\n48: try:\n49:     from lerobot.processor.pipeline import PolicyProcessorPipeline, ProcessorStep\n50:     from lerobot.processor.env_processor import LiberoProcessorStep\n51:     from lerobot.utils.constants import OBS_ENV_STATE, OBS_IMAGE, OBS_IMAGES, OBS_STATE, OBS_STR\n52: except ModuleNotFoundError as exc:\n53:     missing = exc.name or \"\"\n54:     logging.getLogger(__name__).warning(\n55:         \"LeRobot processor dependencies unavailable (%s); using local LIBERO processor fallback\",\n56:         missing or \"unknown module\",\n57:     )\n58: \n59:     OBS_STR = \"observation\"\n60:     OBS_ENV_STATE = OBS_STR + \".environment_state\"\n61:     OBS_STATE = OBS_STR + \".state\"\n62:     OBS_IMAGE = OBS_STR + \".image\"\n63:     OBS_IMAGES = OBS_IMAGE + \"s\"\n64: \n65:     class ProcessorStep:\n66:         pass\n67: \n68:     class PolicyProcessorPipeline:\n69:         def __init__(self, steps):\n70:             self.steps = steps\n71: \n72:         def __call__(self, transition):\n73:             for step in self.steps:\n74:                 transition = step(transition)\n75:             return transition"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/core/env_adapters/libero_adapter.py",
+        "bytes": 72647,
+        "sha256": "17fb74b3d475c91bc015222d4b61989c82a57f83935581b54935bab8080be26d"
+      },
+      "start_line": 718,
+      "end_line": 726,
+      "text": "718:         env_args = {\n719:             \"bddl_file_name\": task_bddl_file,\n720:             \"camera_heights\": self.observation_height,\n721:             \"camera_widths\": self.observation_width,\n722:             \"camera_depths\": True\n723:         }\n724:         env = OffScreenRenderEnv(**env_args)\n725:         env.reset()\n726:         return env"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/core/env_adapters/libero_adapter.py",
+        "bytes": 72647,
+        "sha256": "17fb74b3d475c91bc015222d4b61989c82a57f83935581b54935bab8080be26d"
+      },
+      "start_line": 809,
+      "end_line": 815,
+      "text": "809:     def step(self, action: np.ndarray) -> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:\n810:         if action.ndim != 1:\n811:             raise ValueError(\n812:                 f\"Expected action to be 1-D (shape (action_dim,)), \"\n813:                 f\"but got shape {action.shape} with ndim={action.ndim}\"\n814:             )\n815:         raw_obs, reward, done, info = self._env.step(action)"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/core/env_adapters/libero_adapter.py",
+        "bytes": 72647,
+        "sha256": "17fb74b3d475c91bc015222d4b61989c82a57f83935581b54935bab8080be26d"
+      },
+      "start_line": 1011,
+      "end_line": 1015,
+      "text": "1011:         env_preprocessor_steps: list[ProcessorStep] = []\n1012:         env_postprocessor_steps: list[ProcessorStep] = []\n1013:         env_preprocessor_steps.append(LiberoProcessorStep())\n1014:         self.env_preprocessor = PolicyProcessorPipeline(steps=env_preprocessor_steps)\n1015:         self.env_postprocessor = PolicyProcessorPipeline(steps=env_postprocessor_steps)"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/core/env_adapters/libero_adapter.py",
+        "bytes": 72647,
+        "sha256": "17fb74b3d475c91bc015222d4b61989c82a57f83935581b54935bab8080be26d"
+      },
+      "start_line": 1710,
+      "end_line": 1729,
+      "text": "1710:     def step(self, action: torch.Tensor) -> Tuple[Dict, float, bool, bool, Dict]:\n1711:         \"\"\"Step the LIBERO-PRO environment.\"\"\"\n1712: \n1713:         action_transition = {\"action\": action}\n1714:         action_transition = self.env_postprocessor(action_transition)\n1715:         action = action_transition[\"action\"]\n1716:         # Convert gripper action to binary (-1 or 1) before exporting to NumPy.\n1717:         action = action.clone()\n1718:         action[-1] = 1 if action[-1] > 0 else -1\n1719:         # Convert to CPU / numpy. Cast to float32 first \u2014 pi05 outputs bfloat16\n1720:         # but LIBERO environments expect float32.\n1721:         action_numpy: np.ndarray = action.float().to(\"cpu\").numpy()\n1722: \n1723:         current_env = self._env[self.current_task_idx]\n1724:         evidence = getattr(self, \"_decision_evidence\", None)\n1725:         if evidence is not None:\n1726:             current_env._decision_evidence = evidence\n1727:             evidence.record(\"executed_action\", action_numpy=action_numpy)\n1728:             evidence.flush()\n1729:         observation, reward, terminated, truncated, info = current_env.step(action_numpy)"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/libero_pro/libero/libero/envs/env_wrapper.py",
+        "bytes": 8781,
+        "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0"
+      },
+      "start_line": 13,
+      "end_line": 80,
+      "text": "13:     def __init__(\n14:         self,\n15:         bddl_file_name,\n16:         robots=[\"Panda\"],\n17:         controller=\"OSC_POSE\",\n18:         gripper_types=\"default\",\n19:         initialization_noise=None,\n20:         use_camera_obs=True,\n21:         has_renderer=False,\n22:         has_offscreen_renderer=True,\n23:         render_camera=\"frontview\",\n24:         render_collision_mesh=False,\n25:         render_visual_mesh=True,\n26:         render_gpu_device_id=-1,\n27:         control_freq=20,\n28:         horizon=1000,\n29:         ignore_done=False,\n30:         hard_reset=True,\n31:         camera_names=[\n32:             \"agentview\",\n33:             \"robot0_eye_in_hand\",\n34:         ],\n35:         camera_heights=128,\n36:         camera_widths=128,\n37:         camera_depths=False,\n38:         camera_segmentations=None,\n39:         renderer=\"mujoco\",\n40:         renderer_config=None,\n41:         **kwargs,\n42:     ):\n43:         assert os.path.exists(\n44:             bddl_file_name\n45:         ), f\"[error] {bddl_file_name} does not exist!\"\n46: \n47:         controller_configs = suite.load_controller_config(default_controller=controller)\n48: \n49:         problem_info = BDDLUtils.get_problem_info(bddl_file_name)\n50:         # Check if we're using a multi-armed environment and use env_configuration argument if so\n51: \n52:         # Create environment\n53:         self.problem_name = problem_info[\"problem_name\"]\n54:         self.domain_name = problem_info[\"domain_name\"]\n55:         self.language_instruction = problem_info[\"language_instruction\"]\n56:         self.env = TASK_MAPPING[self.problem_name](\n57:             bddl_file_name,\n58:             robots=robots,\n59:             controller_configs=controller_configs,\n60:             gripper_types=gripper_types,\n61:             initialization_noise=initialization_noise,\n62:             use_camera_obs=use_camera_obs,\n63:             has_renderer=has_renderer,\n64:             has_offscreen_renderer=has_offscreen_renderer,\n65:             render_camera=render_camera,\n66:             render_collision_mesh=render_collision_mesh,\n67:             render_visual_mesh=render_visual_mesh,\n68:             render_gpu_device_id=render_gpu_device_id,\n69:             control_freq=control_freq,\n70:             horizon=horizon,\n71:             ignore_done=ignore_done,\n72:             hard_reset=hard_reset,\n73:             camera_names=camera_names,\n74:             camera_heights=camera_heights,\n75:             camera_widths=camera_widths,\n76:             camera_depths=camera_depths,\n77:             camera_segmentations=camera_segmentations,\n78:             renderer=renderer,\n79:             renderer_config=renderer_config,\n80:             **kwargs,"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/libero_pro/libero/libero/envs/env_wrapper.py",
+        "bytes": 8781,
+        "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0"
+      },
+      "start_line": 87,
+      "end_line": 88,
+      "text": "87:     def step(self, action):\n88:         return self.env.step(action)"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/libero_pro/libero/libero/envs/env_wrapper.py",
+        "bytes": 8781,
+        "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0"
+      },
+      "start_line": 152,
+      "end_line": 162,
+      "text": "152: class OffScreenRenderEnv(ControlEnv):\n153:     \"\"\"\n154:     For visualization and evaluation.\n155:     \"\"\"\n156: \n157:     def __init__(self, **kwargs):\n158:         # This shouldn't be customized\n159:         kwargs[\"has_renderer\"] = False\n160:         kwargs[\"has_offscreen_renderer\"] = True\n161:         super().__init__(**kwargs)\n162: "
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/lerobot/src/lerobot/processor/pipeline.py",
+        "bytes": 71910,
+        "sha256": "9924bda0e8056c1cb3fe9f3ccd95af0b6ceaa3ae3326b3ed1a8884fd58dd7f2b"
+      },
+      "start_line": 270,
+      "end_line": 316,
+      "text": "270:     steps: Sequence[ProcessorStep] = field(default_factory=list)\n271:     name: str = \"DataProcessorPipeline\"\n272: \n273:     to_transition: Callable[[TInput], EnvTransition] = field(\n274:         default_factory=lambda: cast(Callable[[TInput], EnvTransition], batch_to_transition), repr=False\n275:     )\n276:     to_output: Callable[[EnvTransition], TOutput] = field(\n277:         default_factory=lambda: cast(Callable[[EnvTransition], TOutput], transition_to_batch),\n278:         repr=False,\n279:     )\n280: \n281:     before_step_hooks: list[Callable[[int, EnvTransition], None]] = field(default_factory=list, repr=False)\n282:     after_step_hooks: list[Callable[[int, EnvTransition], None]] = field(default_factory=list, repr=False)\n283: \n284:     def __call__(self, data: TInput) -> TOutput:\n285:         \"\"\"Processes input data through the full pipeline.\n286: \n287:         Args:\n288:             data: The input data to process.\n289: \n290:         Returns:\n291:             The processed data in the specified output format.\n292:         \"\"\"\n293:         transition = self.to_transition(data)\n294:         transformed_transition = self._forward(transition)\n295:         return self.to_output(transformed_transition)\n296: \n297:     def _forward(self, transition: EnvTransition) -> EnvTransition:\n298:         \"\"\"Executes all processing steps and hooks in sequence.\n299: \n300:         Args:\n301:             transition: The initial `EnvTransition` object.\n302: \n303:         Returns:\n304:             The final `EnvTransition` after all steps have been applied.\n305:         \"\"\"\n306:         for idx, processor_step in enumerate(self.steps):\n307:             # Execute pre-hooks\n308:             for hook in self.before_step_hooks:\n309:                 hook(idx, transition)\n310: \n311:             transition = processor_step(transition)\n312: \n313:             # Execute post-hooks\n314:             for hook in self.after_step_hooks:\n315:                 hook(idx, transition)\n316:         return transition"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/lerobot/src/lerobot/processor/pipeline.py",
+        "bytes": 71910,
+        "sha256": "9924bda0e8056c1cb3fe9f3ccd95af0b6ceaa3ae3326b3ed1a8884fd58dd7f2b"
+      },
+      "start_line": 1436,
+      "end_line": 1436,
+      "text": "1436: PolicyProcessorPipeline: TypeAlias = DataProcessorPipeline[TInput, TOutput]"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/lerobot/src/lerobot/processor/converters.py",
+        "bytes": 13720,
+        "sha256": "c56ac3f10733afa85ff0cc145426dd42e00274b87642aa0612a844f6283ffac3"
+      },
+      "start_line": 179,
+      "end_line": 209,
+      "text": "179:     action: PolicyAction | RobotAction | None = None,\n180:     reward: float = 0.0,\n181:     done: bool = False,\n182:     truncated: bool = False,\n183:     info: dict[str, Any] | None = None,\n184:     complementary_data: dict[str, Any] | None = None,\n185: ) -> EnvTransition:\n186:     \"\"\"\n187:     Create an `EnvTransition` dictionary with sensible defaults.\n188: \n189:     Args:\n190:         observation: Observation dictionary.\n191:         action: Action dictionary.\n192:         reward: Scalar reward value.\n193:         done: Episode termination flag.\n194:         truncated: Episode truncation flag.\n195:         info: Additional info dictionary.\n196:         complementary_data: Complementary data dictionary.\n197: \n198:     Returns:\n199:         A complete `EnvTransition` dictionary.\n200:     \"\"\"\n201:     return {\n202:         TransitionKey.OBSERVATION: observation,\n203:         TransitionKey.ACTION: action,\n204:         TransitionKey.REWARD: reward,\n205:         TransitionKey.DONE: done,\n206:         TransitionKey.TRUNCATED: truncated,\n207:         TransitionKey.INFO: info if info is not None else {},\n208:         TransitionKey.COMPLEMENTARY_DATA: complementary_data if complementary_data is not None else {},\n209:     }"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/lerobot/src/lerobot/processor/converters.py",
+        "bytes": 13720,
+        "sha256": "c56ac3f10733afa85ff0cc145426dd42e00274b87642aa0612a844f6283ffac3"
+      },
+      "start_line": 326,
+      "end_line": 389,
+      "text": "326: def batch_to_transition(batch: dict[str, Any]) -> EnvTransition:\n327:     \"\"\"\n328:     Convert a batch dictionary from a dataset/dataloader into an `EnvTransition`.\n329: \n330:     This function maps recognized keys from a batch to the `EnvTransition` structure,\n331:     filling in missing keys with sensible defaults.\n332: \n333:     Args:\n334:         batch: A batch dictionary.\n335: \n336:     Returns:\n337:         An `EnvTransition` dictionary.\n338: \n339:     Raises:\n340:         ValueError: If the input is not a dictionary.\n341:     \"\"\"\n342: \n343:     # Validate input type.\n344:     if not isinstance(batch, dict):\n345:         raise ValueError(f\"EnvTransition must be a dictionary. Got {type(batch).__name__}\")\n346: \n347:     action = batch.get(ACTION)\n348:     if action is not None and not isinstance(action, PolicyAction):\n349:         raise ValueError(f\"Action should be a PolicyAction type got {type(action)}\")\n350: \n351:     # Extract observation and complementary data keys.\n352:     observation_keys = {k: v for k, v in batch.items() if k.startswith(OBS_PREFIX)}\n353:     complementary_data = _extract_complementary_data(batch)\n354: \n355:     return create_transition(\n356:         observation=observation_keys if observation_keys else None,\n357:         action=batch.get(ACTION),\n358:         reward=batch.get(REWARD, 0.0),\n359:         done=batch.get(DONE, False),\n360:         truncated=batch.get(TRUNCATED, False),\n361:         info=batch.get(\"info\", {}),\n362:         complementary_data=complementary_data if complementary_data else None,\n363:     )\n364: \n365: \n366: def transition_to_batch(transition: EnvTransition) -> dict[str, Any]:\n367:     \"\"\"\n368:     Convert an `EnvTransition` back to the canonical batch format used in LeRobot.\n369: \n370:     This is the inverse of `batch_to_transition`.\n371: \n372:     Args:\n373:         transition: The `EnvTransition` to convert.\n374: \n375:     Returns:\n376:         A batch dictionary with canonical LeRobot field names.\n377:     \"\"\"\n378:     if not isinstance(transition, dict):\n379:         raise ValueError(f\"Transition should be a EnvTransition type (dict) got {type(transition)}\")\n380: \n381:     batch = {\n382:         ACTION: transition.get(TransitionKey.ACTION),\n383:         REWARD: transition.get(TransitionKey.REWARD, 0.0),\n384:         DONE: transition.get(TransitionKey.DONE, False),\n385:         TRUNCATED: transition.get(TransitionKey.TRUNCATED, False),\n386:         \"info\": transition.get(TransitionKey.INFO, {}),\n387:     }\n388: \n389:     # Add complementary data."
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/lerobot/src/lerobot/processor/core.py",
+        "bytes": 1783,
+        "sha256": "61232c5a45fb44f31ec895240add2803275ccd10ed5382e232d9a2b772a1fbdc"
+      },
+      "start_line": 24,
+      "end_line": 49,
+      "text": "24: \n25: \n26: class TransitionKey(str, Enum):\n27:     \"\"\"Keys for accessing EnvTransition dictionary components.\"\"\"\n28: \n29:     # TODO(Steven): Use consts\n30:     OBSERVATION = \"observation\"\n31:     ACTION = \"action\"\n32:     REWARD = \"reward\"\n33:     DONE = \"done\"\n34:     TRUNCATED = \"truncated\"\n35:     INFO = \"info\"\n36:     COMPLEMENTARY_DATA = \"complementary_data\"\n37: \n38: \n39: PolicyAction: TypeAlias = torch.Tensor\n40: RobotAction: TypeAlias = dict[str, Any]\n41: EnvAction: TypeAlias = np.ndarray\n42: RobotObservation: TypeAlias = dict[str, Any]\n43: \n44: \n45: EnvTransition = TypedDict(\n46:     \"EnvTransition\",\n47:     {\n48:         TransitionKey.OBSERVATION.value: dict[str, Any] | None,\n49:         TransitionKey.ACTION.value: PolicyAction | RobotAction | EnvAction | None,"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/lerobot/src/lerobot/utils/constants.py",
+        "bytes": 3001,
+        "sha256": "0655ea6215a0e5095231ef69ceca8b2f335db1208a97099690535fe1e235f40e"
+      },
+      "start_line": 26,
+      "end_line": 32,
+      "text": "26: OBS_LANGUAGE = OBS_STR + \".language\"\n27: OBS_LANGUAGE_TOKENS = OBS_LANGUAGE + \".tokens\"\n28: OBS_LANGUAGE_ATTENTION_MASK = OBS_LANGUAGE + \".attention_mask\"\n29: \n30: ACTION = \"action\"\n31: REWARD = \"next.reward\"\n32: TRUNCATED = \"next.truncated\""
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/scripts/qd_ed_n34_controller.py",
+        "bytes": 5071,
+        "sha256": "ab33791c8121ea7f255680282276eb8f558dfe81dc95f3a2cab2902025c2d41e"
+      },
+      "start_line": 13,
+      "end_line": 100,
+      "text": "13: FIELDS = ('control_delta', 'control_ori', 'control_dim', 'impedance_mode',\n14:           'input_min', 'input_max', 'output_min', 'output_max', 'policy_freq',\n15:           'uncouple_pos_ori', 'interpolator_pos', 'interpolator_ori')\n16: \n17: # Reviewed robosuite 1.4.0 instance storage. Proof/receipt keys remain canonical;\n18: # this is an exact adapter, not attribute discovery or a compatibility fallback.\n19: INSTANCE_ATTRIBUTES = {\n20:     'control_delta': 'use_delta',\n21:     'control_ori': 'use_ori',\n22:     'control_dim': 'control_dim',\n23:     'impedance_mode': 'impedance_mode',\n24:     'input_min': 'input_min',\n25:     'input_max': 'input_max',\n26:     'output_min': 'output_min',\n27:     'output_max': 'output_max',\n28:     'policy_freq': 'control_freq',\n29:     'uncouple_pos_ori': 'uncoupling',\n30:     'interpolator_pos': 'interpolator_pos',\n31:     'interpolator_ori': 'interpolator_ori',\n32: }\n33: \n34: \n35: def serial(value):\n36:     if hasattr(value, 'tolist'):\n37:         value = value.tolist()\n38:     w.canonical_sha(value)  # reject non-JSON and nonfinite values\n39:     return value\n40: \n41: \n42: def verify_semantics(reference, runtime_ref, closure):\n43:     proof = w.read_ref(reference)\n44:     w.require(proof['schema'] == 'n34-deployed-controller-semantics-v1'\n45:               and proof['runtime'] == runtime_ref and proof['status'] == 'ROOT_REVIEWED'\n46:               and proof['physical_gain_certified'] is False, 'reviewed controller semantics required')\n47:     w.require(proof['module'].startswith('robosuite.') and proof['class'] == 'OperationalSpaceController'\n48:               and proof['source'] == closure['modules'][proof['module']]\n49:               and proof['module'] in closure['required_after'], 'controller loaded source binding')\n50:     expected = proof['instance']\n51:     w.require(set(expected) == set(FIELDS) and expected['control_delta'] is True\n52:               and expected['control_ori'] is True and expected['control_dim'] == 6\n53:               and expected['impedance_mode'] == 'fixed' and expected['policy_freq'] == 20\n54:               and expected['interpolator_pos'] is None and expected['interpolator_ori'] is None,\n55:               'OSC normalized delta/fixed/no-interpolation semantics')\n56:     for key in ('input_min', 'input_max', 'output_min', 'output_max'):\n57:         values = expected[key]\n58:         w.require(isinstance(values, list) and len(values) == 6\n59:                   and all(type(v) in (float,int) and math.isfinite(v) for v in values), 'controller scaling shape/finite')\n60:     w.require(expected['input_min'] == [-1]*6 and expected['input_max'] == [1]*6\n61:               and all(a == -b and b > 0 for a,b in zip(expected['output_min'], expected['output_max'])),\n62:               'zero must map to zero delta; normalized inputs required')\n63:     w.require(proof['semantics'] == {'translation': 'scaled_world_delta', 'rotation': 'scaled_axis_angle_delta',\n64:               'zero_rotation': 'zero_increment_not_absolute_pose', 'gripper': 'minus_open_plus_close',\n65:               'projector_0_01': 'convention_not_measured_gain'}, 'controller interpretation differs')\n66:     # Root must supply source review evidence for set_goal, scale_action and\n67:     # wrapper/gripper forwarding, not a fixture assertion or candidate receipt.\n68:     w.require(set(proof['review_evidence']) == {'set_goal', 'scale_action', 'wrapper_and_gripper'}, 'controller proof coverage')\n69:     for ref in proof['review_evidence'].values():\n70:         evidence = w.read_ref(ref)\n71:         w.require(evidence['kind'] == 'deployed_source_review' and evidence['runtime'] == runtime_ref\n72:                   and evidence['fixture_only'] is False, 'fixture cannot attest deployment')\n73:     return proof\n74: \n75: \n76: def attest_instance(controller, proof):\n77:     cls = type(controller)\n78:     w.require(cls.__module__ == proof['module'] and cls.__name__ == proof['class'], 'controller class differs')\n79:     path = Path(inspect.getfile(cls)).resolve()\n80:     w.require({'path': str(path), 'sha256': w.sha(path)} == proof['source'], 'controller implementation differs')\n81:     values = {key: serial(getattr(controller, INSTANCE_ATTRIBUTES[key])) for key in FIELDS}\n82:     w.require(values == proof['instance'], 'actual controller config/delta semantics differ')\n83:     return {'source': proof['source'], 'module': cls.__module__, 'class': cls.__name__, 'instance': values}\n84: \n85: \n86: @contextmanager\n87: def observe_instances(proof):\n88:     module = importlib.import_module(proof['module'])\n89:     cls = getattr(module, proof['class'])\n90:     original = cls.__init__\n91:     records = []\n92:     def observed(self, *args, **kwargs):\n93:         original(self, *args, **kwargs)\n94:         records.append(attest_instance(self, proof))\n95:     cls.__init__ = observed\n96:     try:\n97:         yield records\n98:         w.require(records, 'no deployed controller instance observed')\n99:     finally:\n100:         cls.__init__ = original"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/scripts/qd_ed_n34_source.py",
+        "bytes": 30267,
+        "sha256": "be71a7cc706915c7466b641a68d6ece2689857668baf74fa2a58aa8181ca70b4"
+      },
+      "start_line": 339,
+      "end_line": 377,
+      "text": "339: def source_record(root, paths, *, commit=None):\n340:     root = Path(root).resolve()\n341:     w.require(Path(w._source_git(root, 'rev-parse', '--show-toplevel').decode().strip()).resolve() == root, 'source root differs')\n342:     commit = commit or w._source_git(root, 'rev-parse', 'HEAD').decode().strip()\n343:     # Resolve each registered database/pin once, never from dependency HEAD.\n344:     groups = {}\n345:     for relative in sorted(set(paths)):\n346:         name = Path(relative); path = root / name\n347:         w.require(not name.is_absolute() and '..' not in name.parts and str(name) == relative and name.parts, 'unsafe source path')\n348:         w.require(path.is_file() and not any((root / Path(*name.parts[:i])).is_symlink() for i in range(1,len(name.parts)+1)), 'source path missing or linked')\n349:         submodule = next((s for s in PINNED_SUBMODULES if relative.startswith(s + '/')), None)\n350:         groups.setdefault(submodule, []).append(relative)\n351:     files = []\n352:     for submodule, names in groups.items():\n353:         pin, database = submodule_pin(root, submodule, commit) if submodule else (commit, None)\n354:         entries = _source_tree(root, pin, database)\n355:         selected = {}\n356:         for relative in names:\n357:             key = relative[len(submodule)+1:] if submodule else relative\n358:             w.require(key in entries, 'source Git object missing')\n359:             mode, kind, blob = entries[key]\n360:             w.require(mode in ('100644', '100755') and kind == 'blob', 'source Git object not regular')\n361:             selected[relative] = blob\n362:         committed = _source_blobs(root, selected.values(), database)\n363:         for relative, blob in selected.items():\n364:             path = root / relative\n365:             name = Path(relative)\n366:             w.require(path.is_file() and not any((root / Path(*name.parts[:i])).is_symlink() for i in range(1,len(name.parts)+1)), 'source path missing or linked')\n367:             data = path.read_bytes()\n368:             w.require(data == committed[blob], 'uncommitted source bytes: ' + relative)\n369:             files.append({'path': relative, 'sha256': hashlib.sha256(data).hexdigest()})\n370:     files.sort(key=lambda row: row['path'])\n371:     return {'commit': commit, 'files': files, 'sha256': w.canonical_sha(files)}\n372: \n373: \n374: def verify_source(root, record, *, commit=None):\n375:     w.require(set(record) == {'commit', 'files', 'sha256'}, 'source record schema')\n376:     expected = source_record(root, [x['path'] for x in record['files']], commit=commit)\n377:     w.require(record == expected, 'source bytes/commit differ')"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/scripts/qd_ed_n34_source.py",
+        "bytes": 30267,
+        "sha256": "be71a7cc706915c7466b641a68d6ece2689857668baf74fa2a58aa8181ca70b4"
+      },
+      "start_line": 380,
+      "end_line": 425,
+      "text": "380: def attest_loaded(root, source):\n381:     root = Path(root).resolve()\n382:     index = {x['path']: x['sha256'] for x in source['files']}\n383:     result = {}\n384:     for name, module in list(sys.modules.items()):\n385:         if name in ('torch.ops', 'torch.classes', '__main__'):\n386:             continue  # virtual torch namespaces; worker __main__ has its own spec/origin attestor\n387:         if name == '__mp_main__' and module is sys.modules.get('__main__'):\n388:             continue  # multiprocessing's alias of the separately attested worker\n389:         file = getattr(module, '__file__', None)\n390:         if not file:\n391:             continue\n392:         path = Path(file).resolve()\n393:         scoped = name.startswith(('core.', 'scripts.', 'utils.')) or name.split('.')[0] in RDT_PREFIXES\n394:         if not scoped and not path.is_relative_to(root):\n395:             continue\n396:         w.require(path.is_relative_to(root), 'loaded adjacent checkout: ' + name)\n397:         relative = str(path.relative_to(root))\n398:         w.require(relative in index and w.sha(path) == index[relative], 'loaded source not frozen: ' + name)\n399:         result[name] = {'path': relative, 'sha256': index[relative]}\n400:     return result\n401: \n402: \n403: def verify_runtime(closure, runtime_ref):\n404:     w.require(closure['schema'] in ('n34-runtime-source-closure-v1', 'n34-runtime-source-closure-v2')\n405:               and closure['runtime'] == runtime_ref,\n406:               'runtime closure binding')\n407:     modules = closure['modules']\n408:     w.require(isinstance(modules, dict) and modules, 'runtime modules required')\n409:     for name, record in modules.items():\n410:         try:\n411:             _runtime_file(record)\n412:         except (ValueError, OSError) as exc:\n413:             raise RuntimeOriginError(str(exc), _failure_origin(name, record)) from exc\n414:     aliases = _alias_rules(closure)\n415:     w.require(closure['required_after'] and set(closure['required_after'])\n416:               <= set(modules) | set(closure.get('generated_modules', {})) | set(aliases),\n417:               'runtime modules required')\n418:     _generated_runtime(closure)\n419:     w.require(closure['interpreter'] == {'path': str(Path(sys.executable).resolve()),\n420:               'sha256': w.sha(Path(sys.executable).resolve()), 'version': sys.version}, 'runtime interpreter differs')\n421:     w.require(isinstance(closure['versions'], dict) and all(closure['versions'].get(k) for k in ('python', 'torch', 'libero', 'robosuite', 'mujoco')), 'runtime versions required')\n422:     versions = closure['distribution_versions']\n423:     w.require(isinstance(versions, dict) and {'torch', 'numpy', 'robosuite', 'mujoco', 'transformers'} <= set(versions), 'installed distribution versions required')\n424:     w.require(all(importlib.metadata.version(name) == version for name,version in versions.items()), 'installed distribution version differs')\n425:     return closure"
+    },
+    {
+      "source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/scripts/qd_ed_n36_engineering_r1.py",
+        "bytes": 70026,
+        "sha256": "9a88589acaaeaefc3256cded7c3f44c0a32410577b07c048acbeca568424621a"
+      },
+      "start_line": 100,
+      "end_line": 143,
+      "text": "100: def validate_runtime_binding(plan):\n101:     \"\"\"Exact baseline projection or externally accepted measured preparation.\n102: \n103:     Neither branch grants health/episode authority. Readiness proof references\n104:     the immutable baseline/final source, never its own derived runtime hash.\n105:     \"\"\"\n106:     from scripts import qd_ed_n36_readiness_prepare as preparation_api\n107:     spec = specification()\n108:     policy = spec['runtime_binding']\n109:     preparation = preparation_api.policy(spec)\n110:     reference(plan['runtime'])\n111:     w.require(plan['runtime']['path'] in (policy['runtime_path'], preparation['disabled_runtime_path'])\n112:               and str(Path(plan['runtime']['path']).resolve()) == plan['runtime']['path'],\n113:               'R1 canonical runtime reference path')\n114:     runtime = read(plan['runtime'])\n115:     template = read(spec['canonical_runtime'])\n116:     source_ref = reference(runtime['preparation']['source_record'])\n117:     w.require(source_ref['path'] == policy['source_record_path'], 'R1 exact source record path')\n118:     source = read(source_ref)\n119:     exact(source, plan['source'], 'R1 runtime source record binding')\n120:     exact(source, plan['scientific_source'], 'R1 runtime scientific source binding')\n121:     root = Path(__file__).resolve().parents[1]\n122:     exact(sorted(x['path'] for x in source['files']), sorted(b.source_paths(root)),\n123:           'R1 complete runtime source inventory')\n124:     b.closure.verify_source(root, source)\n125:     w.require(subprocess.run(['git', '--no-replace-objects', '-C', str(root),\n126:                              'merge-base', '--is-ancestor', policy['source_base'], source['commit']],\n127:                             check=False, capture_output=True).returncode == 0,\n128:               'R1 runtime source ancestry')\n129:     changed = subprocess.check_output(['git', '--no-replace-objects', '-C', str(root),\n130:         'diff', '--name-only', policy['source_base'], source['commit'], '--'], text=True).splitlines()\n131:     w.require(set(changed) <= set(policy['source_change_allowlist']) <= (OPERATIONAL_FILES | preparation_api.NEW_FILES),\n132:               'R1 runtime repair source allowlist')\n133:     template['preparation']['source'] = source['commit']\n134:     template['preparation']['source_record'] = source_ref\n135:     if plan['runtime']['path'] == policy['runtime_path']:\n136:         w.require(plan['worktree'] == str(SOURCE) == str(root), 'R1 measured deployed checkout')\n137:         b.attest_loaded(root, source)\n138:         proof_ref = runtime['preparation'].get('readiness_proof')\n139:         template = preparation_api.derive(spec, source, source_ref, proof_ref)\n140:         preparation_api.accepted(spec, proof_ref, plan['runtime'])\n141:     exact(runtime, template, 'R1 exact prospective runtime derivation')\n142:     r.verify_files(runtime['files'], allowed_roots=(runtime['worktree'], runtime['artifact_root']))\n143:     return runtime"
+    }
+  ]
+}

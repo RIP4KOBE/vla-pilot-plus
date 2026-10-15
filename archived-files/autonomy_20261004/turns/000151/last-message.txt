@@ -1,0 +1,3 @@
+N32R2 is running on frozen source `1065f381`: controller `1818171`, task-0 C0 worker `1929472`. Process identities and ledger continuity verified; no duplicate dispatch.
+
+Turn 151 operational summary saved. Next step is continued monitoring. Validation, formal, and required ablation evidence remain incomplete.

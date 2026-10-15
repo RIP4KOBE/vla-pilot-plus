@@ -1,0 +1,5 @@
+Reviewed and adopted the N34R9 engineering repair; 515 CPU tests passed. All ledger charges and scientific gates remain intact. No GPU cohort was launched.
+
+Next: regenerate and validate the frozen runtime release. Original-goal evidence remains incomplete.
+
+[Operational summary](../autonomy_20261004/turns/000697/operational-summary.md)

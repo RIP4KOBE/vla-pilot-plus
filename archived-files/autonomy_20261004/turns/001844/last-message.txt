@@ -1,0 +1,3 @@
+Preserved the reviewed parity repair and restored production to pinned commit `808e27f`; all 1,117 source-file hashes verified. No GPU cohort is running, and ledgers remain unchanged.
+
+Recorded the operational handoff. Next: finite readiness release and measurement. Validation, formal, and ablation completion remain unproven.

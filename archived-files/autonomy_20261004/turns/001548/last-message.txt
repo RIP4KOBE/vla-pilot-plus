@@ -1,0 +1,3 @@
+Continued the owning study and launched bounded G6 CPU verification on unchanged candidate `dcd8904`. Live process identities and operational summary are recorded in the owning state/checkpoint.
+
+Next: monitor G6, review its evidence, then independent B5 review. GPU dispatch remains gated; validation, formal evaluation and required ablation evidence remain incomplete.

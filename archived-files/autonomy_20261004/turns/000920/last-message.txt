@@ -1,0 +1,3 @@
+N35 remains active on GPU7: controller 2632351 and worker 2635111 verified. Frozen source `52a87af`, release hashes and ledger continuity are intact.
+
+Recorded turn 920’s operational summary. The driver continues monitoring; validation, formal and required ablation completion remain unproven.

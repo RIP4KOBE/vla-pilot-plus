@@ -1,0 +1,3 @@
+Verified authority, live process identities, resource isolation, and unchanged private ledgers. The existing CPU repair continues; GPU7 is idle, with no duplicate dispatch.
+
+Saved turn 001794’s hash-bound operational summary. Next: reconcile repair changes and tests, then independent review. Validation, formal evaluation, and required ablation evidence remain incomplete.

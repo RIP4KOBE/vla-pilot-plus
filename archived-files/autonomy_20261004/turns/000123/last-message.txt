@@ -1,0 +1,3 @@
+N32R1’s release passed validation and was adopted at source `531477e9`. Controller PID `1348389` is live, revalidating before dispatch.
+
+Prior charges and scientific gates remain intact. Operational handoff recorded; next step is monitoring this controller. Validation, formal, and ablation evidence remain incomplete.

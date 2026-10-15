@@ -1,0 +1,3 @@
+N36’s independent CPU review remains active with verified process identity. Owning source stays `52a87af`; ledgers remain unchanged at 502 attempts and 75.2438 GPU-hours.
+
+Operational summary saved. Next: reconcile the review before source adoption and runtime preparation. Validation, formal evaluation, and required ablation evidence remain outstanding.

@@ -1,0 +1,3 @@
+N34R11 remains active on GPU7 with verified controller/worker identities and intact ledger prefixes. Task 1 C0 is running; task 0 recorded valid unsuccessful outcomes for all three profiles.
+
+Frozen source and rules remain unchanged. Turn 740’s operational summary is saved. The driver continues monitoring; validation, formal and ablation completion remains unproven.

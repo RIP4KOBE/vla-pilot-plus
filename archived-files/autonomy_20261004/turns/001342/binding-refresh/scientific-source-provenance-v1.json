@@ -1,0 +1,19 @@
+{
+  "historical_baseline": "1065f38122379a515b60a9a424f574330405b66f",
+  "authority_baseline": "1065f38122379a515b60a9a424f574330405b66f",
+  "accepted_composition_source": "bb20aedb952638548dd347b9705dab2beba176c5",
+  "current_source": "bee9f6a4703e9d5d802d6b8c7950b69beefac4c0",
+  "plan_scientific_source_equals_source": true,
+  "immutable_since_accepted_paths": [
+    "core",
+    "configs",
+    "main.py",
+    "scripts/qd_ed_n36_worker.py",
+    "scripts/qd_ed_n36_bridge.py",
+    "scripts/qd_ed_final_runner.py",
+    "scripts/audit_decision_evidence.py",
+    "scripts/qd_ed_n36_build.py",
+    "scripts/qd_ed_n34_controller.py"
+  ],
+  "note": "Historical baseline is provenance, not substituted for the API-required exact current scientific_source."
+}

@@ -1,0 +1,3 @@
+N34R4 CPU repair finished, reporting 230 passing tests. Existing processes were monitored without duplication; all private ledgers remain unchanged.
+
+Operational summary recorded. Next: independently review and adopt the repair, then validate a fresh release before GPU dispatch. Validation, formal evaluation, and ablation goals remain unmet; the driver continues.

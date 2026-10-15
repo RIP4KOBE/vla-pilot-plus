@@ -1,0 +1,3 @@
+N32R2 controller 1818171 remains live on frozen source `1065f381`. Authority hashes, ledger continuity and deadlines verified; no recovery needed.
+
+Recorded turn 361’s operational summary. Current evidence: 14 valid development cells, zero successes. Next: monitor task 4 N32 or terminal evidence. Validation/formal/ablation completion remains unproven.

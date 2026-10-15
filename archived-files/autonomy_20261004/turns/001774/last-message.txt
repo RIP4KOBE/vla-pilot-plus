@@ -1,0 +1,3 @@
+Placed reviewed repair `a5b32cdef` in the production adapter and recorded the handoff. Driver identity verified; no GPU cohort is active. All four ledgers remain unchanged.
+
+Next: recovery/controller binding review and disabled-graph validation. Original validation, formal, and ablation evidence remains incomplete.

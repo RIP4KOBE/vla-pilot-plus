@@ -1,0 +1,7 @@
+Completed the disabled binding refresh; all 40 manifests verified. Source, owner state, ledgers, and old artifacts remain unchanged.
+
+Pending: root controller review, exact B5, adoption, accounting, and fresh health release. Recorded the older fixture’s missing `canonical_worktree` blocker.
+
+`target_met: false`; `score: null`.
+
+[Report JSON](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001355/binding-refresh/report-v1.json) · [Concise report](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001355/binding-refresh/report-v1.md)

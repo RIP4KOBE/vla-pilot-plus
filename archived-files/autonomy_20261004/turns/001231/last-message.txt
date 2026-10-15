@@ -1,0 +1,3 @@
+N36R1’s existing CPU executor remains live. Preparation hit a configuration-drift assertion; terminal diagnosis is pending. No GPU dispatch or restart occurred, and all ledger charges remain intact.
+
+Recorded turn 1231’s operational summary. Next: reconcile the terminal report before release review. Validation, formal evaluation, and ablation completion remain unproven.

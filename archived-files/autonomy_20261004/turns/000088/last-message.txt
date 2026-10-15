@@ -1,0 +1,3 @@
+Continued N32: reviewed the partial delivery, verified source and test-log hashes, and launched the bounded CPU production-adapter executor.
+
+N31 remains closed for futility. Ledgers are intact; no GPU cohort was dispatched. Operational summary recorded. Next: review the adapter delivery before release. Validation, formal and ablation evidence remain outstanding.

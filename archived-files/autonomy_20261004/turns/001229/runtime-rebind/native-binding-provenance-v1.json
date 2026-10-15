@@ -1,0 +1,14 @@
+{
+  "native_build": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001203/recovery-preparation/native-build-n36r1.draft-v1.json",
+    "sha256": "3e7e4f522f8d463671e7fe83bef4762f45f0ab0e32298959e38b8357998052d7"
+  },
+  "turn1219_native_build": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001219/runtime-input-repair/cpu-v1/runtime-candidate-v1/native-build.disabled-candidate.json",
+    "sha256": "3e7e4f522f8d463671e7fe83bef4762f45f0ab0e32298959e38b8357998052d7"
+  },
+  "exact_value_unchanged": true,
+  "libraries": 75,
+  "same_worker_native_attestation_performed": false,
+  "native_readiness": false
+}

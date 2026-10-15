@@ -1,0 +1,179 @@
+{
+  "schema": "n34-lerobot-source-coverage-review-v1",
+  "source_commit": "68c341ef6357887c4ae33ddafad00fab17582302",
+  "status": "BLOCKED_BEFORE_RELEASE",
+  "missing_checkout_modules": {
+    "lerobot.__version__": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/__version__.py",
+      "sha256": "beb2aa5d785c7e7ccbcb910ec4688e2868423458e2a1aac7fd76c1e1a182a470"
+    },
+    "lerobot": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/__init__.py",
+      "sha256": "e9cf424c0656b89d285065a9344efd8149208950047f096f751db50e7d898bd7"
+    },
+    "lerobot.configs.types": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/configs/types.py",
+      "sha256": "1354e7d24b19d5d4970064104f76d8c85570c204bf2d09e2b4402f93a994ad99"
+    },
+    "lerobot.utils.constants": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/utils/constants.py",
+      "sha256": "0655ea6215a0e5095231ef69ceca8b2f335db1208a97099690535fe1e235f40e"
+    },
+    "lerobot.processor.core": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/core.py",
+      "sha256": "61232c5a45fb44f31ec895240add2803275ccd10ed5382e232d9a2b772a1fbdc"
+    },
+    "lerobot.utils.hub": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/utils/hub.py",
+      "sha256": "1981583e520bc73e221491459694d58ad1c1370537bf280968493b31c8e2c51f"
+    },
+    "lerobot.processor.converters": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/converters.py",
+      "sha256": "c56ac3f10733afa85ff0cc145426dd42e00274b87642aa0612a844f6283ffac3"
+    },
+    "lerobot.processor.pipeline": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/pipeline.py",
+      "sha256": "9924bda0e8056c1cb3fe9f3ccd95af0b6ceaa3ae3326b3ed1a8884fd58dd7f2b"
+    },
+    "lerobot.processor.batch_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/batch_processor.py",
+      "sha256": "305843a6bf98ddda243422b577ea10cbe105be71d08c5611a8aed3b2bb27d832"
+    },
+    "lerobot.processor.delta_action_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/delta_action_processor.py",
+      "sha256": "20618218cc5e409f37bade516ea83d702ae00abe50a4e7bcaaa8b13ce2fc7ac6"
+    },
+    "lerobot.utils.utils": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/utils/utils.py",
+      "sha256": "6d15ea2af3a80ae419af3d42d4264ff07bb769147b021a99f1a46cd51b728ac4"
+    },
+    "lerobot.processor.device_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/device_processor.py",
+      "sha256": "be81c88d9e7ea304ec49a42ea80557feb08b252bec82eb3c9eb8faf148397d33"
+    },
+    "lerobot.processor.factory": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/factory.py",
+      "sha256": "23bd0d47e9baeeeea61b4c622388e844a1039fbf7cb8b2367f6e0975d3bf87fb"
+    },
+    "lerobot.processor.gym_action_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/gym_action_processor.py",
+      "sha256": "87ea21d2afda738ddfc53b5c27ed7055872a03cb8752d2c9c33a081a6a7fb212"
+    },
+    "lerobot.teleoperators.config": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/teleoperators/config.py",
+      "sha256": "cc9bacc17230e4c0d1532ee4c998a9d2aa4d6ec374f4606e7f447f1e3c94ba28"
+    },
+    "lerobot.utils.errors": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/utils/errors.py",
+      "sha256": "5bab3b68cbbc88a764daaa103c488a08dcf2d61ef5274931fa3d6013d2a2ec4a"
+    },
+    "lerobot.motors.motors_bus": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/motors/motors_bus.py",
+      "sha256": "27bab5732e4688266fe09da3e0f800a80199f460d31006e89368a22466382462"
+    },
+    "lerobot.motors": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/motors/__init__.py",
+      "sha256": "216b5fef9e2f5f56311e4a92b7effe59bd806ac3927bdf15e2e34df43f1a33a3"
+    },
+    "lerobot.teleoperators.teleoperator": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/teleoperators/teleoperator.py",
+      "sha256": "72cf88c1df20aaa12643c77689ade468a3e91a0324075c60bc006539005c0728"
+    },
+    "lerobot.utils.import_utils": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/utils/import_utils.py",
+      "sha256": "7f846c6e032f2e75d1c3c35e7df2c545a7bef2d5076013e83d5e538341bed393"
+    },
+    "lerobot.teleoperators.utils": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/teleoperators/utils.py",
+      "sha256": "09e2809a02a1a49689f7838cceb4026f04bad3abddfdcb3ed65cee8d0079929e"
+    },
+    "lerobot.teleoperators": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/teleoperators/__init__.py",
+      "sha256": "cc563d12d06c98307f071f7de8c0e0e1d190c4c0666749ca99f6c9283ae8d97d"
+    },
+    "lerobot.processor.hil_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/hil_processor.py",
+      "sha256": "602424058bd090ef0d317fe4f099c2f534fa10c6c172db45ecf745558bbad003"
+    },
+    "lerobot.robots.config": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/robots/config.py",
+      "sha256": "65f420e72414df8717d4d2d0788d7e3584d7420f616e39b0d07af2098a877094"
+    },
+    "lerobot.robots.robot": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/robots/robot.py",
+      "sha256": "20b39fcd82ba4750cbfec8e522ed3057c2bc6356ade1c2f3ff4663d408899e45"
+    },
+    "lerobot.robots.utils": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/robots/utils.py",
+      "sha256": "36129f378cb86bfa0578263d93e7dff5f509ee253ed44954c2424d646de4bf96"
+    },
+    "lerobot.robots": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/robots/__init__.py",
+      "sha256": "809dfb9fa15249bf33fa3d400d1e776450e59300829c9b1841a841ccf31fbc17"
+    },
+    "lerobot.processor.joint_observations_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/joint_observations_processor.py",
+      "sha256": "a345b28ad97ff14ee540640cf5b41627ed06769cc76f6f4496d6a050fecc202a"
+    },
+    "lerobot.datasets.backward_compatibility": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/datasets/backward_compatibility.py",
+      "sha256": "e6fc804f37f7968b1a7bf8d01a21360c59b89ee8de8ac38415deb8bf339d8caa"
+    },
+    "lerobot.datasets.utils": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/datasets/utils.py",
+      "sha256": "b1d32074e843880ef81436d7357bd1ac7b8d26ad9d30a0594c38620d36fae692"
+    },
+    "lerobot.datasets.compute_stats": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/datasets/compute_stats.py",
+      "sha256": "941dd3c6d0f14704e95123c9a9c49270b2b5ea589f712b734adb4ee03b8736b2"
+    },
+    "lerobot.datasets.image_writer": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/datasets/image_writer.py",
+      "sha256": "2e39a940baa54fef5e09957b1151ebe31bfc74184fe631c74a25bcd2589f43f8"
+    },
+    "lerobot.datasets.video_utils": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/datasets/video_utils.py",
+      "sha256": "14d2a05dae010e7f434927619b21e1afea103b3e016e7c301c25bcc9f2b41b6e"
+    },
+    "lerobot.datasets.lerobot_dataset": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/datasets/lerobot_dataset.py",
+      "sha256": "b7d63fe7d37308de876a28f0b8293c4da939aa9b7580c2a0d43b9237163f6be5"
+    },
+    "lerobot.processor.normalize_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/normalize_processor.py",
+      "sha256": "5f5033509993f03e64273b801bb42e023f7a761f3782187625bafd158e13d3c0"
+    },
+    "lerobot.processor.observation_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/observation_processor.py",
+      "sha256": "7b3735a82f5c8bc52c119a1480107c3cba5afd612b0ff5c5e55731c27fee9eb3"
+    },
+    "lerobot.processor.policy_robot_bridge": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/policy_robot_bridge.py",
+      "sha256": "8d00ad845d184570d3071f45ccf3bebfde61412713f7b6d4d94b193f25d094d9"
+    },
+    "lerobot.processor.rename_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/rename_processor.py",
+      "sha256": "11c4a25620260fc281cdeef50968280c7d4fcfe549cd272edf638763dcc4eca4"
+    },
+    "lerobot.processor.tokenizer_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/tokenizer_processor.py",
+      "sha256": "91aa14a4624aeb2217880bd352ac4724eeabc5e3070a5dbf307fb973ffc4f55c"
+    },
+    "lerobot.processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/__init__.py",
+      "sha256": "10c1151144d60b32d7eff191931a7dc1f0057d00335131f13b664861fc3562bc"
+    },
+    "lerobot.processor.env_processor": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/lerobot/src/lerobot/processor/env_processor.py",
+      "sha256": "a8575aa5587873dfe16d1c721b55195923ee44f8e9a89f9f2e900f34a44a4b4d"
+    }
+  },
+  "existing_source_auditor_rejection": {
+    "type": "ValueError",
+    "message": "loaded source not frozen: lerobot.__version__"
+  },
+  "finding": "LeRobot sources physically inside owning worktree are skipped by external-runtime attestation and must be present in operational Git source inventory. Current source_paths omits these modules; attest_loaded rejects them. Adding them only to external closure cannot repair the gap.",
+  "repair_scope": "Separate engineering executor: extend committed submodule source closure to pinned LeRobot Python/config sources with exact gitlink/object-database verification and materialization; keep scientific N34 bytes, native audits, and thresholds unchanged. Check other checkout-local imports (LIBERO) for same coverage gap before release. Do not weaken path checks or accept candidate receipt discovery.",
+  "gpu_dispatched": false,
+  "diagnostic_note": "Initial stdin diagnostic encountered pseudo __main__ file <stdin>; repeated with that non-file marker removed, preserving actual loaded file modules."
+}

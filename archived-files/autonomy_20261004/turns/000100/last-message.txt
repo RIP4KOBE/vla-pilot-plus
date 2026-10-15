@@ -1,0 +1,3 @@
+N32’s STOP-path repair finished successfully; its delivery reports 160 passing tests. Owning source remains `7428ce8`; the driver is live and private ledgers are unchanged.
+
+Operational summary saved. Next: independently review the repair before adoption and release preparation. Validation/formal/ablation completion remains unproven.

@@ -1,0 +1,16 @@
+Error during episode execution:
+Traceback (most recent call last):
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py", line 1518, in run
+    self._run_episode(episode, episode_dir, episode_seed)
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py", line 1817, in _run_episode
+    action_chunk = self.policy.select_action(**select_kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py", line 1580, in select_action
+    raw = self._predict_guided(
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py", line 1743, in _predict_guided
+    resolved_eds_config = self._resolve_eds_config_with_reference_defaults(eds_config)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py", line 8143, in _resolve_eds_config_with_reference_defaults
+    raise ValueError(f"N4 terminal population requires {name}={expected!r}")
+ValueError: N4 terminal population requires qd_quality_mode='provider'

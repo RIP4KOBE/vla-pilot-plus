@@ -1,0 +1,5 @@
+N32R2 controller 1818171 remains live on frozen source `1065f381`. Identity, artifact hashes, and ledger continuity verified; no duplicate dispatch or restart.
+
+C0/Q0 task 0 are valid failures. Candidate evidence remains pending; validation/formal/ablation completion is not established.
+
+Turn 170 operational summary saved. Next: monitor the existing controller and reconcile its next outcome.

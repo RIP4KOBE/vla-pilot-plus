@@ -1,0 +1,3 @@
+Verified authorization, live worker identities, and unchanged private ledgers. The existing CPU recovery worker remains active; no duplicate was launched.
+
+Recorded turn 001734’s hash-bound operational summary. Next: reconcile its completed repair and tests, then obtain independent review. Validation, formal, and ablation evidence remains incomplete.

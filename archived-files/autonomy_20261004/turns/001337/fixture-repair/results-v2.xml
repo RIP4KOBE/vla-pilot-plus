@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="3" failures="0" skipped="0" tests="3" time="1.192" timestamp="2026-10-10T07:04:57.404626+00:00" hostname="hynx"><testcase classname="" name="tests.test_n36_stop_guard" time="0.000"><error message="collection failure">tests/test_n36_stop_guard.py:6: in &lt;module&gt;
+    from scripts import qd_ed_n36_stop as stop, qd_ed_n36_contract as c
+scripts/qd_ed_n36_contract.py:7: in &lt;module&gt;
+    from scripts import qd_ed_n23_worker as w
+scripts/qd_ed_n23_worker.py:22: in &lt;module&gt;
+    from scripts import audit_decision_evidence as audit
+scripts/audit_decision_evidence.py:19: in &lt;module&gt;
+    import torch
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/__init__.py:2126: in &lt;module&gt;
+    from torch import _VF as _VF, functional as functional  # usort: skip
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/functional.py:8: in &lt;module&gt;
+    import torch.nn.functional as F
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/__init__.py:8: in &lt;module&gt;
+    from torch.nn.modules import *  # usort: skip # noqa: F403
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/__init__.py:1: in &lt;module&gt;
+    from .module import Module  # usort: skip
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py:17: in &lt;module&gt;
+    from torch.utils._python_dispatch import is_traceable_wrapper_subclass
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/__init__.py:8: in &lt;module&gt;
+    from torch.utils import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/__init__.py:1: in &lt;module&gt;
+    from torch.utils.data.dataloader import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/dataloader.py:22: in &lt;module&gt;
+    import torch.utils.data.graph_settings
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/graph_settings.py:8: in &lt;module&gt;
+    from torch.utils.data.datapipes.iter.sharding import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/__init__.py:1: in &lt;module&gt;
+    from torch.utils.data.datapipes import dataframe as dataframe, iter as iter, map as map
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/dataframe/__init__.py:1: in &lt;module&gt;
+    from torch.utils.data.datapipes.dataframe.dataframes import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/dataframe/dataframes.py:4: in &lt;module&gt;
+    from torch.utils.data.datapipes._decorator import functional_datapipe
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/_decorator.py:7: in &lt;module&gt;
+    from torch.utils.data.datapipes.datapipe import IterDataPipe, MapDataPipe
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/datapipe.py:17: in &lt;module&gt;
+    dill = import_dill()
+           ^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/_import_utils.py:37: in import_dill
+    import dill
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/dill/__init__.py:26: in &lt;module&gt;
+    from ._dill import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/dill/_dill.py:173: in &lt;module&gt;
+    BufferedRandomType = None if IS_PYODIDE else get_file_type('r+b', buffering=-1)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/dill/_dill.py:164: in get_file_type
+    f = open(os.devnull, *args, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 13] Permission denied: '/dev/null'</error></testcase><testcase classname="" name="tests.test_n36_audit_repair" time="0.000"><error message="collection failure">tests/test_n36_audit_repair.py:19: in &lt;module&gt;
+    import torch
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/__init__.py:2126: in &lt;module&gt;
+    from torch import _VF as _VF, functional as functional  # usort: skip
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/functional.py:8: in &lt;module&gt;
+    import torch.nn.functional as F
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/__init__.py:8: in &lt;module&gt;
+    from torch.nn.modules import *  # usort: skip # noqa: F403
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/__init__.py:1: in &lt;module&gt;
+    from .module import Module  # usort: skip
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py:17: in &lt;module&gt;
+    from torch.utils._python_dispatch import is_traceable_wrapper_subclass
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/__init__.py:8: in &lt;module&gt;
+    from torch.utils import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/__init__.py:1: in &lt;module&gt;
+    from torch.utils.data.dataloader import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/dataloader.py:22: in &lt;module&gt;
+    import torch.utils.data.graph_settings
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/graph_settings.py:8: in &lt;module&gt;
+    from torch.utils.data.datapipes.iter.sharding import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/__init__.py:1: in &lt;module&gt;
+    from torch.utils.data.datapipes import dataframe as dataframe, iter as iter, map as map
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/dataframe/__init__.py:1: in &lt;module&gt;
+    from torch.utils.data.datapipes.dataframe.dataframes import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/dataframe/dataframes.py:4: in &lt;module&gt;
+    from torch.utils.data.datapipes._decorator import functional_datapipe
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/_decorator.py:7: in &lt;module&gt;
+    from torch.utils.data.datapipes.datapipe import IterDataPipe, MapDataPipe
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/datapipe.py:17: in &lt;module&gt;
+    dill = import_dill()
+           ^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/_import_utils.py:37: in import_dill
+    import dill
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/dill/__init__.py:26: in &lt;module&gt;
+    from ._dill import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/dill/_dill.py:173: in &lt;module&gt;
+    BufferedRandomType = None if IS_PYODIDE else get_file_type('r+b', buffering=-1)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/dill/_dill.py:164: in get_file_type
+    f = open(os.devnull, *args, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 13] Permission denied: '/dev/null'</error></testcase><testcase classname="" name="tests.test_n36r2_draft" time="0.000"><error message="collection failure">tests/test_n36r2_draft.py:3: in &lt;module&gt;
+    from scripts import qd_ed_n36_contract as c, qd_ed_n36_release as release
+scripts/qd_ed_n36_contract.py:7: in &lt;module&gt;
+    from scripts import qd_ed_n23_worker as w
+scripts/qd_ed_n23_worker.py:22: in &lt;module&gt;
+    from scripts import audit_decision_evidence as audit
+scripts/audit_decision_evidence.py:19: in &lt;module&gt;
+    import torch
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/__init__.py:2126: in &lt;module&gt;
+    from torch import _VF as _VF, functional as functional  # usort: skip
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/functional.py:8: in &lt;module&gt;
+    import torch.nn.functional as F
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/__init__.py:8: in &lt;module&gt;
+    from torch.nn.modules import *  # usort: skip # noqa: F403
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/__init__.py:1: in &lt;module&gt;
+    from .module import Module  # usort: skip
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/nn/modules/module.py:17: in &lt;module&gt;
+    from torch.utils._python_dispatch import is_traceable_wrapper_subclass
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/__init__.py:8: in &lt;module&gt;
+    from torch.utils import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/__init__.py:1: in &lt;module&gt;
+    from torch.utils.data.dataloader import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/dataloader.py:22: in &lt;module&gt;
+    import torch.utils.data.graph_settings
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/graph_settings.py:8: in &lt;module&gt;
+    from torch.utils.data.datapipes.iter.sharding import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/__init__.py:1: in &lt;module&gt;
+    from torch.utils.data.datapipes import dataframe as dataframe, iter as iter, map as map
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/dataframe/__init__.py:1: in &lt;module&gt;
+    from torch.utils.data.datapipes.dataframe.dataframes import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/dataframe/dataframes.py:4: in &lt;module&gt;
+    from torch.utils.data.datapipes._decorator import functional_datapipe
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/_decorator.py:7: in &lt;module&gt;
+    from torch.utils.data.datapipes.datapipe import IterDataPipe, MapDataPipe
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/data/datapipes/datapipe.py:17: in &lt;module&gt;
+    dill = import_dill()
+           ^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/torch/utils/_import_utils.py:37: in import_dill
+    import dill
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/dill/__init__.py:26: in &lt;module&gt;
+    from ._dill import (
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/dill/_dill.py:173: in &lt;module&gt;
+    BufferedRandomType = None if IS_PYODIDE else get_file_type('r+b', buffering=-1)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/dill/_dill.py:164: in get_file_type
+    f = open(os.devnull, *args, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 13] Permission denied: '/dev/null'</error></testcase></testsuite></testsuites>

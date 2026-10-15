@@ -1,0 +1,3 @@
+N32R2 remains under its existing controller on frozen source `1065f381`; identities, hashes, and ledger continuity verified.
+
+C0 is a valid failure. Q0’s log reports failure, with terminal audit/accounting pending. Turn 166’s operational summary is saved. Next: monitor that receipt. Validation, formal, and ablation goals remain incomplete.

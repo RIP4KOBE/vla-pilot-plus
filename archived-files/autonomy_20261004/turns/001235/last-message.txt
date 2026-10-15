@@ -1,0 +1,3 @@
+N36R1’s independent review and all 40 release-manifest checks passed. One controller is live and performing admission checks; no new episode has dispatched yet.
+
+Recorded the hash-bound operational summary. Next is monitoring the existing controller. Validation, formal evaluation, and required ablation evidence remain outstanding.

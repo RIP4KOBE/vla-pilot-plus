@@ -1,0 +1,3 @@
+Continued from source `1065f381`. One official Codex CPU executor is preparing N32R2 release artifacts; no GPU cohort was launched.
+
+State and operational handoff are recorded. Next: review the release before GPU admission. Validation, formal evaluation, and required ablation evidence remain incomplete.

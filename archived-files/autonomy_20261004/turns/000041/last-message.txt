@@ -1,0 +1,3 @@
+N31 remains active on GPU7 with one verified worker; frozen source `7428ce8` and ledger history are intact.
+
+Results: C0 0/5, Q0 0/5, N31 0/4; task-4 N31 is running. Turn 41’s operational summary is saved. Next: monitor the existing controller. Validation, formal evaluation, and required ablation evidence remain outstanding.

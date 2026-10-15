@@ -1,0 +1,3 @@
+Reconciled the completed CPU worker and recorded the terminal review. G3 is blocked by 45 unmaterialized Git LFS assets; all required payloads are available locally with matching hashes.
+
+State/checkpoint and operational summary now identify the bounded repair. GPU dispatch remains disabled, costs preserved, and the original research goal remains unmet.

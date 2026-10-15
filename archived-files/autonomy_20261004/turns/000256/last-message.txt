@@ -1,0 +1,5 @@
+N32R2 controller 1818171 remains live on source `1065f381`. Frozen hashes and ledger continuity verified; no restart or duplicate dispatch.
+
+Eight valid development outcomes are unsuccessful; task-2 candidate remains pending. Validation, formal, and ablation evidence is incomplete.
+
+Turn 256 operational summary recorded. Next step: monitor the existing controller.

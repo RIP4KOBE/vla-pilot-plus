@@ -1,0 +1,3 @@
+N32R3 runtime and official image-transport checks passed. The diagnostic authentication failure was retained and its launcher corrected.
+
+No GPU cohort was dispatched. State and operational handoff are saved; next is detached production review and release validation. Historical charges and reserves remain intact. The driver continues; the original research goal remains unmet.

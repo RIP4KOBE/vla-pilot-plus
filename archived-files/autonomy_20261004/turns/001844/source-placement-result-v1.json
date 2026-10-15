@@ -1,0 +1,30 @@
+{
+  "schema": "n36-test-evidence-production-binding-placement-result-v1",
+  "at": "2026-10-11T07:47:16.979485+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001844/source-placement-authority-v1.json",
+    "bytes": 1485,
+    "sha256": "aa4600312eb197f4717e9953bd603d4bb57a665af84117b7f0791405f9640daa"
+  },
+  "before": "ea5d7646f1d64531e6aec1f4b7abc5455af93b5a",
+  "after": "808e27f702564fe51db45016e139b68ecb476f8c",
+  "destination": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "test_evidence_commit": "ea5d7646f1d64531e6aec1f4b7abc5455af93b5a",
+  "retained_test_branch": "exp/n36-engineering-adapter-001482",
+  "tracked_clean": true,
+  "output": "HEAD is now at 808e27f Admit exact prospective N36 canonical inventory correction\n",
+  "production_bytes_unchanged": true,
+  "graph": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001841/composition-v6/graph.complete-disabled-v1.json",
+    "bytes": 6767,
+    "sha256": "bc1d26f1ac9e4f4db1f362d716d83ce0516973a714c2731d9856edebba9e1441"
+  },
+  "graph_admission": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001841/composition-v6/graph-admission-result-v1.json",
+    "bytes": 963,
+    "sha256": "696c637ec984293505d36f7d5022b9846ecff156ec2edc43a59328c39b14456b"
+  },
+  "tests_rerun": false,
+  "gpu_dispatches": 0,
+  "release_enabled": false
+}

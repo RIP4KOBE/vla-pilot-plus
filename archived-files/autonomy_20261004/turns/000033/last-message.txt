@@ -1,0 +1,5 @@
+N31 continues on frozen source `7428ce8`. Controller `203563` and GPU7 worker `582309` are verified live; task 4 C0 is running.
+
+Audited Dev results remain C0 0/4, Q0 0/4, N31 0/4. Ledger prefixes are intact; no restart or scientific changes made.
+
+Turn 33 operational summary recorded. Next: monitor the cohort and review terminal audits and promotion gates. Validation, formal, and ablation completion remain unestablished.

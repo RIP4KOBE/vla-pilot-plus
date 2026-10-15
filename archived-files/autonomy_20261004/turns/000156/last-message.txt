@@ -1,0 +1,3 @@
+N32R2 remains live with verified controller/worker identities and unchanged frozen source. Task0 C0 reports failure after 720 steps; audited acceptance is still pending.
+
+Preserved the cohort and ledger history. Recorded turn 156’s operational summary. Next: monitor terminal receipts and reconcile validity/accounting. The original goal remains unproven.

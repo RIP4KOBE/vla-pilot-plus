@@ -1,0 +1,3 @@
+N32’s CPU executor completed successfully. Verified its delivery and 180 passing tests; recorded CPU acceptance and updated the owning checkpoint.
+
+Source and private ledgers remain unchanged. Driver is live; no GPU cohort is active. Next: freeze and validate N32’s prospective release before GPU admission. Validation, formal and ablation evidence remain outstanding.

@@ -1,0 +1,1 @@
+env CUDA_VISIBLE_DEVICES= OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 NUMEXPR_NUM_THREADS=2 VECLIB_MAXIMUM_THREADS=2 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1 taskset -c 0,1 /home/hynx/miniconda3/envs/vla-pilot/bin/python3.12 -m pytest -q -p no:cacheprovider tests/test_n34_source_controller.py

@@ -1,0 +1,21 @@
+{
+  "schema": "n36-engineering-plan-release-provenance-v1",
+  "at": "2026-10-10T19:41:58.847344+00:00",
+  "parent_disabled_plan": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001588/attested-consumer-refresh/engineering-plan.disabled-v1.json",
+    "sha256": "07dcfaa7c757b56b55b560cb42ae175ff3ac43c0532d3d2e156c5cc996f3d936"
+  },
+  "plan": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001597/engineering-plan.frozen-v1.json",
+    "sha256": "841f1ba3598a3f57680be60e1122e991f5fea24d08539988981449b15417f7af"
+  },
+  "changed_fields": [
+    "frozen",
+    "release_enabled",
+    "authority",
+    "b5_review",
+    "phase_authorization.engineering"
+  ],
+  "gpu_dispatch": false,
+  "detached_releases_pending": true
+}

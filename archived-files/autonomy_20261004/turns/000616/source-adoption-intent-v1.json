@@ -1,0 +1,11 @@
+{
+  "schema": "n34-engineering-adoption-intent-v1",
+  "at": "2026-10-08T20:15:30.940756+00:00",
+  "source_before": "3acfda1adea7b4d9880c81dab7e3882f1587d4d0",
+  "candidate": "83b4ceba312835410200713e3d65a03de89f0931",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000615/engineering-review-v1.json",
+    "sha256": "59e9f10f04fe2e40a087d0c3544767bc99e0725d25f290c703d0925625588cc0"
+  },
+  "gpu_dispatch": false
+}

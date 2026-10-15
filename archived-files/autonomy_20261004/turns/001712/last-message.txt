@@ -1,0 +1,3 @@
+Verified authority, live process identities, source commits, and unchanged ledgers. The CPU review emitted a provisional pass but remains live; terminal reconciliation is next.
+
+Saved the operational summary for driver continuation. GPU release remains gated; validation, formal, and ablation completion is still unproven.

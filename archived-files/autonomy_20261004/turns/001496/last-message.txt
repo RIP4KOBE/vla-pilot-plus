@@ -1,0 +1,3 @@
+Verified live reviewer identities, authority, and unchanged private ledgers. The N36 adapter review continues; GPU dispatch remains gated.
+
+Saved hash-bound operational summary for turn 001496. Next: reconcile the review’s terminal report and address bounded findings. Validation, formal, and ablation completion remain unproven.

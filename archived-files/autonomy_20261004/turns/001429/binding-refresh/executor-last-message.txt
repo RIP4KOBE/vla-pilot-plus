@@ -1,0 +1,7 @@
+Prepared disabled bindings and all 40 manifests. Accounting verified: **75.53031173955723 GPUh / 505 attempts**. All 69 artifact hashes passed.
+
+[Report](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001429/binding-refresh/report-v1.md)
+
+Remaining: root controller review/manifest refresh, independent B5, adoption, finite accounting, fresh charged health, and first-C0/G3. Production attestation remains blocked.
+
+No source or ledger changes; no GPU or release. **Score null; goal incomplete.**

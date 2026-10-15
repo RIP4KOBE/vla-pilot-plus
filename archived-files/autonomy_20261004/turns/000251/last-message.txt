@@ -1,0 +1,5 @@
+N32R2 remains active under the verified controller; frozen source and ledger history are preserved.
+
+Task-2 Q0 completed validly but unsuccessfully. Eight development outcomes are valid, all unsuccessful; task-2 N32 remains pending. Validation, formal evaluation, and ablation goals remain unproven.
+
+Turn 251’s operational summary is saved. Next: monitor the existing controller and reconcile the next terminal evidence.

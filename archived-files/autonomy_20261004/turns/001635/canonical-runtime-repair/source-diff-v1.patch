@@ -1,0 +1,278 @@
+diff --git a/configs/qd_ed_final/n36_engineering_r1_spec.disabled.json b/configs/qd_ed_final/n36_engineering_r1_spec.disabled.json
+index c51b68e..78587c6 100644
+--- a/configs/qd_ed_final/n36_engineering_r1_spec.disabled.json
++++ b/configs/qd_ed_final/n36_engineering_r1_spec.disabled.json
+@@ -164,8 +164,8 @@
+     "sha256": "9df1dbbbe985df1d02e88770356b59e47d346a9f546629e0d7262cb9e51ecd15"
+   },
+   "canonical_runtime": {
+-    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001597/runtime.readiness-verified-v1.json",
+-    "sha256": "d68870143e68008352710bec1f97db4fe1a3dae9c77ca2dd0ba6162262a5acfe"
++    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001631/runtime.r1.disabled-v1.json",
++    "sha256": "c8af3302446fff0b03d1942ba52c2e892bcf27c7b9a1676e747028aabbb7732f"
+   },
+   "retained_snapshot": {
+     "dispatched": 507,
+@@ -194,5 +194,37 @@
+     "gpu_healthcheck_inflight": 0
+   },
+   "deployment_source_cwd": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+-  "source_adoption_required": true
++  "source_adoption_required": true,
++  "runtime_binding": {
++    "schema": "n36-r1-authority-bound-runtime-derivation-v1",
++    "repair_authority": {
++      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/authority-v1.json",
++      "sha256": "579d1b44f8a501e9aad152d0b2f53eb014a0682494873002c31ba306b9438593"
++    },
++    "amendment": {
++      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001630/prospective-runtime-binding-amendment-v1.json",
++      "sha256": "b1243b2db16f59b4d3f834acd5bedc270e8e1398413831aafe71f29d9230f6e8"
++    },
++    "preparation": {
++      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001631/runtime-binding-preparation-v1.json",
++      "sha256": "fb59d74f5e1f48e923b2408ab02b39f598a259f856c56ab9d90765993bc5c113"
++    },
++    "historical_specification": {
++      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001617/recovery-implementation/engineering-r1-spec.disabled-v1.json",
++      "sha256": "ccd1991b59cdc30043d6b7061cf4ad73f0ae6c867dd6ae0a9f3e72b1d71d6162"
++    },
++    "runtime_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/runtime.source-bound.disabled-v1.json",
++    "source_record_path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/source-inventory.disabled-v1.json",
++    "source_base": "f256fecedbcf0d47b807aeaa196407cb24933a41",
++    "source_change_allowlist": [
++      "configs/qd_ed_final/n36_engineering_r1_spec.disabled.json",
++      "scripts/qd_ed_n36_engineering_r1.py",
++      "tests/test_n36_engineering_r1.py"
++    ],
++    "mutable_runtime_fields": [
++      "preparation.source",
++      "preparation.source_record"
++    ],
++    "technical_justification": "A static final runtime digest in source would bind a runtime whose source inventory includes that same source digest and commit, creating a cycle. Pin the exact 001631 template and repair authority instead; permit only a complete verified current committed source inventory at fixed prospective paths. Runtime file records are unchanged because these three repair paths are absent from the template files. All non-source preparation fields, dependencies, model/native bytes and false readiness remain exact. This is disabled preparation only; review, B5, adoption and separately released fresh health/episode gates remain required."
++  }
+ }
+diff --git a/scripts/qd_ed_n36_engineering_r1.py b/scripts/qd_ed_n36_engineering_r1.py
+index fa58902..5a11289 100644
+--- a/scripts/qd_ed_n36_engineering_r1.py
++++ b/scripts/qd_ed_n36_engineering_r1.py
+@@ -34,7 +34,7 @@ OWNER_ROUTE_MAPPING = {
+     'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
+     'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
+ HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
+-SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001617/recovery-implementation/engineering-r1-spec.disabled-v1.json', 'sha256': 'ccd1991b59cdc30043d6b7061cf4ad73f0ae6c867dd6ae0a9f3e72b1d71d6162'}
++SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/engineering-r1-spec.prospective-disabled-v1.json', 'sha256': 'f240a88296a6dd3808dbcc78028784edbdc66bf7506f0af4270d6c8e22dd01e4'}
+ AMENDMENT = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json', 'sha256': 'fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba'}
+ IDENTITY = 'N36_ENGINEERING_R1_C0_TASK0_001616'
+ EPISODE_KEY = 'n36_engineering_r1_t00_c0_001616'
+@@ -89,6 +89,56 @@ def specification():
+     return spec
+ 
+ 
++def validate_runtime_binding(plan):
++    """Exact disabled template plus two source fields; no self-hash cycle.
++
++    The fixed prospective paths and template are pinned by SPECIFICATION.
++    Source must equal the complete, committed checkout executing this validator.
++    This check grants neither source adoption nor runtime/dispatch readiness.
++    """
++    spec = specification()
++    policy = spec['runtime_binding']
++    authority = read(policy['repair_authority'])
++    exact(authority['runtime_amendment'], policy['amendment'], 'R1 runtime amendment authority')
++    exact(authority['runtime_preparation'], policy['preparation'], 'R1 runtime preparation authority')
++    amendment = read(policy['amendment'])
++    preparation = read(policy['preparation'])
++    exact(spec['canonical_runtime'], {k: preparation['runtime'][k] for k in ('path', 'sha256')},
++          'R1 canonical runtime template')
++    exact(policy['source_base'], authority['source_base'], 'R1 runtime source base')
++    exact(amendment['source'], policy['source_base'], 'R1 amended source base')
++    reference(plan['runtime'])
++    w.require(plan['runtime']['path'] == policy['runtime_path']
++              and str(Path(policy['runtime_path']).resolve()) == policy['runtime_path'],
++              'R1 canonical runtime reference path')
++    runtime = read(plan['runtime'])
++    template = read(spec['canonical_runtime'])
++    source_ref = reference(runtime['preparation']['source_record'])
++    w.require(source_ref['path'] == policy['source_record_path'], 'R1 exact source record path')
++    source = read(source_ref)
++    exact(source, plan['source'], 'R1 runtime source record binding')
++    exact(source, plan['scientific_source'], 'R1 runtime scientific source binding')
++    root = Path(__file__).resolve().parents[1]
++    exact(sorted(x['path'] for x in source['files']), sorted(b.source_paths(root)),
++          'R1 complete runtime source inventory')
++    b.closure.verify_source(root, source)
++    w.require(subprocess.run(['git', '--no-replace-objects', '-C', str(root),
++                             'merge-base', '--is-ancestor', policy['source_base'], source['commit']],
++                            check=False, capture_output=True).returncode == 0,
++              'R1 runtime source ancestry')
++    changed = subprocess.check_output(['git', '--no-replace-objects', '-C', str(root),
++        'diff', '--name-only', policy['source_base'], source['commit'], '--'], text=True).splitlines()
++    w.require(set(changed) <= set(policy['source_change_allowlist']) <= OPERATIONAL_FILES,
++              'R1 runtime repair source allowlist')
++    # Exact whole-document equality rejects all other changes, including inherited
++    # readiness, file records, provider, model, task, native and preparation fields.
++    template['preparation']['source'] = source['commit']
++    template['preparation']['source_record'] = source_ref
++    exact(runtime, template, 'R1 exact prospective runtime derivation')
++    r.verify_files(runtime['files'], allowed_roots=(runtime['worktree'], runtime['artifact_root']))
++    return runtime
++
++
+ def terminal_parent_prefix():
+     """Read exact bytes, never infer permission by filtering old identities.
+ 
+@@ -219,7 +269,7 @@ def operational_binding(plan):
+ def validate_audit_view(plan, *, require_manifests=True):
+     """Keep all forty scientific rows and gates in a disabled audit-only view."""
+     spec = specification()
+-    exact(plan['runtime'], spec['canonical_runtime'], 'R1 canonical runtime reference')
++    validate_runtime_binding(plan)
+     original_ref = {k: spec['full_audit_view']['immutable_original_plan'][k] for k in ('path', 'sha256')}
+     original = read(original_ref)
+     fields = {'schema', 'original_plan', 'dispatch_authority', 'frozen', 'release_enabled',
+@@ -283,7 +333,7 @@ def validate_plan_shape(plan, *, released=False):
+               and (not released or plan['release_enabled'] is True)
+               and plan['cohort'] == IDENTITY and plan['purpose'] == PURPOSE,
+               'distinct released engineering plan required')
+-    exact(plan['runtime'], specification()['canonical_runtime'], 'R1 canonical runtime reference')
++    validate_runtime_binding(plan)
+     exact(plan['limits'], LIMITS, 'engineering finite limits')
+     exact(plan['episodes'], [row()], 'one engineering episode')
+     exact(plan['worker_contract'], c.WORKER_CONTRACT, 'unchanged worker gates')
+diff --git a/tests/test_n36_engineering_r1.py b/tests/test_n36_engineering_r1.py
+index b14bb39..4dc3a18 100644
+--- a/tests/test_n36_engineering_r1.py
++++ b/tests/test_n36_engineering_r1.py
+@@ -26,7 +26,10 @@ def documents(tmp_path_factory):
+     root = tmp_path_factory.mktemp('r1-disabled')
+     route = e.read(plan['deployment'])
+     route.update(source_cwd=str(e.SOURCE), output_root=str(e.SESSION / 'engineering-executions' / e.EPISODE_KEY))
+-    common = dict(worktree=str(e.SOURCE), runtime=e.specification()['canonical_runtime'],
++    policy = e.specification()['runtime_binding']
++    runtime_ref = {'path': policy['runtime_path'], 'sha256': e.w.sha(policy['runtime_path'])}
++    source = e.read({'path': policy['source_record_path'], 'sha256': e.w.sha(policy['source_record_path'])})
++    common = dict(worktree=str(e.SOURCE), runtime=runtime_ref, source=source, scientific_source=source,
+                   deployment=put(root, 'route', route), scope=put(root, 'scope', e.disabled_scope()))
+     audit.update(common, artifact_root=route['output_root'] + '/audit-only', expected_manifests={})
+     runtime = e.read(audit['runtime'])
+@@ -183,7 +186,7 @@ def test_disabled_and_cross_family_plans_rejected(documents, tmp_path):
+ 
+ 
+ def test_real_dino_consumer_canonical_reference_and_unchanged_bytes():
+-    reference = e.specification()['canonical_runtime']
++    reference = e.read(e.specification()['runtime_binding']['historical_specification'])['canonical_runtime']
+     before = Path(reference['path']).read_bytes()
+     consumer = DinoSources(reference)
+     assert len(consumer.files) == 157
+@@ -231,7 +234,7 @@ def test_parent_source_and_shared_safety_predicates_unchanged():
+     old, new = functions(parent_path), functions(e.__file__)
+     intentional = {'specification', 'validate_audit_view', 'validate_plan_shape', 'validate_authority',
+                    '_journal_suffixes', 'reconcile', 'validate_readiness'}
+-    assert set(old) == set(new) - {'terminal_parent_prefix'}
++    assert set(old) == set(new) - {'terminal_parent_prefix', 'validate_runtime_binding'}
+     for name in old.keys() - intentional:
+         assert new[name] == old[name], name
+     assert e.LIMITS == parent.LIMITS
+@@ -291,3 +294,101 @@ def test_health_alone_does_not_remove_retained_cost_or_allow_second_use(baseline
+     with pytest.raises(ValueError): e.headroom(snap, local, health=True, **kw)
+     with pytest.raises(ValueError): e.headroom(snap, {**local, 'reserved_attempts': 1}, health=False, **kw)
+     with pytest.raises(ValueError): e.headroom(snap, local, health=False, margin=0, protected=kw['protected'])
++
++
++def test_prospective_binding_accepts_exact_committed_source(documents):
++    plan, audit, runtime = documents
++    assert e.validate_runtime_binding(plan) == runtime
++    e.validate_plan_shape(plan)
++    e.validate_audit_view(audit)
++    template = e.read(e.specification()['canonical_runtime'])
++    expected = copy.deepcopy(runtime)
++    for name in ('source', 'source_record'):
++        expected['preparation'][name] = template['preparation'][name]
++    assert expected == template
++    assert runtime['cuda_egl_verified'] is runtime['provider_ready'] is False
++    assert runtime['preparation']['runtime_ready'] is False
++
++
++@pytest.mark.parametrize('mutation', ['runtime_hash', 'unapproved_path', 'source_ref_hash',
++    'source_ref_path', 'source_commit', 'source_file_hash', 'source_file_missing',
++    'runtime_file_hash', 'readiness', 'provider_readiness', 'mapping_readiness',
++    'preparation_readiness', 'extra_field', 'provider', 'authority_hash'])
++def test_prospective_runtime_mutations_rejected(documents, tmp_path, monkeypatch, mutation):
++    plan, _, runtime = copy.deepcopy(documents)
++    spec = e.specification()
++    policy = spec['runtime_binding']
++    # Test-only fixed paths: production authority/template validators stay active.
++    policy['runtime_path'] = str(tmp_path / 'runtime.json')
++    policy['source_record_path'] = str(tmp_path / 'source.json')
++    source = copy.deepcopy(plan['source'])
++    if mutation == 'source_commit': source['commit'] = '0' * 40
++    if mutation == 'source_file_hash': source['files'][0]['sha256'] = '0' * 64
++    if mutation == 'source_file_missing': source['files'].pop()
++    source_ref = put(tmp_path, 'source', source)
++    plan['source'] = plan['scientific_source'] = source
++    runtime['preparation']['source'] = source['commit']
++    runtime['preparation']['source_record'] = source_ref
++    if mutation == 'source_ref_hash': source_ref['sha256'] = '0' * 64
++    if mutation == 'source_ref_path': source_ref['path'] = '/unapproved-source.json'
++    if mutation == 'runtime_file_hash': runtime['files'][0]['sha256'] = '0' * 64
++    if mutation == 'readiness': runtime['cuda_egl_verified'] = True
++    if mutation == 'provider_readiness': runtime['provider_ready'] = True
++    if mutation == 'mapping_readiness': runtime['gpu_mapping']['cuda_egl_verified'] = True
++    if mutation == 'preparation_readiness': runtime['preparation']['runtime_ready'] = True
++    if mutation == 'extra_field': runtime['unapproved'] = True
++    if mutation == 'provider': runtime['frozen_stage_provider']['backend'] = 'unapproved'
++    if mutation == 'authority_hash': policy['repair_authority']['sha256'] = '0' * 64
++    plan['runtime'] = put(tmp_path, 'runtime', runtime)
++    if mutation == 'runtime_hash': plan['runtime']['sha256'] = '0' * 64
++    if mutation == 'unapproved_path': plan['runtime'] = put(tmp_path, 'other', runtime)
++    monkeypatch.setattr(e, 'SPECIFICATION', put(tmp_path, 'spec', spec))
++    with pytest.raises(ValueError): e.validate_runtime_binding(plan)
++
++
++def test_prospective_spec_preserves_all_other_contract_fields():
++    new = e.specification()
++    old = e.read(new['runtime_binding']['historical_specification'])
++    assert {k: v for k, v in new.items() if k not in ('runtime_binding', 'canonical_runtime')} == {
++        k: v for k, v in old.items() if k != 'canonical_runtime'}
++    assert json.loads(Path('configs/qd_ed_final/n36_engineering_r1_spec.disabled.json').read_text()) == new
++
++
++def test_altered_local_source_file_rejected(documents):
++    path = Path(e.__file__).resolve().parents[1] / 'configs/qd_ed_final/n36_engineering_r1_spec.disabled.json'
++    before = path.read_bytes()
++    try:
++        path.write_bytes(before + b'\n')
++        with pytest.raises(ValueError, match='uncommitted source bytes'):
++            e.validate_runtime_binding(documents[0])
++    finally:
++        path.write_bytes(before)
++
++
++def test_enabled_prospective_plan_without_separate_gates_fails(documents, tmp_path):
++    plan, _, _ = copy.deepcopy(documents)
++    plan.update(frozen=True, release_enabled=True)
++    plan['phase_authorization']['engineering'] = True
++    # Shape alone is not approval. Both real release entrypoints must reject it.
++    e.validate_plan_shape(plan, released=True)
++    plan_ref = put(tmp_path, 'enabled-without-authority', plan)
++    missing_release = put(tmp_path, 'no-release', {'approved': False})
++    for validator in (e.validate_health_release, e.validate_release):
++        with pytest.raises(ValueError, match='independent engineering B5'):
++            validator(plan_ref, missing_release)
++
++
++def test_stale_readiness_source_rejected(documents, tmp_path, monkeypatch):
++    plan, _, runtime = documents
++    plan_ref = put(tmp_path, 'readiness-plan', plan)
++    health_ref = put(tmp_path, 'health-release-fixture', {'disabled_fixture': True})
++    output = Path(plan['artifact_root']) / 'healthchecks' / e.HEALTH_ID
++    terminal = dict(output_dir=str(output), plan=plan_ref, release=health_ref,
++                    source_commit='0' * 40, runtime=plan['runtime'], event='completed',
++                    provider_verified=True)
++    terminal_ref = {'path': str(output / 'healthcheck-result.json'), 'sha256': '0' * 64}
++    original_read = e.read
++    monkeypatch.setattr(e, 'validate_health_release', lambda *a: (plan, runtime, {}))
++    monkeypatch.setattr(e, 'read', lambda ref: terminal if ref == terminal_ref else original_read(ref))
++    with pytest.raises(ValueError, match='terminal readiness binding'):
++        e.validate_readiness(plan_ref, {'readiness': {'health_release': health_ref, 'terminal': terminal_ref}}, resources=[])

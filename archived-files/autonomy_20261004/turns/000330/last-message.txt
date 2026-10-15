@@ -1,0 +1,3 @@
+N32R2 controller remains live with frozen source and ledger history intact. Task 4 C0 settled as valid, success=false. No duplicate dispatch or scientific changes.
+
+Operational summary saved for turn 330. Next: monitor cohort progression. Validation, formal evaluation and required ablation evidence remain outstanding.

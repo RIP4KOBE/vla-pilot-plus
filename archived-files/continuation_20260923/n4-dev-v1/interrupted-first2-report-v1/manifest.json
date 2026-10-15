@@ -1,0 +1,75 @@
+{
+  "attempts": [
+    {
+      "audit": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t00_c0_20260924__abc31327e3aa/eds_eval/decision-evidence-audit.json",
+        "sha256": "a945c3e849581ca341db78a21924dc6c82131c77e06e32b4512b271e4cf68ac6"
+      },
+      "compute": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t00_c0_20260924__abc31327e3aa/eds_eval/episode_compute.jsonl",
+        "sha256": "264c9e9e3f47e89fd8be48f3f8c14325b8dddd459c153c4f7dffa70cede2dc6d"
+      },
+      "metrics": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t00_c0_20260924__abc31327e3aa/eds_eval/eds_metrics.jsonl",
+        "sha256": "dc56c5d2e4b3abe464c89754abb8ff7e6cf1252c89028b874370bff78ee3855e"
+      },
+      "terminal": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t00_c0_20260924__abc31327e3aa/attempt-result.json",
+        "sha256": "8218be28325b5d072b30daaef6c7c51b9548be91c5dd5b29f61eeb68c185e9f1"
+      }
+    },
+    {
+      "audit": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t00_q0_20260924__a3d6be3dbacc/eds_eval/decision-evidence-audit.json",
+        "sha256": "eae974b6f5ac4d169a7a4e1e404c14b90e5cc31d5551187217c68e48b1966460"
+      },
+      "compute": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t00_q0_20260924__a3d6be3dbacc/eds_eval/episode_compute.jsonl",
+        "sha256": "e54098d8640e59cfabc7486571b2cbf67895b06de4ee4fadf727bb646027eeea"
+      },
+      "metrics": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t00_q0_20260924__a3d6be3dbacc/eds_eval/eds_metrics.jsonl",
+        "sha256": "b8701ce4d9ddc6c9c9a30094bfa501881155e4dc999e7dca82705edb4d803adc"
+      },
+      "terminal": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4_dev_t00_q0_20260924__a3d6be3dbacc/attempt-result.json",
+        "sha256": "dbe306f82fb6a73aff3c309155c9b507999eb9a925161174e9623356c71bdd11"
+      }
+    }
+  ],
+  "authorization": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/interrupted-first2-report-v1/authorization.json",
+    "sha256": "33e0542ba70af03b238923e0bda4552b2646253938d00d3312721d96cbab5446"
+  },
+  "base_plan": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/plan.frozen.json",
+    "sha256": "8f9c058cd0e87da1ba8a108c1d778b6da445bba5a87b5c212351d7145770c5ed"
+  },
+  "health_resources": [
+    {
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_egl__060fecd66f77",
+      "scope": "reused_prior",
+      "terminal": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_egl__060fecd66f77/healthcheck-result.json",
+        "sha256": "e8385096b29a8629d579514b0e6e7249b2bef14fcf353e41ccc150454964a913"
+      }
+    },
+    {
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287",
+      "scope": "reused_prior",
+      "terminal": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/freshboot-model-first/rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287/healthcheck-result.json",
+        "sha256": "c510a6e5c6a3735612d93cc576f9b61670bac6f25c88a17edecd2b4a8c5fe5e5"
+      }
+    }
+  ],
+  "input_scope_complete": true,
+  "journal_excerpt": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/interrupted-first2-report-v1/journal-excerpt.json",
+    "sha256": "62b40baf5055e64f238db10bee2eafb41bf909246cd50f64281c43cb9b3560bc"
+  },
+  "plan_revisions": [],
+  "protocol_sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2",
+  "schema": "qd-ed-n4-report-input-v1",
+  "script_sha256": "d26769d73e43e6b10b8171f6930604bc510d15b26174ca3a767bcdf84a72c2fb"
+}

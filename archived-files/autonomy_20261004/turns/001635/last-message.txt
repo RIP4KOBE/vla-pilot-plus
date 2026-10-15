@@ -1,0 +1,5 @@
+Continuation recorded. One CPU-only executor is repairing the runtime binding; its verified live handles are persisted for monitoring.
+
+No GPU work was dispatched. Ledgers and protected reserves remain unchanged. Validation, formal and ablation evidence is still incomplete.
+
+Operational summary saved under turn `001635`; next step is monitoring the executor and reviewing its repair.

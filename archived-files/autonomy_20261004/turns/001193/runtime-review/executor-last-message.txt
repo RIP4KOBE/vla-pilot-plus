@@ -1,0 +1,5 @@
+CPU runtime review: **PASS within scope**. No concrete predispatch source/config defects found. Release remains disabled; root readiness/accounting and RT-03/04/05 obligations remain open.
+
+Reports: [JSON](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001193/runtime-review/report-v1.json) · [Markdown](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001193/runtime-review/report-v1.md)
+
+Stopped after reporting.

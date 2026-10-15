@@ -1,0 +1,3 @@
+N36R1 remains running: controller 391755, runner 391766, worker 396903 have verified identities. Frozen records and ledger prefixes are intact.
+
+First C0 development outcome and audits remain pending. Saved turn 1237’s hash-bound operational summary. Next step is continued monitoring; validation, formal evaluation and required ablations remain outstanding.

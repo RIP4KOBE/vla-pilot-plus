@@ -1,0 +1,53 @@
+{
+  "schema": "n36r2-private-routing-preparation-v1",
+  "release_enabled": false,
+  "source_cwd": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r2_alias_recovery_001250/implementation_worktree",
+  "owner_root": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree",
+  "physical_gpu": 7,
+  "gpu_uuid": "GPU-48473162-9548-1a19-04aa-ea86c5349187",
+  "state": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/research-state.yaml",
+  "ledgers": {
+    "attempt-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "bytes": 7537764,
+      "sha256": "32db62bfda1e6da93aac4bdce85d44881048f0ce455203e68d7e06bdb3e6dbff"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "bytes": 71240,
+      "sha256": "b4df8fb3c8e45bbe24e560e55262819430d0c5a4da9754f09062d59fdb480ff6"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    }
+  },
+  "locks": [
+    "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/qd-ed-runner.lock",
+    "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/qd-ed-state.lock"
+  ],
+  "operation_lock_order": "runner nonblocking then state; no locks acquired in this task",
+  "cuda_egl": {
+    "physical_gpu": 7,
+    "uuid": "GPU-48473162-9548-1a19-04aa-ea86c5349187",
+    "logical_device": "cuda:0",
+    "egl_device_index": 4,
+    "independently_confirmed_now": false
+  },
+  "provider": "current official gpt-6-astra account via existing codex_cli only; no provider/login/network work in preparation",
+  "import_policy": "source-only bootstrap -I -S -B; ignores inherited PYTHONPATH; explicit isolated source and three vendored package roots plus interpreter paths only; no site startup/.pth; live source attestation rejects resolved search entries outside source/interpreter prefix; no adjacent checkout paths",
+  "receipt_policy": {
+    "actual_worker_receipts_exist": false,
+    "preflight_is_worker_evidence": false,
+    "before": "In actual admitted worker, before Main, capture process/context/runtime_closure bound runtime, loaded source, source-execution and native-build observations using exclusive create + fsync + read-only mode. Hash-bind retained before file in final worker receipt.",
+    "after": "Same PID/boot_id/start ticks, after Main and native audits, capture separate after file once; parent hashes files and checks exact embedded observations, inventories, generated-runtime ownership, CUDA UUID, controller instances, all native gates and before/after continuity. Missing/partial/tampered receipt yields INVALID and retains charge.",
+    "immutability_limit": "Exclusive create and read-only mode prevent normal overwrite; SHA-256 references detect later changes. This is hash-bound retention, not filesystem WORM or protection against a privileged malicious writer."
+  },
+  "STOP_paths": [
+    "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/STOP",
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/STOP"
+  ],
+  "deadline": "2026-10-11T11:13:13Z",
+  "readiness": "Future independent release must refresh source/runtime reviews and device/provider/accounting/STOP/time evidence. Historical booleans and CPU readiness are not production evidence."
+}

@@ -1,0 +1,3 @@
+The existing N36 CPU repair executor remains live and verified. Ledger history is unchanged; no duplicate process or GPU run was launched.
+
+Turn 1618’s hash-bound operational summary is recorded. Next: reconcile the repair and focused tests, then obtain independent review. Validation, formal evaluation, and required ablations remain incomplete.

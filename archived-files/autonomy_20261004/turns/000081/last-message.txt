@@ -1,0 +1,5 @@
+Continued the study. N32’s bounded CPU release-preparation executor is running (PID 1003500); no GPU cohort was dispatched. Ledger history and protected reserves remain intact.
+
+Next: review its delivery before freezing the Dev release. Validation, formal and ablation evidence remain outstanding.
+
+[Operational summary](../autonomy_20261004/turns/000081/operational-summary.json)

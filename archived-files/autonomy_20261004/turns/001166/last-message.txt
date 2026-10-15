@@ -1,0 +1,3 @@
+N36’s CPU implementation exited normally. Verified commit `e7cdf2c`, artifact hashes, test records, and unchanged private ledgers; recorded the reconciliation in state, checkpoint, and tree.
+
+No GPU controller is active. Next: independent source, native-audit, and controller review before adoption and execution release. Validation, formal, and ablation evidence remain outstanding.

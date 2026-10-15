@@ -1,0 +1,3 @@
+Reconciled the completed N36 CPU graph build and verified 84 artifacts. Source and private ledgers remain unchanged; no GPU cohort is running.
+
+Saved the operational summary and updated the owning checkpoint. Next is independent B5 review, then accounting adoption and fresh readiness. Validation, formal evaluation and required ablation evidence remain incomplete.

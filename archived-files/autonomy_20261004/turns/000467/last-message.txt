@@ -1,0 +1,3 @@
+Adopted reviewed operational repair `04d1255` and reconciled owning state/checkpoint. Scientific code and all 438 charged attempts remain preserved.
+
+Next: fresh source-continuity review, 16 manifests and full release validation before GPU dispatch. Completion evidence remains unmet; the local driver continues.

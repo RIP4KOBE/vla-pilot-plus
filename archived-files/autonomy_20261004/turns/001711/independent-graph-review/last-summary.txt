@@ -1,0 +1,3 @@
+PASS_STATIC_GRAPH_REVIEW_ROOT_ATTESTATION_PENDING
+Exact d3225489 graph and static controller semantics support owning-root static attestation. Unmodified preparation.verify_graph rejects the expected missing ROOT_REVIEWED controller evidence. No genuine graph defect found in bounded scope. Root acceptance, refreshed complete-graph pass and all measurement/release gates remain pending. GPU/readiness/production eligibility remain false. Source unchanged. This is not scientific success evidence.
+Review SHA256: f3ce106ee0a31ce0aede68594d340e196bd486208424f2f91ed1131a5cd46541

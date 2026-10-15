@@ -1,0 +1,26 @@
+{
+  "schema": "n34r2-source-adoption-v1",
+  "at": "2026-10-08T20:58:37.168233+00:00",
+  "source_before": "3cb1f736ceb42acde2e40b1e7f2c22b0f8de9df7",
+  "candidate": "82fe104752fa89d56501bbc78bae856e6bd6ad8a",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000627/engineering-review-v1.json",
+    "sha256": "9476d47b226d8fde73d2fa44c26d9ffe5ac2d953cafb7a3241feb921077e1d2e"
+  },
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6672888,
+      "sha256": "0506db74684e6fa825a16dc04eb86a3d6d2b06e38f4ce93e2539e6b7413bac17"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    }
+  },
+  "gpu_dispatch": false,
+  "scientific_promotion": false
+}

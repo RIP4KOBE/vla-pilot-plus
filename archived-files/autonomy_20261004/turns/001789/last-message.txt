@@ -1,0 +1,3 @@
+Continued monitoring N36 readiness on source `a5b32cd`. Controller `3516667` and wrapper `3516666` remain identity-verified and live; ledger history is preserved.
+
+Saved the hash-bound turn summary and checkpoint. Next: reconcile the measurement’s terminal evidence and costs. Validation, formal evaluation, and required ablations remain incomplete.

@@ -1,0 +1,3 @@
+N31 closed at its frozen futility gate: C0, Q0, and N31 each scored 0/6. Diagnosis found 32 changed proposals and 12 decisions selecting proposal content; physical capture remains unresolved.
+
+Source `7428ce8` and all charges are preserved. No GPU worker remains; the driver is active. The hash-bound operational summary records the next bounded native-evidence review. Validation, formal evaluation, and required ablations remain unmet.

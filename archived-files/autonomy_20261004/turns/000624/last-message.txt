@@ -1,0 +1,3 @@
+Reconciled N34R1’s invalid stop and preserved all charges: 444 attempts, 63.327674 GPU-hours. No study worker remains live.
+
+CPU diagnosis confirmed missing Hydra imports in the frozen runtime inventory. Recorded the prospective repair and continuation handoff; source and scientific gates remain unchanged. Validation, formal evaluation and ablation evidence remain incomplete.

@@ -1,0 +1,3 @@
+Verified live identities, authority hashes, and unchanged ledgers. Recorded a fresh-measurement recovery plan that preserves expiry checks, prior charges, and frozen source.
+
+GPU dispatch remains blocked pending production admission. Validation, formal evaluation, and required ablations remain incomplete. The driver handoff is saved in turn 001858’s operational summary.

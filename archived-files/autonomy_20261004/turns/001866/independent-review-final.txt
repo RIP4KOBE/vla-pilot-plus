@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "scope": "Readiness-only release and accounting review; no adoption or dispatch.",
+  "hash_base": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001866",
+  "reviewed_sha256": {
+    "release-validation-v1.json": "adf24ccf44c72f61f2439d7bc262348eaa0d0093978719df294427d20018ab8e",
+    "prospective-arithmetic-v1.json": "e64747f90c6a4becc5b74e6c69538a4f526be46a8bf2b495ff1b6020320eb1cf",
+    "accounting-reconciliation-v1.json": "0aae45dfa5954261833426e90689f9a7890efcd074d104bb6c262daae0e9ab30",
+    "accounting-authority-v1.json": "91dcc9f25edcf83f3ceb0346110aa93a32bca3e69f4e21ecc335de2e7d77f3da",
+    "measurement-root-review-v1.json": "579eb0f6ada2a3c991df5b971e224c5a10601a3eacb48658c3233aaf03c123fd",
+    "accounting-root-review-v1.json": "f79a92c5d435289c51672989eb9aecaa005f3fd1fa94881622aa04d4854aeaa3",
+    "../001859/successor-disabled-composition/pending-release.json": "2a5ce6fe6b4423d21246f2af341325acd1d67104c7868e2c96494dec41796ffb",
+    "../001864/canonical-v2/graph.complete-disabled-v1.json": "8406676048d2f5321f1e58a04f78499f1e223dbd2537407620a22d71168f0b12",
+    "../001864/canonical-v2/audit-result-v1.json": "d88b9d56d2a04abd860616f5a7da481c69a41ebcb6187704e4f6c9fc3159ad14"
+  },
+  "checks": {
+    "references": "24 direct reference hashes matched; detached root reviews and release/accounting bindings matched.",
+    "deadline": "2026-10-11T11:13:13Z was future at 2026-10-11T09:34:49.639653Z, with 5903 seconds remaining. Authority windows matched; STOP paths absent.",
+    "limits": "600 GPU seconds, exactly 1 provider call, zero episode attempts, zero health invocations, zero automatic recoveries.",
+    "fresh_resource": "n36_readiness_preparation_recovery_001858 absent from all four complete owning journals; reconciliation prefix hashes matched.",
+    "reconciliation": "Only recovery and health subtotals increased by 270.01767802238464/3600 = 0.07500491056177351. Total remained 75.89305892427247; all other snapshot fields unchanged. Exact completed terminal matched both journals.",
+    "historical_accounting": "Four previous terminal charges sum to 0.25041189822885723 hours and reconcile the retained authority total to the current total without replay.",
+    "prospective_arithmetic": "Protected 36.24082400243081 + retained margin 0.23357169027962 + charged 75.89305892427247 + reservation 0.16666666666666666 = 112.53412128364957 hours. Effective cap and remaining 108.54992564304881 agree within floating-point rounding.",
+    "source": "Engineering HEAD is 808e27f702564fe51db45016e139b68ecb476f8c with no tracked differences. Accepted graph retains scientific anchor 1065f38122379a515b60a9a424f574330405b66f.",
+    "graph": "Accepted existing PASS_DISABLED_GRAPH_ADMISSION_ALL41; release plan/runtime/specification bindings match."
+  },
+  "blockers": [],
+  "scope_limitations": [
+    "No full graph audit rerun, recursive provenance rebuild, or scientific-equivalence re-audit.",
+    "No GPU/provider calls, files written, locks, delegation, or protected outcome inspection.",
+    "Parent non-adoption is supplied context; live adoption state was not independently inspected.",
+    "No claim of native readiness or scientific success."
+  ]
+}

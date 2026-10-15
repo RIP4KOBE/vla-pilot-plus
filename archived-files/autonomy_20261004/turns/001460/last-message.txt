@@ -1,0 +1,3 @@
+N36R3 stopped invalid during DINOv2 import auditing. All cohort processes have exited; no replay occurred.
+
+Reconciled 506 attempts and 75.606163 GPU-hours, preserving charges and reserves. Saved the operational handoff. Next: bounded CPU repair with provenance tests and independent review. Validation, formal evaluation and ablation completion remain unevidenced.

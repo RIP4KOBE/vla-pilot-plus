@@ -1,0 +1,1025 @@
+diff --git a/docs/n36-leaf-15-6-engineering-repair.md b/docs/n36-leaf-15-6-engineering-repair.md
+new file mode 100644
+index 0000000..dcbcb70
+--- /dev/null
++++ b/docs/n36-leaf-15-6-engineering-repair.md
+@@ -0,0 +1,49 @@
++# Leaf 15.6: canonical STOP and frozen executable alias proof
++
++This change is CPU engineering only. N36R2 release and admission remain disabled.
++It grants no GPU, provider, simulator, source-adoption or execution authority.
++
++`qd_ed_n36_stop.py` pins the exact lexical owner and relocated data STOP paths
++from the explicit engineering contract, independently of checkout resolution.
++The source-bound `n36-canonical-stop-v1` record identifies owner source
++`ca4e6a96d049c7ebb1f302d755883388ddbfdbd8` and the unchanged deadline
++`2026-10-11T11:13:13Z`. It is a veto binding, not an execution approval.
++New draft/release plans must match this record and separately pass supported
++checkout-layout validation. Callers cannot select a different pair.
++
++The shared lstat guard rejects every entry (including dangling symlinks) and
++all errors except missing entries. Admission, healthcheck reservation/start,
++post-reservation, final worker launch, worker entry and pre-Main use it.
++Next-dispatch goes through the same admission guard. Episode boundaries retain
++1840 seconds of headroom; healthchecks require that plus their complete probe
++and cleanup reservation. Canonical deadline clipping cannot be extended by a
++caller. An entry may race a filesystem check; the child rechecks before Main.
++STOP is never polled to signal an admitted episode. Settlement/context receipt
++verification remains available after STOP and deadline expiry; unknown live
++handles retain their reservations and block subsequent dispatch.
++
++`n36-source-execution-v2` adds an interpreter-bound, process/context/phase-bound
++proof for exactly `os.path -> posixpath`. The producer checks the live object
++chain, canonical name/spec/frozen loader, `_imp.is_frozen`, and both exact
++inventory file/hash records. The parent validates the ordinary runtime receipt,
++its external binding, the execution binding, the interpreter, canonical frozen
++membership and both inventory records before allowing this single exemption.
++No arbitrary name, path-only or equal-hash exemption was added. Existing
++compiled/startup checks and generated/native/_cyutility audit code remain.
++Controller-only attestations without external bindings cannot grant the alias
++exemption during parent runtime-receipt verification.
++
++Old v1 execution receipts and old plans are not rewritten or upgraded in place.
++The new CPU diagnostic aligns process start ticks with production's string
++representation and checks the pinned STOP pair/deadline. Its snapshots remain
++`after=False`; the fresh test receipt uses a synthetic CPU context and partial
++inventory. Neither is post-episode coverage or a production source freeze.
++
++Follow-ups remain: independent source review; complete committed scientific and
++engineering source freeze and all dependent manifests; immutable isolated
++runtime/controller checkout composition; complete worker receipts including
++post-episode required modules; and separately authorized finite N36R2 admission,
++accounting, resource routing and detached root approval. Other frozen aliases
++receive no exemption here and must still satisfy existing executable coverage.
++Preserve both old INVALID charges and the retained 504 dispatches /
++75.49265038509455 GPUh. No scientific promotion or completion is claimed.
+diff --git a/scripts/qd_ed_n36_accounting.py b/scripts/qd_ed_n36_accounting.py
+index aa0434e..efb58a4 100644
+--- a/scripts/qd_ed_n36_accounting.py
++++ b/scripts/qd_ed_n36_accounting.py
+@@ -100,11 +100,7 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
+             reservation=headroom(snap,cohort,retained_margin_hours=snap['n36_reservation']['retained_margin_gpu_hours'],
+                 protected_hours=snap['n36_reservation']['protected_gpu_hours'],healthcheck=True,need=need)
+             admission=adapter.device_check()
+-            now=dt.datetime.now(dt.timezone.utc)
+-            end=min(dt.datetime.fromisoformat(x.replace('Z','+00:00')) for x in
+-                    (c.DEADLINE,authority['coordinator_ends_at'],authority['weekly_window']['ends_at']))
+-            stop=Path(plan['stop_path'])
+-            w.require(not stop.exists() and not stop.is_symlink() and (end-now).total_seconds()>=1840+need,'STOP/deadline before healthcheck reservation')
++            c.launch_guard(plan, authority, need=1840+need)
+             record={**c.operational_binding(plan), 'resource_id':resource_id,'event':'reserved','cohort':c.cohort(plan),
+                 'kind':('n36_resource_preparation_v1' if c.cohort(plan)==c.COHORT else 'n36r1_resource_preparation_v1'),'plan':plan_ref,'release':release_ref,
+                 'source_commit':plan['source']['commit'],'runtime':plan['runtime'],
+diff --git a/scripts/qd_ed_n36_contract.py b/scripts/qd_ed_n36_contract.py
+index c351cff..4e51379 100644
+--- a/scripts/qd_ed_n36_contract.py
++++ b/scripts/qd_ed_n36_contract.py
+@@ -5,6 +5,7 @@ import json
+ import math
+ from pathlib import Path
+ from scripts import qd_ed_n23_worker as w
++from scripts import qd_ed_n36_stop as stop
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+ COHORT = 'N36_NONPROGRESS_TANGENT_DEV_001147'
+@@ -49,6 +50,19 @@ def stop_path(root=ROOT):
+     return str(session / 'autonomy_20261004/STOP')
+ 
+ 
++def validate_stop_binding(plan):
++    w.require(plan.get('stop_authority') == stop.binding(), 'canonical STOP authority differs')
++    w.require(plan['stop_path'] == stop_path(plan['worktree'])
++              and plan['stop_path'] in stop.STOP_PATHS, 'canonical STOP layout differs')
++
++
++def launch_guard(plan, authority, *, need=1840, now=None):
++    validate_stop_binding(plan)
++    end = min(dt.datetime.fromisoformat(value.replace('Z', '+00:00')) for value in
++              (authority['coordinator_ends_at'], authority['weekly_window']['ends_at'])).isoformat()
++    stop.check(now=now, ends_at=end, need=need)
++
++
+ def expected_rows(root=ROOT, *, cohort=COHORT):
+     w.require(cohort in IDENTITIES, 'unsupported N36 cohort')
+     prefix, suffix = IDENTITIES[cohort]
+@@ -126,6 +140,7 @@ def validate_draft(plan):
+               and all(plan[k] is None for k in ('root_review', 'authority', 'execution_release'))
+               and (cohort(plan) != COHORT or plan['protocol'] is None),
+               'draft cannot claim authority/release')
++    validate_stop_binding(plan)
+     operational_binding(plan)
+     if cohort(plan) == RECOVERY_COHORT:
+         from scripts.qd_ed_n36_recovery import validate_protocol
+@@ -154,7 +169,8 @@ def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
+     and charges. Exact owning ledger-to-snapshot arithmetic is a root prerequisite.
+     """
+     w.require(cohort != DRAFT_RECOVERY_COHORT, 'N36R2 draft only; admission disabled')
+-    w.require(not Path(stop_path).exists() and not Path(stop_path).is_symlink(), 'STOP pre-dispatch')
++    w.require(stop_path in stop.STOP_PATHS, 'canonical STOP path differs')
++    stop.check(now=now, ends_at=allowance['authority_ends_at'], need=1840)
+     w.require(now.tzinfo is not None, 'timezone-aware admission time')
+     ends = dt.datetime.fromisoformat(allowance['authority_ends_at'].replace('Z', '+00:00'))
+     starts = dt.datetime.fromisoformat(allowance['authority_starts_at'].replace('Z', '+00:00'))
+diff --git a/scripts/qd_ed_n36_cpu_receipt.py b/scripts/qd_ed_n36_cpu_receipt.py
+index 7ba1cbe..3330e0c 100644
+--- a/scripts/qd_ed_n36_cpu_receipt.py
++++ b/scripts/qd_ed_n36_cpu_receipt.py
+@@ -12,6 +12,7 @@ import sys
+ 
+ def main():
+     from scripts import qd_ed_n23_worker as w
++    from scripts import qd_ed_n36_stop as stop
+     context_ref = {'path': sys.argv[1], 'sha256': sys.argv[2]}
+     context = w.read_ref(context_ref)
+ 
+@@ -19,10 +20,9 @@ def main():
+         w.require(os.environ.get('CUDA_VISIBLE_DEVICES') == ''
+                   and len(os.sched_getaffinity(0)) <= 2, 'bounded CPU diagnostic only')
+         w.require(context['release_enabled'] is False, 'diagnostic has no release')
+-        w.require(len(context['stop_paths']) == 2
+-                  and all(not os.path.lexists(p) for p in context['stop_paths']), 'STOP diagnostic')
+-        w.require(dt.datetime.now(dt.timezone.utc) < dt.datetime.fromisoformat(
+-            context['deadline'].replace('Z', '+00:00')), 'diagnostic deadline')
++        w.require(context['stop_paths'] == list(stop.STOP_PATHS)
++                  and context['deadline'] == stop.DEADLINE, 'canonical diagnostic STOP/deadline')
++        stop.check()
+ 
+     guard()
+     from scripts import qd_ed_n36_worker as worker, qd_ed_n36_source as execution
+@@ -33,7 +33,7 @@ def main():
+     guard()
+     # Only native CPU package imports. No simulator construction or model call.
+     process = {'pid': os.getpid(),
+-               'proc_start_ticks': int(Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19]),
++               'proc_start_ticks': Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19],
+                'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
+     frozen = w.read_ref(context['runtime_closure'])
+     source = w.read_ref(context['source'])
+@@ -45,7 +45,7 @@ def main():
+         result[phase] = closure.attest_runtime_receipt(frozen, frozen['runtime'],
+                                                       binding=binding, after=False)
+         result['loaded_' + phase] = worker.attest_worker_loaded(context['worktree'], source)
+-        result['execution_' + phase] = execution.attest(context['worktree'], source, frozen)
++        result['execution_' + phase] = execution.attest(context['worktree'], source, frozen, binding=binding)
+     guard()
+     destination = Path(context['output'])
+     w.require(not destination.exists(), 'immutable CPU diagnostic output')
+diff --git a/scripts/qd_ed_n36_healthcheck.py b/scripts/qd_ed_n36_healthcheck.py
+index 450d5ef..a4aedf2 100644
+--- a/scripts/qd_ed_n36_healthcheck.py
++++ b/scripts/qd_ed_n36_healthcheck.py
+@@ -55,12 +55,8 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
+         r.owned(output, plan['artifact_root'])
+         w.require(not output.exists() and not output.is_symlink(), 'healthcheck output exists')
+         output.mkdir(parents=True)
+-        end = min(dt.datetime.fromisoformat(x.replace('Z','+00:00')) for x in
+-                  (c.DEADLINE, authority['coordinator_ends_at'], authority['weekly_window']['ends_at']))
+         def before_start():
+-            stop=Path(plan['stop_path'])
+-            w.require(not stop.exists() and not stop.is_symlink()
+-                      and dt.datetime.now(dt.timezone.utc)<end, 'STOP/deadline before healthcheck start')
++            c.launch_guard(plan, authority, need=1840 + record['reserved_gpu_seconds'])
+         process = identity = None
+         started = finished = None
+         event, result = 'aborted', {}
+diff --git a/scripts/qd_ed_n36_prepare.py b/scripts/qd_ed_n36_prepare.py
+index f40fce3..3243e7e 100644
+--- a/scripts/qd_ed_n36_prepare.py
++++ b/scripts/qd_ed_n36_prepare.py
+@@ -27,7 +27,7 @@ def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics
+             'worktree': str(root), 'artifact_root': str(directory / 'prospective-artifacts'),
+             'source': source, 'scientific_source': scientific_source, 'runtime': runtime_ref,
+             'native_build':native_build_ref,'runtime_closure': runtime_closure_ref, 'controller_semantics': controller_semantics_ref, 'episodes': c.expected_rows(root),
+-            'limits': c.LIMITS, 'worker_contract': c.WORKER_CONTRACT, 'deadline': c.DEADLINE, 'stop_path': c.stop_path(root),
++            'limits': c.LIMITS, 'worker_contract': c.WORKER_CONTRACT, 'deadline': c.DEADLINE, 'stop_path': c.stop_path(root), 'stop_authority': c.stop.binding(),
+             'root_review': None, 'protocol': None, 'authority': None, 'execution_release': None,
+             'phase_authorization': {'dev': False, 'validation': False, 'formal': False},
+             'expected_manifests': {}, 'http_counters': 'Unknown'}
+diff --git a/scripts/qd_ed_n36_release.py b/scripts/qd_ed_n36_release.py
+index 9ce8954..d8341d5 100644
+--- a/scripts/qd_ed_n36_release.py
++++ b/scripts/qd_ed_n36_release.py
+@@ -20,6 +20,7 @@ def validate_plan(plan):
+               and plan['phase_authorization'] == {'dev': True, 'validation': False, 'formal': False}
+               and not any(k in plan for k in ('root_review', 'execution_release'))
+               and plan['attempt_identity'] == 'episode_key', 'released plan contract')
++    c.validate_stop_binding(plan)
+     c.operational_binding(plan)
+     w.require(set(plan['expected_manifests']) == {x['episode_key'] for x in plan['episodes']}, 'all40 manifests')
+ 
+@@ -222,5 +223,6 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
+                  'protected_attempts_remaining': sum(max(0, caps['buckets'][k] - snap['by_bucket'][k]) for k in ('validation', 'formal')),
+                  'cohort_attempts_remaining': 40 - cohort['reserved_attempts']}
+     w.require(cohort['gpu_healthcheck_hours']*3600 <= c.LIMITS['healthcheck_seconds'], 'bounded cumulative healthcheck allowance')
++    c.validate_stop_binding(plan)
+     c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'], cohort=selected)
+     return {**snap, "n36_reservation":reservation}
+diff --git a/scripts/qd_ed_n36_runner.py b/scripts/qd_ed_n36_runner.py
+index 1c3e8d9..7166e84 100644
+--- a/scripts/qd_ed_n36_runner.py
++++ b/scripts/qd_ed_n36_runner.py
+@@ -118,11 +118,7 @@ def execute_one(plan_ref, release_ref):
+             w.atomic_json(output / 'command.json', {'argv': command, 'main_argv': manifest['argv'], 'context': context_ref})
+             # Recheck STOP after durable reservation. Rejection leaves an unsettled
+             # primary for root review, never a retryable/zero-charge synthetic outcome.
+-            w.require(not Path(plan['stop_path']).exists() and not Path(plan['stop_path']).is_symlink(), 'STOP after reservation')
+-            end = min(dt.datetime.fromisoformat(value.replace('Z', '+00:00')) for value in
+-                      (c.DEADLINE, authority['coordinator_ends_at'], authority['weekly_window']['ends_at']))
+-            w.require((end - dt.datetime.now(dt.timezone.utc)).total_seconds() >= 1840,
+-                      'deadline after reservation: full attempt unavailable')
++            c.launch_guard(plan, authority)
+             r.append_event_locked(root, {**base, 'event': 'dispatched', 'time_unix': time.time(), 'timeout_seconds': 1800})
+         started = time.monotonic()
+         process = None
+@@ -132,9 +128,7 @@ def execute_one(plan_ref, release_ref):
+         start_admitted = False
+         try:
+             with (output / 'runner.log').open('w') as log:
+-                w.require(not Path(plan['stop_path']).exists() and not Path(plan['stop_path']).is_symlink(), 'STOP before worker start')
+-                w.require((end - dt.datetime.now(dt.timezone.utc)).total_seconds() >= 1840,
+-                          'deadline before worker start: full attempt unavailable')
++                c.launch_guard(plan, authority)
+                 start_admitted = True
+                 process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.PIPE, stdout=log,
+                                            stderr=subprocess.STDOUT, start_new_session=True)
+diff --git a/scripts/qd_ed_n36_source.py b/scripts/qd_ed_n36_source.py
+index ea13a34..3541a12 100644
+--- a/scripts/qd_ed_n36_source.py
++++ b/scripts/qd_ed_n36_source.py
+@@ -6,6 +6,8 @@ import importlib.machinery
+ import hashlib
+ import _imp
+ import runpy
++import os
++import copy
+ from pathlib import Path
+ import sys
+ import zipimport
+@@ -51,7 +53,80 @@ def run_main(path):
+     return runpy._run_module_code(code, mod_name='__main__', pkg_name='', script_name=path)
+ 
+ 
+-def attest(root, source, runtime):
++def interpreter_identity():
++    path = str(Path(sys.executable).resolve())
++    return {'path': path, 'sha256': sha(path), 'version': sys.version}
++
++
++def alias_claim(runtime, binding):
++    # This fixed rule has no extensible names, paths or hash-only fallback.
++    require(all(name in runtime['modules'] for name in ('os.path', 'posixpath')),
++            'N36 alias inventory incomplete')
++    return {'rule': 'n36-frozen-os.path-posixpath-v1',
++            'binding': copy.deepcopy(binding), 'interpreter': copy.deepcopy(runtime['interpreter']),
++            'alias': 'os.path', 'canonical': 'posixpath',
++            'spec_name': 'posixpath', 'origin': 'frozen',
++            'loader': '_frozen_importlib.FrozenImporter', 'is_frozen': True,
++            'same_module_object': True,
++            'records': {name: copy.deepcopy(runtime['modules'][name]) for name in ('os.path', 'posixpath')}}
++
++
++def live_alias(runtime, binding):
++    if binding is not None:
++        process = {'pid': os.getpid(),
++                   'proc_start_ticks': Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19],
++                   'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
++        require(binding.get('process') == process, 'N36 alias live process differs')
++    alias, canonical = sys.modules.get('os.path'), sys.modules.get('posixpath')
++    spec = getattr(canonical, '__spec__', None)
++    require(alias is not None and alias is canonical is os.path
++            and canonical.__name__ == 'posixpath'
++            and getattr(spec, 'name', None) == 'posixpath'
++            and getattr(spec, 'origin', None) == 'frozen'
++            and spec.loader is importlib.machinery.FrozenImporter
++            and getattr(canonical, '__loader__', None) is importlib.machinery.FrozenImporter
++            and _imp.is_frozen('posixpath'), 'N36 frozen alias live identity differs')
++    require(runtime['interpreter'] == interpreter_identity(), 'N36 alias interpreter differs')
++    for name, module in (('os.path', alias), ('posixpath', canonical)):
++        path = str(Path(module.__file__).resolve())
++        require(module.__file__ == path
++                and runtime['modules'].get(name) == {'path': path, 'sha256': sha(path)},
++                'N36 frozen alias inventory differs: ' + name)
++    return alias_claim(runtime, binding)
++
++
++def verify_alias(receipt, runtime, runtime_receipt, binding):
++    require(receipt.get('schema') == 'n36-source-execution-v2', 'N36 alias receipt schema')
++    require(isinstance(binding, dict) and set(binding) == {'context', 'runtime_closure', 'process', 'phase'}
++            and binding['phase'] in ('runtime_before', 'runtime_after')
++            and all(isinstance(binding[k], dict) and set(binding[k]) == {'path', 'sha256'}
++                    for k in ('context', 'runtime_closure'))
++            and isinstance(binding['process'], dict)
++            and set(binding['process']) == {'pid', 'proc_start_ticks', 'boot_id'}
++            and type(binding['process']['pid']) is int and binding['process']['pid'] > 0
++            and isinstance(binding['process']['proc_start_ticks'], str)
++            and binding['process']['proc_start_ticks'].isdigit()
++            and isinstance(binding['process']['boot_id'], str) and bool(binding['process']['boot_id']),
++            'N36 alias external binding required')
++    require(receipt.get('binding') == binding == runtime_receipt.get('binding'),
++            'N36 alias context/process/phase differs')
++    require(receipt.get('interpreter') == runtime['interpreter'] == interpreter_identity(),
++            'N36 alias interpreter differs')
++    claim = receipt.get('frozen_aliases', {}).get('os.path')
++    require(set(receipt.get('frozen_aliases', {})) == {'os.path'}
++            and claim == alias_claim(runtime, binding)
++            and claim['same_module_object'] is True and claim['is_frozen'] is True
++            and 'posixpath' in receipt['frozen_modules'] and _imp.is_frozen('posixpath'),
++            'N36 frozen alias proof differs')
++    for name in ('os.path', 'posixpath'):
++        require(runtime_receipt['modules'].get(name) == runtime['modules'][name],
++                'N36 alias canonical inventory evidence missing/differs')
++    require(runtime['modules']['os.path'] == runtime['modules']['posixpath'],
++            'N36 alias inventory paths/hashes differ')
++    return {'os.path'}
++
++
++def attest(root, source, runtime, *, binding=None):
+     state = active()
+     root = Path(root).resolve()
+     index = {str(root / row['path']): row['sha256'] for row in source['files']}
+@@ -74,6 +149,7 @@ def attest(root, source, runtime):
+     # No unrecorded custom Python loader may slip through the module inventory.
+     known = {(r['module'], r['path']) for r in records + startup}
+     frozen = []
++    aliases = {}
+     for name, module in list(sys.modules.items()):
+         if name in ('torch.ops', 'torch.classes'):
+             # Same two virtual namespaces explicitly excepted by the existing
+@@ -88,6 +164,8 @@ def attest(root, source, runtime):
+             continue
+         spec = getattr(module, '__spec__', None)
+         filename = getattr(module, '__file__', None)
++        if name == 'os.path':
++            aliases[name] = live_alias(runtime, binding)
+         if getattr(spec, 'origin', None) == 'frozen':
+             require(_imp.is_frozen(spec.name) and spec.loader is importlib.machinery.FrozenImporter,
+                     'N36 unbound frozen module: ' + name)
+@@ -102,15 +180,16 @@ def attest(root, source, runtime):
+             continue
+         canonical = getattr(spec, 'name', name)
+         require((canonical, path) in known, 'N36 unrecorded Python execution: ' + name)
+-    return {'schema': 'n36-source-execution-v1', 'bootstrap': {'path': bootstrap, 'sha256': state.bootstrap_digest},
++    return {'schema': 'n36-source-execution-v2', 'binding': copy.deepcopy(binding),
++        'interpreter': copy.deepcopy(runtime['interpreter']), 'frozen_aliases': aliases, 'bootstrap': {'path': bootstrap, 'sha256': state.bootstrap_digest},
+         'compiled': records, 'startup_source_only': startup, 'frozen_modules': sorted(set(frozen)),
+         'exceptions': ['interpreter-bound built-in/frozen modules', 'separately inventoried native extensions',
+                        'existing independently validated generated-runtime rules',
+                        'torch.ops/classes instances of inventoried owner classes']}
+ 
+ 
+-def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_receipt=None):
+-    require(receipt['schema'] == 'n36-source-execution-v1', 'N36 execution receipt schema')
++def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_receipt=None, binding=None):
++    require(receipt['schema'] == 'n36-source-execution-v2', 'N36 execution receipt schema')
+     index = {str(Path(root).resolve() / row['path']): row['sha256'] for row in source['files']}
+     index.update({row['path']: row['sha256'] for row in runtime['modules'].values()})
+     generated = {name: rule['sha256'] for name, rule in runtime.get('generated_modules', {}).items()}
+@@ -125,7 +204,11 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
+     known = {(r['path'], r['sha256']) for r in receipt['compiled'] + receipt['startup_source_only']}
+     observed = list((loaded or {}).values())
+     if runtime_receipt is not None:
+-        observed += [row for name, row in runtime_receipt['modules'].items() if name not in frozen]
++        from scripts import qd_ed_n34_source as closure
++        require(binding is not None, 'N36 external runtime binding required')
++        closure.verify_runtime_receipt(runtime, runtime_receipt, binding=binding, after=False)
++        aliases = verify_alias(receipt, runtime, runtime_receipt, binding)
++        observed += [row for name, row in runtime_receipt['modules'].items() if name not in frozen and name not in aliases]
+         observed += [e['record'] for e in runtime_receipt['generated_modules'].values()]
+     for row in observed:
+         path = Path(row['path'])
+diff --git a/scripts/qd_ed_n36_stop.py b/scripts/qd_ed_n36_stop.py
+new file mode 100644
+index 0000000..2e7a641
+--- /dev/null
++++ b/scripts/qd_ed_n36_stop.py
+@@ -0,0 +1,36 @@
++"""Canonical leaf-15.6 STOP authority. This is a veto, never execution authority.
++
++Lexical owner and relocated entries are pinned by the explicit repair contract;
++checkout resolution and caller input cannot replace either entry. Source review
++and a new detached release are still required before any production use.
++"""
++import datetime as dt
++import os
++
++OWNER_STOP = '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/STOP'
++DATA_STOP = '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/STOP'
++STOP_PATHS = (OWNER_STOP, DATA_STOP)
++DEADLINE = '2026-10-11T11:13:13Z'
++
++
++def binding():
++    return {'schema': 'n36-canonical-stop-v1', 'owner_source':
++            'ca4e6a96d049c7ebb1f302d755883388ddbfdbd8',
++            'paths': list(STOP_PATHS), 'deadline': DEADLINE}
++
++
++def check(*, now=None, ends_at=DEADLINE, need=0):
++    """Fail closed; ENOENT alone means absent. Never signal or settle a child."""
++    for path in STOP_PATHS:
++        try:
++            os.lstat(path)
++        except FileNotFoundError:
++            continue
++        except OSError as exc:
++            raise ValueError('STOP inaccessible: ' + path) from exc
++        raise ValueError('STOP present: ' + path)
++    now = now or dt.datetime.now(dt.timezone.utc)
++    end = min(dt.datetime.fromisoformat(x.replace('Z', '+00:00'))
++              for x in (DEADLINE, ends_at))
++    if now.tzinfo is None or need < 0 or (end-now).total_seconds() < need or now >= end:
++        raise ValueError('deadline: full work headroom unavailable')
+diff --git a/scripts/qd_ed_n36_worker.py b/scripts/qd_ed_n36_worker.py
+index cc0fcb4..6e28348 100644
+--- a/scripts/qd_ed_n36_worker.py
++++ b/scripts/qd_ed_n36_worker.py
+@@ -77,17 +77,17 @@ def release_api(plan_ref):
+     return release
+ 
+ 
+-def validate_context(reference):
++def validate_context(reference, *, admission=False):
+     with closure.verification_phase('context'):
+-        return _validate_context(reference)
++        return _validate_context(reference, admission=admission)
+ 
+ 
+-def _validate_context(reference):
++def _validate_context(reference, *, admission=False):
+     context = w.read_ref(reference)
+     w.require(set(context) == {'schema', 'plan', 'release', 'expected_manifest', 'episode_key', 'attempt_id', 'main_argv', 'worker_contract'}, 'worker context fields: explicit detached release required')
+     w.require(context['schema'] == 'n36-worker-context-v1' and context['worker_contract'] == c.WORKER_CONTRACT, 'worker contract')
+     release = release_api(context['plan'])
+-    plan, runtime, _, manifests = release._verify_release_transaction(context['plan'], context['release'])
++    plan, runtime, authority, manifests = release._verify_release_transaction(context['plan'], context['release'])
+     rows = [r for r in plan['episodes'] if r['episode_key'] == context['episode_key']]
+     w.require(len(rows) == 1 and context['attempt_id'] == context['episode_key'], 'exact primary attempt')
+     row = rows[0]
+@@ -95,6 +95,8 @@ def _validate_context(reference):
+     manifest = manifests[row['episode_key']]
+     w.require(context['main_argv'] == manifest['argv'][1:], 'exact candidate command')
+     w.require(runtime['gpu_mapping']['physical_gpu'] == 7 and runtime['gpu_mapping']['uuid'] == c.GPU_UUID, 'assigned GPU mapping')
++    if admission:
++        c.launch_guard(plan, authority)
+     return context, plan, runtime, row, manifest
+ 
+ 
+@@ -201,7 +203,7 @@ def runtime_receipt_binding(context_ref, plan, process, phase):
+ def _run_in_process(context_ref):
+     """Internal implementation, to be called only by a root-released bounded runner."""
+     source_execution.active()
+-    context, plan, runtime, row, manifest = validate_context(context_ref)
++    context, plan, runtime, row, manifest = validate_context(context_ref, admission=True)
+     root, output = Path(plan['worktree']), Path(manifest['output_dir'])
+     identity = w.process_identity()
+     verify_dispatch_record(context_ref, context, output, identity)
+@@ -223,13 +225,15 @@ def _run_in_process(context_ref):
+             binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_before'))
+         receipt['native_build_before']=native_build.attest(plan['native_build'])
+         receipt['loaded_before'] = attest_worker_loaded(root, plan['source'])
+-        receipt['execution_before'] = source_execution.attest(root, plan['source'], runtime_closure)
++        receipt['execution_before'] = source_execution.attest(root, plan['source'], runtime_closure,
++            binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_before'))
+         sys.argv = context['main_argv']
+         os.chdir(root)
+         with controller.observe_instances(proof) as observed:
+             try:
+                 # Use the same source-only loader as worker/auditor dependencies.
+                 w.require(Path(sys.argv[0]).resolve() == root.resolve() / 'main.py', 'Main source entry')
++                validate_context(context_ref, admission=True)
+                 source_execution.run_main(sys.argv[0])
+             except SystemExit as exc:
+                 w.require(exc.code is None or type(exc.code) is int and exc.code == 0, 'main nonzero exit')
+@@ -256,7 +260,8 @@ def _run_in_process(context_ref):
+         receipt['runtime_after'] = closure.attest_runtime_receipt(runtime_closure, plan['runtime'], after=True,
+             binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_after'))
+         receipt['native_build_after']=native_build.attest(plan['native_build'],after=True)
+-        receipt['execution_after'] = source_execution.attest(root, plan['source'], runtime_closure)
++        receipt['execution_after'] = source_execution.attest(root, plan['source'], runtime_closure,
++            binding=runtime_receipt_binding(context_ref, plan, identity, 'runtime_after'))
+         receipt.update(audit_seconds=time.perf_counter() - audit_started, native_counts=counts, auxiliary=auxiliary,
+                        evidence=before, audit_backend=backend.report())
+         w.atomic_json(report_path, report)
+@@ -328,7 +333,8 @@ def verify_receipt(context_ref, receipt_ref, process_record):
+     for phase in ('execution_before', 'execution_after'):
+         suffix = phase.removeprefix('execution_')
+         source_execution.verify_receipt(receipt[phase], plan['worktree'], plan['source'], runtime_closure,
+-            loaded=receipt['loaded_' + suffix], runtime_receipt=receipt['runtime_' + suffix])
++            loaded=receipt['loaded_' + suffix], runtime_receipt=receipt['runtime_' + suffix],
++            binding=runtime_receipt_binding(context_ref, plan, process, 'runtime_' + suffix))
+     w.require(all(row in receipt['execution_after']['compiled'] for row in receipt['execution_before']['compiled']),
+               'N36 executable inventory changed')
+     w.require('main' in {r['module'] for r in receipt['execution_after']['compiled']}, 'N36 Main executable absent')
+diff --git a/tests/test_n36_audit_repair.py b/tests/test_n36_audit_repair.py
+index ac126be..6070642 100644
+--- a/tests/test_n36_audit_repair.py
++++ b/tests/test_n36_audit_repair.py
+@@ -224,10 +224,12 @@ assert torch.equal(decode(SimpleNamespace(_action_chunk_horizon=8),samples),samp
+ # Synthetic inventory for checking the binding mechanism, not a release anchor.
+ state=source.active()
+ frozen={'files':[{'path':str(p.relative_to(root)),'sha256':source.sha(p)} for p in root.rglob('*.py')]}
+-runtime={'modules':{},'generated_modules':{}}
++runtime={'modules':{},'generated_modules':{},'interpreter':source.interpreter_identity()}
+ for name,path in list(state.compiled)+[(n,p) for n,(p,h) in state.startup_sources.items()]:
+     if not Path(path).resolve().is_relative_to(root):
+         runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':source.sha(path)}
++for name in ('os.path','posixpath'):
++    runtime['modules'][name]={'path':str(Path(sys.modules[name].__file__).resolve()),'sha256':source.sha(sys.modules[name].__file__)}
+ receipt=source.attest(root,frozen,runtime)
+ loaded={'reference':{'path':'scripts/qd_ed_n31_reference.py','sha256':source.sha(root/'scripts/qd_ed_n31_reference.py')}}
+ source.verify_receipt(receipt,root,frozen,runtime,loaded=loaded)
+@@ -256,13 +258,15 @@ state=source.active()
+ # Explicitly synthetic inventories; this does not attest the installed runtime.
+ def inventories():
+     files=[{'path':str(p.relative_to(root)),'sha256':source.sha(p)} for p in root.rglob('*.py')]
+-    runtime={'modules':{},'generated_modules':{}}
++    runtime={'modules':{},'generated_modules':{},'interpreter':source.interpreter_identity()}
+     for name,module in list(sys.modules.items()):
+         path=getattr(module,'__file__',None)
+         if path and Path(path).is_file() and not Path(path).resolve().is_relative_to(root):
+             runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':source.sha(path)}
+     return {'files':files},runtime
+ frozen,runtime=inventories()
++for name in ('os.path','posixpath'):
++    runtime['modules'][name]={'path':str(Path(sys.modules[name].__file__).resolve()),'sha256':source.sha(sys.modules[name].__file__)}
+ receipt=source.attest(root,frozen,runtime)
+ assert any(r['module']=='fixture' for r in receipt['compiled'])
+ (root/'fixture.py').write_text('value = "other!"\\n')
+diff --git a/tests/test_n36_composition.py b/tests/test_n36_composition.py
+index 0a98879..da8d108 100644
+--- a/tests/test_n36_composition.py
++++ b/tests/test_n36_composition.py
+@@ -55,7 +55,7 @@ def prospective_base(tmp_path_factory):
+             'runtime_closure': write(tmp_path / 'closure.json', {'synthetic_only': True}),
+             'controller_semantics': write(tmp_path / 'controller.json', {'synthetic_only': True}),
+             'episodes': c.expected_rows(), 'limits': c.LIMITS, 'worker_contract': c.WORKER_CONTRACT,
+-            'deadline': c.DEADLINE, 'stop_path': c.stop_path(), 'root_review': None, 'protocol': None,
++            'deadline': c.DEADLINE, 'stop_path': c.stop_path(), 'stop_authority': c.stop.binding(), 'root_review': None, 'protocol': None,
+             'authority': None, 'execution_release': None,
+             'phase_authorization': {'dev': False, 'validation': False, 'formal': False}, 'expected_manifests': {}}
+     # Freeze all prospective configs BEFORE any candidate evidence exists.
+diff --git a/tests/test_n36_cyutility_alias.py b/tests/test_n36_cyutility_alias.py
+index b0f6752..9559609 100644
+--- a/tests/test_n36_cyutility_alias.py
++++ b/tests/test_n36_cyutility_alias.py
+@@ -254,8 +254,8 @@ def test_worker_persists_rejection_origin(tmp_path, phase):
+         path.write_text(json.dumps(value))
+ 
+     namespace = dict(Path=Path, sys=SimpleNamespace(argv=[]), os=os, time=time,
+-                     source_execution=SimpleNamespace(active=lambda: None, attest=lambda *a: {}, run_main=lambda *a: None),
+-                     validate_context=lambda _: (context, plan, {}, {}, {'output_dir': str(output)}),
++                     source_execution=SimpleNamespace(active=lambda: None, attest=lambda *a, **kw: {}, run_main=lambda *a: None),
++                     validate_context=lambda _, **kw: (context, plan, {}, {}, {'output_dir': str(output)}),
+                      verify_dispatch_record=lambda *a: None,
+                      w=SimpleNamespace(process_identity=lambda: {}, require=source.w.require,
+                                        atomic_json=atomic_json, read_ref=lambda _: {}),
+diff --git a/tests/test_n36_frozen_alias.py b/tests/test_n36_frozen_alias.py
+new file mode 100644
+index 0000000..fbf030a
+--- /dev/null
++++ b/tests/test_n36_frozen_alias.py
+@@ -0,0 +1,188 @@
++"""Closed alias proof tests; synthetic contexts confer no production authority."""
++import copy
++import json
++import os
++from pathlib import Path
++import subprocess
++import sys
++from types import SimpleNamespace
++import pytest
++from scripts import qd_ed_n36_source as execution, qd_ed_n34_source as closure
++
++
++def process():
++    return {'pid':os.getpid(), 'proc_start_ticks':Path('/proc/self/stat').read_text().rsplit(')',1)[1].split()[19],
++            'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
++
++
++@pytest.fixture
++def proof():
++    record = {'path':str(Path(os.path.__file__).resolve()), 'sha256':execution.sha(os.path.__file__)}
++    runtime = {'modules':{'os.path':record.copy(), 'posixpath':record.copy()},
++               'interpreter':execution.interpreter_identity(), 'required_after':['episode.only']}
++    binding = {'context':{'path':'/synthetic/context','sha256':'a'*64},
++               'runtime_closure':{'path':'/synthetic/runtime','sha256':'b'*64},
++               'process':process(), 'phase':'runtime_before'}
++    claim = execution.live_alias(runtime, binding)
++    receipt = {'schema':'n36-source-execution-v2', 'binding':binding.copy(),
++               'interpreter':runtime['interpreter'], 'frozen_modules':['posixpath'],
++               'frozen_aliases':{'os.path':claim}}
++    observed = {'schema':'n34-runtime-receipt-v2', 'binding':binding.copy(),
++                'modules':copy.deepcopy(runtime['modules']), 'generated_modules':{}}
++    return runtime, binding, receipt, observed
++
++
++def test_live_proof_and_parent_binding(proof):
++    runtime,binding,receipt,observed = proof
++    assert execution.verify_alias(receipt,runtime,observed,binding) == {'os.path'}
++    closure.verify_runtime_receipt(runtime, observed, binding=binding, after=False)
++    with pytest.raises(ValueError,match='incomplete'):
++        closure.verify_runtime_receipt(runtime, observed, binding=binding, after=True)
++
++
++@pytest.mark.parametrize('fault', ['object','canonical_absent','loader','origin','name','module_name','module_loader','lexical_file','not_frozen','hash','path','interpreter','process'])
++def test_producer_rejects_substitution(proof, monkeypatch, fault):
++    runtime,binding,_,_ = proof
++    canonical = sys.modules['posixpath']
++    if fault == 'object': monkeypatch.setitem(sys.modules,'os.path',SimpleNamespace(**vars(canonical)))
++    elif fault == 'canonical_absent': monkeypatch.delitem(sys.modules,'posixpath')
++    elif fault in ('loader','origin','name'):
++        spec = copy.copy(canonical.__spec__)
++        setattr(spec, {'loader':'loader','origin':'origin','name':'name'}[fault], None if fault=='loader' else 'wrong')
++        monkeypatch.setattr(canonical,'__spec__',spec)
++    elif fault == 'module_name': monkeypatch.setattr(canonical,'__name__','other')
++    elif fault == 'module_loader': monkeypatch.setattr(canonical,'__loader__',None)
++    elif fault == 'lexical_file': monkeypatch.setattr(canonical,'__file__',str(Path(canonical.__file__).parent)+'/./posixpath.py')
++    elif fault == 'not_frozen': monkeypatch.setattr(execution._imp,'is_frozen',lambda _:False)
++    elif fault in ('hash','path'): runtime['modules']['os.path']['sha256' if fault=='hash' else 'path'] = 'wrong'
++    elif fault == 'interpreter': runtime['interpreter']['sha256'] = '0'*64
++    else: binding['process']['pid'] += 1
++    with pytest.raises(ValueError): execution.live_alias(runtime,binding)
++
++
++@pytest.mark.parametrize('fault', ['context','process','phase','closure','interpreter','interpreter_path',
++    'hash','path','canonical_absent','canonical_hash','frozen_absent','alias_name','extra_alias','boolean','loader','origin','spec_name','unbound','receipt_binding','schema','inventory_canonical_absent','frozen_boolean'])
++def test_parent_rejects_mismatched_receipts(proof, fault):
++    runtime,binding,receipt,observed = copy.deepcopy(proof)
++    claim = receipt['frozen_aliases']['os.path']
++    if fault in ('context','process','phase','closure'):
++        key = 'runtime_closure' if fault=='closure' else fault
++        binding = copy.deepcopy(binding)
++        if fault=='phase': binding[key]='runtime_after'
++        elif fault=='process': binding[key]['pid']+=1
++        else: binding[key]['sha256']='f'*64
++    elif fault.startswith('interpreter'): receipt['interpreter']['path' if fault.endswith('path') else 'sha256'] = 'wrong'
++    elif fault in ('hash','path'): claim['records']['os.path']['sha256' if fault=='hash' else 'path'] = 'wrong'
++    elif fault == 'canonical_absent': del observed['modules']['posixpath']
++    elif fault == 'canonical_hash': observed['modules']['posixpath']['sha256'] = 'wrong'
++    elif fault == 'frozen_absent': receipt['frozen_modules'] = []
++    elif fault == 'alias_name': claim['alias'] = 'other'
++    elif fault == 'extra_alias': receipt['frozen_aliases']['other'] = copy.deepcopy(claim)
++    elif fault == 'boolean': claim['same_module_object'] = 1
++    elif fault in ('loader','origin','spec_name'): claim[fault] = 'wrong'
++    elif fault == 'unbound': binding = None
++    elif fault == 'schema': receipt['schema']='n36-source-execution-v1'
++    elif fault == 'inventory_canonical_absent': del runtime['modules']['posixpath']
++    elif fault == 'frozen_boolean': claim['is_frozen']=1
++    else: observed['binding'] = {}
++    with pytest.raises(ValueError): execution.verify_alias(receipt,runtime,observed,binding)
++
++
++def complete_fixture(root, proof):
++    runtime,binding,receipt,observed = proof
++    names = ['scripts.qd_ed_n36_worker','scripts.qd_ed_n36_native','scripts.qd_ed_n36_arithmetic',
++             'scripts.audit_decision_evidence','scripts.qd_ed_n36_source', 'ordinary']
++    files = [{'path':n.replace('.','/')+'.py', 'sha256':'c'*64} for n in names]
++    files.append({'path':'scripts/qd_ed_n36_bootstrap.py','sha256':'d'*64})
++    receipt.update(bootstrap={'path':str(root/'scripts/qd_ed_n36_bootstrap.py'),'sha256':'d'*64},
++                   compiled=[{'module':n,'path':str(root/f['path']),'sha256':f['sha256']} for n,f in zip(names,files)],
++                   startup_source_only=[])
++    for name in ('encodings','encodings.aliases','encodings.utf_8'):
++        record={'path':'/synthetic/'+name+'.py','sha256':'e'*64}
++        runtime['modules'][name]=record
++        observed['modules'][name]=record
++        receipt['startup_source_only'].append({'module':name,**record})
++    observed['modules']['ordinary']={'path':str(root/'ordinary.py'),'sha256':'c'*64}
++    runtime['modules']['ordinary']=observed['modules']['ordinary']
++    return {'files':files}
++
++
++@pytest.mark.parametrize('fault', [None,'ordinary_missing','arbitrary_same_path','equal_hash_substitution'])
++def test_full_parent_exemption_is_only_os_path(proof,tmp_path,fault):
++    runtime,binding,receipt,observed=proof
++    source=complete_fixture(tmp_path,proof)
++    if fault=='ordinary_missing': receipt['compiled']=[r for r in receipt['compiled'] if r['module']!='ordinary']
++    elif fault=='arbitrary_same_path':
++        runtime['modules']['arbitrary']=runtime['modules']['posixpath'].copy()
++        observed['modules']['arbitrary']=runtime['modules']['arbitrary']
++    elif fault=='equal_hash_substitution': observed['modules']['os.path']['path']='/substitute/posixpath.py'
++    if fault:
++        with pytest.raises(ValueError): execution.verify_receipt(receipt,tmp_path,source,runtime,runtime_receipt=observed,binding=binding)
++    else: execution.verify_receipt(receipt,tmp_path,source,runtime,runtime_receipt=observed,binding=binding)
++
++
++def test_fresh_source_bootstrap_process_receipt(tmp_path):
++    """Real isolated interpreter proof; only alias inventory, never an episode."""
++    root = Path(__file__).resolve().parents[1]
++    record = {'path':str(Path(os.path.__file__).resolve()), 'sha256':execution.sha(os.path.__file__)}
++    runtime = {'interpreter':execution.interpreter_identity(),
++               'modules':{'os.path':record,'posixpath':record}, 'required_after':['episode.only']}
++    runtime_path = tmp_path/'runtime.json'; runtime_path.write_text(json.dumps(runtime))
++    runtime_ref = {'path':str(runtime_path),'sha256':execution.sha(runtime_path)}
++    context = tmp_path/'context.json'; context.write_text(json.dumps({'release_enabled':False,'cpu_only':True}))
++    context_ref = {'path':str(context),'sha256':execution.sha(context)}
++    program = tmp_path/'alias_child.py'
++    program.write_text('''import json, os, sys
++from pathlib import Path
++from scripts import qd_ed_n36_source as execution
++execution.active()
++runtime_path, context_path = map(Path,sys.argv[1:])
++runtime=json.loads(runtime_path.read_text())
++binding={'context':{'path':str(context_path),'sha256':execution.sha(context_path)},
++ 'runtime_closure':{'path':str(runtime_path),'sha256':execution.sha(runtime_path)},
++ 'process':{'pid':os.getpid(),'proc_start_ticks':Path('/proc/self/stat').read_text().rsplit(')',1)[1].split()[19],
++ 'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip()},'phase':'runtime_before'}
++# Partial, observed CPU inventory for testing the actual producer. This is
++# explicitly not the complete committed production source freeze.
++root=Path(execution.__file__).resolve().parents[1]
++state=execution.active()
++source_files={str(root/'scripts/qd_ed_n36_bootstrap.py'):state.bootstrap_digest}
++for (name,path),digest in state.compiled.items():
++    path=str(Path(path).resolve())
++    if Path(path).is_relative_to(root): source_files[path]=digest
++    elif name not in runtime['modules']: runtime['modules'][name]={'path':path,'sha256':digest}
++for name,module in list(sys.modules.items()):
++    path=getattr(module,'__file__',None)
++    if path and Path(path).is_file() and not Path(path).resolve().is_relative_to(root) and name not in runtime['modules']:
++        runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':execution.sha(path)}
++source={'files':[{'path':str(Path(path).relative_to(root)),'sha256':digest} for path,digest in source_files.items()]}
++# Freeze this expanded test-only inventory before the parent's handoff.
++frozen_path=runtime_path.with_name('observed-runtime.json')
++frozen_path.write_text(json.dumps(runtime))
++binding['runtime_closure']={'path':str(frozen_path),'sha256':execution.sha(frozen_path)}
++print('READY',flush=True)
++assert sys.stdin.read(1)=='G'
++receipt=execution.attest(root,source,runtime,binding=binding)
++print(json.dumps(receipt),flush=True)
++''')
++    command = execution.command(sys.executable, root, 'alias_child', str(runtime_path), str(context))
++    child = subprocess.Popen(command, env={**os.environ,'PYTHONPATH':str(tmp_path),'CUDA_VISIBLE_DEVICES':''},
++                             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
++    assert child.stdout.readline().strip() == 'READY'
++    frozen_path=runtime_path.with_name('observed-runtime.json')
++    runtime=json.loads(frozen_path.read_text())
++    assert runtime['modules']['os.path']==runtime['modules']['posixpath']==record
++    assert all(execution.sha(row['path'])==row['sha256'] for row in runtime['modules'].values())
++    runtime_ref={'path':str(frozen_path),'sha256':execution.sha(frozen_path)}
++    identity = {'pid':child.pid, 'proc_start_ticks':Path(f'/proc/{child.pid}/stat').read_text().rsplit(')',1)[1].split()[19],
++                'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
++    stdout,stderr=child.communicate('G',timeout=20)
++    assert child.returncode == 0, stderr
++    receipt=json.loads(stdout)
++    binding={'context':context_ref,'runtime_closure':runtime_ref,'process':identity,'phase':'runtime_before'}
++    observed={'schema':'n34-runtime-receipt-v2','binding':binding,'modules':runtime['modules'],'generated_modules':{}}
++    assert execution.verify_alias(receipt,runtime,observed,binding)=={'os.path'}
++    closure.verify_runtime_receipt(runtime,observed,binding=binding,after=False)
++    with pytest.raises(ValueError,match='incomplete'): closure.verify_runtime_receipt(runtime,observed,binding=binding,after=True)
++    (tmp_path/'live-receipt.json').write_text(json.dumps({'command':command,'expected_binding':binding,
++        'execution':receipt,'runtime':observed,'full_after_coverage':False},indent=2)+'\n')
+diff --git a/tests/test_n36_release.py b/tests/test_n36_release.py
+index bbb8d8b..b809426 100644
+--- a/tests/test_n36_release.py
++++ b/tests/test_n36_release.py
+@@ -39,7 +39,7 @@ def boundary(tmp_path,monkeypatch):
+         'approval_basis':write(tmp_path/'basis.json',{'synthetic_only':True})}
+     plan={'native_build':native_build,'protocol_review':protocol_review,'schema':'n36-released-plan-v1','frozen':True,'release_enabled':True,'worktree':str(b.ROOT),
+         'artifact_root':str(tmp_path/'artifacts'),'episodes':c.expected_rows(),'limits':copy.deepcopy(c.LIMITS),
+-        'worker_contract':c.WORKER_CONTRACT,'deadline':c.DEADLINE,'stop_path':c.stop_path(),
++        'worker_contract':c.WORKER_CONTRACT,'deadline':c.DEADLINE,'stop_path':c.stop_path(), 'stop_authority':c.stop.binding(),
+         'phase_authorization':{'dev':True,'validation':False,'formal':False},'attempt_identity':'episode_key',
+         'source':source,'scientific_source':copy.deepcopy(source),'runtime':runtime_ref,
+         'runtime_closure':write(tmp_path/'closure.json',{'synthetic_only':True}),
+diff --git a/tests/test_n36_runner.py b/tests/test_n36_runner.py
+index 1322baf..d27471d 100644
+--- a/tests/test_n36_runner.py
++++ b/tests/test_n36_runner.py
+@@ -17,10 +17,18 @@ from scripts import qd_ed_n36_runner as adapter, qd_ed_n36_supervise as supervis
+ from test_n36_composition import write
+ from scripts import qd_ed_n36_accounting as accounting
+ 
+-@pytest.fixture(autouse=True)
+-def synthetic_accounting_margin(monkeypatch):
++pytestmark = pytest.mark.usefixtures('synthetic_accounting_margin')
++
++
++@pytest.fixture
++def synthetic_accounting_margin(monkeypatch, tmp_path):
+     # Exact prefix reconciliation has its own bounded synthetic test.
+     monkeypatch.setattr(accounting,'retained_margin',lambda *args:0.)
++    paths = (str(tmp_path/'owner/STOP'), str(tmp_path/'autonomy_20261004/STOP'))
++    for path in paths: Path(path).parent.mkdir(parents=True, exist_ok=True)
++    monkeypatch.setattr(c.stop, 'STOP_PATHS', paths)
++    expected_rows = c.expected_rows
++    monkeypatch.setattr(c, 'expected_rows', lambda root=None, **kw: expected_rows(c.ROOT, **kw))
+ 
+ NOW = dt.datetime(2026, 10, 8, tzinfo=dt.timezone.utc)
+ 
+@@ -33,7 +41,9 @@ def budget_fixture(tmp_path, events=(), resources=()):
+                  'coordinator_ends_at': release.COORDINATOR_END,
+                  'weekly_window': {'origin_gpu_hours': 53.08404692669838, 'increment_gpu_hours': 168., 'ends_at': c.DEADLINE}}
+     reference = write(tmp_path / 'authority.json', authority)
+-    plan = {'authority': reference, 'stop_path': str(tmp_path / 'STOP')}
++    plan = {'authority': reference, 'stop_path': c.stop.STOP_PATHS[1],
++            'stop_authority': c.stop.binding(),
++            'worktree': str(tmp_path if tmp_path.name == 'study_worktree' else tmp_path/'study_worktree')}
+     snap = r.budget_snapshot(events, resources)
+     state = {'gpu_pool': [7], 'max_concurrent_gpu_workers': 1, 'n36_budget_authority': reference,
+              'resource_isolation': {'status': 'ACTIVE', 'validation_status': 'PASS', 'private_budget': True},
+@@ -137,7 +147,7 @@ def lifecycle(tmp_path, monkeypatch):
+     monkeypatch.setattr(c, 'expected_rows', lambda root=None: rows)
+     plan, authority, state, reservations = budget_fixture(tmp_path, old_invalid())
+     plan['stop_path'] = c.stop_path(tmp_path)
+-    Path(plan['stop_path']).parent.mkdir()
++    Path(plan['stop_path']).parent.mkdir(exist_ok=True)
+     plan.update(schema='n36-released-plan-v1', worktree=str(tmp_path), artifact_root=str(tmp_path / 'artifacts/n36'), episodes=rows,
+                 run_name='synthetic', source={'commit': 'a'*40}, runtime={'path': str(tmp_path / 'runtime'), 'sha256': 'b'*64},
+                 runtime_inventory_sha256='c'*64, expected_manifests={})
+@@ -308,7 +318,7 @@ def test_stop_arrives_after_reservation_no_worker_started(lifecycle,monkeypatch)
+         if event['event']=='reserved':Path(plan['stop_path']).touch()
+     monkeypatch.setattr(r,'append_event_locked',stopped)
+     monkeypatch.setattr(adapter.subprocess,'Popen',lambda *a,**kw:pytest.fail('STOP must prohibit new worker'))
+-    with pytest.raises(ValueError,match='STOP after reservation'):adapter.execute_one(plan_ref,release_ref)
++    with pytest.raises(ValueError,match='STOP present'):adapter.execute_one(plan_ref,release_ref)
+     events=r.read_events(root/'data/attempt-ledger.jsonl')
+     assert len(events)==1 and events[0]['event']=='reserved' and events[0]['reserved_gpu_seconds']==1840
+     assert adapter.execute_one(plan_ref,release_ref)['status']=='LIVE_OR_UNSETTLED'
+diff --git a/tests/test_n36_stop_guard.py b/tests/test_n36_stop_guard.py
+new file mode 100644
+index 0000000..5bd8e1f
+--- /dev/null
++++ b/tests/test_n36_stop_guard.py
+@@ -0,0 +1,183 @@
++"""Canonical authority and synthetic launch races: no device or owner writes."""
++import datetime as dt
++import errno
++from pathlib import Path
++import pytest
++from scripts import qd_ed_n36_stop as stop, qd_ed_n36_contract as c
++from scripts import qd_ed_n36_runner as adapter, qd_ed_final_runner as r
++from test_n36_runner import lifecycle, synthetic_accounting_margin
++
++pytestmark = pytest.mark.usefixtures('synthetic_accounting_margin')
++
++NOW = dt.datetime(2026, 10, 10, tzinfo=dt.timezone.utc)
++
++
++def test_lexical_authority_is_independent_of_checkout_resolution(monkeypatch):
++    assert stop.OWNER_STOP.startswith('/home/hynx/lizhuo/')
++    assert stop.DATA_STOP.startswith('/mnt/data/shared2/hynx/')
++    assert stop.OWNER_STOP != stop.DATA_STOP
++    # Restoring literal authority counters the imported synthetic fixture.
++    monkeypatch.setattr(stop, 'STOP_PATHS', (stop.OWNER_STOP, stop.DATA_STOP))
++    seen = []
++    def absent(path):
++        seen.append(path)
++        raise FileNotFoundError(errno.ENOENT, 'fixture absence', path)
++    monkeypatch.setattr(stop.os, 'lstat', absent)
++    stop.check(now=NOW)
++    assert seen == [stop.OWNER_STOP, stop.DATA_STOP]
++
++
++@pytest.mark.parametrize('location', [0, 1, 'both'])
++@pytest.mark.parametrize('kind', ['file', 'directory', 'dangling', 'permission', 'io', 'notdir'])
++def test_each_canonical_entry_fails_closed(tmp_path, monkeypatch, location, kind):
++    # Actual filesystem entry semantics, redirected from exact lexical paths.
++    monkeypatch.setattr(stop, 'STOP_PATHS', (stop.OWNER_STOP, stop.DATA_STOP))
++    actual = tmp_path/'entry'
++    if kind == 'file': actual.touch()
++    elif kind == 'directory': actual.mkdir()
++    elif kind == 'dangling': actual.symlink_to(tmp_path/'missing')
++    original = stop.os.lstat
++    def lstat(path):
++        if path not in stop.STOP_PATHS: return original(path)
++        if location == 'both' or path == stop.STOP_PATHS[location]:
++            if kind in ('permission', 'io', 'notdir'):
++                raise OSError({'permission':errno.EACCES, 'io':errno.EIO, 'notdir':errno.ENOTDIR}[kind], kind)
++            return original(actual)
++        raise FileNotFoundError(errno.ENOENT, 'absent', path)
++    monkeypatch.setattr(stop.os, 'lstat', lstat)
++    with pytest.raises(ValueError, match='STOP'): stop.check(now=NOW)
++
++
++@pytest.mark.parametrize('fault', ['owner', 'path', 'deadline', 'source'])
++def test_plan_cannot_replace_canonical_authority(fault):
++    plan = {'worktree': str(c.ROOT), 'stop_path': c.stop_path(), 'stop_authority': stop.binding()}
++    if fault == 'owner': plan['stop_authority']['paths'][0] = '/arbitrary/STOP'
++    elif fault == 'path': plan['stop_path'] = '/arbitrary/STOP'
++    elif fault == 'deadline': plan['stop_authority']['deadline'] = '2099-01-01T00:00:00Z'
++    else: plan['stop_authority']['owner_source'] = '0'*40
++    with pytest.raises(ValueError, match='STOP'): c.validate_stop_binding(plan)
++
++
++@pytest.mark.parametrize('seconds,need', [(0, 0), (1839,1840), (1939,1940)])
++def test_deadline_full_attempt_and_health_headroom(seconds, need):
++    end = dt.datetime.fromisoformat(stop.DEADLINE.replace('Z','+00:00'))
++    with pytest.raises(ValueError, match='deadline'):
++        stop.check(now=end-dt.timedelta(seconds=seconds), need=need)
++
++
++@pytest.mark.parametrize('location', [0,1])
++@pytest.mark.parametrize('boundary', ['reserved','dispatched'])
++def test_independent_stop_launch_races(lifecycle, monkeypatch, location, boundary):
++    root, plan, plan_ref, release_ref = lifecycle
++    append = r.append_event_locked
++    def race(root, event):
++        append(root,event)
++        if event['event'] == boundary: Path(stop.STOP_PATHS[location]).symlink_to(root/'absent')
++    monkeypatch.setattr(r, 'append_event_locked', race)
++    monkeypatch.setattr(adapter.subprocess, 'Popen', lambda *a, **kw: pytest.fail('worker launched after STOP'))
++    with pytest.raises(ValueError, match='STOP'): adapter.execute_one(plan_ref, release_ref)
++    events = r.read_events(root/'data/attempt-ledger.jsonl')
++    assert [e['event'] for e in events] == (['reserved'] if boundary == 'reserved' else ['reserved','dispatched'])
++    assert events[0]['reserved_gpu_seconds'] == 1840
++    assert adapter.execute_one(plan_ref, release_ref)['status'] == 'LIVE_OR_UNSETTLED'
++
++
++@pytest.mark.parametrize('location', [0,1])
++@pytest.mark.parametrize('boundary', ['reserved','dispatched'])
++def test_independent_healthcheck_launch_races(lifecycle, monkeypatch, location, boundary):
++    from scripts import qd_ed_n36_healthcheck as health, qd_ed_n36_accounting as accounting
++    root, plan, plan_ref, release_ref = lifecycle
++    if boundary == 'reserved':
++        reserve = accounting.reserve_healthcheck
++        def race(*args, **kw):
++            result = reserve(*args, **kw)
++            Path(stop.STOP_PATHS[location]).touch()
++            return result
++        monkeypatch.setattr(accounting,'reserve_healthcheck',race)
++    else:
++        append = r.append_healthcheck_event
++        def race(root,event):
++            append(root,event)
++            if event['event']=='dispatched': Path(stop.STOP_PATHS[location]).touch()
++        monkeypatch.setattr(r,'append_healthcheck_event',race)
++    monkeypatch.setattr(health.subprocess,'Popen',lambda *a, **kw:pytest.fail('STOP must prohibit probe launch'))
++    result = health.run_healthcheck(plan_ref,release_ref,'n36_healthcheck_preparation')
++    assert result['status']=='INVALID_STOP'
++    assert result['terminal']['gpu_process_wall_seconds']==0
++    assert 'STOP' in result['terminal']['reason']
++
++
++@pytest.mark.parametrize('location',[0,1])
++def test_worker_context_checks_entry_but_allows_settlement(lifecycle,monkeypatch,location):
++    from scripts import qd_ed_n36_worker as worker, qd_ed_n36_release as release
++    root,plan,plan_ref,release_ref=lifecycle
++    context=worker.context_for(plan_ref,plan['episodes'][0],release_ref)
++    manifests={key:worker.w.read_ref(ref) for key,ref in plan['expected_manifests'].items()}
++    authority=worker.w.read_ref(plan['authority'])
++    runtime={'gpu_mapping':{'physical_gpu':7,'uuid':c.GPU_UUID}}
++    monkeypatch.setattr(release,'_verify_release_transaction',lambda *a:(plan,runtime,authority,manifests))
++    ref={'path':str(root/'context.json'),'sha256':'synthetic'}
++    read=worker.w.read_ref
++    monkeypatch.setattr(worker.w,'read_ref',lambda value:context if value==ref else read(value))
++    worker._validate_context(ref,admission=True)
++    Path(stop.STOP_PATHS[location]).touch()
++    with pytest.raises(ValueError,match='STOP'):worker._validate_context(ref,admission=True)
++    assert worker._validate_context(ref)[0]==context
++
++
++@pytest.mark.parametrize('location',[0,1])
++def test_stop_after_worker_entry_prevents_main_and_retains_receipt(tmp_path,location):
++    import ast
++    from contextlib import nullcontext
++    import json
++    import os
++    import sys
++    import time
++    from types import SimpleNamespace
++    from scripts import qd_ed_n23_worker as w
++    path=c.ROOT/'scripts/qd_ed_n36_worker.py'
++    function=next(n for n in ast.parse(path.read_text()).body if isinstance(n,ast.FunctionDef) and n.name=='_run_in_process')
++    root=tmp_path/'study_worktree'; root.mkdir()
++    output=root/'output'; (output/'eds_eval').mkdir(parents=True)
++    plan={'worktree':str(root),'stop_path':c.stop_path(root),'stop_authority':stop.binding(),
++          'source':{},'scientific_source':{},'runtime_closure':{},'controller_semantics':{},'runtime':{},'native_build':{}}
++    authority={'coordinator_ends_at':c.DEADLINE,'weekly_window':{'ends_at':c.DEADLINE}}
++    context={'plan':{},'expected_manifest':{},'attempt_id':'cpu-fixture','main_argv':[str(root/'main.py')]}
++    calls=[]
++    def validate(_, *, admission=False):
++        calls.append(admission)
++        if admission:c.launch_guard(plan,authority)
++        return context,plan,{}, {},{'output_dir':str(output)}
++    def attest(*args,**kw):
++        Path(stop.STOP_PATHS[location]).touch()
++        return {}
++    namespace=dict(Path=Path,sys=SimpleNamespace(argv=[]),os=os,time=time,validate_context=validate,
++        source_execution=SimpleNamespace(active=lambda:None,attest=lambda *a,**kw:{},
++                                         run_main=lambda *a:pytest.fail('STOP must prohibit Main')),
++        verify_dispatch_record=lambda *a:None,
++        w=SimpleNamespace(process_identity=lambda:{},require=w.require,atomic_json=w.atomic_json,read_ref=lambda _:{}),
++        closure=SimpleNamespace(attest_runtime_receipt=attest,RuntimeOriginError=type('OriginError',(ValueError,),{})),
++        controller=SimpleNamespace(verify_semantics=lambda *a:{},observe_instances=lambda _:nullcontext([])),
++        native_build=SimpleNamespace(attest=lambda _:{}),attest_worker_loaded=lambda *a:{},runtime_receipt_binding=lambda *a:{})
++    exec(compile(ast.Module(body=[function],type_ignores=[]),str(path),'exec'),namespace)
++    assert namespace['_run_in_process']({})==2
++    receipt=json.loads((output/'eds_eval/n36-worker-receipt.json').read_text())
++    assert calls==[True,True]
++    assert receipt['accepted'] is False and receipt['classification']=='INVALID'
++    assert receipt['main_exit_code'] is None and 'STOP' in receipt['error']
++
++
++def test_exact_authority_accepts_supported_session_layout(monkeypatch):
++    monkeypatch.setattr(stop,'STOP_PATHS',(stop.OWNER_STOP,stop.DATA_STOP))
++    plan={'worktree':str(c.ROOT),'stop_path':c.stop_path(),'stop_authority':stop.binding()}
++    c.validate_stop_binding(plan)
++    plan['worktree']='/unrelated/variants/x/implementation_worktree'
++    plan['stop_path']=c.stop_path(plan['worktree'])
++    with pytest.raises(ValueError,match='layout'):c.validate_stop_binding(plan)
++
++
++def test_deadline_does_not_shrink_full_attempt_requirement():
++    end=dt.datetime.fromisoformat(stop.DEADLINE.replace('Z','+00:00'))
++    stop.check(now=end-dt.timedelta(seconds=1840),need=1840)
++    with pytest.raises(ValueError,match='deadline'):
++        stop.check(now=end-dt.timedelta(seconds=1839.99),ends_at='2099-01-01T00:00:00Z',need=1840)

@@ -1,0 +1,3 @@
+N32R2 remains live under its verified controller. Frozen hashes and ledger history are intact. Seven valid outcomes are recorded, all unsuccessful.
+
+Turn 234’s operational summary is saved. The driver continues monitoring; validation, formal evaluation and required ablation evidence remain outstanding.

@@ -1,0 +1,3 @@
+Verified N36 runtime readiness: official Codex login passed, accounted CUDA/EGL evidence remains valid, and GPU7 is idle. Recorded the hash-bound readiness review and operational handoff; no cohort dispatched.
+
+Next: rebind release artifacts and pass full release validation. The original validation/formal/ablation goal remains unmet.

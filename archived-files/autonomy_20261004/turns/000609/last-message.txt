@@ -1,0 +1,3 @@
+N34 stopped on its first attempt’s 1,800-second timeout. The invalid attempt and cost remain recorded; controller and worker have exited.
+
+Turn 609 terminal reconciliation is saved. Next: close accounting and diagnose the timeout before prospective recovery. Validation, formal evaluation, and ablations remain unresolved.

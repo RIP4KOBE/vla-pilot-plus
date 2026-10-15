@@ -1,0 +1,3 @@
+Verified authority, live process identities, and unchanged private ledgers. The CPU repair remains active at commit `3f2ddbc`; no duplicate work was launched.
+
+Recorded turn 1698’s operational summary. Next: reconcile the repair’s final tests and report, then independent admission review. Validation/formal/ablation completion remains unproven.

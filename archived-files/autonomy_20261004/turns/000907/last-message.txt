@@ -1,0 +1,3 @@
+N35’s independent review found two reset-audit blockers. A bounded CPU repair is running in its isolated worktree, with verified process identities.
+
+Owning source remains `969d5fb`; ledgers are unchanged. No GPU dispatch or source adoption occurred. Operational handoff is recorded; next is repair reconciliation and independent review. Validation, formal evaluation, and ablation evidence remain outstanding.

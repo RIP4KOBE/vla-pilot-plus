@@ -1,0 +1,3 @@
+N32R1 remains active on frozen source `531477e9dc1c`: controller `1348389`, worker `1460701`. Identity, release hashes, and ledger continuity verified; no duplicate dispatch or source changes.
+
+Turn 127 operational summary saved. Next: monitor the first C0 terminal audit. Validation, formal, and required ablation evidence remain incomplete.

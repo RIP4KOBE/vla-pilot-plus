@@ -1,0 +1,80 @@
+{
+  "schema": "n36r2-root-source-accounting-adoption-v1",
+  "at": "2026-10-10T04:22:44.426667+00:00",
+  "status": "SOURCE_ACCOUNTING_ADOPTED_READINESS_PENDING",
+  "source_before": "ca4e6a96d049c7ebb1f302d755883388ddbfdbd8",
+  "source_after": "30c6321715df86c5bab623db607bab2811aed56d",
+  "independent_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001284/independent-final-review/report-v1.json",
+    "bytes": 148074,
+    "sha256": "a43cf53ca9755239f90dbfb35fe2f9ca2710891743abf1182d6f415c83eb57a9"
+  },
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001288/budget-authority-v1.json",
+    "bytes": 4395,
+    "sha256": "7f17d9c0cb49da38720e8bf3859f100c359eae3e083c51bc2fdb226f0705361b"
+  },
+  "amendment": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001276/b5-preparation/accounting.prospective-disabled-v1.json",
+    "sha256": "1f1b5425c8a67736f6f122ab8d15b7451e03b5b8450d44f64aa12ffda8dcf45f"
+  },
+  "calculation": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001276/b5-preparation/accounting-calculation-v1.json",
+    "sha256": "cc273cba1f7e1b9f59f8f07407b63c38df72c2d3fc44bd79670d5f6144f1c240"
+  },
+  "previous_budget": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001288/previous-budget-envelope-v1.json",
+    "bytes": 1791,
+    "sha256": "38edc7db94e50fb7d8a3aebd2f4d122b3f3f8d58a53afe5dbd0aa314a1a55412"
+  },
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "bytes": 7537764,
+      "sha256": "32db62bfda1e6da93aac4bdce85d44881048f0ce455203e68d7e06bdb3e6dbff"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "bytes": 71240,
+      "sha256": "b4df8fb3c8e45bbe24e560e55262819430d0c5a4da9754f09062d59fdb480ff6"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    }
+  },
+  "retained_snapshot": {
+    "dispatched": 504,
+    "aborted": 23,
+    "valid": 463,
+    "invalid": 18,
+    "completed": 481,
+    "running": 0,
+    "gpu_hours_consumed": 75.49265038509455,
+    "by_bucket": {
+      "baseline": 104,
+      "development": 313,
+      "validation": 60,
+      "formal": 0,
+      "recovery": 27
+    },
+    "reserved_attempts": 504,
+    "gpu_hours_by_bucket": {
+      "baseline": 15.647763415515309,
+      "development": 48.05656184449396,
+      "validation": 7.7591759975691845,
+      "formal": 0.0,
+      "recovery": 4.029149127516051
+    },
+    "gpu_healthcheck_hours": 0.23655687199321304,
+    "gpu_healthcheck_inflight": 0
+  },
+  "arithmetic": "504+40=544 attempts; 40*(1800+40)+1800+200=75600 seconds=21 GPUh; 75.49265038509455+0.23357169027962+21=96.72622207537417 conservative GPUh; effective cap221.08404692669838 minus protected36.2408240024308155 leaves88.1170008488933945 after full cohort.",
+  "caps_changed": false,
+  "scientific_gates_changed": false,
+  "release_enabled": false,
+  "gpu_dispatch": false,
+  "target_met": false,
+  "next_action": "Establish bounded current GPU7/CUDA logical0/EGL4 and official current-login Codex readiness for adopted N36R2 source30c6321715df86c5bab623db607bab2811aed56d. Reuse reviewed isolated source/runtime routing and unchanged provenance; update only readiness-dependent bindings. Obtain external input-bound B5 review, freeze final plan (omit root_review/execution_release keys), external root production review and detached release before any episode dispatch. Authority/accounting adopted in turn001288; no scientific promotion."
+}

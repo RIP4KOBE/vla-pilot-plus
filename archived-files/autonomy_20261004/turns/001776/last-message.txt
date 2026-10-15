@@ -1,0 +1,3 @@
+Continued N36 on source `a5b32cdef`. CPU execution-graph preparation is running with verified process identities; state, checkpoint, and operational summary are saved. All four owning ledgers remain unchanged.
+
+Next: reconcile preparation results and obtain independent review before readiness testing. Validation, formal evaluation, and required ablation evidence remain incomplete.

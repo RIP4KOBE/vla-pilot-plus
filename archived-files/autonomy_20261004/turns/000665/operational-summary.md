@@ -1,0 +1,9 @@
+Turn665 — 2026-10-08T22:51:42.096916+00:00
+
+Current source f351be8831cd426515b771cc247d1cd77cdda8bb; scientific source 1065f38122379a515b60a9a424f574330405b66f unchanged. Handoff/authority/context/completion contract verified. Prior turn664 completed normally and terminal closure matches exact owning ledger prefix. Driver268073/start97715947 and coordinator843546/start136259611 live on boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7; former controller802963 and worker805796 absent. STOP absent; deadline 2026-10-11T11:13:13Z. No active cohort.
+
+Completed CPU-only runtime diagnosis: eleven synthetic OpenGL conversions PASS including None, int, float, ctypes scalar, bytes and str. Existing serialization checks and strict runtime attestation/controller semantics PASS; CUDA uninitialized. Probe, candidate closure and review hash-bound under this turn. No benchmark source mutation, dispatch, ledger charge, scientific threshold change, process signal, or driver/coordinator lock acquisition. State/checkpoint/tree reference review. Initial CPU probe failure retained in runtime-v1; corrected probe and strict attestation in runtime-v2. All 448 attempts and 63.873736138346 GPUh retained.
+
+Next bounded step: Prepare isolated N34R6 recovery-identity repair through executor; preserve N34R5 and all predecessor invalid charges, source science and strict audits. Regenerate prospective runtime from turn665 CPU converter probe on adopted source; freeze new accounting/protocol/manifests and independently reviewed release before idle GPU7 admission. No replay or protected evaluation.
+
+Unresolved: full native runtime coverage, accepted matched Dev evidence, scientific promotion, validation20/formal10/required ablations and hash-bound original-goal completion. CPU coverage is not task efficacy. Driver continues.

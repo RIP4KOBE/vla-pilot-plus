@@ -1,0 +1,3 @@
+N36R3’s CPU binding refresh remains live on `d01bc1e2`; process identities verified. Saved the hash-bound operational summary.
+
+Accounting is unchanged: 505 attempts / 75.530312 GPU-hours. Next: reconcile its terminal report and complete the required review before GPU release. Validation, formal and ablation goals remain unmet.

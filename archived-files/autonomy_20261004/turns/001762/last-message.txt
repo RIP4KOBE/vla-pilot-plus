@@ -1,0 +1,3 @@
+Reconciled the completed CPU diagnosis: missing OpenGL inventory entries caused the rejection; source and strict audits remain unchanged. Seven focused checks passed, and all ledger charges were preserved.
+
+Recorded the handoff. Next is reviewing runtime coverage before a fresh recovery release. Validation, formal evaluation, and required ablation evidence remain incomplete.

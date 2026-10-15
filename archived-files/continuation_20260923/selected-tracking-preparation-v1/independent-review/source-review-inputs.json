@@ -1,0 +1,35 @@
+{
+  "scope": "source-only, no actual episode payload/outcome read",
+  "protocol_sha256": "abb6cf3d725a453397d49bc130d8889028bf59d86ca915abaff7ee48f2f9c539",
+  "source_root": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923",
+  "files": [
+    {
+      "path": "docs/03_evidence/qd_ed_final/continuation_20260923/post-n2-mechanism-space/selected-tracking-protocol-draft-v1.md",
+      "sha256": "abb6cf3d725a453397d49bc130d8889028bf59d86ca915abaff7ee48f2f9c539"
+    },
+    {
+      "path": "core/decision_evidence.py",
+      "sha256": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c"
+    },
+    {
+      "path": "scripts/audit_decision_evidence.py",
+      "sha256": "c5936a251bc8145093392136fc8b06779c499cb456953d1079fc4e26c68e1b95"
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "sha256": "cf5d50870738f94c6c8cb211e8e0557e2db5e67639da7c2bf545d54e9ed17bdc"
+    },
+    {
+      "path": "core/env_adapters/libero_adapter.py",
+      "sha256": "029657074f6fc783beebc3b4a1431faceee51f970e4d79f0ead3796b6dd2f508"
+    },
+    {
+      "path": "core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
+    },
+    {
+      "path": "main.py",
+      "sha256": "258d66b3040be8750beb9e0eab47a7b607db7cbe00d167726664526554fdec57"
+    }
+  ]
+}

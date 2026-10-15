@@ -1,0 +1,3 @@
+N32R2 controller identity verified and still live; frozen source and ledger history remain intact. Matched tasks 0–3 show C0/Q0/N32 each at 0/4.
+
+Saved turn 321’s operational summary. Next: monitor task 4 or terminal evidence. Validation, formal evaluation, and required ablations remain unfulfilled; the driver continues.

@@ -1,0 +1,79 @@
+{
+  "schema": "n36-b5-operational-token-integration-v1",
+  "at": "2026-10-10T20:05:35.998488+00:00",
+  "status": "PASS_EXACT_CONSUMER_REVIEW_SCHEMA",
+  "independent_report": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001604/independent-readiness-b5/report-v1.json",
+    "bytes": 32536,
+    "sha256": "678e07eb9e3472dc3742f9c96fb620bc5df3b815b82859b85529462bbfed5ff4"
+  },
+  "terminal_reconciliation": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001606/terminal-reconciliation-v1.json",
+    "bytes": 3442,
+    "sha256": "dc9323cb77a557b9843857fca2c946a9772401d611fec4dfe154e2c3b5d84315"
+  },
+  "reviewed_plan": {
+    "bytes": 386914,
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001601/attested-readiness-consumers/engineering-plan.disabled-v1.json",
+    "sha256": "bcc7a57c0a4028467c9bf588f433342066855faa427a14958235c963ded28a62"
+  },
+  "consumer": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/scripts/qd_ed_n36_engineering.py",
+    "bytes": 45703,
+    "sha256": "d93eed25e93fb4a211180cc9abdc76d767ca278a7663dbedd1f29aee53874af1"
+  },
+  "token": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001606/independent-b5.operational-v1.json",
+    "bytes": 383153,
+    "sha256": "7eb799afd87ba5fb3ce61cc6c3ab4fa69d29d94580b47768e43b863c73143541"
+  },
+  "binding_fields": [
+    "scope",
+    "accounting",
+    "audit_plan",
+    "engineering_manifest",
+    "source",
+    "scientific_source",
+    "scientific_equivalence",
+    "runtime",
+    "runtime_closure",
+    "native_build",
+    "controller_semantics",
+    "deployment"
+  ],
+  "validation": "Exact review dictionary extracted from hash-verified production validate_authority AST; JSON equality passed. Full validate_authority/readiness not executed.",
+  "prior_report_and_plan_unchanged": true,
+  "source_adopted": false,
+  "accounting_adopted": false,
+  "release_enabled": false,
+  "gpu_dispatch": false,
+  "target_met": false,
+  "outstanding_gates": [
+    {
+      "consumer": "scripts/qd_ed_n36_engineering.py:267-273",
+      "detail": "Production validate_authority expects exact closed-schema n36-engineering-independent-b5-review-v1 with decision PASS_PREPARATION_REQUIRES_ROOT_RELEASE, all 12 BINDINGS, worker_receipts_are_future=true and release_enabled=false. This detailed report is not that closed-schema token. A later authorized integration must bind this independent verdict to the exact reviewed plan bindings, preserving this report's scope and unresolved gates.",
+      "gate": "EXACT_OPERATIONAL_B5_TOKEN_INTEGRATION",
+      "satisfied": false
+    },
+    {
+      "detail": "Turns001595/001596 approvals exist historically, but five changed binding keys require final reattestation: audit_plan, engineering_manifest, runtime, runtime_closure, controller_semantics. Proposed replacements are not approvals or adoption.",
+      "gate": "FINAL_ROOT_PROTOCOL_SOURCE_ACCOUNTING_BUDGET_REATTESTATION",
+      "satisfied": false
+    },
+    {
+      "detail": "Retain turn001601 RuntimeOriginError at prohibited credentials-library path and ImportError at native/model import fence. No credentials file read or native import attempted by this reviewer. This is unresolved, not inferred PASS or proven fingerprint corruption. Root must complete actual unmodified closure in separately authorized environment.",
+      "gate": "FULL_PRODUCTION_RUNTIME_AND_AUDIT_CLOSURE",
+      "satisfied": false
+    },
+    {
+      "detail": "Separate root health release, fresh metered native healthcheck and settlement, then episode release; all source/runtime/native/audit closures and fresh STOP/deadline/budget/headroom gates remain required.",
+      "gate": "NATIVE_READINESS_AND_SEPARATE_RELEASES",
+      "satisfied": false
+    },
+    {
+      "detail": "No worker outcome or target success established.",
+      "gate": "FUTURE_WORKER_RECEIPTS_AND_SCIENTIFIC_OUTCOME",
+      "satisfied": false
+    }
+  ]
+}

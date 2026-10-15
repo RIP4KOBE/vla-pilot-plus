@@ -1,0 +1,9 @@
+Completed the disabled consumer refresh: 44 affected records, 1,644 bounded checks passed, final hashes verified. Source and prior history preserved; `release_enabled=false`.
+
+Remaining blockers: independent B5, renewed root approvals, full production closure blocked by execution restrictions, and later root release operations. Scientific goal remains incomplete.
+
+All requested artifacts and the precise proposed next command are in the [output directory](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001601/attested-readiness-consumers).
+
+Report SHA-256: `f275ce7221a93fd9ab0540443e8a0d9b5083cf8635348e09fe31c0ce00e5c82e`
+
+STOP absent; deadline open.

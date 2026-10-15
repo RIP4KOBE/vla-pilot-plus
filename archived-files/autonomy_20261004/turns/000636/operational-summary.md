@@ -1,0 +1,11 @@
+Turn636 — 2026-10-08T21:25:56.321473+00:00
+
+Owning source 9d0122c9fea8d6967cea3a7abba60489baae2302; scientific source71ffff1a0f70d9874b309db9ef1843c02bf17ebf unchanged. Hash-bound handoff and exact authority verified. Driver268073/start97715947 and coordinator635682/start135743908 verified on boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7; N34R2 controller592818/worker595896 absent and terminal record reconciled by turn634. Turn635 completed normally with ledger prefix retained. STOP absent; authorization ends2026-10-11T11:13:13Z. No active GPU cohort.
+
+Launched one official current-login gpt-6-astra CPU engineering executor in existing isolated production worktree. Wrapper639114/start135753864; executor639115/start135753867. Output: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/recovery3-identity-repair-v1. Authority limits work to N34R3 fresh identity/replacement binding and focused tests; CUDA hidden, no experiment/provider calls or scientific changes. Bounded1800sec. Driver locks untouched. State/checkpoint and node15.4 bind authority/process. Historical obsolete executor handles retained in prior records, live executor index corrected.
+
+Prospective arithmetic recorded before implementation:445 retained dispatches+30=475 of1800;63.45894268680093+5=68.45894268680092 of224GPUh; additional1 recovery/9 baseline/20 development gives19/98/298 respectively. Protected remaining validation24.240824002430816 and formal12GPUh preserved. This CPU authority is not a GPU release. All owning ledgers unchanged byte-for-byte; invalid outcomes/unknown telemetry retained.
+
+Next bounded step: Monitor existing N34R3 CPU identity executor by boot/PID/start; do not duplicate. After exit independently review scoped commit and focused tests, adopt operational identity repair, regenerate runtime with turn635 corrected inventory, and freeze fresh prospective accounting/protocol/30 manifests/root review/release with full public validation before GPU7 admission. Preserve N34R2 invalid charge and scientific gates.
+
+Unresolved: native runtime completeness, accepted fresh matched Dev efficacy, scientific promotion, validation20/formal10/required ablations and hash-bound original-goal completion. No completion claim; local driver continues.

@@ -1,0 +1,3 @@
+N36R1 accounting adopted: 40 Dev attempts, capped at 21 GPU-hours. Historical charges and protected reserves remain intact; source and ledgers are unchanged.
+
+No GPU cohort is running. State, checkpoint, and operational summary are updated. Next: production review and native readiness before release. Validation, formal, and ablation evidence remain outstanding.

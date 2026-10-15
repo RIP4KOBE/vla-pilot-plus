@@ -1,0 +1,3 @@
+N34’s controller identity is verified and it remains active in release revalidation. No new GPU attempt is recorded; frozen source, scientific gates, and ledgers remain unchanged.
+
+Turn 593’s operational summary is saved. The driver continues monitoring. Validation, formal evaluation, and required ablation evidence remain incomplete.

@@ -1,0 +1,9 @@
+Turn524: bound handoff/authorization verified; prior turn523 exit0. Driver268073/start97715947 and current coordinator2425862/start133520108 verified on boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. STOP absent; deadline2026-10-11T11:13:13Z open. Isolation ACTIVE/PASS. No active GPU controller or owned worker; terminal N34 wrapper2385726/executor2385727 absent.
+
+Completed independent source/reference/test semantic review against turn514 method. Accepted CPU integration only; cherry-picked a4edcfd650f94d5e40ab437c46d591058ccb6e73 into owning source 71ffff1a0f70d9874b309db9ef1843c02bf17ebf. All10 integrated file bytes equal reviewed commit; diff-check passes. Existing synthetic test evidence retained without broad repeats. Root review and adoption are hash-bound in state/checkpoint/tree. No GPU dispatch, protected evaluation, ledger mutation or scientific promotion.
+
+Ledger remains1326 rows/6659252 bytes/229878bc3a9d99fd596f363835f4ef1ae3c2757b7f34aa43e0aef985de1aa0f2;442 attempts and62.81145837588456GPUh retained. Live driver owns locks/lease; none acquired by this turn except normal state operation lock.
+
+Next bounded step: Prepare isolated N34 production worker/controller integration using docs/experiments/n34_cpu_implementation.md and existing N32R3 source-closure patterns. Bind external expected config/source manifest, pinned RDT modules and actual controller delta semantics; freeze fresh matched Dev protocol, finite accounting/reserves and release before any GPU dispatch. CPU source accepted/integrated; do not repeat completed N34 implementation or broad CPU review.
+
+Unresolved: production release attestation and real controller semantics, fresh matched Dev efficacy, original validation/formal/required ablation evidence. Original goal remains unmet; no completion record. Driver continues.

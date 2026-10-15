@@ -1,0 +1,3 @@
+N32R2 remains active on frozen source `1065f381`. Controller/worker identities and ledger integrity verified; no restart or duplicate dispatch.
+
+Task 3 N32 reports failure, pending terminal audit acceptance. Turn 310 operational summary saved. Next: monitor acceptance and cohort progression. Validation, formal, and ablation completion remain unevidenced.

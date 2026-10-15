@@ -1,0 +1,45 @@
+import pathlib,json,hashlib,datetime,os,sys,subprocess,yaml,shutil
+root=pathlib.Path.cwd();out=(root.parent/'autonomy_20261004/turns/001235').resolve();cp=root/'.arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/checkpoint.json';tree=cp.parent/'idea_tree.json'
+def ref(p):return {'path':str(p.resolve()),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+def read(r):
+ p=pathlib.Path(r['path']);assert ref(p)==r;return json.loads(p.read_text())
+def write(p,d):
+ tmp=p.with_suffix('.tmp');tmp.write_text(json.dumps(d,indent=2)+'\n');tmp.replace(p)
+validation=json.load(open(out/'public-release-validation-v1.json'));assert validation['status']=='PASS';plan=read(validation['plan']);release=read(validation['release']);a=read(plan['authority']);runtime=read(plan['runtime']);os.environ.update(runtime['environment']);sys.path[:0]=[str(root),str(root/'scripts')]+runtime['environment']['PYTHONPATH'].split(':')
+from scripts import qd_ed_final_runner as r,qd_ed_n36_runner as runner,qd_ed_n36_release as gate
+assert not pathlib.Path(plan['stop_path']).exists();assert not pathlib.Path(plan['stop_path']).is_symlink()
+assert datetime.datetime.now(datetime.timezone.utc)<datetime.datetime.fromisoformat(a['coordinator_ends_at'].replace('Z','+00:00'))
+with r.locked(root/'data/qd-ed-runner.lock',nonblocking=True):
+ with r.locked(root/'data/qd-ed-state.lock'):
+  s,ev,res,reserv=runner.snapshot(root,a)
+  assert not runner.existing_handles(plan,ev)
+  assert all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(ev).values())
+  assert s.get('active_controller') is None and not s.get('current_owned_workers')
+  new={**s,'budget':{**s['budget'],'amendment':a['amendment']},'n36_budget_authority':plan['authority']}
+  snap=gate.admission(plan,a,new,ev,res,reserv,plan['episodes'][0],now=datetime.datetime.now(datetime.timezone.utc),gpu_idle=True)
+  # Admission above is CPU accounting only; actual idle GPU/provider are rechecked by runner before reservation.
+  record={'schema':'n36-authority-adoption-v1','at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'plan':validation['plan'],'release':validation['release'],'authority':plan['authority'],'validation':ref(out/'public-release-validation-v1.json'),'accounting':snap,'gpu_dispatched':False}
+  write(out/'authority-adoption-v1.json',record)
+  for p in [root/'research-state.yaml',cp,tree]:shutil.copyfile(p,out/(p.name+'.before-update'))
+  new.update(active_iteration=a['cohort'],active_plan=validation['plan'],phase='N36R1_DEV_RUNNING',status='N36R1_RELEASE_ADOPTED_CONTROLLER_STARTING',n36_execution_release=validation['release'],n36_authority_adoption=ref(out/'authority-adoption-v1.json'),automatic_gpu_dispatch_authorized=True,automatic_gpu_dispatch_scope=a['cohort'])
+  ck=json.loads(cp.read_text());ck.update(active_iteration=a['cohort'],active_plan=validation['plan'],phase='N36R1_DEV_RUNNING',status=new['status'],n36_budget_authority=plan['authority'],n36_execution_release=validation['release'],n36_authority_adoption=ref(out/'authority-adoption-v1.json'),automatic_gpu_dispatch_authorized=True,automatic_gpu_dispatch_scope=a['cohort'])
+  for d in [new,ck]:
+   d['n36r1_owner_production_review'].update(status='CPU_OWNER_PRODUCTION_REVIEW_ACCEPTED',executor_exited=True,live_handles=[],terminal_reconciliation=ref(out/'terminal-and-release-review-v1.json'))
+   d['n36r1_public_release_validation']=ref(out/'public-release-validation-v1.json')
+   d['n36r1_execution_release']=validation['release']
+   d['next_action']='Monitor the single turn1235 N36R1 frozen runner; reconcile exact live handles and private ledger. No duplicate launch, automatic recovery, or protected-phase access.'
+  t=json.loads(tree.read_text());t['nodes']['15.6'].update(result='N36R1 independent production review and public final release validation PASS; development cohort dispatched through frozen runner.',insight='Production argv and deadline repair accepted with unchanged scientific protocol. No task-success evidence or protected-phase promotion.',execution_authorized=True,execution_release=validation['release'])
+  tmp=root/'research-state.yaml.tmp';tmp.write_text(yaml.safe_dump(new,sort_keys=False));tmp.replace(root/'research-state.yaml');write(cp,ck);write(tree,t)
+write(out/'release-refs-v1.json',{'plan':validation['plan'],'release':validation['release']})
+controller=out/'controller.py';assert controller.exists()
+env=os.environ.copy();env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',NUMEXPR_NUM_THREADS='1')
+with (out/'controller.log').open('ab',buffering=0) as log:
+ p=subprocess.Popen(['/home/hynx/miniconda3/envs/vla-pilot/bin/python3.12','-B',str(controller)],cwd=root,env=env,stdin=subprocess.PIPE,stdout=log,stderr=log,start_new_session=True)
+ stat=pathlib.Path(f'/proc/{p.pid}/stat').read_text().split(') ',1)[1].split();h={'pid':p.pid,'boot_id':pathlib.Path('/proc/sys/kernel/random/boot_id').read_text().strip(),'start_ticks':int(stat[19]),'state':stat[0]}
+ record={'schema':'n36-controller-launch-v1','at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'handle':h,'script':ref(controller),'plan':validation['plan'],'release':validation['release'],'authority':plan['authority'],'status_path':str(out/'controller-status-v1.json'),'result_path':str(out/'controller-result-v1.json')};write(out/'controller-launch-v1.json',record)
+ with r.locked(root/'data/qd-ed-state.lock'):
+  s=r.read_state(root/'research-state.yaml');ck=json.loads(cp.read_text());active={'kind':'N36_CONTROLLER','handles':{'controller':h},'launch':ref(out/'controller-launch-v1.json'),**{k:record[k] for k in ['status_path','result_path','plan','release']}}
+  for d in [s,ck]:d.update(active_controller=active,status='N36R1_CONTROLLER_RUNNING')
+  tmp=root/'research-state.yaml.tmp';tmp.write_text(yaml.safe_dump(s,sort_keys=False));tmp.replace(root/'research-state.yaml');write(cp,ck)
+ p.stdin.write(b'G');p.stdin.close()
+print(json.dumps(record))

@@ -1,0 +1,5 @@
+N35’s controller identity and ledger continuity are verified; it remains active between cells. Frozen source and cohort rules are unchanged.
+
+Interim Dev results: C0/Q0/N34/N35 each 0/5. No duplicate dispatch or restart occurred. Operational summary saved for turn 001056.
+
+Next: monitor the existing controller. Validation, formal, and required ablation evidence remain incomplete.

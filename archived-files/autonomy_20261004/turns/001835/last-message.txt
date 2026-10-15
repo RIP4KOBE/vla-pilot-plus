@@ -1,0 +1,3 @@
+Continuation recorded. Runtime admission remains blocked; one bounded CPU repair executor is running. No GPU cohort was launched, and ledgers and reserves remain unchanged.
+
+Next: review the repair and rerun graph admission. Validation, formal evaluation, and required ablation completion remain unevidenced.

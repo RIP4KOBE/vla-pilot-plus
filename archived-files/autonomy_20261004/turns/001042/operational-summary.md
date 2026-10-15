@@ -1,0 +1,9 @@
+# Turn 001042 operational summary
+
+Frozen source: `52a87af0bf11f95b21ce17aba456dc98944d9774`. Controller: `{"pid": 2632351, "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7", "start_ticks": 141061885, "state": "S", "ppid": 12479, "cpu_ticks": 597668}`. Direct children: `[{"pid": 3431763, "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7", "start_ticks": 143056464, "state": "D", "ppid": 2632351, "cpu_ticks": 24460}]`. Driver PID 268073 retains coordination ownership and its locks.
+
+Handoff, exact user authority, current launch/plan/release and completion contract verified. Prior turn completed normally and its ledger prefix is intact. Resource isolation ACTIVE/PASS. STOP: False; deadline elapsed: False; window ends 2026-10-11T11:13:13Z. Ledger: 1478 rows / 7370251 bytes. Terminal result present: False. Interim Dev counts: {"C0": {"valid": 5, "success": 0}, "Q0": {"valid": 5, "success": 0}, "N34": {"valid": 4, "success": 0}, "N35": {"valid": 4, "success": 0}}. GPU7 UUID GPU-48473162-9548-1a19-04aa-ea86c5349187 has the single observed worker PID3431763. Task4 N34 remains dispatched. Coarse controller status is stale; verified live identities and ledger establish continuity. Historical checkpoint next_action is superseded by active N35 records.
+
+Completed bounded live reconciliation and monitoring. No dispatch/replay/recovery, process signals, source changes or state/ledger mutation. Next bounded step: monitor existing N35 worker/controller through next outcome or terminal record; reconcile native audits and accounting before scientific disposition. Preserve frozen source/plan/thresholds, all old charges, unknown telemetry and protected reserves. Validation/formal/required-ablation completion evidence remains unresolved; target not met.
+
+Reconciliation: `end-reconciliation-v1.json`, SHA-256 `80e7d6f5975ac3ce47fa1473a349019bb7c6ceeaa4afc90cf00ec828c5ecd7fc`.

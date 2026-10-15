@@ -1,0 +1,3 @@
+Adopted reviewed N32R3 operational repair `36aac818` and recorded the handoff. All 438 attempt charges remain intact; no GPU cohort is active.
+
+Next: prepare and verify the prospective execution release. Validation, formal evaluation, and required ablation evidence remain outstanding. The local driver continues.

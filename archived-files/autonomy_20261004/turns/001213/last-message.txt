@@ -1,0 +1,3 @@
+Adopted the independently reviewed N36R1 operational repair as source `066f2bf`. Recorded the handoff; all 503 attempts and 75.2678 GPU-hours remain preserved.
+
+No GPU cohort is running. Next: fresh runtime/accounting bindings and release checks. Validation, formal evaluation and required ablation evidence remain incomplete.

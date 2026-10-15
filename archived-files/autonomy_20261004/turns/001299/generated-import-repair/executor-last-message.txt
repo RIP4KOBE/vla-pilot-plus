@@ -1,0 +1,7 @@
+Committed `e4914cb4baf91bbb66f91e25584652eb273b8904`.
+
+The generated-import repair passes 54 focused CPU tests. Scientific files/settings are unchanged; working tree is clean.
+
+Full receipt consumption remains blocked by the existing `importlib._bootstrap` frozen-alias failure. No release or GPU work occurred.
+
+[JSON report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001299/generated-import-repair/report-v1.json>) · [Markdown report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001299/generated-import-repair/report-v1.md>) — exact commands, evidence, and source delta hashes included.

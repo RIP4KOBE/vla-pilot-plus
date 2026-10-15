@@ -1,0 +1,5 @@
+N32R2 remains active on frozen source `1065f381`; controller `1818171` and worker `383113` identities verified. Ledger history is intact.
+
+Task 4 C0 reports failure in its log; authoritative settlement is pending. Next step is receipt and accounting reconciliation. Validation/formal/ablation completion remains unmet.
+
+Turn 327 operational summary saved; the existing driver continues coordination.

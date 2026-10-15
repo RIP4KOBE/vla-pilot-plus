@@ -1,0 +1,11 @@
+Turn513: N33 CPU reachability closed; no GPU dispatch.
+
+Current source 04d1255016fa13a2d467995b9e37a6a829356a1c; scientific source 1065f38122379a515b60a9a424f574330405b66f unchanged. Driver268073/start97715947 and coordinator2352376/start133265613 verified on boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. N32R3 controller1070042 absent, NUMERIC_FUTILITY/exit0; state/checkpoint have no active controller or worker. Turn512 exit0 and registration hash verified, no abnormal side effects to recover. STOP absent; authorization ends2026-10-11T11:13:13Z.
+
+Completed availability-first hash-bound extraction across18 accepted development cells,1571 decisions. All540 N32 observation packets present:102 eligible guided recognized-target decisions with nonempty jaw intervals, zero literal current-prism entry hits, zero possible changed proposal opportunities;438 decisions have no recognized target. Controls1031 missing packets remain Unknown. No malformed N32 packets. Node15.3 pruned by its prospective CPU rule; no threshold adjustment, new provider call, benchmark-source edit, protected-result read or full native audit replay. Review SHA256 8875685f1fefc75089911df2a3554c9334b8b9ce3588c9c612d78fd47eb877c5.
+
+Owning ledger unchanged1326 rows/6659252 bytes/SHA256 229878bc3a9d99fd596f363835f4ef1ae3c2757b7f34aa43e0aef985de1aa0f2;442 dispatches and62.81145837588456GPUh retained, protected reserves unchanged. State/checkpoint/tree link the closure.
+
+Next bounded step: Constraints-first Arbor successor ideation using N33 exact current-observation trigger rejection and N32 projection-error evidence. N33 has zero entry hits across all102 eligible guided N32 dev decisions; do not expand its prism or tune thresholds. Select a distinct falsifiable mechanism addressing observed execution/geometry or capture timing, screen feasibility before isolated executor implementation, and freeze prospective dev source/protocol/native audits before any new GPU release. Preserve all442 charges and protected gates; no historical replay or protected-result access.
+
+Unresolved: a reachable and effective capture mechanism, tracked-keypoint grasp relevance, original validation/formal/required-ablation evidence. Goal unmet; no completion record. Local driver continues.

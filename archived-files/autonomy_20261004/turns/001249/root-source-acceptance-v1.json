@@ -1,0 +1,112 @@
+{
+  "schema": "n36-alias-root-source-acceptance-v1",
+  "at": "2026-10-10T02:16:05.056845+00:00",
+  "node_id": "15.6",
+  "decision": "ACCEPTED_SOURCE_ONLY",
+  "source_base": "ca4e6a96d049c7ebb1f302d755883388ddbfdbd8",
+  "accepted_isolated_commit": "e95745853ec2fbb95e55915e99644a4dc0443261",
+  "owner_source_unchanged": true,
+  "source_adopted": false,
+  "review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001247/review/report-v1.json",
+    "sha256": "6634a67c9202f79f36f83d5908b716b539c6e37925325132f3b9650f77e4d354",
+    "bytes": 18635
+  },
+  "review_exit": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001247/review/executor-exit-v1.json",
+    "sha256": "ebcbe15e8a22ce39e4edaa806fba7a668d77ec6bd9fc51a274d164705ffcbb42",
+    "bytes": 96
+  },
+  "reviewed_diff_sha256": "6c3ef5bd1a6493d043496089e54b9e105e2bf9b0f00bab2306353a068a762f82",
+  "verification": [
+    "Review, exit, authority, repair report and all reviewed source artifact hashes match.",
+    "Isolated HEAD matches reviewed commit; tracked working files clean; diff digest matches independent review.",
+    "Root inspected production source diff; finite explicit alias authority and strict no-rule behavior retained.",
+    "Prior turn receipt records normal exit 0; controller and review/repair processes are absent; no duplicate launched."
+  ],
+  "tests": "Independent review: 34 focused tests passed plus 6 negative/layout probes; prior positive/import-order tests inspected, not repeated. No broad test rerun by root.",
+  "limitations": [
+    "Source PASS is limited to prospective alias-validator changes at the hash-bound commit; no new production closure, scientific result, release or dispatch is accepted.",
+    "No end-to-end production bootstrap/simulator/native GPU evaluation was run. Worker diagnostic test AST-executes intact worker function with inert collaborators.",
+    "Composition fixture layout limitation remains explicit and unresolved.",
+    "Object identity attestation is point-in-time; this is not continuous monitoring or protection against arbitrary in-process tampering.",
+    "All tests used synthetic fixtures; installed import-order coverage was inspected but not repeated. No historical failed native origin was recovered.",
+    "Prohibited design document, protected validation/formal results, credentials, Poe files and Superpowers were not opened."
+  ],
+  "next_bounded_production_requirements": [
+    "Create and independently review a new hash-bound runtime closure with explicit finite module_aliases opt-in against frozen qualified native records; do not modify or relax historical closures.",
+    "Bind the reviewed operational source commit, complete ordinary inventory, generated rule, interpreter/distributions and native build into the new production artifacts; verify process-bound v3 receipts through the actual source-only bootstrap and parent path with bounded authorized CPU evidence.",
+    "Resolve or use the supported composition checkout layout and run the focused composition gate without weakening STOP/layout validation.",
+    "Separately authorize and review fresh recovery identity/episode names, protocol, accounting, source/closure/native bindings and detached release. Existing N36R1 paths cannot be reused.",
+    "Preserve N36R1 INVALID and every retained charge. No replay, rehabilitation, promotion or GPU dispatch is authorized by this review."
+  ],
+  "runtime_closure_accepted": false,
+  "recovery_release_accepted": false,
+  "gpu_dispatch_authorized_by_this_record": false,
+  "scientific_promotion": false,
+  "target_met": false,
+  "n36r1_disposition": "INVALID, all charges retained; no replay or rehabilitation",
+  "ledger_prefixes": {
+    "gpu-healthcheck-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "sha256": "b4df8fb3c8e45bbe24e560e55262819430d0c5a4da9754f09062d59fdb480ff6",
+      "bytes": 71240
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+      "bytes": 401
+    },
+    "attempt-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "sha256": "32db62bfda1e6da93aac4bdce85d44881048f0ce455203e68d7e06bdb3e6dbff",
+      "bytes": 7537764
+    }
+  },
+  "live_handles": {
+    "268073": {
+      "pid": 268073,
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "start_ticks": 97715947,
+      "state": "S",
+      "live": true
+    },
+    "488201": {
+      "pid": 488201,
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "start_ticks": 146126049,
+      "state": "S",
+      "live": true
+    },
+    "391755": {
+      "pid": 391755,
+      "live": false
+    },
+    "455478": {
+      "pid": 455478,
+      "live": false
+    },
+    "455481": {
+      "pid": 455481,
+      "live": false
+    },
+    "478929": {
+      "pid": 478929,
+      "live": false
+    },
+    "478933": {
+      "pid": 478933,
+      "live": false
+    }
+  },
+  "standing_authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c",
+    "bytes": 1942
+  },
+  "completion_contract": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/completion-contract-v1.json",
+    "sha256": "4e825a595c3422824f5160b42690528a03a1ac4d8d2cf4025576a3bb59b2514c",
+    "bytes": 654
+  }
+}

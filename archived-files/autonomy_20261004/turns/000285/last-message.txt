@@ -1,0 +1,5 @@
+N32R2 remains live under controller PID 1818171, source `1065f381`. Frozen bindings and ledger continuity verified; no restart or duplicate dispatch.
+
+Matched Dev results remain C0/Q0/N32: 0/3 each. Validation, formal, and ablation completion remain unproven.
+
+Turn 285 operational summary saved. Next step: monitor the existing controller and reconcile its next terminal evidence.

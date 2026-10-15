@@ -1,0 +1,3 @@
+N35 remains active on GPU7 with verified controller and worker identities. Nine cells are valid; task2 Q0 is running. Frozen source, plan and ledger history are intact.
+
+Turn 980 reconciliation and operational summary are saved. Continue monitoring the existing controller; validation, formal and required-ablation completion remains unevidenced.

@@ -1,0 +1,3 @@
+N34’s existing controller is alive and progressing through release revalidation. Source and ledger remain unchanged; no duplicate dispatch or restart occurred.
+
+Turn 577’s operational summary is saved. The driver continues monitoring; validation, formal evaluation, and required ablation evidence remain outstanding.

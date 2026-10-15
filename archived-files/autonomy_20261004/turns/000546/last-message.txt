@@ -1,0 +1,3 @@
+Registered the pinned LeRobot database and verified all 682 dependency files. Scientific code, charges, and reserves remain unchanged; no GPU dispatch occurred.
+
+Recorded the handoff for continued runtime verification. Validation, formal evaluation, and ablation evidence remain outstanding; the original goal is not yet met.

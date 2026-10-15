@@ -1,0 +1,50 @@
+{
+  "schema": "n35-protocol-root-acceptance-v1",
+  "at": "2026-10-09T10:33:16.787269+00:00",
+  "source": "969d5fb57c90f61dfc93331346f0ea8158f4eaf1",
+  "disposition": "PASS_CPU_IMPLEMENTATION_ONLY",
+  "independent_report": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000885/n35-protocol-review/report-v1.json",
+    "sha256": "e7bf4a834bfe1900543a9c6bc5fbfdb336c980e3b73901671d70c6501c7cc684"
+  },
+  "executor_exit": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000885/n35-protocol-review/executor-exit-v1.json",
+    "sha256": "8d30af41122b0097cae0636b5412435d49bc314db693b1c609271a6159bbcf71"
+  },
+  "protocol": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000884/n35-prospective-protocol-v2.json",
+    "sha256": "b8ac519a02623a7f033c5ce4b9c805bf1970f10224e29c0f851ba8568b000345"
+  },
+  "accounting": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000884/prospective-accounting-v2.json",
+    "sha256": "0e6925d214c7613ef2f6a7ffe5b8ec04d6f90fb134b40f0e77e111a67204491c"
+  },
+  "scientific_fields_unchanged": true,
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 7099066,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "sha256": "e6bb943ec36f4afa13f006d5232912bfc283158a7e09353979591a1bc8ef71d3"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "bytes": 401,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    }
+  },
+  "live_reviewer_handles": [],
+  "review_obligations": [
+    "In a separately authorized isolated CPU implementation, prove selected occurrence identity through archive copies/deduplication and decoder/step-return acknowledgements. Equal-content aliases cannot be assigned an N34 origin by content alone; ambiguous origin cannot arm memory.",
+    "Test the single boundary-entry consumption and all ten parent rounds, expiry regardless of winner, every reset/exception path and absence of memory-origin rearming. Preserve source template bytes, other coordinates and other 15 candidates at replacement.",
+    "Keep N35 memory absent in C0/Q0/N34. Verify N34 fallback, same-process mandatory audits across arms, exact runtime/provider/source manifests, native dtype/shape hashes and source adoption before any later release.",
+    "Test complete-quadruple futility and invalidity stopping, partial denominators, zero retries, STOP/deadline drain and atomic charge/reservation admission. Bound cumulative healthcheck allowance and full cleanup time; never borrow protected reserves.",
+    "Report trigger exclusions, native and decoded deltas separately, archive survival, selected direct origins and actual execution. A gate pass is not efficacy or completion and cannot authorize protected phases."
+  ],
+  "gpu_authorized": false,
+  "target_met": false
+}

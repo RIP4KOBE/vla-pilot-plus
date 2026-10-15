@@ -1,0 +1,3 @@
+N32’s first C0 cell remains active on GPU7. Controller/worker identities, frozen source `c427e7ac`, and ledger continuity verified; no duplicate dispatch or restart.
+
+Turn 109 operational summary saved. Next: monitor terminal receipt and native audit. Validation, formal, and required ablation evidence remain outstanding.

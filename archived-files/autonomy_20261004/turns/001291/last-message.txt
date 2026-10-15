@@ -1,0 +1,5 @@
+Verified authority, live identities and unchanged ledgers. N36R2 CPU preparation remains active on source `30c6321715df`; no duplicate launched.
+
+Retained: 504 attempts / 75.492650385 GPU-hours. Operational summary saved for turn 001291.
+
+Next: reconcile the executor’s report, then complete independent review and release gates. Validation, formal evaluation and required ablation evidence remain incomplete.

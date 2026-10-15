@@ -1,0 +1,5 @@
+N31 continues under verified controller `203563`; task 0 candidate worker `284821` is alive. Source `7428ce8a51f7` and frozen rules remain unchanged.
+
+C0 and Q0 task 0 both recorded valid failures. Ledger history is intact; operational summary saved.
+
+Next: monitor the candidate’s native audited outcome. Validation, formal evaluation, and required ablation evidence remain outstanding.

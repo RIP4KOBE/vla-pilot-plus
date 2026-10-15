@@ -1,0 +1,3 @@
+Recorded scoped root acceptance of the N36 controller evidence and updated the owning state/checkpoint. Ledger history is unchanged; no GPU worker is live.
+
+Next: refresh affected graph bindings and run the unchanged validator. Runtime readiness and validation/formal/ablation completion remain unproven. The driver continuation remains active.

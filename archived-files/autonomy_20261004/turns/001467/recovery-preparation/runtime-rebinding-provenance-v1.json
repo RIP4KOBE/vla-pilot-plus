@@ -1,0 +1,358 @@
+{
+  "prior_runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001448/binding-refresh/runtime.isolated.disabled-v1.json",
+    "sha256": "c6aec77622bde5fb4e637635f4779c48b95d58c43597f4d03bde41b5d9d0f5dc"
+  },
+  "prior_closure": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001448/binding-refresh/runtime-closure.isolated.disabled-v1.json",
+    "sha256": "9ded7eb5e6f692363405ffb09d16319628254541589918bbd5cca2acc192f056"
+  },
+  "source_updates": [
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_bootstrap.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_bootstrap.py",
+        "sha256": "b58430c8d7381e13791ad62cc00ce8cb11d7c344192df9729f0d4bdbc306fb64",
+        "size_bytes": 5831
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_bootstrap.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_bootstrap.py",
+        "sha256": "4b5c6649b47803570ad6dc29151589a62b5c35c5a00c29448fa84f05c201ce8b",
+        "size_bytes": 6384
+      }
+    },
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_source.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_source.py",
+        "sha256": "dc11451c64d24f8c3d74fb2ed63ac98e96b38760253879a9d90f874e03854497",
+        "size_bytes": 19424
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_source.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_source.py",
+        "sha256": "e6557d5fe5335a52776c57f1586d701e7628461f9fa665f79a414d17565cb70b",
+        "size_bytes": 21404
+      }
+    },
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_worker.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_worker.py",
+        "sha256": "f719b22fe54c4beb4ef908040cc130efca7c28ce46fad68243745ac46cda5726",
+        "size_bytes": 29899
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_worker.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_worker.py",
+        "sha256": "bfffce692e3ef50d71d68911da470cb74776643bb77137f996b8041713ae4e8a",
+        "size_bytes": 29967
+      }
+    }
+  ],
+  "module_updates": [
+    {
+      "module": "scripts.qd_ed_n36_bootstrap",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_bootstrap.py",
+        "sha256": "b58430c8d7381e13791ad62cc00ce8cb11d7c344192df9729f0d4bdbc306fb64"
+      },
+      "after_sha256": "4b5c6649b47803570ad6dc29151589a62b5c35c5a00c29448fa84f05c201ce8b"
+    },
+    {
+      "module": "scripts.qd_ed_n36_source",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_source.py",
+        "sha256": "dc11451c64d24f8c3d74fb2ed63ac98e96b38760253879a9d90f874e03854497"
+      },
+      "after_sha256": "e6557d5fe5335a52776c57f1586d701e7628461f9fa665f79a414d17565cb70b"
+    },
+    {
+      "module": "scripts.qd_ed_n36_worker",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_worker.py",
+        "sha256": "f719b22fe54c4beb4ef908040cc130efca7c28ce46fad68243745ac46cda5726"
+      },
+      "after_sha256": "bfffce692e3ef50d71d68911da470cb74776643bb77137f996b8041713ae4e8a"
+    }
+  ],
+  "historical_readiness_not_transferred": {
+    "cuda_egl_verified": true,
+    "metadata_mapping_verified": true,
+    "provider_ready": true,
+    "cuda_egl_probe": {
+      "resource_id": "n35_healthcheck_bootstrap_20261009_turn915",
+      "evidence_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000915/gpu-probe/probe-evidence.json",
+      "evidence_sha256": "362de6b67d3f0ca26e90f61fc66ea07a1712aac8c7d695491060ef5005803f3d"
+    },
+    "gpu_mapping": {
+      "physical_gpu": 7,
+      "egl_device_index": 4,
+      "uuid": "GPU-48473162-9548-1a19-04aa-ea86c5349187",
+      "pci_bus_id": "00000000:E1:00.0",
+      "driver_version": "580.65.06",
+      "drm_pci_verified": false,
+      "metadata_mapping_verified": true,
+      "cuda_egl_verified": true,
+      "historical_gpu7_egl4_holds": true,
+      "devices": [
+        {
+          "egl_device_index": 0,
+          "extensions": [
+            "EGL_NV_device_cuda",
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "cuda_attribute_ok": true,
+          "physical_cuda_ordinal": 3,
+          "drm_device_file": ""
+        },
+        {
+          "egl_device_index": 1,
+          "extensions": [
+            "EGL_NV_device_cuda",
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "cuda_attribute_ok": true,
+          "physical_cuda_ordinal": 2,
+          "drm_device_file": ""
+        },
+        {
+          "egl_device_index": 2,
+          "extensions": [
+            "EGL_NV_device_cuda",
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "cuda_attribute_ok": true,
+          "physical_cuda_ordinal": 0,
+          "drm_device_file": ""
+        },
+        {
+          "egl_device_index": 3,
+          "extensions": [
+            "EGL_NV_device_cuda",
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "cuda_attribute_ok": true,
+          "physical_cuda_ordinal": 1,
+          "drm_device_file": ""
+        },
+        {
+          "egl_device_index": 4,
+          "extensions": [
+            "EGL_NV_device_cuda",
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "cuda_attribute_ok": true,
+          "physical_cuda_ordinal": 7,
+          "drm_device_file": ""
+        },
+        {
+          "egl_device_index": 5,
+          "extensions": [
+            "EGL_NV_device_cuda",
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "cuda_attribute_ok": true,
+          "physical_cuda_ordinal": 6,
+          "drm_device_file": ""
+        },
+        {
+          "egl_device_index": 6,
+          "extensions": [
+            "EGL_NV_device_cuda",
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "cuda_attribute_ok": true,
+          "physical_cuda_ordinal": 4,
+          "drm_device_file": ""
+        },
+        {
+          "egl_device_index": 7,
+          "extensions": [
+            "EGL_NV_device_cuda",
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "cuda_attribute_ok": true,
+          "physical_cuda_ordinal": 5,
+          "drm_device_file": ""
+        },
+        {
+          "egl_device_index": 8,
+          "extensions": [
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "drm_device_file": "/dev/dri/card1",
+          "drm_pci_bus_id": "0000:61:00.0"
+        },
+        {
+          "egl_device_index": 9,
+          "extensions": [
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "drm_device_file": "/dev/dri/card2",
+          "drm_pci_bus_id": "0000:41:00.0"
+        },
+        {
+          "egl_device_index": 10,
+          "extensions": [
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "drm_device_file": "/dev/dri/card3",
+          "drm_pci_bus_id": "0000:01:00.0"
+        },
+        {
+          "egl_device_index": 11,
+          "extensions": [
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "drm_device_file": "/dev/dri/card4",
+          "drm_pci_bus_id": "0000:21:00.0"
+        },
+        {
+          "egl_device_index": 12,
+          "extensions": [
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "drm_device_file": "/dev/dri/card5",
+          "drm_pci_bus_id": "0000:e1:00.0"
+        },
+        {
+          "egl_device_index": 13,
+          "extensions": [
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "drm_device_file": "/dev/dri/card6",
+          "drm_pci_bus_id": "0000:c1:00.0"
+        },
+        {
+          "egl_device_index": 14,
+          "extensions": [
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "drm_device_file": "/dev/dri/card7",
+          "drm_pci_bus_id": "0000:81:00.0"
+        },
+        {
+          "egl_device_index": 15,
+          "extensions": [
+            "EGL_EXT_device_drm",
+            "EGL_EXT_device_drm_render_node",
+            "EGL_EXT_device_query_name",
+            "EGL_EXT_device_persistent_id"
+          ],
+          "drm_device_file": "/dev/dri/card8",
+          "drm_pci_bus_id": "0000:a1:00.0"
+        },
+        {
+          "egl_device_index": 16,
+          "extensions": [
+            "EGL_MESA_device_software",
+            "EGL_EXT_device_drm_render_node"
+          ]
+        }
+      ],
+      "created_utc": "2026-09-29T09:39:05Z",
+      "metadata_cuda_ordinal_namespace": "unmasked_pci_bus_id",
+      "enumeration_only": true,
+      "display_or_context_calls": false,
+      "allowed_egl_calls": [
+        "eglGetProcAddress",
+        "eglQueryDevicesEXT",
+        "eglQueryDeviceAttribEXT",
+        "eglQueryDeviceStringEXT"
+      ]
+    },
+    "preparation": {
+      "source": "711602acc32031cfd977a2b3ec2e7ef0582e7377",
+      "source_record": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001448/binding-refresh/source.complete-v1.json",
+        "sha256": "0f8143b009bafe9df274caea616e359cdc9327dd221eca27ad09f43df4a85933"
+      },
+      "status": "DISABLED_CPU_BINDING_REFRESH",
+      "runtime_ready": false,
+      "release_enabled": false,
+      "historical_runtime": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001429/binding-refresh/runtime.isolated.disabled-v1.json",
+        "sha256": "e235f7f912e107856fc5b043552f48d2e628fe129d04acd68c5e42c25a556930"
+      },
+      "historical_readiness_is_not_current": true
+    },
+    "preparation_history": [
+      {
+        "source": "066f2bf57e05111fea329ff7c393ac3e002d7c0f",
+        "release_enabled": false,
+        "runtime_ready": false,
+        "historical_runtime": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001198/runtime.ready-v1.json",
+          "sha256": "f23ba8f1230f11f1cac02c7768158fa8f21e5835236fc4e03a42fd9fcc85ab63"
+        },
+        "historical_device_provider_receipts_are_not_current_readiness": true,
+        "status": "CPU_COMPOSED_DISABLED",
+        "no_provider_or_device_probe": true
+      },
+      {
+        "source": "ca4e6a96d049c7ebb1f302d755883388ddbfdbd8",
+        "release_enabled": false,
+        "runtime_ready": true,
+        "runtime_ready_scope": "Inherited turn1223 readiness only after unchanged-input verification; not new live evidence or release",
+        "status": "CPU_OWNER_REBIND",
+        "historical_runtime": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001223/runtime.ready-v1.json",
+          "sha256": "33da2baedb6a8a345de062267047985c4b0acfc1370d59f10e9e334d890c2de5"
+        },
+        "readiness_review": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001223/runtime-readiness-review-v1.json",
+          "sha256": "44987b8a333059baf7e10534cc91861df77e28d8d012dd046d0169ae2ebd6f2a"
+        },
+        "no_provider_or_device_probe": true
+      }
+    ]
+  },
+  "removed_inventory_entries": []
+}

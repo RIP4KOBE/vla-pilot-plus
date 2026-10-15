@@ -1,0 +1,3 @@
+N36R1 remains on source `066f2bf`. The existing production reviewer is active with verified process identities; no duplicate or GPU job was launched. Ledgers and reserves are unchanged.
+
+Operational summary saved. Next: reconcile the review and complete release validation. Original validation, formal, and ablation evidence remains outstanding.

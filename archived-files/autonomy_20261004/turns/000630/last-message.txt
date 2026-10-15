@@ -1,0 +1,3 @@
+N34R2 passed full release verification for 30 manifests. One controller is live (PID 592818), revalidating before locked GPU7 admission.
+
+All prior charges, unknown telemetry and protected reserves remain intact. Operational handoff recorded; the driver continues monitoring. Validation, formal and ablation evidence remain outstanding—completion is not claimed.

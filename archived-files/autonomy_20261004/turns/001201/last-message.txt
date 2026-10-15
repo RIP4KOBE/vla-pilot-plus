@@ -1,0 +1,3 @@
+N36 stopped before task execution on a native-build metadata mismatch. All cohort processes exited; the invalid attempt and 86.4-second charge are preserved.
+
+Recorded reconciliation and the next CPU-only diagnosis step. Source, scientific gates, and frozen records remain unchanged. Validation, formal evaluation, and required ablation evidence remain incomplete.

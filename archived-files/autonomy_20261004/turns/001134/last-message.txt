@@ -1,0 +1,5 @@
+Reconciled N35 accounting: 502 attempts, 75.243793 GPU-hours; historical charges and protected reserves preserved.
+
+N35 failed its frozen Dev futility gate. No experiment controller is active. State, checkpoint, and operational handoff are updated.
+
+Next: bounded Dev mechanism review. Validation, formal, and required ablation evidence remain incomplete.

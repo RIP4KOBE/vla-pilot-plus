@@ -1,0 +1,3 @@
+Adopted N32 runtime-alias repair at `c427e7a`; 28 focused tests passed. Ledgers remain intact, and no GPU cohort is running.
+
+Next: rebuild source-bound manifests and validate the release before dispatch. Operational handoff is recorded; validation/formal/ablation goals remain unmet.

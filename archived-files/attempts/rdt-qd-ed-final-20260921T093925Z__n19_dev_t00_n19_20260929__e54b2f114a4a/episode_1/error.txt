@@ -1,0 +1,19 @@
+Error during episode execution:
+Traceback (most recent call last):
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py", line 1518, in run
+    self._run_episode(episode, episode_dir, episode_seed)
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py", line 1817, in _run_episode
+    action_chunk = self.policy.select_action(**select_kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py", line 1580, in select_action
+    raw = self._predict_guided(
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py", line 1784, in _predict_guided
+    guided = self._eds_guided_denoise_loop(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py", line 6975, in _eds_guided_denoise_loop
+    stage_raw_rewards = original_rewards(population_info, final_rewards, None if qd_archive is not None else population)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/rdt_policy_steer.py", line 5115, in original_rewards
+    raise RuntimeError("N2 canonical original reward association missing or invalid")
+RuntimeError: N2 canonical original reward association missing or invalid

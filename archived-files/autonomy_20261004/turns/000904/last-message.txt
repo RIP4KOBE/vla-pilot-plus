@@ -1,0 +1,3 @@
+N35 implementation exited successfully; commit and artifact hashes verified. Independent CPU implementation, audit, and controller review is now running.
+
+Accounting remains unchanged; no GPU work dispatched. Source adoption and scientific promotion remain gated. Operational handoff saved for the driver’s next turn; the original validation/formal/ablation goal remains unmet.

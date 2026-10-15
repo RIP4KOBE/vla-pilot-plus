@@ -1,0 +1,5 @@
+Continued N36 on source `ab8e8c6`. Independent runtime review is running under verified PIDs 116992/116994.
+
+Accounting remains unchanged: 502 attempts, 75.243793 GPU-hours. No GPU dispatch occurred. Operational summary saved.
+
+Next: reconcile the review before prospective release. Validation, formal, and required ablation evidence remain incomplete.

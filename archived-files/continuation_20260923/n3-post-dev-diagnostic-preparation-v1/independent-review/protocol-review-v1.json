@@ -1,0 +1,27 @@
+{
+  "schema": "n3-complete-cohort-protocol-independent-review-v1",
+  "status": "PROTOCOL_NO_BLOCKER_IMPLEMENTATION_NOT_YET_REVIEWED",
+  "scope": "source-only review; no new actual episode/derived scientific payload reads for this task",
+  "references": {
+    "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-post-dev-conditional-preparation-v1/source-only-memo-v1.md": "13b87184d2ce47fdab63eb55ac98bee684c45978deffa238ece905d535559dcd",
+    "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-post-dev-diagnostic-preparation/protocol-v1.md": "cd007fa3ab559367fadcf6f42e584cefd2cca77fe31c3f0ed3900bcb262ed64a"
+  },
+  "preserved_definitions": [
+    "chronology including absent versus empty Stage and original EEF/gripper interval conventions",
+    "FP64 previous full8 residual times i/8 versus zero on actual i<=m, no gain/window/scorer fitting",
+    "first3-v2 actual-selected-relative final consumer relation or strict raw gap, canonical and nonselected-only comparisons descriptive"
+  ],
+  "required_implementation_review": [
+    "all30 task0..9 x C0/Q0/N3 exact accepted representative/recovery/own-plan/source/runtime identities before any native decode",
+    "authoritative complete matrix and exact original audit/status/index/bundle bindings; no legacy N2 admission or hidden fresh audit",
+    "terminal/pre-reset and actual m<8 plus runtime eligibility separately from structural temporal pairing",
+    "native duplicate occurrence ambiguity and all final-pool ties preserved",
+    "unknown optional Stage values remain Unknown; all records and all30 outputs retained before interpretation"
+  ],
+  "not_authorized": [
+    "actual cohort read",
+    "GPU/model/provider/projector/simulator",
+    "W/source/state/ledger changes",
+    "candidate or science-definition changes"
+  ]
+}

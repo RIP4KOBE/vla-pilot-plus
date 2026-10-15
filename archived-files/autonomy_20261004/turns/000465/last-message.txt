@@ -1,0 +1,3 @@
+Verified authority and live process identities. The existing N32R3 CPU repair executor is progressing; no duplicate or GPU job was launched.
+
+Ledger and scientific source remain unchanged. Operational summary recorded for driver continuation. Next: review the completed repair and validate its release. Original research goal remains unmet.

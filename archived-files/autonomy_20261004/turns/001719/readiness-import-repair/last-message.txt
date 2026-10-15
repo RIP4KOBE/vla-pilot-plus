@@ -1,0 +1,7 @@
+Committed `1c10f9dd2afed8f8301e61f42dde46b8fa9565ed`; worktree clean.
+
+The repair initializes the admitted Torch producer before requiring its generated module, preserving strict closure audits. All 63 focused CPU tests passed.
+
+[Report and verified SHA-256 sidecar](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001719/readiness-import-repair/report-v1.json) written.
+
+No CUDA initialization, GPU/provider execution, or native-readiness claim. The consumed resource was not replayed. Fresh measurement requires independent review, a new recovery identity/release, and source-bound graph refresh.

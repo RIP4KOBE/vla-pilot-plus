@@ -1,0 +1,3 @@
+N32R2 controller 1818171 remains live on frozen source `1065f381`. Task 0 C0 completed validly with failure; matched Q0/N32 evidence remains pending.
+
+Verified authority, process identity, and ledger continuity. Saved turn 159’s operational summary. Next step is continued controller monitoring; validation, formal, and ablation completion remain unproven.

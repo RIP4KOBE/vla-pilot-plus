@@ -1,0 +1,3 @@
+CPU repair finished successfully and delivered commit `6baa930`; 16 focused tests passed. Artifact hashes and unchanged private ledgers verified.
+
+Operational summary recorded. Next: independent repair review before adoption and a fresh recovery release. No GPU dispatch occurred; validation/formal/ablation completion remains unproved.

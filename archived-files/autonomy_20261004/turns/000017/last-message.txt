@@ -1,0 +1,5 @@
+N31 continues on GPU7 under verified controller 203563; worker 421229 is running task2 Q0. Frozen source remains `7428ce8a`.
+
+Seven cells are audited: C0 0/3, Q0 0/2, N31 0/2. Ledger history is intact; no restart or scientific changes were needed.
+
+Turn 17 operational summary is saved. Next: monitor cohort progression, then review terminal evidence. Validation, formal, and ablation completion remain unproven.

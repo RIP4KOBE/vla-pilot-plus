@@ -1,0 +1,3 @@
+Continued the owning study: restored 45 verified LFS payloads and passed G3/G4 CPU runtime checks. Recorded the hash-bound summary and updated state/checkpoint.
+
+Charges remain 506 attempts / 75.606 GPU-hours. No GPU worker is active. Next: G5 audit preparation; remaining engineering gates and original validation/formal/ablation evidence are still outstanding.

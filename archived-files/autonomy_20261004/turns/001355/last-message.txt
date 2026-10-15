@@ -1,0 +1,3 @@
+Continuation recorded. One CPU executor is refreshing bindings for repair commit `21fc93e`; its live handles are saved for monitoring. No GPU experiment was launched, and all ledger charges remain unchanged.
+
+Next: verify refreshed bindings and obtain independent review before release. Validation, formal evaluation, and ablation evidence remain outstanding.

@@ -1,0 +1,3 @@
+Repair `e957458` completed; independent CPU review is running. Owning source and ledgers remain unchanged, with no GPU dispatch.
+
+Turn 001247’s hash-bound operational summary is recorded. Next: reconcile review before preparing recovery. Validation, formal, and required ablation evidence remain unmet.

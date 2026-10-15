@@ -1,0 +1,50 @@
+{
+  "artifact_free_bytes": 652855476224,
+  "baseline_originals": 4,
+  "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+  "budget": {
+    "aborted": 4,
+    "by_bucket": {
+      "baseline": 16,
+      "development": 58,
+      "formal": 0,
+      "recovery": 6,
+      "validation": 0
+    },
+    "completed": 76,
+    "dispatched": 80,
+    "gpu_healthcheck_hours": 0.20961513444019236,
+    "gpu_healthcheck_inflight": 0,
+    "gpu_hours_by_bucket": {
+      "baseline": 1.819408092041348,
+      "development": 8.5067729418525,
+      "formal": 0.0,
+      "recovery": 1.0769918294311285,
+      "validation": 0.0
+    },
+    "gpu_hours_consumed": 11.403172863324977,
+    "invalid": 6,
+    "reserved_attempts": 80,
+    "running": 0,
+    "valid": 70
+  },
+  "development_originals": 8,
+  "local_originals": 12,
+  "max_dispatches": 16,
+  "new_health_dispatches": 0,
+  "protected_validation_formal_attempts": 100,
+  "protected_validation_formal_hours": 24,
+  "reused_health_resources": [
+    {
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_egl__060fecd66f77",
+      "scope": "reused_prior"
+    },
+    {
+      "resource_id": "rdt-qd-ed-final-20260921T093925Z__gpu3_freshboot_model_first__be47760b9287",
+      "scope": "reused_prior"
+    }
+  ],
+  "schema": "qd-ed-n4e1-predispatch-resource-snapshot-v1",
+  "utc": "2026-09-24T09:56:34.329731+00:00",
+  "worktree_free_bytes": 24413470720
+}

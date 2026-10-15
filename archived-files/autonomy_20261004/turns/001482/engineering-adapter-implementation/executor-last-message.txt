@@ -1,0 +1,5 @@
+Committed `3b05c0b` as a **disabled partial implementation**.
+
+190 focused CPU tests pass. Scientific code/configs remain unchanged. Dispatch is hard-disabled pending complete release/lifecycle integration tests and independent review. No GPU execution or owner-state writes occurred.
+
+Reports include exact coverage, gaps, commands, and fixture failures: [Markdown](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001482/engineering-adapter-implementation/report-v1.md) · [JSON](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001482/engineering-adapter-implementation/report-v1.json).

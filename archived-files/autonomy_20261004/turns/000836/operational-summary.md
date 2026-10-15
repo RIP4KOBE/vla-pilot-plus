@@ -1,0 +1,7 @@
+Turn 836: Continued authorized Arbor monitoring. Handoff/authorization and launch/plan/release/completion-contract hashes verified; owning state/checkpoint agree; prior turn835 completed normally. All three prior ledger prefixes intact. Isolation ACTIVE/PASS, STOP absent, deadline 2026-10-11T11:13:13Z remains future.
+
+Current source 4b390b3e0c6b708572736939749a0fab0fb7ef37; scientific source 1065f38122379a515b60a9a424f574330405b66f. Controller {'pid': 1322966, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 137471973, 'state': 'R'}; driver {'pid': 268073, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 97715947, 'state': 'S'}; current child handles []. Controller result present: False. Monitor record SHA256 4bef3d447715258d0d8040d0bcd7ab2971026c8025d1f07d2e53c7b5b2bf3ad3.
+
+N34R11 counts {'C0': {'valid': 6, 'success': 0}, 'Q0': {'valid': 6, 'success': 0}, 'N34': {'valid': 6, 'success': 1}}; events {'reserved': 18, 'dispatched': 18, 'valid': 18}; cumulative dispatches 471. Task5 N34 newly recorded valid success, yielding six complete matched triples. No source/state/budget/ledger changes, restart, replay, signals, new coordinator or protected evaluation access.
+
+Next bounded step: monitor existing controller through remaining frozen cohort or its prospective terminal decision. Reconcile native receipts, denominators and costs at termination before promotion/disposition. Validation/formal/required ablation goal remains unevidenced. No completion record warranted; existing driver retains coordination.

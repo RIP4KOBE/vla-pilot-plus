@@ -1,0 +1,53 @@
+{
+  "schema": "n34r1-recovery-identity-source-adoption-v1",
+  "at": "2026-10-08T20:29:02.433898+00:00",
+  "source_before": "2d61cff3f4f0530e89294567586569e2b3bbfd72",
+  "candidate": "908efa454450a079c5ed6a1b10eff1eb9ef290c1",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000620/engineering-review-v1.json",
+    "sha256": "fd0eef678b48a38134cd8f20b529df4d67f09a9648d0ab818955781161c65f3a"
+  },
+  "gpu_dispatch": false,
+  "scientific_promotion": false,
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6665435,
+      "sha256": "fa460c62818cc45c123a529b783eaedeb726ff93a0a4b068442410e5877644e5",
+      "unchanged": true
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7",
+      "unchanged": true
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+      "unchanged": true
+    }
+  },
+  "source_after": "3cb1f736ceb42acde2e40b1e7f2c22b0f8de9df7",
+  "tree": "762f10635cd7a32adf2984d4d99ef2402bff9963",
+  "implementation_result": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/recovery-identity-repair-v1/implementation-result-v1.json",
+    "sha256": "d53a98d1af8b66362b5378f166f0887a4df13ae2c4e6defd49a8ef5cf106d2c2"
+  },
+  "executor_exit": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/recovery-identity-repair-v1/executor-exit-v1.json",
+    "sha256": "5b3304b2c8dee450b98dee1987916036c540d4d8c82ee28d6bce7900beb6af34"
+  },
+  "identical_integrated_files": [
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n34_contract.py",
+    "scripts/qd_ed_n34_prepare.py",
+    "scripts/qd_ed_n34_release.py",
+    "scripts/qd_ed_n34_runner.py",
+    "scripts/qd_ed_n34_supervise.py",
+    "scripts/qd_ed_n34_worker.py",
+    "tests/test_n34_lifecycle.py",
+    "tests/test_n34_production_integration.py",
+    "tests/test_n34_recovery_identity.py",
+    "tests/test_n34_release_boundary.py"
+  ],
+  "next_step": "Regenerate N34R1 source/runtime/30 fresh manifests and detached release on adopted repair, with9 baseline/20 development/1 recovery and5 GPUh prospective cap; preserve invalid N34/unknown telemetry. Bounded full CPU verification must pass before fresh idle GPU7 admission. No scientific promotion or protected evaluation authorized."
+}

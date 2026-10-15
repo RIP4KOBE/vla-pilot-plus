@@ -1,0 +1,5 @@
+Continued N34 preparation: tokenizer runtime coverage and receipt verification passed; 30 disabled manifests regenerated. Scientific source and accounting remain unchanged.
+
+Next: reviewed release wiring before GPU dispatch. Validation, formal evaluation, and ablation evidence remain outstanding.
+
+[Operational summary](../autonomy_20261004/turns/000562/operational-summary.md)

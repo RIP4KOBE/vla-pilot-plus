@@ -1,0 +1,3 @@
+Adopted reviewed N32 source `abbdb396`, preserved mutable records and ledger history, and updated the owning checkpoint and operational summary.
+
+No experiment controller is running. Next: assemble and validate N32’s prospective release before GPU dispatch. Validation, formal evaluation, and required ablation evidence remain incomplete.

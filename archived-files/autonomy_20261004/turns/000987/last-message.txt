@@ -1,0 +1,5 @@
+N35 remains active on GPU7: controller PID 2632351, worker PID 3086181. Source `52a87af0` remains frozen.
+
+Verified process identities, authorization and ledger integrity. Ten development cells are recorded valid; task2/N34 is running. No duplicate dispatch or recovery was needed.
+
+Turn987 operational summary saved. Monitoring continues through the existing driver; validation, formal and required-ablation evidence remains incomplete.

@@ -1,0 +1,3 @@
+N32 CPU integration delivered commit `260f19e`; file and test-log hashes verified, with 48 focused tests passing. Executor exited; driver remains live and ledgers unchanged.
+
+Operational summary recorded. Next: independent runtime/auditor review before GPU release. Validation, formal evaluation and ablations remain outstanding.

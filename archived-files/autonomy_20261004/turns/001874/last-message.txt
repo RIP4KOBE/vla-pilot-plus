@@ -1,0 +1,3 @@
+Continued the owning study. The CPU readiness check is running with the corrected cache-path setting; its live handles and next step are recorded in the checkpoint.
+
+No GPU dispatch occurred. Scientific source and ledgers remain unchanged. Validation, formal evaluation, and required ablation evidence remain incomplete.

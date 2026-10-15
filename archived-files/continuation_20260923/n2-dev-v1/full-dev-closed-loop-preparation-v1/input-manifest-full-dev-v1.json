@@ -1,0 +1,669 @@
+{
+  "cells": [
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "05a19eaada0032a21a279e1ebd0f3d6933b31b27111c6ea5a2c22945e3ad696e"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/eds_eval/episode_metadata.jsonl",
+        "sha256": "b6b785e25090ff0c13297e2c596ed90130acecb3cdd72654b9d12a25c17fbde1"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/eds_eval/stage_events.jsonl",
+          "sha256": "bac0717cf0d761c051514dd894dcd7a27880d0007cfe85f06683815892499776"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "bf9fcde6ad16a492202574c33a63d556ba0bca6f11201a80e6ee7f3b2019db32"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "b9c675b24cbdf0923878fc16cc7299e91a2d5fabef89e5758e566d53c6eaecc3"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/eds_eval/episode_metadata.jsonl",
+        "sha256": "b6b785e25090ff0c13297e2c596ed90130acecb3cdd72654b9d12a25c17fbde1"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/eds_eval/stage_events.jsonl",
+          "sha256": "56c5b65b35931ba7adf1f86ed68d95a4b4f7fa72de35624f260270237445b829"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_q0_recovery1_20260923__28dd3c7a9e74/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "9e23522621aacf381fce7bec0340159cf36bc58ad655a654caeeffa8d6b4853d"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "b30e9820282202e06579bf559bbe1d32169d015a1d15c6afb474c4434a252cf5"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/eds_eval/episode_metadata.jsonl",
+        "sha256": "b6b785e25090ff0c13297e2c596ed90130acecb3cdd72654b9d12a25c17fbde1"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/eds_eval/stage_events.jsonl",
+          "sha256": "0d788e78211ca7fd9af2e54555f37cb0e2917072c41af0591da4a54b2e6481e1"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_n2_20260923__45c5f8694f85/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "74b83fc0e3b1549aeb8b7fb0bbcba1564086489b1c4f828f50df92790766d8c5"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_c0_20260923__cc90e218d323",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_c0_20260923__cc90e218d323/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "ab78e2bca06bd3a8d5e5116e29a22795074bd06c7ed56791d89d9a6fabd3ba29"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_c0_20260923__cc90e218d323/eds_eval/episode_metadata.jsonl",
+        "sha256": "312e67f015ca533c1875e7ab90854d25ee6ea9998a5e1049c6c9d0f1ccba0475"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_c0_20260923__cc90e218d323/eds_eval/stage_events.jsonl",
+          "sha256": "afd1f89948b98e803f65ef7e5ab1a4b45b7a92bfbaa909db3c15d59a8db9e2d6"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_c0_20260923__cc90e218d323/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "6dbe68717243a806b039f9feb5fe38760ca1257fbd4d8b376a9633b6641f92ba"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_q0_20260923__ade0e87c0fda",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_q0_20260923__ade0e87c0fda/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "aff4458d96dae886c460aaf319da62b48315a91a66b8df3b7db60ddb5e3510c1"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_q0_20260923__ade0e87c0fda/eds_eval/episode_metadata.jsonl",
+        "sha256": "312e67f015ca533c1875e7ab90854d25ee6ea9998a5e1049c6c9d0f1ccba0475"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_q0_20260923__ade0e87c0fda/eds_eval/stage_events.jsonl",
+          "sha256": "0706289527bf72c37aa5c93ded7c2b29d8ac1562cc7369e8a5001288a03f6831"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_q0_20260923__ade0e87c0fda/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "7337f7f935427e845579f8dd8f7d38bf16a24c5c98b1a9c978829b0402e3aeab"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_n2_20260923__2ef05a2ea69e",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_n2_20260923__2ef05a2ea69e/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "c5962be4a25195fb036e58e1eee08ca037e61e0f6fa80c799bdaf85059b6305e"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_n2_20260923__2ef05a2ea69e/eds_eval/episode_metadata.jsonl",
+        "sha256": "312e67f015ca533c1875e7ab90854d25ee6ea9998a5e1049c6c9d0f1ccba0475"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_n2_20260923__2ef05a2ea69e/eds_eval/stage_events.jsonl",
+          "sha256": "c7f92247258dfcf05f33d4c77a8f204077cb1ae4ecd51be2f9174af0b0d65cdd"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t01_n2_20260923__2ef05a2ea69e/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "2e9e85af6359bb96382909435fda643c82c555b86fb1dd5d6196df980d37c06a"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_c0_20260923__a7caab524ecc",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_c0_20260923__a7caab524ecc/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "4abe61058da8450c8654227e5c492eb4a913ec3fedf795a872e8789744b225f6"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_c0_20260923__a7caab524ecc/eds_eval/episode_metadata.jsonl",
+        "sha256": "2e9b58e7c4f160277ec8b9c33827d04d08ceff16a1f18c0fd9181143cf2990b3"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_c0_20260923__a7caab524ecc/eds_eval/stage_events.jsonl",
+          "sha256": "80a1ad87560641a471954014df1d1d50a73003ac989f1f68a649a4aed8323f45"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_c0_20260923__a7caab524ecc/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "2b2953629fdf35eb4c5df2f16b3fa99a8ae804e42d5371b40180eb5af15ea3db"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_q0_20260923__5621338664ed",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_q0_20260923__5621338664ed/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "0e02c58f3f14641159fa598bfc7193ff91c98d30dd34d18fc6da6845468f21d0"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_q0_20260923__5621338664ed/eds_eval/episode_metadata.jsonl",
+        "sha256": "2e9b58e7c4f160277ec8b9c33827d04d08ceff16a1f18c0fd9181143cf2990b3"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_q0_20260923__5621338664ed/eds_eval/stage_events.jsonl",
+          "sha256": "52606ded486796ec36bdabd9415bae75704d5daf9a7520e722156cc50df4950f"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_q0_20260923__5621338664ed/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "4d012d00dbe4aa14d1b3f6e19a724eba317b202b39751f245668fab0d763711c"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_n2_20260923__1fbdd93d0ba9",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_n2_20260923__1fbdd93d0ba9/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "7bb97a63275863bfcd7fc74075d98732f909280340a535ec611c34812400ef20"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_n2_20260923__1fbdd93d0ba9/eds_eval/episode_metadata.jsonl",
+        "sha256": "2e9b58e7c4f160277ec8b9c33827d04d08ceff16a1f18c0fd9181143cf2990b3"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_n2_20260923__1fbdd93d0ba9/eds_eval/stage_events.jsonl",
+          "sha256": "3491106d24795a40310abbe6784834287ae85da26ebed3620e7b61aacf37a931"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t02_n2_20260923__1fbdd93d0ba9/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "f341fe178eba7627eaafeb2fb56f23cc9ce65f718aa2cb5407471cade3bc1be9"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_c0_20260923__00eab44b3500",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_c0_20260923__00eab44b3500/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "35e38a51ad91fe28d2631fb8b824cf3d1caf9cc3b94ebabaa887a25d512e3bd3"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_c0_20260923__00eab44b3500/eds_eval/episode_metadata.jsonl",
+        "sha256": "640b0b426edcad6fe93c9d8bfb2ded1c722640c74929e8af9b66213ac258ed61"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_c0_20260923__00eab44b3500/eds_eval/stage_events.jsonl",
+          "sha256": "ec13c09498b417d05e140a48b270ac02c1b57ffeeccfda4ae3b9edd45ed39cfe"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_c0_20260923__00eab44b3500/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "a2619dd465965235512a202a7a917db4108370b3175b1b9d2c278f5d1666cf9c"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_q0_20260923__6c72ee7e1726",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_q0_20260923__6c72ee7e1726/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "62b3d07df1709dc1431c68c05f287cbfe5c1421e210945cc160f65cba572b59f"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_q0_20260923__6c72ee7e1726/eds_eval/episode_metadata.jsonl",
+        "sha256": "640b0b426edcad6fe93c9d8bfb2ded1c722640c74929e8af9b66213ac258ed61"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_q0_20260923__6c72ee7e1726/eds_eval/stage_events.jsonl",
+          "sha256": "7e1cb9d117d8503b91fa28a4c476e2474092c6410bd1c956c53176e656caa1ee"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_q0_20260923__6c72ee7e1726/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "4ce623634b4a5815b974de268be6cceaa1dabebd97f87caeb5786a812e0c2648"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_n2_20260923__13df3ae055a9",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_n2_20260923__13df3ae055a9/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "06be295b36fd69f1b3c70f13141a06891762a22f20e1366994ad2aca4f021604"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_n2_20260923__13df3ae055a9/eds_eval/episode_metadata.jsonl",
+        "sha256": "640b0b426edcad6fe93c9d8bfb2ded1c722640c74929e8af9b66213ac258ed61"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_n2_20260923__13df3ae055a9/eds_eval/stage_events.jsonl",
+          "sha256": "9f132266404d48472cd2176efb3ccacff139fffef459a3f6b3c755256a64938c"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t03_n2_20260923__13df3ae055a9/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "6a058e244f2d0fd2a7d77307d213c54b20c9716381d3c20c71b21935808ad85d"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_c0_20260923__695be5681246",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_c0_20260923__695be5681246/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "59ee4cdc67dee1a2313bf16c3d4a5ee2ac003ed9b866ea577e8088c4afa3bc03"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_c0_20260923__695be5681246/eds_eval/episode_metadata.jsonl",
+        "sha256": "17288636ed32c0311ddfc84f750226103b99fe86d5c6668a3bcd65dde794ff62"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_c0_20260923__695be5681246/eds_eval/stage_events.jsonl",
+          "sha256": "628e45dadd0b7c2ebe117db3d7d3e61d9b93aa7e3406cf7767b06977086da9a9"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_c0_20260923__695be5681246/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "585b391dec159d01aa58186a45babb34c0e6344220f280bbc53aa06d7a2392bf"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_q0_20260923__333584f44696",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_q0_20260923__333584f44696/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "5a4f1244c4797694d738122ef78f9d0c9e1a9347aec99e767f484b34513ca0e9"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_q0_20260923__333584f44696/eds_eval/episode_metadata.jsonl",
+        "sha256": "17288636ed32c0311ddfc84f750226103b99fe86d5c6668a3bcd65dde794ff62"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_q0_20260923__333584f44696/eds_eval/stage_events.jsonl",
+          "sha256": "52df0ab91205902fc9b24b54e1c899ceb5f59814ad51a8d62d414314def56eba"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_q0_20260923__333584f44696/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "9cd45885361c91cf0ec3cb04977a56d6e186bb8dd6f794a335a602b2890d42be"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_n2_20260923__2c3cf6dd13c3",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_n2_20260923__2c3cf6dd13c3/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "8fc945e66d3a6ae7065fa6ef1a2dd23b0e2a2c7fbaa5d99eb88b6e83ac210d48"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_n2_20260923__2c3cf6dd13c3/eds_eval/episode_metadata.jsonl",
+        "sha256": "17288636ed32c0311ddfc84f750226103b99fe86d5c6668a3bcd65dde794ff62"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_n2_20260923__2c3cf6dd13c3/eds_eval/stage_events.jsonl",
+          "sha256": "9a1bb9a6139aeab7447bd93c16f2824aedaad51e3c322bf5ec4f420da7b34125"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t04_n2_20260923__2c3cf6dd13c3/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "1e84ee038cbdb31c8f1717c91ce666d0a33db02f78af4ec5822ad8ffec1b19c0"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_c0_20260923__5d314c406280",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_c0_20260923__5d314c406280/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "f860e7d008d24bcf6e70ffa8b10efe641e10fa6abea22f2aa3d52fca83b25f27"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_c0_20260923__5d314c406280/eds_eval/episode_metadata.jsonl",
+        "sha256": "7cd32b7e35753da86271985ac37fb3f2ecfc4ac9aaf5d1287c752176299b5f65"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_c0_20260923__5d314c406280/eds_eval/stage_events.jsonl",
+          "sha256": "8ecee3f1811a311818b4b8f95eeb8547b092ec02b99014164f5c7121a7c36291"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_c0_20260923__5d314c406280/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "687bf95f865491a6d96d1c573c544cf2e16bf87492d91f44fda91399be8baf29"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_q0_20260923__da259f430d35",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_q0_20260923__da259f430d35/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "784df501298a8f041856a5b3d825e0f6e9dbe14602a976c8a904f645c4079734"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_q0_20260923__da259f430d35/eds_eval/episode_metadata.jsonl",
+        "sha256": "7cd32b7e35753da86271985ac37fb3f2ecfc4ac9aaf5d1287c752176299b5f65"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_q0_20260923__da259f430d35/eds_eval/stage_events.jsonl",
+          "sha256": "e58f3b33c680245168cdc07f937f938cdf566753be7dab819e75c4e5669613e2"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_q0_20260923__da259f430d35/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "dc77bf46267622022861691a3d61cb76bda1ce2b5f65ee40205a377d9f2ccafc"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_n2_20260923__fc1ced4747dc",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_n2_20260923__fc1ced4747dc/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "24eb872a9f4d688a8003e10109cecc2a0ba1da065fcece8477a6ae3ee47aed8e"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_n2_20260923__fc1ced4747dc/eds_eval/episode_metadata.jsonl",
+        "sha256": "7cd32b7e35753da86271985ac37fb3f2ecfc4ac9aaf5d1287c752176299b5f65"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_n2_20260923__fc1ced4747dc/eds_eval/stage_events.jsonl",
+          "sha256": "71f95d52060294732f5cc95ae07207b31b748eb5bddfeed517a442c9fcd54017"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t05_n2_20260923__fc1ced4747dc/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "56d31bebf10447de416d1f2e3ea4141d364f7cdd8af9f6dcc3daf7c663d734f4"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_c0_20260923__89f03f047b9b",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_c0_20260923__89f03f047b9b/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "a74b9f6049e6e5644ffe88db9e97441367eab898de28d7763c06debc49a445f2"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_c0_20260923__89f03f047b9b/eds_eval/episode_metadata.jsonl",
+        "sha256": "f4b9cc62508196968eb0fccf200be15dcf6129ca341e9af8a1ef0c7cf48295b5"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_c0_20260923__89f03f047b9b/eds_eval/stage_events.jsonl",
+          "sha256": "fffbf7c50078d094ae6121be809ad0ea49196a27a8b362a329767c85b7970753"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_c0_20260923__89f03f047b9b/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "8cc6e93ef7b9ef7b411d4bddea75d048473c67bb6b4f342ad482027b59dd2f6c"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_q0_20260923__727226a3d7ab",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_q0_20260923__727226a3d7ab/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "195da64b3120d07f43a0829df12598d70ee759512359a955a999b6a2d6a5c83c"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_q0_20260923__727226a3d7ab/eds_eval/episode_metadata.jsonl",
+        "sha256": "f4b9cc62508196968eb0fccf200be15dcf6129ca341e9af8a1ef0c7cf48295b5"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_q0_20260923__727226a3d7ab/eds_eval/stage_events.jsonl",
+          "sha256": "9e86511dd738bb11d1a8a8c160c0e0be5284bda1eb86045a752c0fefdcd7bdad"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_q0_20260923__727226a3d7ab/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "6273c6eea04938c856a18524c94ba58cfb4421b677e1dfe9e30c204f98ad7402"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_n2_20260923__338dc43b286e",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_n2_20260923__338dc43b286e/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "933e96128ef4223a0c5ddf696230fb8c85adcaacc9a4a318cc2a1ebc9d06c662"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_n2_20260923__338dc43b286e/eds_eval/episode_metadata.jsonl",
+        "sha256": "f4b9cc62508196968eb0fccf200be15dcf6129ca341e9af8a1ef0c7cf48295b5"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_n2_20260923__338dc43b286e/eds_eval/stage_events.jsonl",
+          "sha256": "e69e1970701f2d91bffe716192d15fca3faf133a99a9d2ca52aad093d808df41"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t06_n2_20260923__338dc43b286e/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "0ce3855a5255d5d2e06c59cdde985a6ec8cb587134bac909cb25ada1f2c70c34"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_c0_20260923__82244e140f10",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_c0_20260923__82244e140f10/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "730dd028e66ea9ac8dfcd948cfe5b026fc86dca8fd2533f40b2dff6dca928545"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_c0_20260923__82244e140f10/eds_eval/episode_metadata.jsonl",
+        "sha256": "68b239f29db8ed7400c61028cf6a3cae8a680b6c8a556de679547f22a2512084"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_c0_20260923__82244e140f10/eds_eval/stage_events.jsonl",
+          "sha256": "f5fa64107220cdd2caecdd2d4a9fc23a707ac6e4d68fed97d90afdbac3ddeeaf"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_c0_20260923__82244e140f10/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "3b61920fe4a44250618b344a0a4187a997ad99e0796e1f501825bc33c4a17281"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_q0_20260923__1ef119a81905",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_q0_20260923__1ef119a81905/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "a94140fa3bc9dddf0951509e7b3da7e773234273d01a6f1fff80434b8bbd6c6b"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_q0_20260923__1ef119a81905/eds_eval/episode_metadata.jsonl",
+        "sha256": "68b239f29db8ed7400c61028cf6a3cae8a680b6c8a556de679547f22a2512084"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_q0_20260923__1ef119a81905/eds_eval/stage_events.jsonl",
+          "sha256": "7418d582e82283da7e6cffcd73eb4ef003984c1b56f2a2de1328380d6856247f"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_q0_20260923__1ef119a81905/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "f6f6afb5fa3d80d42d2998b6aed53d6042f7bfff595827d952ba6858266acf75"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_n2_20260923__a22c33849902",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_n2_20260923__a22c33849902/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "4fdf424d75594804d451760a606addd43d2b0e9cb833c4c935efe563c830e5fc"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_n2_20260923__a22c33849902/eds_eval/episode_metadata.jsonl",
+        "sha256": "68b239f29db8ed7400c61028cf6a3cae8a680b6c8a556de679547f22a2512084"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_n2_20260923__a22c33849902/eds_eval/stage_events.jsonl",
+          "sha256": "993c154b747a0ae9427da37bc1349a3e7301e5a11d966f80db3b1af86df0fed0"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t07_n2_20260923__a22c33849902/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "8b5aa29fd1f5078b794f5e098928703e34f5f63b1842cf7272cb62419e1658bf"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_c0_20260923__3111277332ac",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_c0_20260923__3111277332ac/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "8005c5a02ad029ddc719a58d2cc662ab1edc14c16965a04a81e2473077792515"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_c0_20260923__3111277332ac/eds_eval/episode_metadata.jsonl",
+        "sha256": "2b5c45523f4db0e52bb00709051ee759368300355b7774846df2841d5a9ef85b"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_c0_20260923__3111277332ac/eds_eval/stage_events.jsonl",
+          "sha256": "9a02a8f3b78abbb27fe700777d2cd9de51f1feee9cc03ec8c457e4256da221fb"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_c0_20260923__3111277332ac/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "9a44ed5729f501af851ebfaa6c865b3439e3c80bc642c332dc6262ee3e2b2a17"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_q0_20260923__c6064f2b289c",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_q0_20260923__c6064f2b289c/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "590cd5b2f6b5e52b57cb9111da0b2a6754930a4a0b1d6cecd63559228938c8ae"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_q0_20260923__c6064f2b289c/eds_eval/episode_metadata.jsonl",
+        "sha256": "2b5c45523f4db0e52bb00709051ee759368300355b7774846df2841d5a9ef85b"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_q0_20260923__c6064f2b289c/eds_eval/stage_events.jsonl",
+          "sha256": "81f6ada392146edf4a9c790047d148c762f158a438339633637cea5386fc5767"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_q0_20260923__c6064f2b289c/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "d516d27ce8bae6761e6adf754e8dd620bd9a83d03064b8dd84f000e9b67905a9"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_n2_20260923__a0f81b80c939",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_n2_20260923__a0f81b80c939/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "60bc92b26e5dd6490ee3409b9b93047b0742a17b473f59fce248ef1642f2ac46"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_n2_20260923__a0f81b80c939/eds_eval/episode_metadata.jsonl",
+        "sha256": "2b5c45523f4db0e52bb00709051ee759368300355b7774846df2841d5a9ef85b"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_n2_20260923__a0f81b80c939/eds_eval/stage_events.jsonl",
+          "sha256": "7aff2018e61441e72c7a8705766e11a88a1bae62fec09e3a5eb3e0179651e685"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t08_n2_20260923__a0f81b80c939/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "c9c6b64f63b2afee0110826883596f3b998973854cd30d80e6ff1161cf8bf951"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_c0_20260923__2a7b4037d020",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_c0_20260923__2a7b4037d020/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "c83de10f26ae2623709663f30f83e2858a6f9f228cbdfb08f0f76318086f9172"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_c0_20260923__2a7b4037d020/eds_eval/episode_metadata.jsonl",
+        "sha256": "44e50afc6b1456f06c154d8ddf7738c5eab7c8a450c024176bf860a6186fd86c"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_c0_20260923__2a7b4037d020/eds_eval/stage_events.jsonl",
+          "sha256": "22493d965191d26839f9cc50d3c92735d8da2139a860953ab5a5097559d2df8d"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_c0_20260923__2a7b4037d020/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "4e874b4743648d0b4cb33c24e4d91f9a0e527ef3ab2b436a41d9f996332588e9"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_q0_20260923__eb55f1b3e3e7",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_q0_20260923__eb55f1b3e3e7/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "a649206d14746cf2f2a377b57ddf2282485251f38a4f252d535f55a2ece56a11"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_q0_20260923__eb55f1b3e3e7/eds_eval/episode_metadata.jsonl",
+        "sha256": "44e50afc6b1456f06c154d8ddf7738c5eab7c8a450c024176bf860a6186fd86c"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_q0_20260923__eb55f1b3e3e7/eds_eval/stage_events.jsonl",
+          "sha256": "49b0dedf088c8595b6565dcccf129be00318c73257a1423061f53950a308871c"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_q0_20260923__eb55f1b3e3e7/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "609a261a5eb1aa2517d3edaf0e2d41d2a49f0e8021ad4302f089403c9632c829"
+      }
+    },
+    {
+      "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_n2_20260923__6e0958800eb3",
+      "index": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_n2_20260923__6e0958800eb3/eds_eval/decision_evidence/episode_000/events.jsonl",
+        "sha256": "96d75d6aeaec7a5130aecdebe568dba16d28a07b4d9dd844a8e0487dfe8bfdf7"
+      },
+      "metadata": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_n2_20260923__6e0958800eb3/eds_eval/episode_metadata.jsonl",
+        "sha256": "44e50afc6b1456f06c154d8ddf7738c5eab7c8a450c024176bf860a6186fd86c"
+      },
+      "stage_events": {
+        "reference": {
+          "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_n2_20260923__6e0958800eb3/eds_eval/stage_events.jsonl",
+          "sha256": "c869352821c8d5c0a47a4e37b50e18ee1fa22763fc99bf92122642c6aab93e2d"
+        },
+        "status": "present"
+      },
+      "status": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t09_n2_20260923__6e0958800eb3/eds_eval/decision_evidence/episode_000/status.json",
+        "sha256": "9c4d93f7e209222e615598032e8e89f935672ea9e49a9fa2b191bb6e8ddbca16"
+      }
+    }
+  ],
+  "matrix_report": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-matrix-report/report-full-dev-v1.json",
+    "sha256": "d376f98a0d0d23d7b73b0a20ab768594c63ed6a6abce9473e0e67d2247bc88ab"
+  },
+  "schema": "n2-dev-chronology-input-v1"
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "n34r2-source-adoption-v1",
+  "at": "2026-10-08T20:58:37.168233+00:00",
+  "source_before": "3cb1f736ceb42acde2e40b1e7f2c22b0f8de9df7",
+  "candidate": "82fe104752fa89d56501bbc78bae856e6bd6ad8a",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000627/engineering-review-v1.json",
+    "sha256": "9476d47b226d8fde73d2fa44c26d9ffe5ac2d953cafb7a3241feb921077e1d2e"
+  },
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6672888,
+      "sha256": "0506db74684e6fa825a16dc04eb86a3d6d2b06e38f4ce93e2539e6b7413bac17"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    }
+  },
+  "gpu_dispatch": false,
+  "scientific_promotion": false,
+  "source_after": "9d0122c9fea8d6967cea3a7abba60489baae2302",
+  "tree": "ca773df2d8e647df7d34269d7dfb0f3fb069d985",
+  "identical_integrated_files": [
+    "scripts/qd_ed_n34_contract.py",
+    "scripts/qd_ed_n34_release.py",
+    "tests/test_n34_lifecycle.py",
+    "tests/test_n34_recovery_identity.py",
+    "tests/test_n34_release_boundary.py"
+  ],
+  "test_evidence": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/recovery2-identity-repair-v1/test-identity.log",
+      "sha256": "4278f92822493d9edf187bebd03085bf8b23d20558d0236cdc8ffd938144f698"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/recovery2-identity-repair-v1/test-consumers.log",
+      "sha256": "dbf258de1269e9bbb3e61d8168f24e8cdabaa14a0c42fdd71c22abe6cfbb2e9b"
+    }
+  ],
+  "tests_repeated": false,
+  "next_step": "Regenerate composed N34R2 runtime closure and30 fresh manifests on adopted source, retaining turn625 runtime completeness correction; freeze fresh detached protocol/accounting/root review/release and pass full public verification before idle GPU7 admission. Preserve both prior invalid charges, unknown telemetry, scientific thresholds and protected gates."
+}

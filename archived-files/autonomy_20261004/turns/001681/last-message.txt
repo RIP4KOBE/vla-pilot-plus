@@ -1,0 +1,3 @@
+Accepted the independently reviewed F1/F2/F3 CPU repairs at `a14f3a8b` and recorded hash-bound acceptance in owning state, checkpoint, and research tree.
+
+Reviewer exited cleanly; ledgers remain unchanged. Next is deployment/runtime verification before a bounded preparation measurement. Validation, formal evaluation, and ablation evidence remain incomplete. Driver continuation remains active.

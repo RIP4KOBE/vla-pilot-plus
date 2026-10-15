@@ -1,0 +1,8 @@
+Committed `d93129b24d09711458975c5964c2127e01442a4f` on `codex/n34-production-integration`.
+
+- Distinct N34 integration and disabled fresh Dev candidates prepared.
+- 86 focused CPU cases have passing coverage.
+- Existing files unchanged; worktree clean.
+- Release remains blocked by missing RDT files, deployed runtime/controller attestation, and root accounting/freeze. No GPU or provider execution.
+
+[Report](../production-integration-v1/report-v1.md) · [Implementation result](../production-integration-v1/implementation-result-v1.json)

@@ -1,0 +1,3 @@
+N32R2 controller 1818171 remains live on frozen source `1065f3812237`. Ledger history and bound artifacts verified; no duplicate dispatch or changes made.
+
+Task-0 C0/Q0 are valid failures. Candidate evidence remains pending. Turn 171 operational summary saved; next step is continued monitoring and matched-triple review. The original goal remains unproven.

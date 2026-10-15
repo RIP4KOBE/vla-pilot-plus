@@ -1,0 +1,27 @@
+{
+  "review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001228/root-source-review-v1.json",
+    "sha256": "fbde437c39e98f0112f7aaad8a6ef7b000d0f6d482e62202d300006d7b32083d"
+  },
+  "old_commit": "066f2bf57e05111fea329ff7c393ac3e002d7c0f",
+  "new_commit": "ca4e6a96d049c7ebb1f302d755883388ddbfdbd8",
+  "delta": [
+    {
+      "path": "scripts/qd_ed_n36_runner.py",
+      "old_sha256": "85a60c60c64bc2a9af8884ab3be99e710dec6670e68636fec3ea62983655ff00",
+      "new_sha256": "6d83b9b5b64b5cff0b74893bcc3a9aa97f333fcbad5d7d2286835959e14e9e33"
+    },
+    {
+      "path": "scripts/qd_ed_n36_worker.py",
+      "old_sha256": "42733eb91beaec98a4e2c86378ecb585a3b67d941fe2f886061f6d637a772dad",
+      "new_sha256": "a867750c82891aa10389d7d8e19fd67606d33d3d491c44a17573e830116b411f"
+    },
+    {
+      "path": "tests/test_n36_production_repair.py",
+      "old_sha256": null,
+      "new_sha256": "b5eeb5bb3730b7b4daff81505b2067be1f7717e2de62bf8666e21fb468bfacf6"
+    }
+  ],
+  "all_other_source_bytes_unchanged": true,
+  "repair_tests_repeated": false
+}

@@ -1,0 +1,3 @@
+Prepared N34’s 11 missing-cell manifests. Scientific equality and CPU runtime checks passed; 19 accepted outcomes and all charges remain intact.
+
+Recorded the operational handoff. Next: validate the separate continuation release before GPU admission. Validation, formal evaluation, and required ablations remain outstanding.

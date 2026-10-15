@@ -1,0 +1,9 @@
+Turn540 — 2026-10-08T16:17:55.437992+00:00
+
+Source 68c341ef6357887c4ae33ddafad00fab17582302 unchanged. Driver268073/start97715947 and coordinator2527891/start133885817 verified against boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7. No active GPU controller or executor; STOP absent, authorization deadline2026-10-11T11:13:13Z. Prior turn539 exit0 reconciled. Ledger 6659252 bytes SHA256229878bc3a9d99fd596f363835f4ef1ae3c2757b7f34aa43e0aef985de1aa0f2 unchanged; all442 charges and62.81145837588456 GPUh retained.
+
+Completed actual installed CPU LeRobot pipeline/decoder probe: empty pipeline preserves action values; decoder emits [1,8,7], direct pose channels and sign-binarized gripper. CUDA not initialized. Source coverage review found41 imported LeRobot modules physically inside owning checkout absent from operational source_paths. Existing attest_loaded rejects lerobot.__version__; external-runtime closure skips checkout-local files, so adding external hashes alone cannot fix it. No audit relaxed, no GPU dispatched, no scientific change.
+
+Next bounded step: isolated engineering executor must extend pinned checkout-submodule source provenance (LeRobot, check LIBERO too), exact gitlink/object database verification/materialization, focused regression against deployed imports. Then root review/adopt, finish runtime/import closure and prospective30-cell release/accounting. See n34-lerobot-source-coverage-review-v1.json and postprocessor-decoder-cpu-probe-v1.json. State/checkpoint reference both.
+
+Unresolved: full source/runtime closure, prospective release, native N34 Dev results, promotion, validation/formal/required ablation evidence. Goal unmet; no completion record. Single-action identity flag in probe compares two separately created tensor views and is not an action-value failure; equality passes.

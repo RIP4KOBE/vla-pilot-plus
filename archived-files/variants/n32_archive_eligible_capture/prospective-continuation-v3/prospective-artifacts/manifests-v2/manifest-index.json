@@ -1,0 +1,74 @@
+{
+  "schema": "n32r3-manifest-index-v1",
+  "plan": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000468/composition-input-v2.json",
+    "sha256": "29b1ed704ff578e815c863686c870749f7985c0897ee7532a96114a4eac8259d"
+  },
+  "release_enabled": false,
+  "expected_manifests": {
+    "n32r3_recovery_t04_n32_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_recovery_t04_n32_20261008.json",
+      "sha256": "cdff7d018cdf7fbe3768b5080c9747d3e7f074f007a29d1a0978da222fc0fb34"
+    },
+    "n32r3_dev_t05_c0_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t05_c0_20261008.json",
+      "sha256": "b60a9e9089d7174e67d7deb6919417b0ad98f37e807b99b6289784a3b7e8bdb6"
+    },
+    "n32r3_dev_t05_q0_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t05_q0_20261008.json",
+      "sha256": "335452dd3b871a1aa1cb1e47492473427089826a979caaba2559a9d6b8216101"
+    },
+    "n32r3_dev_t05_n32_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t05_n32_20261008.json",
+      "sha256": "02a9b310bef058c586c83ebe594bf34439f983e516015e046010f37e36c30b0f"
+    },
+    "n32r3_dev_t06_c0_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t06_c0_20261008.json",
+      "sha256": "31b868afad50249da4ed8f86d5cab3332f401b32248bef8688e6e16d8f6352fe"
+    },
+    "n32r3_dev_t06_q0_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t06_q0_20261008.json",
+      "sha256": "21e361cc347d026a83776971bb7216b93ddf88f9c1b665b98e24ee52cd071370"
+    },
+    "n32r3_dev_t06_n32_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t06_n32_20261008.json",
+      "sha256": "710adcd31328387a8b7bb5708a88b68dfd8bfc1518a406f7b96ec719874bfa48"
+    },
+    "n32r3_dev_t07_c0_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t07_c0_20261008.json",
+      "sha256": "0ec7d47f786900d31755fbcdbe734a5092c30423f3c32047b4e41ed43d2fdc94"
+    },
+    "n32r3_dev_t07_q0_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t07_q0_20261008.json",
+      "sha256": "ce3d3c8d70804f215b9306f516a1f7c3e60ec1b9472880e8c776d7cc56aa5d8d"
+    },
+    "n32r3_dev_t07_n32_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t07_n32_20261008.json",
+      "sha256": "da3e9d833d4da2018e577edab3edb2789d6a2f00e8b172d0f4a3bf93ce4b0d50"
+    },
+    "n32r3_dev_t08_c0_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t08_c0_20261008.json",
+      "sha256": "4fad0cbf860419755d5d526d3d8bee33f69411d37da85ce155130fb9987c34cd"
+    },
+    "n32r3_dev_t08_q0_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t08_q0_20261008.json",
+      "sha256": "dd153e14c12094da00e14c24c901a6509e26b9706a81f3a66925557d67af28c4"
+    },
+    "n32r3_dev_t08_n32_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t08_n32_20261008.json",
+      "sha256": "6e0561cb1bd5517bce41dfeaa98d82784a9448296bac3ef13af11981f9271bc7"
+    },
+    "n32r3_dev_t09_c0_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t09_c0_20261008.json",
+      "sha256": "93d39e548118c7f32dca497c4d488ae459fc45eec67cc64f196090c076e2f0f9"
+    },
+    "n32r3_dev_t09_q0_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t09_q0_20261008.json",
+      "sha256": "7f1eb6997b44ce647a30c34541da9997ac06d962e7a8b28742ba9fc90738e543"
+    },
+    "n32r3_dev_t09_n32_20261008": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/prospective-continuation-v3/prospective-artifacts/manifests-v2/n32r3_dev_t09_n32_20261008.json",
+      "sha256": "215bc2ab44c565421e22d072c0eeb4471edbf7da64e8eb5fc495f0e1ded50148"
+    }
+  }
+}

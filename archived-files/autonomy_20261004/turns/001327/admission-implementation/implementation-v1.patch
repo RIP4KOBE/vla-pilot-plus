@@ -1,0 +1,1176 @@
+diff --git a/docs/n36r3-admission-implementation.md b/docs/n36r3-admission-implementation.md
+new file mode 100644
+index 0000000..6c4268b
+--- /dev/null
++++ b/docs/n36r3-admission-implementation.md
+@@ -0,0 +1,92 @@
++# N36R3 admission and separate health transaction
++
++This is CPU implementation for root review, not adoption or execution authority.
++The original source remains frozen. No production release is included.
++
++N36R3 keeps the accepted operational protocol and allocation exactly, including
++all 40 task/seed/arm rows. The protocol's draft labels describe scientific inputs;
++they confer no authority. A released plan now requires distinct externally bound
++N36R3 adoption, accounting and independent review. N36R2 approvals cannot substitute.
++The original source/runtime closure, native build, controller, all manifests,
++worker Main and receipt consumer, required_after modules, and native/generic
++scientific audits remain required and unchanged.
++
++## Root-owned artifact order
++
++1. Independently review the exact committed source and adopt its complete accepted
++   composition. Refresh actual source/runtime/native/controller bindings for the
++   isolated source path. No historic attestation regeneration is required by this
++   implementation. The owner route is the lexical `study_worktree`; source cwd,
++   imports and provider configuration come from the isolated N36R3 checkout.
++2. Bind a new `n36r3-independent-b5-review-v1` using `BINDINGS` in
++   `qd_ed_n36r3_admission.py`. Bind `n36r3-source-adoption-v1` to that review,
++   source, runtime and route, with root approval.
++3. Under the existing owning locks, reconcile the complete current journals and
++   create `n36r3-owning-accounting-v1`. Its fields are checked in
++   `validate_authority`: exact 505-attempt/75.52725286641478 GPUh baseline,
++   three complete journal prefixes, source adoption, unchanged caps/limits,
++   `HEALTH`, full snapshot and `qd_ed_n36r3_preparation.arithmetic(snapshot)`.
++   This record is the budget authority's `amendment`; its `accounting` remains
++   the accepted N36R3 protocol accounting. Adopt the authority into owning state
++   (`n36_budget_authority`, budget amendment/caps/reserves) separately.
++4. Bind a frozen released plan, including actual manifests, authority and B5
++   review. Its `phase_authorization.dev` is a necessary plan condition, never
++   permission to execute without the correct detached release. The plan has no
++   root-review/release field and no forward readiness reference.
++5. Independently create a `n36r3-root-health-review-v1` and detached
++   `n36r3-health-release-v1`. The health release has the common bindings of the
++   existing episode release plus `healthchecks: HEALTH`; it has no readiness
++   field or reference to an episode release. Root approval is externally hashed.
++6. Run exactly one explicitly requested health transaction through the existing
++   source-only bootstrap, using the health release, timeout 20 and resource ID
++   `n36_healthcheck_n36r3_preparation_001314`. The new health CLI is:
++
++   ```text
++   $PYTHON -I -S -B -X pycache_prefix=/dev/null $SOURCE/scripts/qd_ed_n36_bootstrap.py \
++     scripts.qd_ed_n36_healthcheck --plan $PLAN --plan-sha256 $PLAN_SHA \
++     --release $HEALTH_RELEASE --release-sha256 $HEALTH_SHA \
++     --resource-id n36_healthcheck_n36r3_preparation_001314
++   ```
++
++   This is a template, not an authorized command for this executor. The health
++   transaction consumes the same source/runtime closures, runs the existing
++   official Codex provider check from source cwd, and checks assigned GPU identity.
++   Historical runtime readiness flags retained in the accepted runtime descriptor
++   do not supply fresh readiness: the new transaction must actually complete.
++7. Review its actual evidence and charged terminal. Create an episode root review
++   and detached `n36-execution-release-v1` using the existing exact release schema
++   plus `readiness: {health_release: REF, terminal: REF}`. The terminal is the
++   hash-bound `healthcheck-result.json` from that health transaction. The readiness
++   validator checks source, authority, runtime, provider check, probe evidence,
++   frame hash, and (under admission locks) the completed journal lifecycle.
++   The runner rechecks current idle device and provider before dispatch.
++8. Invoke the existing episode runner only after independently approving those
++   bindings. First C0 terminal settlement still precedes `PAUSED_FOR_ROOT_G3`.
++   Every restart reverifies the terminal and returns the pause without a second
++   charge. There is no resume override or post-G3 continuation implementation.
++
++## Finite accounting and failure behavior
++
++40 × 1840 + 1800 health + 200 unused = 75600 seconds (21 GPUh). All retained
++charges, unknown telemetry handling, the 0.23357169027962 GPUh margin, dual caps,
++and protected validation/formal reserves are preserved. Health enforces both
++41 calls and 1800 cumulative seconds. Each call reserves exactly 60 seconds
++(20 probe + 40 cleanup); only 30 full reservations fit. No automatic retries.
++
++Reservations are fsynced under the owner runner/state locks. During lock
++transfer an unsettled health record blocks new work. Settlement reuses the
++existing fsynced health journal/state synchronization. A crash or interrupt
++leaves unresolved work charged as in flight until root reconciliation; it does
++not fabricate a zero-duration completion. A failed settled probe vetoes further
++health or episode work. STOP/deadline are checked before reservation and launch;
++a running child is never killed merely because STOP appears. Health needs its
++own 60-second deadline headroom, not a future episode's 1840 seconds.
++
++New unrelated journal activity or changed reservation policy requires fresh root
++accounting. Only correctly bound N36R3 lifecycle suffixes may follow the accepted
++baseline. No production journals or owner state were written by this executor.
++
++The disabled JSON example is intentionally incomplete and cannot validate.
++Tests with temporary owners exercise the actual release, health, admission and
++runner consumers with synthetic runtime/source leaves and substituted GPU,
++provider and worker boundaries. They do not establish production G3 acceptance.
+diff --git a/docs/n36r3-authority-examples.disabled.json b/docs/n36r3-authority-examples.disabled.json
+new file mode 100644
+index 0000000..b086e92
+--- /dev/null
++++ b/docs/n36r3-authority-examples.disabled.json
+@@ -0,0 +1,52 @@
++{
++  "schema": "n36r3-authority-examples-disabled-v1",
++  "release_enabled": false,
++  "gpu_authorized": false,
++  "production_accepted": false,
++  "score": null,
++  "source_adopted": false,
++  "note": "Review-only shapes. Null references and approved=false prohibit execution. Root must independently create exact bindings.",
++  "source_adoption": {
++    "schema": "n36r3-source-adoption-v1",
++    "approved": false,
++    "owner_root": null,
++    "source_cwd": null,
++    "source": null,
++    "independent_review": null
++  },
++  "owning_accounting": {
++    "schema": "n36r3-owning-accounting-v1",
++    "source_adoption": null,
++    "accounting": null,
++    "ledger_prefixes": null,
++    "snapshot": null,
++    "arithmetic": null,
++    "automatic_recoveries": 0
++  },
++  "health_release": {
++    "schema": "n36r3-health-release-v1",
++    "approved": false,
++    "plan": null,
++    "authority": null,
++    "root_review": null,
++    "healthchecks": {
++      "preparation_id": "n36_healthcheck_n36r3_preparation_001314",
++      "max_invocations": 41,
++      "timeout_seconds": 20,
++      "cleanup_seconds": 40,
++      "per_invocation_seconds": 60,
++      "aggregate_seconds": 1800
++    }
++  },
++  "episode_release": {
++    "schema": "n36-execution-release-v1",
++    "approved": false,
++    "plan": null,
++    "authority": null,
++    "root_review": null,
++    "readiness": {
++      "health_release": null,
++      "terminal": null
++    }
++  }
++}
+diff --git a/scripts/qd_ed_n36_accounting.py b/scripts/qd_ed_n36_accounting.py
+index e159869..5b045fd 100644
+--- a/scripts/qd_ed_n36_accounting.py
++++ b/scripts/qd_ed_n36_accounting.py
+@@ -60,6 +60,9 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
+     and the existing 40-second owned cleanup bound, then settles the journal.
+     An unsettled reservation prevents every episode and probe admission.
+     """
++    if c.cohort(w.read_ref(plan_ref)) == c.DRAFT_N36R3_COHORT:
++        from scripts.qd_ed_n36r3_health import reserve
++        return reserve(plan_ref, release_ref, resource_id, timeout_seconds=timeout_seconds)
+     import datetime as dt
+     import os
+     import re
+diff --git a/scripts/qd_ed_n36_contract.py b/scripts/qd_ed_n36_contract.py
+index 1b33db2..cf1feab 100644
+--- a/scripts/qd_ed_n36_contract.py
++++ b/scripts/qd_ed_n36_contract.py
+@@ -79,10 +79,6 @@ def expected_rows(root=ROOT, *, cohort=COHORT):
+ def cohort(plan):
+     value = plan.get('cohort', COHORT)
+     w.require(value in IDENTITIES, 'unsupported N36 cohort')
+-    if value == DRAFT_N36R3_COHORT:
+-        w.require(plan.get('schema') == 'n36-release-draft-v1'
+-                  and plan.get('frozen') is False and plan.get('release_enabled') is False,
+-                  'N36R3 draft only; separate root bindings required')
+     return value
+ 
+ 
+@@ -96,7 +92,7 @@ def operational_binding(plan):
+     if cohort(plan) == COHORT:
+         w.require('accounting' not in plan, 'original plan cannot claim recovery accounting')
+         return {}
+-    return {**({'resource_routing': plan['resource_routing']} if cohort(plan) == DRAFT_RECOVERY_COHORT and 'resource_routing' in plan else {}), 'cohort': cohort(plan), **{k: plan[k] for k in
++    return {**({'resource_routing': plan['resource_routing']} if cohort(plan) in (DRAFT_RECOVERY_COHORT, DRAFT_N36R3_COHORT) and 'resource_routing' in plan else {}), 'cohort': cohort(plan), **{k: plan[k] for k in
+             ('protocol', 'protocol_review', 'accounting')}}
+ 
+ 
+@@ -230,8 +226,13 @@ def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
+     All *_remaining values must already include prior reservations, health costs
+     and charges. Exact owning ledger-to-snapshot arithmetic is a root prerequisite.
+     """
+-    w.require(cohort != DRAFT_N36R3_COHORT,
+-              'N36R3 draft only; separate root bindings required')
++    if cohort == DRAFT_N36R3_COHORT:
++        w.require(allowance.get('n36r3_release_refs') is not None,
++                  'N36R3 draft only; separate root bindings required')
++        from scripts.qd_ed_n36_release import validate_release
++        plan, _, authority = validate_release(*allowance['n36r3_release_refs'])
++        w.require(plan == allowance['n36r3_plan'] and authority == allowance['n36r3_authority'],
++                  'N36R3 admission detached release differs')
+     if cohort == DRAFT_RECOVERY_COHORT:
+         from scripts.qd_ed_n36_release import validate_release
+         plan, _, authority = validate_release(*allowance['n36r2_release_refs'])
+diff --git a/scripts/qd_ed_n36_healthcheck.py b/scripts/qd_ed_n36_healthcheck.py
+index d9e0c4d..1a93ff5 100644
+--- a/scripts/qd_ed_n36_healthcheck.py
++++ b/scripts/qd_ed_n36_healthcheck.py
+@@ -41,14 +41,20 @@ def wait_probe(process, started, identity, timeout):
+ 
+ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
+     """One bounded probe, no retry, no episode attempt, no readiness mutation."""
++    n36r3 = c.cohort(w.read_ref(plan_ref)) == c.DRAFT_N36R3_COHORT
++    validate = release.validate_health_release if n36r3 else release.validate_release
++    if n36r3:
++        adapter.source_execution.active()
++        plan, _, _ = validate(plan_ref, release_ref)
++        adapter.source_execution.attest(Path(plan['worktree']), plan['source'], w.read_ref(plan['runtime_closure']))
+     record = accounting.reserve_healthcheck(plan_ref, release_ref, resource_id,
+                                             timeout_seconds=timeout_seconds)
+-    plan, runtime, authority = release.validate_release(plan_ref, release_ref)
++    plan, runtime, authority = validate(plan_ref, release_ref)
+     from scripts.qd_ed_n36r2_admission import owner_root, child_environment
+     root = owner_root(plan)
+     # The durable in-flight resource blocks admissions during lock transfer.
+     with r.locked(root/'data/qd-ed-runner.lock', nonblocking=True):
+-        plan, runtime, authority = release.validate_release(plan_ref, release_ref)
++        plan, runtime, authority = validate(plan_ref, release_ref)
+         resources = r.read_events(root/'data/gpu-healthcheck-ledger.jsonl')
+         w.require([e for e in resources if e['resource_id']==resource_id]==[record],
+                   'healthcheck reservation changed; no replay')
+@@ -57,7 +63,7 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
+         w.require(not output.exists() and not output.is_symlink(), 'healthcheck output exists')
+         output.mkdir(parents=True)
+         def before_start():
+-            c.launch_guard(plan, authority, need=1840 + record['reserved_gpu_seconds'])
++            c.launch_guard(plan, authority, need=record['reserved_gpu_seconds'] if n36r3 else 1840 + record['reserved_gpu_seconds'])
+         process = identity = None
+         started = finished = None
+         event, result = 'aborted', {}
+@@ -68,6 +74,10 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
+             before_start()
+             adapter.device_check()
+             env=child_environment(plan, runtime)
++            if n36r3:
++                r.verify_provider(runtime, env, root=Path(plan['worktree']))
++                r.runtime_gpu(runtime, r.read_state(root/'research-state.yaml'))
++                base['provider_verified'] = True
+             env.update(QD_ED_GPU_PROBE_PARENT_PID=str(os.getpid()), QD_ED_GPU_PROBE_RESOURCE_ID=resource_id)
+             command=[str(r.PYTHON),str(Path(probe.__file__).resolve()),'_child',
+                      '--manifest',plan['runtime']['path'],'--output',str(output),'--resource-id',resource_id]
+@@ -89,6 +99,8 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
+             probe.validate_probe_evidence(result,runtime['gpu_mapping'])
+             w.require(w.sha(output/'probe-frame.png')==result['frame_png_sha256'],'healthcheck frame fingerprint')
+             w.require(w.sha(plan['runtime']['path'])==plan['runtime']['sha256'],'runtime changed during healthcheck')
++            if n36r3:
++                validate(plan_ref, release_ref)
+             event='completed'
+         except BaseException as exc:
+             # Never settle an unknown/live handle or kill on STOP/interrupt.
+@@ -105,3 +117,22 @@ def run_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds=60):
+         r.append_healthcheck_event(root,terminal)
+         w.atomic_json(output/'healthcheck-result.json',terminal)
+         return {'status':'VALID' if event=='completed' else 'INVALID_STOP','terminal':terminal}
++
++
++def main():
++    import argparse
++    import sys
++    if '_n36_source_bootstrap' not in sys.modules:
++        raise RuntimeError('Launch N36 healthcheck through qd_ed_n36_bootstrap.py')
++    parser = argparse.ArgumentParser(description=__doc__)
++    for key in ('plan', 'plan-sha256', 'release', 'release-sha256', 'resource-id'):
++        parser.add_argument('--'+key, required=True)
++    args = parser.parse_args()
++    result = run_healthcheck({'path': args.plan, 'sha256': args.plan_sha256},
++        {'path': args.release, 'sha256': args.release_sha256}, args.resource_id, timeout_seconds=20)
++    print(result['status'])
++    return 0 if result['status'] == 'VALID' else 1
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+diff --git a/scripts/qd_ed_n36_release.py b/scripts/qd_ed_n36_release.py
+index fac9e57..8068109 100644
+--- a/scripts/qd_ed_n36_release.py
++++ b/scripts/qd_ed_n36_release.py
+@@ -12,6 +12,10 @@ COORDINATOR_END = '2026-10-11T11:13:13Z'
+ 
+ 
+ def validate_plan(plan):
++    if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
++        w.require(all(plan.get(k) is not None for k in ('authority', 'b5_review', 'resource_routing')),
++                  'N36R3 draft only; separate root bindings required')
++        c.validate_n36r3_protocol(plan)
+     w.require(plan['schema'] == 'n36-released-plan-v1' and plan['frozen'] is True
+               and plan['release_enabled'] is True and plan['episodes'] == c.plan_rows(plan)
+               and plan['limits'] == c.LIMITS and plan['worker_contract'] == c.WORKER_CONTRACT
+@@ -38,15 +42,24 @@ def verify_prospective_release(plan_ref, release_ref):
+     return plan, runtime, authority
+ 
+ 
+-def _verify_release_transaction(plan_ref, release_ref):
++def validate_health_release(plan_ref, release_ref):
++    return _verify_release_transaction(plan_ref, release_ref, health=True)[:3]
++
++
++def _verify_release_transaction(plan_ref, release_ref, *, health=False):
+     # No reusable token/cache escapes: each caller starts a new full transaction.
+     with b.closure.verification_phase('release'):
+-        return _verify_release_contents(plan_ref, release_ref)
++        return _verify_release_contents(plan_ref, release_ref, health=health)
+ 
+ 
+-def _verify_release_contents(plan_ref, release_ref):
++def _verify_release_contents(plan_ref, release_ref, *, health=False):
+     plan = w.read_ref(plan_ref)
+     validate_plan(plan)
++    n36r3 = c.cohort(plan) == c.DRAFT_N36R3_COHORT
++    w.require(not health or n36r3, 'separate health authority is N36R3 only')
++    if n36r3:
++        from scripts import qd_ed_n36r3_admission as n3
++        n3.independent_review(plan)
+     if c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
+         from scripts.qd_ed_n36r2_admission import independent_review
+         independent_review(plan)
+@@ -57,10 +70,17 @@ def _verify_release_contents(plan_ref, release_ref):
+                 'runtime_closure': plan['runtime_closure'], 'controller_semantics': plan['controller_semantics'],
+                 'runtime': plan['runtime'], 'limits': c.LIMITS,
+                 'phase_authorization': plan['phase_authorization'], **c.operational_binding(plan)}
++    if health:
++        expected['schema'] = 'n36r3-health-release-v1'
++        expected['healthchecks'] = n3.HEALTH
++    elif n36r3:
++        expected['readiness'] = release['readiness']
+     w.require(set(release) == set(expected) | {'root_review'} and all(release[k] == v for k, v in expected.items()), 'external release differs')
+     review = w.read_ref(release['root_review'])
+-    w.require(review == {**expected, 'schema': 'n36-root-production-review-v1', 'decision': 'APPROVED'}, 'root review differs')
+-    if c.cohort(plan) == c.RECOVERY_COHORT:
++    w.require(review == {**expected, 'schema': ('n36r3-root-health-review-v1' if health else 'n36-root-production-review-v1'), 'decision': 'APPROVED'}, 'root review differs')
++    if n36r3:
++        protocol = c.validate_n36r3_protocol(plan)
++    elif c.cohort(plan) == c.RECOVERY_COHORT:
+         from scripts.qd_ed_n36_recovery import validate_protocol
+         protocol = validate_protocol(plan)
+     elif c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
+@@ -90,6 +110,8 @@ def _verify_release_contents(plan_ref, release_ref):
+     if c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
+         from scripts.qd_ed_n36r2_admission import validate_authority
+         validate_authority(plan, authority)
++    if n36r3:
++        n3.validate_authority(plan, authority)
+     validate_caps(caps)
+     window_end = dt.datetime.fromisoformat(authority['weekly_window']['ends_at'].replace('Z', '+00:00'))
+     w.require(window_end.tzinfo is not None and window_end <= dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00')), 'weekly authorization deadline')
+@@ -139,6 +161,8 @@ def _verify_release_contents(plan_ref, release_ref):
+         for row in plan['episodes']:
+             manifests[row['episode_key']] = b._verify_manifest_bound(
+                 plan['expected_manifests'][row['episode_key']], plan, runtime, row)
++    if n36r3 and not health:
++        n3.validate_readiness(plan_ref, release)
+     return plan, runtime, authority, manifests
+ 
+ 
+@@ -167,6 +191,11 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
+     """Caller holds normal runner/state locks; all balances come from journals."""
+     selected = c.cohort(plan)
+     c.require_row(row, plan.get('worktree', c.ROOT), cohort=selected)
++    if selected == c.DRAFT_N36R3_COHORT:
++        from scripts import qd_ed_n36r3_admission as n3
++        n3.live_journals(plan, authority, events, resources, reservations)
++        w.require(release_refs is not None, 'N36R3 detached release required')
++        n3.validate_readiness(release_refs[0], w.read_ref(release_refs[1]), resources=resources)
+     if selected == c.RECOVERY_COHORT:
+         from scripts.qd_ed_n36_recovery import validate_authority, preserve_charge
+         validate_authority(plan, authority)
+@@ -182,19 +211,12 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
+     rows = c.plan_rows(plan)
+     w.require(plan.get('episodes', rows) == rows, 'admission exact cohort rows')
+     # Accounting continuity only; runner separately reverifies native terminals.
+-    reconciled = supervisor.reconcile({**c.operational_binding(plan), 'episodes': rows,
+-        'worktree': str(plan.get('worktree', c.ROOT))}, events, lambda *args: None)
++    reconciliation_plan = plan if selected == c.DRAFT_N36R3_COHORT else {
++        **c.operational_binding(plan), 'episodes': rows, 'worktree': str(plan.get('worktree', c.ROOT))}
++    reconciled = supervisor.reconcile(reconciliation_plan, events, lambda *args: None)
+     w.require(reconciled['next_row'] == row, 'accounting requires next fresh contiguous row')
++    validate_state(plan, authority, state)
+     caps, budget = authority['caps'], state['budget']
+-    validate_caps(caps)
+-    w.require(state.get('n36_budget_authority') == plan['authority'] and r.authorized_gpu(state) == 7
+-              and budget['max_episode_attempts'] == caps['attempts'] and budget['max_gpu_hours'] == caps['gpu_hours']
+-              and budget['reserved'] == caps['buckets'] and budget['gpu_hour_reservations'] == caps['protected_gpu_hours']
+-              and budget['amendment'] == authority['amendment'], 'adopted state authority differs')
+-    isolation = state.get('resource_isolation', {})
+-    w.require(isolation.get('status') == 'ACTIVE' and isolation.get('validation_status') == 'PASS'
+-              and isolation.get('private_budget') is True
+-              and not state.get('external_resource_hold', {}).get('do_not_auto_resume', False), 'private resource admission')
+     # Generic accounting deliberately preserves unknown durations as errors.
+     snap = r.budget_snapshot(events, resources)
+     groups = r.event_groups(events)
+@@ -215,6 +237,8 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
+     if selected == c.RECOVERY_COHORT:
+         from scripts.qd_ed_n36_recovery import resource_events
+         local_resources = resource_events(plan, resources)
++    if selected == c.DRAFT_N36R3_COHORT:
++        local_resources = n3.resource_events(plan, resources)
+     if selected == c.DRAFT_RECOVERY_COHORT:
+         from scripts.qd_ed_n36r2_admission import resource_events
+         local_resources = resource_events(plan, resources)
+@@ -227,8 +251,10 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
+     from scripts import qd_ed_n36_accounting as accounting
+     from scripts.qd_ed_n36r2_admission import owner_root
+     accounting_root = owner_root(plan)
+-    margin=accounting.retained_margin(accounting_root,authority['accounting']) if selected == c.COHORT else accounting.retained_margin(
+-        accounting_root, w.read_ref(authority['accounting'])['inherited_accounting'])
++    margin_ref = (authority['accounting'] if selected == c.COHORT else
++                  n3.margin_reference(plan) if selected == c.DRAFT_N36R3_COHORT else
++                  w.read_ref(authority['accounting'])['inherited_accounting'])
++    margin = accounting.retained_margin(accounting_root, margin_ref)
+     reservation=accounting.headroom(snap,cohort,retained_margin_hours=margin,protected_hours=protected)
+     allowance = {'authority_starts_at': authority['starts_at'],
+                  'authority_ends_at': min(authority['coordinator_ends_at'], window['ends_at']),
+@@ -246,5 +272,24 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
+     c.validate_stop_binding(plan)
+     if selected == c.DRAFT_RECOVERY_COHORT:
+         allowance.update(n36r2_plan=plan, n36r2_authority=authority, n36r2_release_refs=release_refs)
++    if selected == c.DRAFT_N36R3_COHORT:
++        allowance.update(n36r3_plan=plan, n36r3_authority=authority, n36r3_release_refs=release_refs)
+     c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'], cohort=selected)
+     return {**snap, "n36_reservation":reservation}
++
++
++def validate_state(plan, authority, state):
++    """Shared owning state gate for independent health and episode transactions."""
++    if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
++        from scripts.qd_ed_n36r3_admission import owner_root
++        w.require(state.get('worktree') == str(owner_root(plan)), 'N36R3 owning state worktree differs')
++    caps, budget = authority['caps'], state['budget']
++    validate_caps(caps)
++    w.require(state.get('n36_budget_authority') == plan['authority'] and r.authorized_gpu(state) == 7
++              and budget['max_episode_attempts'] == caps['attempts'] and budget['max_gpu_hours'] == caps['gpu_hours']
++              and budget['reserved'] == caps['buckets'] and budget['gpu_hour_reservations'] == caps['protected_gpu_hours']
++              and budget['amendment'] == authority['amendment'], 'adopted state authority differs')
++    isolation = state.get('resource_isolation', {})
++    w.require(isolation.get('status') == 'ACTIVE' and isolation.get('validation_status') == 'PASS'
++              and isolation.get('private_budget') is True
++              and not state.get('external_resource_hold', {}).get('do_not_auto_resume', False), 'private resource admission')
+diff --git a/scripts/qd_ed_n36_runner.py b/scripts/qd_ed_n36_runner.py
+index 58593eb..b6fefb5 100644
+--- a/scripts/qd_ed_n36_runner.py
++++ b/scripts/qd_ed_n36_runner.py
+@@ -87,7 +87,11 @@ def execute_one(plan_ref, release_ref):
+             # STOP/time/accounting checked before even probing the device.
+             release.admission(plan, authority, state, events, resources, reservations, row,
+                               now=dt.datetime.now(dt.timezone.utc), gpu_idle=True, release_refs=(plan_ref, release_ref))
+-            check_probe(runtime, resources, root)
++            if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
++                from scripts.qd_ed_n36r3_admission import validate_readiness
++                validate_readiness(plan_ref, w.read_ref(release_ref), resources=resources)
++            else:
++                check_probe(runtime, resources, source_root)
+             admission = device_check()
+             env = child_environment(plan, runtime)
+             r.verify_provider(runtime, env, root=source_root)
+diff --git a/scripts/qd_ed_n36r2_admission.py b/scripts/qd_ed_n36r2_admission.py
+index 055594c..e7b14ad 100644
+--- a/scripts/qd_ed_n36r2_admission.py
++++ b/scripts/qd_ed_n36r2_admission.py
+@@ -14,6 +14,9 @@ HEALTH = {'preparation_id': PREPARATION_ID, 'max_invocations': 41,
+ 
+ 
+ def owner_root(plan):
++    if c.cohort(plan) == c.DRAFT_N36R3_COHORT:
++        from scripts.qd_ed_n36r3_admission import owner_root as n36r3_owner
++        return n36r3_owner(plan)
+     if c.cohort(plan) != c.DRAFT_RECOVERY_COHORT:
+         return Path(plan['worktree']).resolve()
+     w.require(OWNER.resolve() == OWNER and SOURCE.resolve() == SOURCE, 'N36R2 route symlink redirection')
+@@ -97,9 +100,10 @@ def resource_events(plan, resources):
+ def child_environment(plan, runtime):
+     from scripts import qd_ed_final_runner as r
+     env = r.child_environment(runtime)
+-    if c.cohort(plan) == c.DRAFT_RECOVERY_COHORT:
++    if c.cohort(plan) in (c.DRAFT_RECOVERY_COHORT, c.DRAFT_N36R3_COHORT):
+         owner_root(plan)
+-        env['PYTHONPATH'] = ':'.join(str(SOURCE / p) for p in
++        source = Path(plan['worktree'])
++        env['PYTHONPATH'] = ':'.join(str(source / p) for p in
+             ('', 'third_party/lerobot/src', 'third_party/rdt', 'third_party/libero_pro'))
+         env['PYTHONNOUSERSITE'] = '1'
+     return env
+diff --git a/scripts/qd_ed_n36r3_admission.py b/scripts/qd_ed_n36r3_admission.py
+new file mode 100644
+index 0000000..16a3a70
+--- /dev/null
++++ b/scripts/qd_ed_n36r3_admission.py
+@@ -0,0 +1,179 @@
++"""N36R3 admission: exact existing science, distinct root authority and owner.
++
++Consumes external approvals only. No adoption, release generation or retries.
++"""
++import datetime as dt
++import json
++from pathlib import Path
++from scripts import qd_ed_n23_worker as w, qd_ed_n36_contract as c
++from scripts import qd_ed_final_runner as r
++from scripts import qd_ed_n36r2_admission as previous
++
++OWNER = previous.OWNER
++SOURCE = previous.SESSION / 'variants/n36r3_generated_import_001299/implementation_worktree'
++PREPARATION_ID = 'n36_healthcheck_n36r3_preparation_001314'
++KIND = 'n36r3_resource_preparation_v1'
++HEALTH = {**previous.HEALTH, 'preparation_id': PREPARATION_ID}
++JOURNALS = {'attempt-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl',
++            'gpu-hour-reservation-ledger.jsonl'}
++BINDINGS = ('source', 'scientific_source', 'protocol', 'protocol_review', 'accounting',
++            'runtime', 'runtime_closure', 'native_build', 'controller_semantics', 'resource_routing')
++
++
++def owner_root(plan):
++    # Preserve the lexical owner: resolving a path is not authority to reroute it.
++    expected = {'source_cwd': str(SOURCE), 'owner_root': str(OWNER),
++                'physical_gpu': 7, 'gpu_uuid': c.GPU_UUID}
++    w.require(plan['resource_routing'] == expected and plan['worktree'] == str(SOURCE)
++              and SOURCE.resolve() == SOURCE and OWNER.resolve() == OWNER,
++              'N36R3 lexical owner/source routing differs')
++    return OWNER
++
++
++def independent_review(plan):
++    owner_root(plan)
++    w.require(w.read_ref(plan['b5_review']) == {
++        'schema': 'n36r3-independent-b5-review-v1',
++        'decision': 'PASS_PREPARATION_REQUIRES_ROOT_RELEASE',
++        **{k: plan[k] for k in BINDINGS},
++        'worker_receipts_are_future': True, 'release_enabled': False},
++        'N36R3 exact independent source review required')
++
++
++def validate_authority(plan, authority):
++    protocol = c.validate_n36r3_protocol(plan)
++    root = owner_root(plan)
++    independent_review(plan)
++    w.require(authority['cohort'] == c.DRAFT_N36R3_COHORT
++              and authority['protocol'] == plan['protocol']
++              and authority['accounting'] == protocol['accounting']
++              and authority['healthchecks'] == HEALTH,
++              'N36R3 distinct finite authority required')
++    adoption = w.read_ref(authority['source_adoption'])
++    w.require(adoption == {'schema': 'n36r3-source-adoption-v1', 'approved': True,
++        'owner_root': str(root), 'source_cwd': str(SOURCE),
++        **{k: plan[k] for k in BINDINGS}, 'independent_review': plan['b5_review']},
++        'N36R3 exact root source adoption required')
++    accounting = w.read_ref(authority['amendment'])
++    w.require(accounting['schema'] == 'n36r3-owning-accounting-v1'
++              and accounting['cohort'] == c.DRAFT_N36R3_COHORT
++              and accounting['accounting'] == plan['accounting']
++              and accounting['source_adoption'] == authority['source_adoption']
++              and accounting['caps'] == c.CAPS and accounting['limits'] == c.LIMITS
++              and accounting['healthchecks'] == HEALTH
++              and accounting['automatic_recoveries'] == 0
++              and accounting['ledger_prefixes'] == authority['ledger_prefixes']
++              and set(authority['ledger_prefixes']) == JOURNALS,
++              'N36R3 root accounting bindings differ')
++    # This is the accepted current 505-attempt baseline, not a reconstructed
++    # historical attestation or a relabelled N36R2 allowance.
++    prefix_rows = {}
++    from scripts import qd_ed_n36_release as release
++    for name, anchor in authority['ledger_prefixes'].items():
++        path = root / 'data' / name
++        w.require(anchor['path'] == str(path), 'N36R3 foreign ledger anchor')
++        release.prefix(path, anchor)
++        with path.open('rb') as stream:
++            prefix_rows[name] = [json.loads(line) for line in stream.read(anchor['bytes']).splitlines() if line.strip()]
++    snap = r.budget_snapshot(prefix_rows['attempt-ledger.jsonl'], prefix_rows['gpu-healthcheck-ledger.jsonl'])
++    w.require(snap == accounting['snapshot'] and snap['dispatched'] == snap['reserved_attempts'] == 505
++              and snap['gpu_hours_consumed'] == 75.52725286641478
++              and snap['running'] == snap['gpu_healthcheck_inflight'] == 0
++              and all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(prefix_rows['attempt-ledger.jsonl']).values()),
++              'N36R3 retained 505 attempts and exact costs required')
++    previous.preserve_charges(prefix_rows['attempt-ledger.jsonl'])
++    from scripts.qd_ed_n36r3_preparation import arithmetic
++    w.require(accounting['arithmetic'] == arithmetic(snap), 'N36R3 finite arithmetic differs')
++    ledger = w.read_ref(plan['accounting'])
++    for key, name in (('retained_ledger_prefix', 'attempt-ledger.jsonl'),
++                      ('retained_health_ledger_prefix', 'gpu-healthcheck-ledger.jsonl')):
++        release.prefix(root / 'data' / name, ledger[key])
++    return prefix_rows
++
++
++def live_journals(plan, authority, events, resources, reservations):
++    baseline = validate_authority(plan, authority)
++    suffix = {}
++    for name, rows in [('attempt-ledger.jsonl', events), ('gpu-healthcheck-ledger.jsonl', resources),
++                       ('gpu-hour-reservation-ledger.jsonl', reservations)]:
++        old = baseline[name]
++        w.require(rows[:len(old)] == old, 'N36R3 stale ledger snapshot')
++        suffix[name] = rows[len(old):]
++    local = c.cohort_events(c.plan_rows(plan), suffix['attempt-ledger.jsonl'])
++    w.require(local == suffix['attempt-ledger.jsonl'] and not suffix['gpu-hour-reservation-ledger.jsonl'],
++              'N36R3 unrelated ledger change requires fresh root accounting')
++    binding = c.operational_binding(plan)
++    w.require(all(all(e.get(k) == v for k, v in binding.items()) for e in local),
++              'N36R3 owning event binding differs')
++    health = resource_events(plan, suffix['gpu-healthcheck-ledger.jsonl'])
++    w.require(health == suffix['gpu-healthcheck-ledger.jsonl'], 'N36R3 foreign health suffix')
++    return local, health
++
++
++def resource_events(plan, resources):
++    permitted = {PREPARATION_ID} | {'n36_healthcheck_' + row['episode_key'] for row in c.plan_rows(plan)}
++    ids = {e['resource_id'] for e in resources if e.get('cohort') == c.DRAFT_N36R3_COHORT
++           or e.get('kind') == KIND or str(e.get('resource_id', '')).startswith('n36_healthcheck_n36r3')}
++    local = [e for e in resources if e['resource_id'] in ids]
++    binding = c.operational_binding(plan)
++    w.require(all(e['resource_id'] in permitted and e.get('kind') == KIND
++        and all(e.get(k) == v for k, v in binding.items())
++        and type(e.get('timeout_seconds')) is int and e['timeout_seconds'] == 20
++        and e.get('cleanup_seconds') == 40 and e.get('reserved_gpu_seconds') == 60
++        and e.get('physical_gpu') == 7 and e.get('gpu_uuid') == c.GPU_UUID
++        for e in local), 'N36R3 finite health binding differs')
++    # All lifecycle records keep the same source/authority and reservation.
++    for identity in ids:
++        group = [e for e in local if e['resource_id'] == identity]
++        w.require(group[0]['source_commit'] == plan['source']['commit']
++                  and group[0]['runtime'] == plan['runtime']
++                  and w.read_ref(group[0]['plan']) == plan, 'N36R3 health source/authority differs')
++        for key in ('plan', 'release', 'source_commit', 'runtime', 'accounting_admission'):
++            w.require(all(key in e and e[key] == group[0][key] for e in group),
++                      'N36R3 health lifecycle binding differs')
++        for e in group:
++            if e['event'] in ('completed', 'aborted'):
++                w.require(c.finite(e['gpu_process_wall_seconds'], 'health elapsed') <= 60,
++                          'N36R3 health exceeds reservation')
++    w.require(len(ids) <= 41, 'N36R3 health invocation ceiling')
++    return local
++
++
++def margin_reference(plan):
++    ledger = w.read_ref(plan['accounting'])
++    inherited = w.read_ref(ledger['inherited_accounting'])
++    return inherited['inherited_accounting']
++
++
++def validate_readiness(plan_ref, release_record, *, resources=None):
++    """Episode authority binds actual completed separately authorized evidence.
++
++    No runtime rewrite is needed: the health release precedes this detached
++    episode release and never references it. Locked admission checks the journal.
++    """
++    from scripts import qd_ed_n36_release as release, qd_ed_gpu_probe as probe
++    ready = release_record['readiness']
++    plan, runtime, authority = release.validate_health_release(plan_ref, ready['health_release'])
++    terminal = w.read_ref(ready['terminal'])
++    output = Path(terminal['output_dir'])
++    r.owned(output, plan['artifact_root'])
++    w.require(Path(ready['terminal']['path']) == output / 'healthcheck-result.json'
++        and terminal['plan'] == plan_ref and terminal['release'] == ready['health_release']
++        and terminal['source_commit'] == plan['source']['commit'] and terminal['runtime'] == plan['runtime']
++        and terminal['event'] == 'completed' and terminal.get('provider_verified') is True
++        and terminal['source_script_sha256'] == w.sha(SOURCE / 'scripts/qd_ed_gpu_probe.py'),
++        'N36R3 fresh readiness binding required')
++    resource_events(plan, [terminal])
++    starts = dt.datetime.fromisoformat(authority['starts_at'].replace('Z', '+00:00')).timestamp()
++    w.require(starts <= c.finite(terminal['time_unix'], 'readiness time') <= dt.datetime.now(dt.timezone.utc).timestamp(),
++              'N36R3 readiness outside authority window')
++    evidence = r.read_json(output / 'probe-evidence.json')
++    w.require(evidence['resource_id'] == terminal['resource_id']
++              and w.sha(output / 'probe-frame.png') == evidence['frame_png_sha256']
++              and all(terminal.get(k) == v for k, v in evidence.items()), 'N36R3 readiness evidence differs')
++    probe.validate_probe_evidence(evidence, runtime['gpu_mapping'])
++    if resources is not None:
++        group = [e for e in resources if e['resource_id'] == terminal['resource_id']]
++        w.require([e['event'] for e in group] == ['reserved', 'dispatched', 'completed']
++                  and group[-1] == terminal, 'N36R3 readiness not durably charged')
++    return terminal
+diff --git a/scripts/qd_ed_n36r3_health.py b/scripts/qd_ed_n36r3_health.py
+new file mode 100644
+index 0000000..bdf360e
+--- /dev/null
++++ b/scripts/qd_ed_n36r3_health.py
+@@ -0,0 +1,68 @@
++"""Separately approved finite N36R3 health reservation in the owning journals."""
++import datetime as dt
++import json
++import os
++import time
++from scripts import qd_ed_n23_worker as w, qd_ed_final_runner as r
++from scripts import qd_ed_n36_contract as c, qd_ed_n36_release as release
++from scripts import qd_ed_n36_accounting as accounting, qd_ed_n36_runner as adapter
++from scripts import qd_ed_n36_supervise as supervisor, qd_ed_n36r3_admission as gate
++
++
++def reserve(plan_ref, health_release_ref, resource_id, *, timeout_seconds):
++    w.require(type(timeout_seconds) is int and timeout_seconds == 20,
++              'N36R3 exactly 20 probe plus 40 cleanup seconds')
++    plan, runtime, authority = release.validate_health_release(plan_ref, health_release_ref)
++    root = gate.owner_root(plan)
++    with r.locked(root/'data/qd-ed-runner.lock', nonblocking=True):
++        with r.locked(root/'data/qd-ed-state.lock'):
++            plan, runtime, authority = release.validate_health_release(plan_ref, health_release_ref)
++            state, events, resources, reservations = adapter.snapshot(root, authority)
++            local, health = gate.live_journals(plan, authority, events, resources, reservations)
++            release.validate_state(plan, authority, state)
++            w.require(state['run_name'] == plan['run_name']
++                      and state['artifacts'] == runtime['artifact_root'], 'N36R3 owning run identity')
++            result = supervisor.reconcile(plan, events,
++                lambda row, final: adapter.worker.verify_terminal(plan_ref, row, final, final['release']),
++                live_handles=adapter.existing_handles(plan, events))
++            w.require(result['next_row'] is not None, 'health cannot bypass cohort stop or first C0 pause')
++            w.require(all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(events).values()),
++                      'health unsettled episode reservation')
++            w.require(not any(e['resource_id'] == resource_id for e in resources), 'health replay forbidden')
++            permitted = {'n36_healthcheck_' + result['next_row']['episode_key']}
++            if not result['outcomes']:
++                permitted.add(gate.PREPARATION_ID)
++            w.require(resource_id in permitted, 'one preparation plus one check per primary cell')
++            w.require(len({e['resource_id'] for e in health}) < 41
++                      and not any(e['event'] == 'aborted' for e in health),
++                      'health invocation ceiling or invalidity stop; no retry')
++            snap = r.budget_snapshot(events, resources)
++            # Existing state/journal and protected reserve checks; no episode
++            # authority, readiness, attempt reservation, or 1840s deadline needed.
++            w.require(r.check_budget_limits(state, snap, result['next_row'], reservations,
++                      bucket_caps=c.CAPS['buckets'], amendment=authority['amendment']) >= 20,
++                      'health budget unavailable')
++            cohort = r.budget_snapshot(local, health)
++            protected = sum(max(0., hours-snap['gpu_hours_by_bucket'][key])
++                            for key, hours in c.CAPS['protected_gpu_hours'].items())
++            reservation = accounting.headroom(snap, cohort,
++                retained_margin_hours=accounting.retained_margin(root, gate.margin_reference(plan)),
++                protected_hours=protected, healthcheck=True, need=60)
++            now = dt.datetime.now(dt.timezone.utc)
++            w.require(dt.datetime.fromisoformat(authority['starts_at'].replace('Z', '+00:00')) <= now,
++                      'health authority not started')
++            c.launch_guard(plan, authority, now=now, need=60)
++            admission = adapter.device_check()
++            c.launch_guard(plan, authority, need=60)
++            record = {**c.operational_binding(plan), 'resource_id': resource_id,
++                'event': 'reserved', 'kind': gate.KIND, 'plan': plan_ref, 'release': health_release_ref,
++                'source_commit': plan['source']['commit'], 'runtime': plan['runtime'],
++                'physical_gpu': 7, 'gpu_uuid': c.GPU_UUID, 'timeout_seconds': 20,
++                'cleanup_seconds': 40, 'reserved_gpu_seconds': 60,
++                'accounting_admission': reservation, 'admission': admission, 'time_unix': time.time()}
++            r.budget_snapshot(events, [*resources, record])
++            with (root/'data/gpu-healthcheck-ledger.jsonl').open('a') as stream:
++                stream.write(json.dumps(record, sort_keys=True, allow_nan=False)+'\n')
++                stream.flush(); os.fsync(stream.fileno())
++            r.sync_state_from_journal(root, events)
++            return record
+diff --git a/tests/test_n36_controller.py b/tests/test_n36_controller.py
+index 5f30415..65b0ef2 100644
+--- a/tests/test_n36_controller.py
++++ b/tests/test_n36_controller.py
+@@ -2,6 +2,7 @@
+ import copy
+ import datetime as dt
+ from decimal import Decimal
++from pathlib import Path
+ import hashlib
+ import json
+ import pytest
+@@ -102,7 +103,7 @@ def test_retained_prefix_margin_never_rewrites_or_forgets_cost(tmp_path,monkeypa
+     with pytest.raises(ValueError,match='prefix differs'):a.retained_margin(tmp_path,ref)
+ 
+ 
+-def test_full1840_deadline_and_stop(tmp_path):
++def test_full1840_deadline_and_stop(tmp_path, monkeypatch):
+     allowance={'authority_starts_at':'2026-10-09T00:00:00Z','authority_ends_at':c.DEADLINE,
+         'private_budget':True,'gpu_idle':True,'physical_gpu':7,'gpu_uuid':c.GPU_UUID,
+         'live_handles':[],'unsettled_reservations':0,'global_seconds_remaining':1000000,
+@@ -110,10 +111,11 @@ def test_full1840_deadline_and_stop(tmp_path):
+         'bucket_attempts_remaining':{'baseline':10,'development':30},'global_attempts_remaining':100,
+         'cohort_attempts_remaining':40,'protected_attempts_remaining':0}
+     deadline=dt.datetime.fromisoformat(c.DEADLINE.replace('Z','+00:00'))
+-    stop=tmp_path/'STOP'
++    stop=str(tmp_path/'STOP')
++    monkeypatch.setattr(c.stop, 'STOP_PATHS', (stop,))
+     assert c.pre_dispatch(c.expected_rows()[0],allowance,now=deadline-dt.timedelta(seconds=1840),stop_path=stop)==1840
+     with pytest.raises(ValueError):c.pre_dispatch(c.expected_rows()[0],allowance,now=deadline-dt.timedelta(seconds=1839),stop_path=stop)
+-    stop.symlink_to(tmp_path/'absent')
++    Path(stop).symlink_to(tmp_path/'absent')
+     with pytest.raises(ValueError,match='STOP'):c.pre_dispatch(c.expected_rows()[0],allowance,now=deadline-dt.timedelta(seconds=1900),stop_path=stop)
+ 
+ 
+diff --git a/tests/test_n36_recovery.py b/tests/test_n36_recovery.py
+index 12e4f03..bdea751 100644
+--- a/tests/test_n36_recovery.py
++++ b/tests/test_n36_recovery.py
+@@ -221,6 +221,10 @@ def test_healthcheck_history_uses_fresh_identity_and_refs(fresh, fault):
+ @pytest.mark.parametrize('fault', [None, 'old_row', 'missing_charge', 'changed_charge', 'amendment',
+                                   'protected', 'recovery', 'STOP', 'deadline'])
+ def test_fresh_admission_preserves_failed_charge_and_gates(fresh, tmp_path, monkeypatch, fault):
++    # Never let this fixture create the production session STOP.
++    paths = (str(tmp_path/'owner_STOP'), str(tmp_path/'STOP'))
++    monkeypatch.setattr(c.stop, 'STOP_PATHS', paths)
++    monkeypatch.setattr(c, 'stop_path', lambda root=c.ROOT: paths[1])
+     old = historical(recovery.PRESERVED_ATTEMPT['gpu_seconds'], 'baseline',
+                      recovery.PRESERVED_ATTEMPT['attempt_id'], c.COHORT, 'aborted')
+     plan, authority, state, reservations = budget_fixture(tmp_path, old)
+diff --git a/tests/test_n36r3_admission.py b/tests/test_n36r3_admission.py
+new file mode 100644
+index 0000000..d9f7a8b
+--- /dev/null
++++ b/tests/test_n36r3_admission.py
+@@ -0,0 +1,364 @@
++"""CPU synthetic transactions through real release/admission/journal consumers.
++
++Only source/runtime scientific audits and GPU/provider/process boundaries are
++substituted. These fixtures are not production acceptance or G3 evidence.
++"""
++import copy
++import datetime as dt
++import hashlib
++import json
++from pathlib import Path
++from types import SimpleNamespace
++import pytest
++import yaml
++from scripts import qd_ed_n36_contract as c, qd_ed_n36_release as release
++from scripts import qd_ed_n36r3_admission as gate, qd_ed_n36_runner as runner
++from scripts import qd_ed_n36_healthcheck as health, qd_ed_n36_accounting as accounting
++from scripts import qd_ed_n36_supervise as supervisor, qd_ed_n36_bridge as bridge
++from scripts import qd_ed_final_runner as r, qd_ed_n23_worker as w
++from scripts import qd_ed_n36r3_preparation as preparation
++
++
++@pytest.fixture
++def setup(tmp_path, monkeypatch):
++    source = tmp_path/'session/variants/cpu/implementation_worktree'
++    owner = tmp_path/'owner/study_worktree'
++    source.mkdir(parents=True); (owner/'data').mkdir(parents=True)
++    (source/'configs/qd_ed_final').mkdir(parents=True)
++    (source/'configs/qd_ed_final/n31_dev_task_identities.json').write_bytes(
++        (c.ROOT/'configs/qd_ed_final/n31_dev_task_identities.json').read_bytes())
++    (source/'scripts').mkdir()
++    (source/'scripts/qd_ed_gpu_probe.py').write_bytes((c.ROOT/'scripts/qd_ed_gpu_probe.py').read_bytes())
++    monkeypatch.setattr(gate, 'SOURCE', source); monkeypatch.setattr(gate, 'OWNER', owner)
++    monkeypatch.setattr(bridge, 'ROOT', source)
++    monkeypatch.setattr(c.stop, 'STOP_PATHS', (c.stop_path(source), str(tmp_path/'owner/STOP')))
++    store = tmp_path/'refs'; store.mkdir()
++    def put(name, value):
++        p = store/(name+'.json'); p.write_text(json.dumps(value, sort_keys=True)); return c.ref(p)
++    events = []
++    for i in range(505):
++        saved = gate.previous.draft.PRESERVED[i] if i < 2 else None
++        key = saved['attempt_id'] if saved else 'historical_'+str(i)
++        seconds = saved['gpu_seconds'] if saved else 0.
++        if i == 504:
++            seconds = (75.52725286641478-r.budget_snapshot(events)['gpu_hours_consumed'])*3600
++        bucket = 'baseline' if i < 105 else 'development' if i < 418 else 'validation' if i < 478 else 'recovery'
++        base = {'attempt_id':key, 'episode_key':key, 'budget_bucket':bucket}
++        events.extend([{**base,'event':'reserved'}, {**base,'event':'dispatched'},
++                       {**base,'event':'aborted','gpu_process_wall_seconds':seconds}])
++    reservations = [{'event':'gpu_hour_reservations_changed', 'gpu_hour_reservations':c.CAPS['protected_gpu_hours'],
++                     'rationale':'synthetic existing reserves', 'time_unix':1}]
++    anchors = {}
++    for name, rows in [('attempt-ledger.jsonl',events), ('gpu-healthcheck-ledger.jsonl',[]),
++                       ('gpu-hour-reservation-ledger.jsonl',reservations)]:
++        p = owner/'data'/name; p.write_text(''.join(json.dumps(e)+'\n' for e in rows))
++        anchors[name] = {**c.ref(p), 'bytes':p.stat().st_size}
++    snap = r.budget_snapshot(events, [])
++    assert snap['gpu_hours_consumed'] == 75.52725286641478
++    original = put('original-accounting', {'ledger_prefixes':anchors,
++        'cost_reconciliation':{'retained_admission_margin_gpu_hours':.23357169027962}})
++    monkeypatch.setattr(c, 'ACCOUNTING_SHA', original['sha256'])
++    old_accounting = put('n36r2-accounting', {'inherited_accounting':original})
++    review = put('scientific-review', {'synthetic':True})
++    monkeypatch.setattr(c, 'PROTOCOL_REVIEW_SHA', review['sha256'])
++    old_rows = c.expected_rows(source, cohort=c.DRAFT_RECOVERY_COHORT)
++    old_protocol = put('old-protocol', {'episodes':old_rows})
++    old_plan = put('old-plan', {'cohort':c.DRAFT_RECOVERY_COHORT, 'episodes':old_rows,
++        'limits':c.LIMITS, 'worker_contract':c.WORKER_CONTRACT, 'protocol':old_protocol,
++        'accounting':old_accounting, 'protocol_review':review})
++    rows = c.expected_rows(source, cohort=c.DRAFT_N36R3_COHORT)
++    terminal = put('historical-reconciliation', {'schema':'n36r3-production-closure-terminal-reconciliation-v1',
++        'release_enabled':False, 'ledger_prefix':anchors['attempt-ledger.jsonl'],
++        'health_ledger_prefix':anchors['gpu-healthcheck-ledger.jsonl']})
++    allocation = put('allocation', {'schema':'n36r3-allocation-draft-v1', 'cohort':c.DRAFT_N36R3_COHORT,
++        'episodes':rows, 'automatic_recoveries':0, 'allocation_is_not_authority':True, 'release_enabled':False})
++    ledger = put('accounting', {'schema':'n36r3-accounting-draft-v1', 'cohort':c.DRAFT_N36R3_COHORT,
++        'inherited_accounting':old_accounting, 'terminal_reconciliation':terminal,
++        'retained_ledger_prefix':anchors['attempt-ledger.jsonl'],
++        'retained_health_ledger_prefix':anchors['gpu-healthcheck-ledger.jsonl'],
++        'allocation':allocation, 'all_prior_charges_retained':True, 'N36R2_status':'INVALID',
++        'N36R2_charges_retained':True, 'protected_gpu_hours':c.CAPS['protected_gpu_hours'],
++        'automatic_recoveries':0, 'new_budget_authority':False, 'current_headroom':None, 'release_enabled':False})
++    protocol = put('protocol', {'schema':'n36r3-operational-protocol-draft-v1', 'cohort':c.DRAFT_N36R3_COHORT,
++        'previous_plan':old_plan, 'inherited_protocol':old_protocol, 'inherited_protocol_review':review,
++        'accounting':ledger, 'allocation':allocation, 'episodes':rows, 'automatic_recoveries':0,
++        'scientific_changes':False, 'release_enabled':False})
++    runtime = {'schema':'qd-ed-runtime-setup-v1', 'worktree':str(source), 'artifact_root':str(tmp_path/'artifacts'),
++        'gpu_mapping':{'physical_gpu':7, 'uuid':c.GPU_UUID, 'egl_device_index':4, 'metadata_mapping_verified':True},
++        'cuda_egl_verified':True, 'provider_ready':True, 'stage_recovered_error_condition':r.E2_STAGE_CONDITION,
++        'frozen_stage_provider':{'backend':'codex_cli','model':'gpt-6-astra'}, 'environment':{}, 'files':[c.ref(source/'scripts/qd_ed_gpu_probe.py')], 'tasks':{}}
++    source_ref = {'commit':'synthetic-exact-source', 'files':[{'path':'scripts/qd_ed_gpu_probe.py',
++                   'sha256':w.sha(source/'scripts/qd_ed_gpu_probe.py')}]}
++    plan = {'schema':'n36-released-plan-v1', 'frozen':True, 'release_enabled':True,
++        'cohort':c.DRAFT_N36R3_COHORT, 'worktree':str(source), 'run_name':'cpu-only',
++        'artifact_root':str(tmp_path/'artifacts/n36r3'), 'source':source_ref, 'scientific_source':source_ref,
++        'protocol':protocol, 'protocol_review':review, 'accounting':ledger,
++        'resource_routing':{'source_cwd':str(source),'owner_root':str(owner),'physical_gpu':7,'gpu_uuid':c.GPU_UUID},
++        'runtime':put('runtime',runtime), 'runtime_closure':put('closure',{}),
++        'controller_semantics':put('controller',{}), 'native_build':put('native',{}),
++        'limits':c.LIMITS, 'worker_contract':c.WORKER_CONTRACT, 'deadline':c.DEADLINE,
++        'stop_path':c.stop_path(source), 'stop_authority':c.stop.binding(), 'episodes':rows,
++        'phase_authorization':{'dev':True,'validation':False,'formal':False}, 'attempt_identity':'episode_key',
++        'runtime_inventory_sha256':'synthetic-inventory'}
++    plan['b5_review'] = put('independent', {'schema':'n36r3-independent-b5-review-v1',
++        'decision':'PASS_PREPARATION_REQUIRES_ROOT_RELEASE', **{k:plan[k] for k in gate.BINDINGS},
++        'worker_receipts_are_future':True, 'release_enabled':False})
++    adoption = put('adoption', {'schema':'n36r3-source-adoption-v1', 'approved':True,
++        'owner_root':str(owner), 'source_cwd':str(source), **{k:plan[k] for k in gate.BINDINGS},
++        'independent_review':plan['b5_review']})
++    amendment = put('owning-accounting', {'schema':'n36r3-owning-accounting-v1','cohort':c.DRAFT_N36R3_COHORT,
++        'accounting':ledger,'source_adoption':adoption,'caps':c.CAPS,'limits':c.LIMITS,'healthchecks':gate.HEALTH,
++        'automatic_recoveries':0,'ledger_prefixes':anchors,'snapshot':snap,'arithmetic':preparation.arithmetic(snap)})
++    authority = {'schema':'n36-budget-authority-v1','approved':True,'cohort':c.DRAFT_N36R3_COHORT,
++        'protocol':protocol,'accounting':ledger,'amendment':amendment,'ledger_prefixes':anchors,
++        'source_adoption':adoption,'healthchecks':gate.HEALTH,'caps':c.CAPS,'limits':c.LIMITS,
++        'validation_authorized':False,'formal_authorized':False,'coordinator_ends_at':c.DEADLINE,
++        'starts_at':'2026-10-09T00:00:00Z','weekly_window':{'ends_at':c.DEADLINE,
++          'origin_gpu_hours':53.08404692669838,'increment_gpu_hours':168.},
++        'approval_basis':put('standing',{'approved':True}),'automatic_recoveries':0}
++    plan['authority'] = put('authority',authority)
++    plan['expected_manifests'] = {row['episode_key']:put(row['episode_key'],
++        {'row':row, 'output_dir':str(Path(plan['artifact_root'])/row['episode_key']), 'argv':['cpu-python']}) for row in rows}
++    plan_ref = put('plan',plan)
++    def detached(*, health_only, readiness=None):
++        expected = {'schema':'n36r3-health-release-v1' if health_only else 'n36-execution-release-v1',
++            'approved':True, 'plan':plan_ref, **{k:plan[k] for k in ('native_build','authority','protocol',
++            'protocol_review','source','scientific_source','runtime_closure','controller_semantics','runtime',
++            'limits','phase_authorization')}, **c.operational_binding(plan)}
++        if health_only: expected['healthchecks'] = gate.HEALTH
++        else: expected['readiness'] = readiness
++        rr = put('health-review' if health_only else 'root-review', {**expected,
++            'schema':'n36r3-root-health-review-v1' if health_only else 'n36-root-production-review-v1','decision':'APPROVED'})
++        return put('health-release' if health_only else 'release', {**expected,'root_review':rr})
++    health_ref = detached(health_only=True)
++    state = {'run_name':'cpu-only','worktree':str(owner),'artifacts':runtime['artifact_root'],
++        'gpu_pool':[7], 'max_concurrent_gpu_workers':1, 'n36_budget_authority':plan['authority'],
++        'resource_isolation':{'status':'ACTIVE','validation_status':'PASS','private_budget':True},
++        'budget':{'max_episode_attempts':1800,'max_gpu_hours':224.,'reserved':c.CAPS['buckets'],
++        'gpu_hour_reservations':c.CAPS['protected_gpu_hours'],'amendment':amendment,
++        'dispatched':505,'gpu_hours_consumed':snap['gpu_hours_consumed']}}
++    (owner/'research-state.yaml').write_text(yaml.safe_dump(state))
++    seen = []
++    monkeypatch.setattr(runner.source_execution, 'active', lambda: seen.append('bootstrap'))
++    monkeypatch.setattr(runner.source_execution, 'attest', lambda *a: seen.append('source-only'))
++    def sources(p):
++        assert p['worktree'] == str(source)
++        for item in p['source']['files']:
++            w.require(w.sha(source/item['path']) == item['sha256'], 'synthetic source hash differs')
++        seen.append('source')
++    monkeypatch.setattr(bridge,'verify_sources',sources)
++    monkeypatch.setattr(bridge,'attest_loaded',lambda *a: seen.append('loaded'))
++    monkeypatch.setattr(bridge,'source_paths',lambda *a:{'scripts/qd_ed_gpu_probe.py'})
++    monkeypatch.setattr(bridge.closure,'verify_runtime',lambda *a: seen.append('runtime') or {})
++    from scripts import qd_ed_n34_controller as controller, qd_ed_n36_build as build
++    monkeypatch.setattr(controller,'verify_semantics',lambda *a: seen.append('controller'))
++    monkeypatch.setattr(build,'manifest',lambda *a: seen.append('native'))
++    monkeypatch.setattr(r,'stage_overrides',lambda *a: None)
++    monkeypatch.setattr(r,'validate_runtime_inputs',lambda *a: seen.append('inputs'))
++    monkeypatch.setattr(bridge,'profiles',lambda *a:{'profiles':{'C0':{}}})
++    monkeypatch.setattr(bridge,'_verify_manifest_bound',lambda ref,*a: w.read_ref(ref))
++    monkeypatch.setattr(runner,'device_check',lambda: seen.append('device') or {'cpu_fixture':True})
++    monkeypatch.setattr(r,'verify_provider',lambda runtime,env,root: seen.append(('provider',str(root))))
++    monkeypatch.setattr(runner,'process_identity',lambda pid:{'pid':pid,'boot_id':'cpu','proc_start_ticks':'1'})
++    monkeypatch.setattr(health,'wait_probe',lambda *a: 0)
++    class Process:
++        pid = 123
++        def poll(self): return 0
++    def popen(command, **kwargs):
++        assert kwargs['cwd'] == source
++        assert kwargs['env']['PYTHONPATH'].split(':')[0] == str(source)
++        output = Path(command[command.index('--output')+1]); rid=command[-1]
++        (output/'probe-frame.png').write_bytes(b'CPU synthetic frame; not a rendering')
++        evidence={'schema':'qd-ed-gpu7-context-probe-v1','resource_id':rid,
++            'physical_gpu':7,'torch_logical_device':0,'cuda_visible_devices':'7','cuda_device_order':'PCI_BUS_ID',
++            'egl_cuda_ordinal_namespace':'process_visible','torch_uuid':c.GPU_UUID,'torch_visible_device_count':1,
++            'cuda_kernel_result':2.,'display_egl_device_index':4,'display_cuda_ordinal':0,
++            'cuda_associated_egl_devices':[{'egl_device_index':4,'cuda_ordinal':0}], 'gl_vendor':'NVIDIA fixture',
++            'gl_renderer':'CPU fixture','gl_version':'fixture','frame_shape':[64,64,3], 'frame_dtype':'uint8',
++            'frame_nonzero_values':1,'frame_std':1,'simulation_steps':0,'frame_png_sha256':w.sha(output/'probe-frame.png')}
++        (output/'probe-evidence.json').write_text(json.dumps(evidence))
++        return Process()
++    monkeypatch.setattr(health.subprocess,'Popen',popen)
++    return SimpleNamespace(**locals())
++
++
++def ready(f):
++    result = health.run_healthcheck(f.plan_ref, f.health_ref, gate.PREPARATION_ID, timeout_seconds=20)
++    assert result['status'] == 'VALID'
++    ref = c.ref(Path(result['terminal']['output_dir'])/'healthcheck-result.json')
++    return f.detached(health_only=False, readiness={'health_release':f.health_ref,'terminal':ref})
++
++
++def test_positive_separate_health_then_actual_release_admission(setup):
++    f=setup
++    assert release.validate_health_release(f.plan_ref,f.health_ref)[0] == f.plan
++    with pytest.raises((ValueError,KeyError)): release.validate_release(f.plan_ref,f.health_ref)
++    rr=ready(f)
++    assert release.validate_release(f.plan_ref,rr)[0] == f.plan
++    state,events,resources,reservations=runner.snapshot(f.owner,f.authority)
++    snap=release.admission(f.plan,f.authority,state,events,resources,reservations,f.rows[0],
++        now=dt.datetime.now(dt.timezone.utc),gpu_idle=True,release_refs=(f.plan_ref,rr))
++    assert snap['dispatched']==505 and snap['n36_reservation']['reserved_gpu_seconds']==1840
++    assert len(resources)==3 and resources[-1]['event']=='completed'
++    assert resources[0]['reserved_gpu_seconds']==60
++    assert not (f.source/'data').exists()
++    assert ('provider',str(f.source)) in f.seen
++    assert {'source','loaded','runtime','controller','native','inputs'} <= set(x for x in f.seen if isinstance(x,str))
++    with pytest.raises((ValueError,r.GateError)):
++        health.run_healthcheck(f.plan_ref,f.health_ref,gate.PREPARATION_ID,timeout_seconds=20)
++
++
++@pytest.mark.parametrize('fault',['source','review','authority','hash','owner','readiness','old-authority'])
++def test_release_fail_closed(setup,fault):
++    f=setup; rr=ready(f)
++    if fault=='source': (f.source/'scripts/qd_ed_gpu_probe.py').write_text('changed')
++    elif fault=='review': Path(f.plan['b5_review']['path']).write_text('{}')
++    elif fault=='authority': Path(f.plan['authority']['path']).unlink()
++    elif fault=='hash': rr={**rr,'sha256':'0'*64}
++    elif fault=='owner': f.plan['resource_routing']['owner_root']=str(f.source); f.plan_ref=f.put('plan',f.plan)
++    elif fault=='old-authority': f.authority['cohort']=c.DRAFT_RECOVERY_COHORT; f.put('authority',f.authority)
++    elif fault=='readiness': rr=f.detached(health_only=False,readiness=None)
++    with pytest.raises((ValueError,KeyError,TypeError,OSError)):
++        release.validate_release(f.plan_ref,rr)
++
++
++@pytest.mark.parametrize('fault',['stale-ledger','stale-state','STOP','deadline','bound','unknown','wrong-state','inflight'])
++def test_health_reservation_negative(setup,fault,monkeypatch):
++    f=setup
++    if fault=='stale-ledger':
++        path=f.owner/'data/gpu-hour-reservation-ledger.jsonl'
++        with path.open('a') as stream: stream.write(json.dumps(f.reservations[0])+'\n')
++    elif fault=='stale-state':
++        f.state['budget']['dispatched']=504
++        (f.owner/'research-state.yaml').write_text(yaml.safe_dump(f.state))
++    elif fault=='STOP':
++        path=Path(c.stop.STOP_PATHS[0]);path.parent.mkdir(parents=True);path.symlink_to(f.tmp_path/'absent')
++    elif fault=='deadline': monkeypatch.setattr(c.stop,'DEADLINE','2000-01-01T00:00:00Z')
++    elif fault=='wrong-state':
++        f.state['n36_budget_authority']={}
++        (f.owner/'research-state.yaml').write_text(yaml.safe_dump(f.state))
++    elif fault=='unknown':
++        path=f.owner/'data/attempt-ledger.jsonl'; path.write_text(path.read_text().replace('86.40354533703066','null'))
++    elif fault=='inflight': accounting.reserve_healthcheck(f.plan_ref,f.health_ref,gate.PREPARATION_ID,timeout_seconds=20)
++    with pytest.raises((ValueError,r.GateError)):
++        accounting.reserve_healthcheck(f.plan_ref,f.health_ref,
++            'n36_healthcheck_'+f.rows[0]['episode_key'],timeout_seconds=21 if fault=='bound' else 20)
++
++
++def test_health_aggregate_and_invocation_bounds(setup):
++    f=setup; rr=ready(f)
++    resources=r.read_events(f.owner/'data/gpu-healthcheck-ledger.jsonl')
++    local=gate.resource_events(f.plan,resources)
++    assert local==resources
++    snap=r.budget_snapshot(f.events,resources)
++    cohort=r.budget_snapshot([],resources)
++    cohort['gpu_healthcheck_hours']=1741/3600
++    with pytest.raises(ValueError,match='healthcheck'):
++        accounting.headroom(snap,cohort,retained_margin_hours=.23357169027962,protected_hours=44,healthcheck=True,need=60)
++    bad=copy.deepcopy(resources);bad[-1]['gpu_process_wall_seconds']=61
++    with pytest.raises(ValueError):gate.resource_events(f.plan,bad)
++    bad=copy.deepcopy(resources);bad[-1]['release']={}
++    with pytest.raises(ValueError):gate.resource_events(f.plan,bad)
++
++
++def test_actual_runner_charge_once_and_durable_first_c0_pause(setup, monkeypatch):
++    import io
++    f=setup; rr=ready(f)
++    starts=[]
++    class WorkerProcess:
++        pid=123
++        stdin=io.BytesIO()
++        def poll(self): return 0
++    def start(command, **kwargs):
++        starts.append(command)
++        assert kwargs['cwd']==f.source
++        assert kwargs['env']['PYTHONPATH'].split(':')[0]==str(f.source)
++        output=Path(w.read_ref(f.plan['expected_manifests'][f.rows[0]['episode_key']])['output_dir'])
++        (output/'eds_eval').mkdir()
++        (output/'eds_eval/n36-worker-receipt.json').write_text('{"CPU_fixture":true}')
++        return WorkerProcess()
++    monkeypatch.setattr(runner.subprocess,'Popen',start)
++    monkeypatch.setattr(runner,'wait_worker',lambda *a: 0)
++    monkeypatch.setattr(r,'validate_result',lambda *a:{'outcome_valid':True,
++        'required_cost_telemetry_complete':True,'success':False})
++    # The scientific receipt verifier is unchanged in production; this test
++    # isolates durable accounting/routing/pause, not scientific acceptance.
++    verified=[]
++    monkeypatch.setattr(runner.worker,'verify_terminal',lambda *a:verified.append(a))
++    result=runner.execute_one(f.plan_ref,rr)
++    assert result['status']=='PAUSED_FOR_ROOT_G3'
++    before=(f.owner/'data/attempt-ledger.jsonl').read_bytes()
++    # A dead fixture PID is safe to reconcile; a live handle is never killed.
++    def dead(pid): raise FileNotFoundError('CPU fixture child exited')
++    monkeypatch.setattr(runner,'process_identity',dead)
++    for _ in range(2):
++        assert runner.execute_one(f.plan_ref,rr)['status']=='PAUSED_FOR_ROOT_G3'
++    assert (f.owner/'data/attempt-ledger.jsonl').read_bytes()==before
++    assert len(starts)==1 and len(verified)==3
++    events=r.read_events(f.owner/'data/attempt-ledger.jsonl')
++    assert r.budget_snapshot(events,r.read_events(f.owner/'data/gpu-healthcheck-ledger.jsonl'))['dispatched']==506
++    assert [e['event'] for e in events if e['attempt_id']==f.rows[0]['episode_key']]==['reserved','dispatched','valid']
++    with pytest.raises(ValueError,match='health cannot bypass'):
++        accounting.reserve_healthcheck(f.plan_ref,f.health_ref,'n36_healthcheck_'+f.rows[0]['episode_key'],timeout_seconds=20)
++
++
++def test_actual_health_failed_probe_is_charged_and_no_retry(setup, monkeypatch):
++    f=setup
++    monkeypatch.setattr(health,'wait_probe',lambda *a: 1)
++    result=health.run_healthcheck(f.plan_ref,f.health_ref,gate.PREPARATION_ID,timeout_seconds=20)
++    assert result['status']=='INVALID_STOP'
++    resources=r.read_events(f.owner/'data/gpu-healthcheck-ledger.jsonl')
++    assert [e['event'] for e in resources]==['reserved','dispatched','aborted']
++    assert resources[-1]['gpu_process_wall_seconds'] >= 0
++    with pytest.raises(ValueError,match='no retry'):
++        accounting.reserve_healthcheck(f.plan_ref,f.health_ref,'n36_healthcheck_'+f.rows[0]['episode_key'],timeout_seconds=20)
++
++
++def test_actual_health_lost_handle_remains_unsettled(setup, monkeypatch):
++    f=setup
++    def interrupted(*args): raise KeyboardInterrupt()
++    monkeypatch.setattr(health,'wait_probe',interrupted)
++    with pytest.raises(KeyboardInterrupt):
++        health.run_healthcheck(f.plan_ref,f.health_ref,gate.PREPARATION_ID,timeout_seconds=20)
++    resources=r.read_events(f.owner/'data/gpu-healthcheck-ledger.jsonl')
++    assert [e['event'] for e in resources]==['reserved','dispatched']
++    assert r.budget_snapshot(f.events,resources)['gpu_healthcheck_inflight']==1
++    with pytest.raises(r.GateError,match='unfinished GPU healthcheck'):
++        accounting.reserve_healthcheck(f.plan_ref,f.health_ref,'n36_healthcheck_'+f.rows[0]['episode_key'],timeout_seconds=20)
++
++
++@pytest.mark.parametrize('fault',['STOP','deadline','missing-journal','wrong-owner','state-worktree','stale-state','episode-cap'])
++def test_episode_consumer_admission_gates_after_valid_readiness(setup, monkeypatch, fault):
++    f=setup; rr=ready(f)
++    state,events,resources,reservations=runner.snapshot(f.owner,f.authority)
++    now=dt.datetime.now(dt.timezone.utc)
++    if fault=='STOP':
++        path=Path(c.stop.STOP_PATHS[0]);path.parent.mkdir(parents=True);path.touch()
++    elif fault=='deadline': now=dt.datetime.fromisoformat(c.DEADLINE.replace('Z','+00:00'))-dt.timedelta(seconds=1839)
++    elif fault=='missing-journal': resources=[]
++    elif fault=='wrong-owner': f.plan['resource_routing']['owner_root']=str(f.source)
++    elif fault=='state-worktree': state['worktree']=str(f.source)
++    elif fault=='stale-state': state['budget']['gpu_hours_consumed']=0
++    elif fault=='episode-cap': state['budget']['max_episode_attempts']=505
++    with pytest.raises((ValueError,r.GateError)):
++        release.admission(f.plan,f.authority,state,events,resources,reservations,f.rows[0],
++            now=now,gpu_idle=True,release_refs=(f.plan_ref,rr))
++
++
++def test_actual_health_aggregate_reservation_cannot_borrow_unused_seconds(setup):
++    f=setup
++    # Synthetic history fills only the health allowance. This is an arithmetic
++    # boundary fixture, not a reachable continuation past the first C0 pause.
++    record=accounting.reserve_healthcheck(f.plan_ref,f.health_ref,gate.PREPARATION_ID,timeout_seconds=20)
++    history=[]
++    for row in f.rows[1:31]:
++        base={**record,'resource_id':'n36_healthcheck_'+row['episode_key']}
++        history.extend([{**base,'event':'reserved'}, {**base,'event':'dispatched'},
++                        {**base,'event':'completed','gpu_process_wall_seconds':60}])
++    path=f.owner/'data/gpu-healthcheck-ledger.jsonl'
++    path.write_text(''.join(json.dumps(e)+'\n' for e in history))
++    with r.locked(f.owner/'data/qd-ed-state.lock'):
++        r.sync_state_from_journal(f.owner,f.events)
++    with pytest.raises(ValueError,match='healthcheck bound'):
++        accounting.reserve_healthcheck(f.plan_ref,f.health_ref,gate.PREPARATION_ID,timeout_seconds=20)
++    assert path.read_text()==''.join(json.dumps(e)+'\n' for e in history)

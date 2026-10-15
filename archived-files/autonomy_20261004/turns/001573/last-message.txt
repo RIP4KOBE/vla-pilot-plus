@@ -1,0 +1,3 @@
+Verified the active N36 repair and driver identities. Focused CPU tests remain running; ledgers are unchanged. No duplicate work was launched.
+
+Saved the hash-bound turn 1573 operational summary. Next: reconcile repair results and obtain independent review. Original completion evidence remains outstanding.

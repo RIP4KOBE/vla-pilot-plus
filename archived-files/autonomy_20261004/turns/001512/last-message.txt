@@ -1,0 +1,3 @@
+Scoped F1 repair review passed. Both targeted tests passed, including all five crash/restart cases.
+
+Saved turn 1512’s hash-bound summary and updated owning records. Ledgers and adopted source remain unchanged; GPU dispatch remains gated. The driver continues with remaining integration checks. Validation/formal/ablation completion remains unproven.

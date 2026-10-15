@@ -1,0 +1,16 @@
+{
+  "current_source": "4e632c3bf1afe682d9287a518e531e6f2a6eba42",
+  "scientific_source": "4e632c3bf1afe682d9287a518e531e6f2a6eba42",
+  "prior_adoption": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001413/source-adoption-v1.json",
+    "bytes": 379638,
+    "sha256": "9c7cc8646492aa577bc31c7395fea93c13cd7bc5bdd8287e4a9b6f0dfdfbe39f"
+  },
+  "historical_baseline": "1065f38122379a515b60a9a424f574330405b66f",
+  "changed_paths": [
+    "scripts/qd_ed_n36_healthcheck.py",
+    "scripts/qd_ed_n36r3_admission.py",
+    "tests/test_n36r3_admission.py"
+  ],
+  "production_Main_science_receipts_audits_unchanged": true
+}

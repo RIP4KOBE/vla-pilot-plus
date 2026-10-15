@@ -1,0 +1,8 @@
+Committed `21fc93e5667a83520401282d4ba8e945f954f99b` from authorized source `bee9f6a4703e9d5d802d6b8c7950b69beefac4c0`.
+
+- Changed only the release validator and focused tests.
+- All 44 CPU tests passed.
+- State untouched; branch clean; no owner merge.
+- Fresh B5 review and source/runtime binding refresh remain required.
+
+Reports: [JSON](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001352/owner-alias-repair/report-v1.json) · [Markdown](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001352/owner-alias-repair/report-v1.md)

@@ -1,0 +1,5 @@
+PASS for exact-source CPU integration. All eight retained failures are classified as pre-existing fixture issues, with source evidence and bounded fixes.
+
+Reports written: [JSON](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001334/admission-independent-review/report-v1.json) · [Markdown](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001334/admission-independent-review/report-v1.md).
+
+No source or production-state changes. Adoption, live readiness, detached release, and actual C0/G3 acceptance remain required.

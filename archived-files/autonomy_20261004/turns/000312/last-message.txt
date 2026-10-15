@@ -1,0 +1,3 @@
+N32R2 remains active under controller PID 1818171, with frozen source `1065f381` verified. Task 3 completed validly but unsuccessfully; C0/Q0/N32 each stand at 0/4.
+
+Ledger history is intact. No restart or duplicate dispatch occurred. Turn 312’s operational summary is saved; next is monitoring the existing controller. Validation, formal, and required ablation evidence remain outstanding.

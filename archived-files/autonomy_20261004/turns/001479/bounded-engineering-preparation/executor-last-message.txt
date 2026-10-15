@@ -1,0 +1,7 @@
+Completed within the CPU budget.
+
+**Decision:** a separate engineering adapter is required; existing full-plan authority cannot enforce the distinct diagnostic scope.
+
+Wrote [report-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001479/bounded-engineering-preparation/report-v1.json), concise Markdown, and the bounded adapter specification.
+
+Preserved all scientific gates and retained charges. Verified **2100 wall seconds; 1900/3600 GPU-hours**. No source edits, GPU use, dispatch, adoption, or release. Runtime success and original-goal completion remain unestablished.

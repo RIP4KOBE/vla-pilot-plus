@@ -1,0 +1,3 @@
+N36R1 source `066f2bf` remains unreleased. Production review found four blockers; bounded CPU repair is running with verified handles `330934/330935`.
+
+Owning ledgers and charges are unchanged. Operational summary saved. Next: review the repair, resolve accounting bindings, and validate release. Required validation, formal, and ablation evidence remains outstanding.

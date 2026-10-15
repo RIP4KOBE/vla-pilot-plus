@@ -1,0 +1,19 @@
+{
+  "schema": "n34-controller-alias-source-adoption-v1",
+  "at": "2026-10-08T16:08:23.711957+00:00",
+  "source_before": "c14e1e92870a51b92d70d21e01a0ffaf1a14534b",
+  "source_after": "68c341ef6357887c4ae33ddafad00fab17582302",
+  "implementation_commit": "3f4ec9e27aeb139db246831e8ffc0325a8ea731c",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000537/n34-controller-alias-root-review-v1.json",
+    "sha256": "9bcaa45cdb342de6dfd466ef34b3883fb0f2b42077fa0d226e3118ae3cce1ff8"
+  },
+  "identical_integrated_files": [
+    "scripts/qd_ed_n34_controller.py",
+    "tests/test_n34_source_controller.py"
+  ],
+  "validation": "Both integrated files byte-identical to reviewed executor commit; 62 previously passing focused CPU tests retained, no redundant rerun. Scientific code unchanged.",
+  "gpu_dispatched": false,
+  "scientific_promotion": false,
+  "next_step": "Complete N34 prospective deployed runtime/module closure and external OSC semantics proof using adopted source 68c341ef6357887c4ae33ddafad00fab17582302. Then reconcile finite accounting/protected reserves, verify fresh IDs, freeze 30 prospective manifests and detached release. GPU dispatch and validation/formal remain closed; no replay or scientific promotion."
+}

@@ -1,0 +1,11 @@
+test_before_action_caption_boundary (test_extract_fixed_grid.MetadataTests.test_before_action_caption_boundary) ... ok
+test_decoded_count_not_selected_count (test_extract_fixed_grid.MetadataTests.test_decoded_count_not_selected_count) ... ok
+test_exact_approved_grid (test_extract_fixed_grid.MetadataTests.test_exact_approved_grid) ... ok
+test_fixed_nonoverlapping_layout (test_extract_fixed_grid.MetadataTests.test_fixed_nonoverlapping_layout) ... ok
+test_no_torch_or_gpu_dependency (test_extract_fixed_grid.MetadataTests.test_no_torch_or_gpu_dependency) ... ok
+test_overlap_fails (test_extract_fixed_grid.MetadataTests.test_overlap_fails) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.000s
+
+OK

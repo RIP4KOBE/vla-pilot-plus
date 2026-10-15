@@ -1,0 +1,3 @@
+N32R2 remains live on GPU7 with verified controller/worker identities and unchanged frozen bindings. Ledger prefixes are intact: 13 valid cells, zero successes; task 4 Q0 is running.
+
+Recorded turn 348’s operational summary. Next: monitor the existing cohort and reconcile terminal evidence when it finishes. Validation, formal evaluation, and required ablation evidence remain outstanding.

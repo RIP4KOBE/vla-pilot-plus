@@ -1,0 +1,5 @@
+N31 remains active on GPU7 with verified controller/worker identities and frozen source `7428ce8`. Prior ledger history is intact.
+
+Audited successes: C0 0/4, Q0 0/4, N31 0/3; task3 N31 is running. No promotion or completion established.
+
+Turn 30 operational summary saved. Next: monitor the existing cohort, then review its native evidence and frozen scientific gate.

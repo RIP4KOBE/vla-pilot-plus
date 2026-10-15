@@ -1,0 +1,3 @@
+N35 remains running on frozen source `52a87af0`. Controller and worker identities, authority hashes, and ledger continuity verified. C0 task 0 failed validly; Q0 is still running.
+
+Recorded turn 926’s operational summary. The driver continues monitoring; validation, formal, and required ablation evidence remain unresolved.

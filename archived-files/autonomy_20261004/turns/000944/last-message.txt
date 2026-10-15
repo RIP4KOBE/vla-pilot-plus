@@ -1,0 +1,3 @@
+N35 remains active on GPU7 under source `52a87af0`. Controller PID 2632351 and worker PID 2799034 retain verified identities; ledger continuity is intact.
+
+Task 0 recorded valid failures across all four arms; task 1 C0 is running. Operational summary saved for turn 944. Next: monitor the existing cohort, then reconcile evidence against frozen gates. Validation/formal/ablation completion remains unevidenced.

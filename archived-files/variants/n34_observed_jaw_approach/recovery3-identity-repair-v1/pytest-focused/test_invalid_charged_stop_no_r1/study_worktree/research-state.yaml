@@ -1,0 +1,66 @@
+artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/recovery3-identity-repair-v1/pytest-focused/test_invalid_charged_stop_no_r1/study_worktree/artifacts
+budget:
+  aborted: 1
+  amendment:
+    synthetic: true
+  by_bucket:
+    baseline: 1
+    development: 0
+    formal: 0
+    recovery: 2
+    validation: 0
+  completed: 3
+  dispatched: 4
+  gpu_healthcheck_hours: 0.0
+  gpu_healthcheck_inflight: 0
+  gpu_hour_reservations:
+    formal: 12.0
+    validation: 32.0
+  gpu_hours_by_bucket:
+    baseline: 0.0
+    development: 0.0
+    formal: 0.0
+    recovery: 0.0
+    validation: 0.0
+  gpu_hours_consumed: 4.801580346085959e-07
+  invalid: 3
+  max_episode_attempts: 1800
+  max_gpu_hours: 224.0
+  reserved:
+    baseline: 400
+    development: 1120
+    formal: 40
+    recovery: 60
+    validation: 180
+  reserved_attempts: 3
+  running: 0
+  valid: 0
+gpu_pool:
+- 7
+max_concurrent_gpu_workers: 1
+n34_budget_authority:
+  path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/recovery3-identity-repair-v1/pytest-focused/test_invalid_charged_stop_no_r1/study_worktree/authority.json
+  sha256: 2b3ccbc83e0214447a07642917d3580ff0f77c42299cfe3915b363851a20db9e
+resource_isolation:
+  private_budget: true
+  status: ACTIVE
+  validation_status: PASS
+run_name: synthetic
+runner:
+  by_bucket:
+    baseline: 1
+    development: 0
+    validation: 0
+    formal: 0
+    recovery: 3
+  reserved_attempts: 4
+  gpu_hours_by_bucket:
+    baseline: 0.0
+    development: 0.0
+    validation: 0.0
+    formal: 0.0
+    recovery: 4.801580346085959e-07
+  gpu_healthcheck_hours: 0.0
+  gpu_healthcheck_inflight: 0
+  last_attempt_id: n34r3_dev_t00_c0_20261008
+  last_event: aborted

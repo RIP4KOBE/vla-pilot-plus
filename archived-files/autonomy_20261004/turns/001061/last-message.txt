@@ -1,0 +1,3 @@
+N35 remains active on GPU7; controller identity and ledger continuity verified. C0/Q0/N34/N35 each have 0 successes from 5 valid Dev episodes; task 5 C0 is running.
+
+Saved turn 001061’s operational summary and reconciliation. Frozen source and gates remain unchanged. Next step is continued monitoring; validation/formal/ablation completion remains unproven.

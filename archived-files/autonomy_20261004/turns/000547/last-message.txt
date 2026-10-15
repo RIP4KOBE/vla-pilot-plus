@@ -1,0 +1,3 @@
+Continued the owning study. Verified live identities and unchanged accounting, completed CPU import checks, and launched an isolated repair for missing source-inventory entries.
+
+GPU dispatch remains gated by runtime verification. Operational handoff is saved; the existing driver continues. Validation, formal evaluation, and ablation evidence remain outstanding.

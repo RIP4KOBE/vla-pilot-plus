@@ -1,0 +1,7 @@
+Turn612: bound handoff and exact authorization verified. Source remains 3acfda1adea7b4d9880c81dab7e3882f1587d4d0. Resource isolation ACTIVE/PASS. No STOP; authorization ends 2026-10-11T11:13:13Z. Turn611 completed normally; its executor launch and state adoption were reconciled.
+
+Driver268073/start97715947, coordinator479714/start135266413, CPU wrapper476535/start135257220 and executor476536/start135257223 matched boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. Closed N34 controller3365423, worker4113229 and child399134 are absent. All three private ledger prefixes match turn610 closure exactly:443 dispatched,0 running,63.31147663952318GPUh; charged invalid timeout and unknown telemetry retained.
+
+Existing official gpt-6-astra CPU executor is progressing in verification-efficiency-repair-v1 / production_worktree. It is implementing transaction-scoped closure verification, batched pinned git-object reads and early phase timing, with focused tests pending/in progress. No new launch, GPU dispatch, source adoption, ledger or state mutation this turn. Live edits are unreviewed and must not be adopted yet.
+
+Next bounded step: monitor the same executor, reconcile terminal report/exit, independently review audit equivalence and focused adversarial tests plus timing evidence. Only then prepare a new source-bound prospective recovery identity/release and exact accounting. Do not rewrite/replay the invalid N34 release. Original validation/formal/required-ablation evidence is unresolved; no completion record.

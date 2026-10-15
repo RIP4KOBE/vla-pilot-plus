@@ -1,0 +1,39 @@
+{
+  "schema": "n36r4-prospective-protocol-draft-v1",
+  "cohort": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+  "previous_plan": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001451/manifest-refresh/plan.draft.json",
+    "sha256": "b3d75d399d1953e1e3f3f230a92c4960d0ce6e700714598d0d8cedd603047103"
+  },
+  "terminal_reconciliation": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001460/terminal-reconciliation-v1.json",
+    "sha256": "db25c211aafbd7aad290ba8e2951fe69057fbe28cdd5659de68a2d921f43487a"
+  },
+  "accepted_repair": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001466/root-review-v1.json",
+    "bytes": 3671,
+    "sha256": "1307883e0ddc74b0ecf1ef2b777dc30da2ad4f7d3239e7be854ca0d0f7a87be3"
+  },
+  "allocation": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001467/recovery-preparation/allocation.disabled-v1.json",
+    "sha256": "d633aa5503248528b1edb33e1720c967314a9523408e9a4687113c6b61913a11"
+  },
+  "accounting": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001467/recovery-preparation/accounting.disabled-v1.json",
+    "sha256": "a60c3be578ea6ce48f37ee73205f06e391859899bf96a74c1509017880a0e43d"
+  },
+  "scientific_protocol_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001151/protocol-root-review-v1.json",
+    "sha256": "91391b76195b91bdb0318ae380820959a5bd4c3beaa6b35c6c7b16a65f121fa9"
+  },
+  "seed_policy": "Preserve prospective fixed dev seeds and init rows from N31 dev identities; identical across four arms within each task. Distinct episode/cohort identities; no pooling previous controls.",
+  "task_order": "task 0..9, within each task C0,Q0,N34,N36",
+  "first_C0_G3_pause": true,
+  "later_cells_require_root_G3_acceptance": true,
+  "N36R3_terminal_INVALID_never_replay": true,
+  "methods_controls_thresholds_unchanged": true,
+  "ordinary_native_source_audits_required": true,
+  "fresh_health_required": true,
+  "release_enabled": false,
+  "root_adopted": false
+}

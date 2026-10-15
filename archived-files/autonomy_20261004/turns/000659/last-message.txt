@@ -1,0 +1,3 @@
+N34R5’s frozen release passed validation for all 30 manifests. One controller, PID `802963`, is live and checking GPU7 admission.
+
+Source, historical charges, protected reserves, and scientific gates remain unchanged. Operational summary recorded; the driver will continue monitoring. Validation/formal/ablation evidence remains outstanding.

@@ -1,0 +1,8 @@
+Committed `808e27f702564fe51db45016e139b68ecb476f8c`.
+
+- Exact hash-bound, one-row inventory admission implemented.
+- 217 focused CPU tests passed; pinned v4 projection passed.
+- Pre-existing parity failure preserved and recorded.
+- No deployment, adoption, controller start, or runtime-readiness claim.
+
+[Report and next graph-composition instructions](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001835/engineering-repair/report-v1.json)

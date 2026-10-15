@@ -1,0 +1,20 @@
+{
+  "schema": "n36-source-placement-v1",
+  "at": "2026-10-11T00:58:55.399186+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001722/source-placement-authority-v1.json",
+    "bytes": 2001,
+    "sha256": "2fe21c179c4665cab5ad10dda8e618c78c0d510e3f09b5e2d9beee48cd32d7bc"
+  },
+  "worktree": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "before": "d3225489f6edfd2e49f472dc1ea9307f14f8be70",
+  "after": "1c10f9dd2afed8f8301e61f42dde46b8fa9565ed",
+  "tree": "b43da774541fedca4f7b0a69d847534ba9b815bc",
+  "tracked_clean": true,
+  "untracked_cpu_artifacts_preserved": true,
+  "reviewed_changed_files_match": true,
+  "operation_output": "Updating d322548..1c10f9d\nFast-forward\n scripts/qd_ed_n36_readiness_prepare.py |  43 ++++++++++--\n tests/test_n36_readiness_prepare.py    | 123 ++++++++++++++++++++++++++++++++-\n 2 files changed, 159 insertions(+), 7 deletions(-)",
+  "source_adopted": false,
+  "gpu_dispatch": false,
+  "graph_refresh_performed": false
+}

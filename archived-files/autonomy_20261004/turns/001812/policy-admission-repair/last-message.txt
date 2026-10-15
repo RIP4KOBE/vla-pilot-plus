@@ -1,0 +1,8 @@
+Committed as `f661a570403e9ff7224d4c35230a0f2b9321a269`.
+
+- Repaired both admission functions; 155 focused CPU tests passed.
+- No additional runtime allowlist delta needed.
+- Scientific/accounting and historical fail-closed checks preserved.
+- Final source review, root placement, fresh recovery identity, and release remain pending.
+
+[Report and evidence](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001812/policy-admission-repair/report-v1.json>). No scientific evidence generated.

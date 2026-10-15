@@ -1,0 +1,3 @@
+Verified driver identities and unchanged private ledgers. Recorded the exact prospective source-scope amendment and updated the owning checkpoint.
+
+Next: bounded CPU implementation and review, then fresh readiness preparation. No GPU dispatched; validation, formal, and ablation completion remains unevidenced.

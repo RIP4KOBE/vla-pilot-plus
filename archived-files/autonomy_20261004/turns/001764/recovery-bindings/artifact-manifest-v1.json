@@ -1,0 +1,46 @@
+{
+  "excludes": [
+    "artifact-manifest-v1.json",
+    "report-v1.json",
+    "report-v1.sha256",
+    "existing executor transport logs"
+  ],
+  "files": [
+    {
+      "bytes": 10278,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001764/recovery-bindings/retained-readiness-history.raw.jsonl",
+      "sha256": "ea121c26f71b3ebdbc9ab0a44a9bea2f3ce18f14d2267e6a3971c36db4445ea3"
+    },
+    {
+      "bytes": 4990,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001764/recovery-bindings/accounting-prefix.prospective-v1.json",
+      "sha256": "45047bb8db35716b274d3970fb8b9221b3ca4096d51e19667131fca8a86385c7"
+    },
+    {
+      "bytes": 1621,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001764/recovery-bindings/recovery-identity.prospective-disabled-v1.json",
+      "sha256": "c09b9d776642dd4f1a5e7262e2432eaffc5b5cf413f3eb9457b56110ed542e8a"
+    },
+    {
+      "bytes": 1674320,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001764/recovery-bindings/runtime-closure.candidate-v1.json",
+      "sha256": "36f5ffc3d1f979383a1ca0263aac4e1686993b7adbb385a4f39969e057c6992f"
+    },
+    {
+      "bytes": 4341,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001764/recovery-bindings/retained-evidence-v1.json",
+      "sha256": "2c51366b811b72b28cead8fd1052515febcfe59891a3bb2a9c8ea632592ba1fb"
+    },
+    {
+      "bytes": 5037,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001764/recovery-bindings/affected-bindings.prospective-disabled-v1.json",
+      "sha256": "1912a08727e9f3a5cd42e549a087a04f25e65a22b9ee0c7772070187d7385fc7"
+    },
+    {
+      "bytes": 13468,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001764/recovery-bindings/prepare-prospective-v1.py",
+      "sha256": "1fd4dbd7e355938bbae2a145c0c9faad20e0322fa825547b7ec61d60ec5a9a17"
+    }
+  ],
+  "schema": "n36-prospective-artifact-manifest-v1"
+}

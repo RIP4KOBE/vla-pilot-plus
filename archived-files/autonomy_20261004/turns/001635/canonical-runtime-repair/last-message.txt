@@ -1,0 +1,7 @@
+Committed scoped repair: `f256fec…` → `bd5dd4dabcb5a1f7823a9e2f51c849cd67767cb6`.
+
+- Three allowlisted files changed; exact authority-bound runtime derivation avoids circular hashes.
+- All 257 CPU tests passed; historical artifacts preserved.
+- Review, graph regeneration, readiness, B5 and release gates remain pending. No GPU execution or scientific success claimed.
+
+[Report](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/report-v1.json>) · [SHA256 sidecar](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001635/canonical-runtime-repair/report-v1.sha256.json>)

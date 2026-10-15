@@ -1,0 +1,3 @@
+Reconciled live handles and unchanged accounting. N34’s CPU decoder/postprocessor check passed, but source verification correctly rejects unbound LeRobot modules.
+
+Recorded the blocker and next repair in the operational handoff. No GPU dispatched; scientific gates remain unchanged. Validation, formal evaluation, and ablation evidence are still outstanding.

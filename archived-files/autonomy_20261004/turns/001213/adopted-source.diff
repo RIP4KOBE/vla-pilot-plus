@@ -1,0 +1,771 @@
+diff --git a/scripts/qd_ed_n36_accounting.py b/scripts/qd_ed_n36_accounting.py
+index d2b68bd..aa0434e 100644
+--- a/scripts/qd_ed_n36_accounting.py
++++ b/scripts/qd_ed_n36_accounting.py
+@@ -83,11 +83,16 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
+             # future episode attempt is consumed by this independent resource.
+             snap=release.admission(plan,authority,state,events,resources,reservations,
+                 reconciled['next_row'],now=dt.datetime.now(dt.timezone.utc),gpu_idle=True)
+-            selected={e['resource_id'] for e in resources if e.get('cohort')==c.COHORT
+-                      or e.get('kind')=='n36_resource_preparation_v1'}
++            selected={e['resource_id'] for e in resources if e.get('cohort')==c.cohort(plan)
++                      or (c.cohort(plan)==c.COHORT and e.get('kind')=='n36_resource_preparation_v1')}
++            if c.cohort(plan)==c.RECOVERY_COHORT:
++                from scripts.qd_ed_n36_recovery import resource_events
++                selected = {e['resource_id'] for e in resource_events(plan, resources)}
+             w.require(len(selected)<41,'healthcheck invocation ceiling')
+             permitted={'n36_healthcheck_'+reconciled['next_row']['episode_key']}
+-            if not reconciled['outcomes']:permitted.add('n36_healthcheck_preparation')
++            if not reconciled['outcomes']:
++                permitted.add('n36_healthcheck_preparation' if c.cohort(plan)==c.COHORT
++                              else 'n36_healthcheck_n36r1_preparation_001203')
+             w.require(resource_id in permitted,'one preparation plus one check per primary cell')
+             cohort=r.budget_snapshot(c.cohort_events(plan['episodes'],events),
+                                     [e for e in resources if e['resource_id'] in selected])
+@@ -100,8 +105,8 @@ def reserve_healthcheck(plan_ref, release_ref, resource_id, *, timeout_seconds):
+                     (c.DEADLINE,authority['coordinator_ends_at'],authority['weekly_window']['ends_at']))
+             stop=Path(plan['stop_path'])
+             w.require(not stop.exists() and not stop.is_symlink() and (end-now).total_seconds()>=1840+need,'STOP/deadline before healthcheck reservation')
+-            record={'resource_id':resource_id,'event':'reserved','cohort':c.COHORT,
+-                'kind':'n36_resource_preparation_v1','plan':plan_ref,'release':release_ref,
++            record={**c.operational_binding(plan), 'resource_id':resource_id,'event':'reserved','cohort':c.cohort(plan),
++                'kind':('n36_resource_preparation_v1' if c.cohort(plan)==c.COHORT else 'n36r1_resource_preparation_v1'),'plan':plan_ref,'release':release_ref,
+                 'source_commit':plan['source']['commit'],'runtime':plan['runtime'],
+                 'physical_gpu':7,'gpu_uuid':c.GPU_UUID,'timeout_seconds':timeout_seconds,
+                 'cleanup_seconds':40,'reserved_gpu_seconds':need,'accounting_admission':reservation,
+diff --git a/scripts/qd_ed_n36_bridge.py b/scripts/qd_ed_n36_bridge.py
+index 543e14a..72ec5bb 100644
+--- a/scripts/qd_ed_n36_bridge.py
++++ b/scripts/qd_ed_n36_bridge.py
+@@ -47,7 +47,7 @@ def profiles(root=ROOT):
+ 
+ 
+ def command(plan,runtime,row):
+-    w.require(row in plan['episodes'] and row in c.expected_rows(plan['worktree']),'exact fresh N36 matrix row')
++    w.require(row in plan['episodes'] and row in c.plan_rows(plan),'exact fresh N36 matrix row')
+     argv,output=runner.build_command(plan,profiles(plan['worktree']),runtime,row,row['episode_key'])
+     if row['profile'] in ('N34','N36'):
+         binding={'task_id':row['task_id'],'source_commit':plan['source']['commit'],'run_id':row['episode_key']}
+@@ -77,7 +77,7 @@ def manifest(plan,runtime,row):
+         expected={'binding':binding,'config_sha256':hashlib.sha256(json.dumps(resolved,sort_keys=True,allow_nan=False).encode()).hexdigest(),
+             'source_hashes':{name:index[name] for name in names}}
+     else:w.require(resolved['n34_runtime_binding'] is None and resolved['n36_runtime_binding'] is None,'control binding')
+-    return {'schema':'n36-external-runtime-v1','row':row,'source':plan['source'],'scientific_source':plan['scientific_source'],
++    return {**c.operational_binding(plan), 'schema':'n36-external-runtime-v1','row':row,'source':plan['source'],'scientific_source':plan['scientific_source'],
+         'native_build':plan['native_build'],'runtime':plan['runtime'],'runtime_closure':plan['runtime_closure'],'controller_semantics':plan['controller_semantics'],
+         'argv':argv,'output_dir':str(output),'composed_config_sha256':w.canonical_sha(config),
+         'resolved_config':resolved,'expected_runtime':expected}
+diff --git a/scripts/qd_ed_n36_contract.py b/scripts/qd_ed_n36_contract.py
+index 70dc707..2d552c2 100644
+--- a/scripts/qd_ed_n36_contract.py
++++ b/scripts/qd_ed_n36_contract.py
+@@ -8,6 +8,7 @@ from scripts import qd_ed_n23_worker as w
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+ COHORT = 'N36_NONPROGRESS_TANGENT_DEV_001147'
++RECOVERY_COHORT = 'N36R1_NONPROGRESS_TANGENT_DEV_001203'
+ ARMS = ('C0', 'Q0', 'N34', 'N36')
+ DEADLINE = '2026-10-11T11:13:13Z'
+ GPU_UUID = 'GPU-48473162-9548-1a19-04aa-ea86c5349187'
+@@ -45,17 +46,40 @@ def stop_path(root=ROOT):
+     return str(session / 'autonomy_20261004/STOP')
+ 
+ 
+-def expected_rows(root=ROOT):
++def expected_rows(root=ROOT, *, cohort=COHORT):
++    w.require(cohort in (COHORT, RECOVERY_COHORT), 'unsupported N36 cohort')
++    prefix, suffix = ('n36', '001147') if cohort == COHORT else ('n36r1', '001203')
+     tasks = json.loads((Path(root) / 'configs/qd_ed_final/n31_dev_task_identities.json').read_text())['tasks']
+     w.require([x['task_id'] for x in tasks] == list(range(10)) and all(x['split'] == 'dev' for x in tasks), 'ten exposed Dev tasks')
+-    return [{**task, 'iteration':COHORT, 'profile':arm, 'timeout_seconds':1800,
+-             'episode_key':f'n36_dev_t{task["task_id"]:02d}_{arm.lower()}_001147',
++    return [{**task, 'iteration':cohort, 'profile':arm, 'timeout_seconds':1800,
++             'episode_key':f'{prefix}_dev_t{task["task_id"]:02d}_{arm.lower()}_{suffix}',
+              'budget_bucket':'baseline' if arm=='C0' else 'development', 'replacement':None}
+             for task in tasks for arm in ARMS]
+ 
+ 
+-def require_row(row, root=ROOT):
+-    w.require(row in expected_rows(root), 'exact N36 identity/bucket/replacement')
++def cohort(plan):
++    value = plan.get('cohort', COHORT)
++    w.require(value in (COHORT, RECOVERY_COHORT), 'unsupported N36 cohort')
++    return value
++
++
++def plan_rows(plan):
++    value = cohort(plan)
++    root = plan.get('worktree', ROOT)
++    return expected_rows(root) if value == COHORT else expected_rows(root, cohort=value)
++
++
++def operational_binding(plan):
++    if cohort(plan) == COHORT:
++        w.require('accounting' not in plan, 'original plan cannot claim recovery accounting')
++        return {}
++    return {'cohort': RECOVERY_COHORT, **{k: plan[k] for k in
++            ('protocol', 'protocol_review', 'accounting')}}
++
++
++def require_row(row, root=ROOT, *, cohort=COHORT):
++    rows = expected_rows(root) if cohort == COHORT else expected_rows(root, cohort=cohort)
++    w.require(row in rows, 'exact N36 identity/bucket/replacement')
+ 
+ 
+ def event_binding(row, event):
+@@ -68,13 +92,18 @@ def event_binding(row, event):
+ 
+ def cohort_events(rows, events):
+     """Select by either key or cohort, then reject spoofed identities/buckets."""
++    cohorts = {row['iteration'] for row in rows}
++    w.require(len(cohorts) == 1 and cohorts <= {COHORT, RECOVERY_COHORT}, 'single supported event cohort')
++    selected = next(iter(cohorts))
++    prefix = 'n36r1_dev_' if selected == RECOVERY_COHORT else 'n36_dev_'
+     index = {row['episode_key']: row for row in rows}
+     local = []
+     for event in events:
+         identity = event.get('identity', {})
+         w.require(isinstance(identity, dict), 'malformed journal identity')
+-        if (identity.get('iteration') == COHORT or event.get('attempt_id') in index
+-                or event.get('episode_key') in index):
++        if (identity.get('iteration') == selected or event.get('attempt_id') in index
++                or event.get('episode_key') in index
++                or any(str(event.get(k, '')).startswith(prefix) for k in ('attempt_id', 'episode_key'))):
+             row = index.get(event.get('attempt_id'))
+             w.require(row is not None and event.get('episode_key') == row['episode_key']
+                       and identity == {k: row[k] for k in
+@@ -87,12 +116,17 @@ def cohort_events(rows, events):
+ 
+ def validate_draft(plan):
+     w.require(plan['schema'] == 'n36-release-draft-v1' and plan['frozen'] is False
+-              and plan['release_enabled'] is False and plan['episodes'] == expected_rows(plan['worktree'])
++              and plan['release_enabled'] is False and plan['episodes'] == plan_rows(plan)
+               and plan['limits'] == LIMITS and plan['worker_contract'] == WORKER_CONTRACT
+               and plan['deadline'] == DEADLINE and plan['stop_path'] == stop_path(plan['worktree'])
+               and plan['phase_authorization'] == {'dev': False, 'validation': False, 'formal': False}
+-              and all(plan[k] is None for k in ('root_review', 'protocol', 'authority', 'execution_release')),
++              and all(plan[k] is None for k in ('root_review', 'authority', 'execution_release'))
++              and (cohort(plan) == RECOVERY_COHORT or plan['protocol'] is None),
+               'draft cannot claim authority/release')
++    operational_binding(plan)
++    if cohort(plan) == RECOVERY_COHORT:
++        from scripts.qd_ed_n36_recovery import validate_protocol
++        validate_protocol(plan)
+     w.require(set(plan['expected_manifests']) == {r['episode_key'] for r in plan['episodes']}, 'manifest coverage')
+ 
+ 
+@@ -107,7 +141,7 @@ def finite(value, label):
+     return value
+ 
+ 
+-def pre_dispatch(row, allowance, *, now, stop_path):
++def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
+     """Pure guard over an authoritative snapshot; never changes charges/reserves.
+ 
+     All *_remaining values must already include prior reservations, health costs
+@@ -124,7 +158,7 @@ def pre_dispatch(row, allowance, *, now, stop_path):
+               and allowance['physical_gpu'] == 7 and allowance['gpu_uuid'] == GPU_UUID
+               and allowance['live_handles'] == [] and allowance['unsettled_reservations'] == 0,
+               'private GPU/settled snapshot required')
+-    require_row(row)
++    require_row(row, cohort=cohort)
+     for name in ('global_seconds_remaining', 'private_seconds_remaining', 'cohort_seconds_remaining'):
+         w.require(finite(allowance[name], name) >= need, name + ' insufficient')
+     protected = finite(allowance['protected_seconds_remaining'], 'protected seconds')
+diff --git a/scripts/qd_ed_n36_prepare.py b/scripts/qd_ed_n36_prepare.py
+index ec7db03..1e589fd 100644
+--- a/scripts/qd_ed_n36_prepare.py
++++ b/scripts/qd_ed_n36_prepare.py
+@@ -9,7 +9,7 @@ if str(ROOT) not in sys.path:
+ from scripts import qd_ed_n36_bridge as b, qd_ed_n36_contract as c, qd_ed_n23_worker as w
+ 
+ 
+-def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics_ref, native_build_ref, root=ROOT):
++def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics_ref, native_build_ref, root=ROOT, recovery_protocol_ref=None):
+     root, directory = Path(root).resolve(), Path(directory).resolve()
+     w.require(not directory.exists(), 'immutable draft directory already exists')
+     from scripts.qd_ed_n36_build import manifest as validate_native_build
+@@ -31,6 +31,14 @@ def prepare(directory, runtime_ref, *, runtime_closure_ref, controller_semantics
+             'root_review': None, 'protocol': None, 'authority': None, 'execution_release': None,
+             'phase_authorization': {'dev': False, 'validation': False, 'formal': False},
+             'expected_manifests': {}, 'http_counters': 'Unknown'}
++    if recovery_protocol_ref is not None:
++        amendment = w.read_ref(recovery_protocol_ref)
++        plan.update(cohort=c.RECOVERY_COHORT, protocol=recovery_protocol_ref,
++                    protocol_review=amendment['inherited_protocol_review'],
++                    accounting=amendment['accounting'])
++        plan['episodes'] = c.plan_rows(plan)
++        from scripts.qd_ed_n36_recovery import validate_protocol
++        validate_protocol(plan)
+     for row in plan['episodes']:
+         path = directory / 'expected' / (row['episode_key'] + '.json')
+         w.atomic_json(path, b.manifest(plan, runtime, row))
+@@ -49,9 +57,15 @@ def main():
+     parser.add_argument('--controller-semantics', required=True, type=Path)
+     parser.add_argument('--native-build',required=True,type=Path)
+     parser.add_argument('--native-build-sha256',required=True)
++    parser.add_argument('--recovery-protocol', type=Path)
++    parser.add_argument('--recovery-protocol-sha256')
+     args = parser.parse_args()
++    w.require(bool(args.recovery_protocol) == bool(args.recovery_protocol_sha256),
++              'paired recovery protocol path/hash required')
++    recovery = None if args.recovery_protocol is None else {
++        'path': str(args.recovery_protocol.resolve()), 'sha256': args.recovery_protocol_sha256}
+     plan = prepare(args.output, {'path': str(args.runtime.resolve()), 'sha256': args.runtime_sha256},
+-                   runtime_closure_ref=c.ref(args.runtime_closure), controller_semantics_ref=c.ref(args.controller_semantics),native_build_ref={'path':str(args.native_build.resolve()),'sha256':args.native_build_sha256})
++                   runtime_closure_ref=c.ref(args.runtime_closure), controller_semantics_ref=c.ref(args.controller_semantics),native_build_ref={'path':str(args.native_build.resolve()),'sha256':args.native_build_sha256}, recovery_protocol_ref=recovery)
+     print(json.dumps({'draft': str(args.output / 'plan.draft.json'), 'source_commit': plan['source']['commit'], 'release_enabled': False}))
+ 
+ 
+diff --git a/scripts/qd_ed_n36_recovery.py b/scripts/qd_ed_n36_recovery.py
+new file mode 100644
+index 0000000..754a7ae
+--- /dev/null
++++ b/scripts/qd_ed_n36_recovery.py
+@@ -0,0 +1,102 @@
++"""One prospective identity amendment; no approval, allocation or science changes.
++
++The immutable protocol remains the scientific authority. These exact structural
++wrappers can acquire execution authority only through the detached root release.
++No digest supplied by a plan can replace the original trust anchors.
++"""
++from scripts import qd_ed_n23_worker as w, qd_ed_n36_contract as c
++
++ALLOCATION_SHA = 'fe8d16d01e56a236153e73801e4914b830edde2dc668ac9c33dc1549c10f5358'
++PRESERVED_ATTEMPT = {'attempt_id': 'n36_dev_t00_c0_001147',
++                     'gpu_seconds': 86.40354533703066}
++
++
++def allocation(reference, root=c.ROOT):
++    w.require(reference['sha256'] == ALLOCATION_SHA, 'exact N36R1 allocation proposal')
++    proposal = w.read_ref(reference)
++    rows = c.expected_rows(root, cohort=c.RECOVERY_COHORT)
++    w.require([a['prospective_row'] for a in proposal['attempts']] == rows
++              and proposal['cohort'] == c.RECOVERY_COHORT
++              and proposal['automatic_recoveries'] == 0
++              and proposal['allocation_is_not_authority'] is True,
++              'N36R1 allocation is identities only')
++    return proposal
++
++
++def accounting(reference, root=c.ROOT):
++    amendment = w.read_ref(reference)
++    base_ref = amendment['inherited_accounting']
++    w.require(base_ref['sha256'] == c.ACCOUNTING_SHA, 'frozen accounting anchor')
++    w.read_ref(base_ref)
++    allocation(amendment['allocation'], root)
++    expected = {'schema': 'n36r1-accounting-inheritance-v1',
++                'cohort': c.RECOVERY_COHORT, 'inherited_accounting': base_ref,
++                'allocation': amendment['allocation'],
++                'preserved_attempt': PRESERVED_ATTEMPT,
++                'automatic_recoveries': 0, 'new_budget_authority': False}
++    w.require(amendment == expected, 'exact N36R1 accounting inheritance')
++    return amendment
++
++
++def validate_protocol(plan):
++    """Validate an unsigned proposal too; this does not confer release authority."""
++    w.require(c.cohort(plan) == c.RECOVERY_COHORT, 'N36R1 protocol cohort')
++    amendment = w.read_ref(plan['protocol'])
++    base_ref = amendment['inherited_protocol']
++    w.require(base_ref['sha256'] == c.PROTOCOL_SHA, 'frozen scientific protocol anchor')
++    base = w.read_ref(base_ref)
++    w.require(base['episodes'] == c.expected_rows(plan['worktree'])
++              and base['accounting']['sha256'] == c.ACCOUNTING_SHA,
++              'original scientific protocol/accounting')
++    w.require(plan['protocol_review']['sha256'] == c.PROTOCOL_REVIEW_SHA,
++              'exact inherited root protocol review')
++    review = w.read_ref(plan['protocol_review'])
++    w.require(review['protocol'] == base_ref and review['source'] == base['base_source']
++              and review['status'] == 'PASS_PROTOCOL_DESIGN_FOR_ISOLATED_CPU_IMPLEMENTATION_ONLY',
++              'inherited review covers original science only')
++    ledger = accounting(plan['accounting'], plan['worktree'])
++    w.require(ledger['inherited_accounting'] == base['accounting'], 'accounting inheritance differs')
++    expected = {'schema': 'n36r1-operational-protocol-v1', 'cohort': c.RECOVERY_COHORT,
++                'inherited_protocol': base_ref, 'inherited_protocol_review': plan['protocol_review'],
++                'accounting': plan['accounting'], 'allocation': ledger['allocation'],
++                'episodes': c.plan_rows(plan), 'automatic_recoveries': 0,
++                'scientific_changes': False}
++    w.require(amendment == expected and plan['episodes'] == expected['episodes'],
++              'exact structural N36R1 amendment; science immutable')
++    return amendment
++
++
++def validate_authority(plan, authority):
++    protocol = validate_protocol(plan)
++    w.require(authority['cohort'] == c.RECOVERY_COHORT
++              and authority['protocol'] == plan['protocol']
++              and authority['accounting'] == protocol['accounting']
++              and authority['amendment'] == plan['accounting'],
++              'N36R1 authority protocol/accounting/amendment refs differ')
++
++
++def preserve_charge(events):
++    """Keep the failed primary charged; root prefix validation remains mandatory."""
++    key = PRESERVED_ATTEMPT['attempt_id']
++    group = [e for e in events if e.get('attempt_id') == key or e.get('episode_key') == key]
++    w.require([e['event'] for e in group] == ['reserved', 'dispatched', 'aborted']
++              and all(e.get('attempt_id') == e.get('episode_key') == key for e in group)
++              and group[-1].get('gpu_process_wall_seconds') == PRESERVED_ATTEMPT['gpu_seconds'],
++              'original invalid attempt and exact charge must remain')
++
++
++def resource_events(plan, resources):
++    """Select the complete fresh healthcheck histories, rejecting disguised rows."""
++    permitted = {'n36_healthcheck_' + row['episode_key'] for row in c.plan_rows(plan)}
++    permitted.add('n36_healthcheck_n36r1_preparation_001203')
++    selected = {e['resource_id'] for e in resources
++                if e.get('cohort') == c.RECOVERY_COHORT
++                or e.get('kind') == 'n36r1_resource_preparation_v1'
++                or str(e.get('resource_id', '')).startswith('n36_healthcheck_n36r1')}
++    local = [e for e in resources if e['resource_id'] in selected]
++    binding = c.operational_binding(plan)
++    w.require(all(e['resource_id'] in permitted
++                  and e.get('kind') == 'n36r1_resource_preparation_v1'
++                  and all(e.get(k) == v for k, v in binding.items()) for e in local),
++              'N36R1 healthcheck identity/protocol/accounting binding')
++    return local
+diff --git a/scripts/qd_ed_n36_release.py b/scripts/qd_ed_n36_release.py
+index fca436c..c09bd4b 100644
+--- a/scripts/qd_ed_n36_release.py
++++ b/scripts/qd_ed_n36_release.py
+@@ -13,12 +13,13 @@ COORDINATOR_END = '2026-10-11T11:13:13Z'
+ 
+ def validate_plan(plan):
+     w.require(plan['schema'] == 'n36-released-plan-v1' and plan['frozen'] is True
+-              and plan['release_enabled'] is True and plan['episodes'] == c.expected_rows(plan['worktree'])
++              and plan['release_enabled'] is True and plan['episodes'] == c.plan_rows(plan)
+               and plan['limits'] == c.LIMITS and plan['worker_contract'] == c.WORKER_CONTRACT
+               and plan['deadline'] == c.DEADLINE and plan['stop_path'] == c.stop_path(plan['worktree'])
+               and plan['phase_authorization'] == {'dev': True, 'validation': False, 'formal': False}
+               and not any(k in plan for k in ('root_review', 'execution_release'))
+               and plan['attempt_identity'] == 'episode_key', 'released plan contract')
++    c.operational_binding(plan)
+     w.require(set(plan['expected_manifests']) == {x['episode_key'] for x in plan['episodes']}, 'all40 manifests')
+ 
+ 
+@@ -48,27 +49,34 @@ def _verify_release_contents(plan_ref, release_ref):
+                 'source': plan['source'], 'scientific_source': plan['scientific_source'],
+                 'runtime_closure': plan['runtime_closure'], 'controller_semantics': plan['controller_semantics'],
+                 'runtime': plan['runtime'], 'limits': c.LIMITS,
+-                'phase_authorization': plan['phase_authorization']}
++                'phase_authorization': plan['phase_authorization'], **c.operational_binding(plan)}
+     w.require(set(release) == set(expected) | {'root_review'} and all(release[k] == v for k, v in expected.items()), 'external release differs')
+     review = w.read_ref(release['root_review'])
+     w.require(review == {**expected, 'schema': 'n36-root-production-review-v1', 'decision': 'APPROVED'}, 'root review differs')
+-    w.require(plan['protocol']['sha256']==c.PROTOCOL_SHA, 'frozen protocol v2 only')
+-    protocol=w.read_ref(plan['protocol'])
+-    w.require(protocol['episodes']==plan['episodes'] and protocol['accounting']['sha256']==c.ACCOUNTING_SHA,'reviewed protocol identities/accounting')
+-    w.require(plan['protocol_review']['sha256']==c.PROTOCOL_REVIEW_SHA,'exact root protocol review')
+-    protocol_review=w.read_ref(plan['protocol_review'])
+-    w.require(protocol_review['protocol']==plan['protocol'] and protocol_review['source']==protocol['base_source']
+-        and protocol_review['status']=='PASS_PROTOCOL_DESIGN_FOR_ISOLATED_CPU_IMPLEMENTATION_ONLY','root protocol review binding')
+-    w.read_ref(protocol['accounting'])
++    if c.cohort(plan) == c.RECOVERY_COHORT:
++        from scripts.qd_ed_n36_recovery import validate_protocol
++        protocol = validate_protocol(plan)
++    else:
++        w.require(plan['protocol']['sha256']==c.PROTOCOL_SHA, 'frozen protocol v2 only')
++        protocol=w.read_ref(plan['protocol'])
++        w.require(protocol['episodes']==plan['episodes'] and protocol['accounting']['sha256']==c.ACCOUNTING_SHA,'reviewed protocol identities/accounting')
++        w.require(plan['protocol_review']['sha256']==c.PROTOCOL_REVIEW_SHA,'exact root protocol review')
++        protocol_review=w.read_ref(plan['protocol_review'])
++        w.require(protocol_review['protocol']==plan['protocol'] and protocol_review['source']==protocol['base_source']
++            and protocol_review['status']=='PASS_PROTOCOL_DESIGN_FOR_ISOLATED_CPU_IMPLEMENTATION_ONLY','root protocol review binding')
++        w.read_ref(protocol['accounting'])
+     authority = w.read_ref(plan['authority'])
+     caps = authority['caps']
+     w.require(authority['schema'] == 'n36-budget-authority-v1' and authority['approved'] is True
+-              and authority['cohort'] == c.COHORT and authority['limits'] == c.LIMITS
++              and authority['cohort'] == c.cohort(plan) and authority['limits'] == c.LIMITS
+               and authority['validation_authorized'] is False and authority['formal_authorized'] is False
+               and authority['coordinator_ends_at'] == COORDINATOR_END
+               and caps['protected_gpu_hours'] == {'validation': 32., 'formal': 12.}, 'finite root budget authority')
+     w.require(authority.get('automatic_recoveries')==0 and authority.get('protocol')==plan['protocol']
+         and authority.get('accounting')==protocol['accounting'], 'no recovery authority; exact protocol')
++    if c.cohort(plan) == c.RECOVERY_COHORT:
++        from scripts.qd_ed_n36_recovery import validate_authority
++        validate_authority(plan, authority)
+     validate_caps(caps)
+     window_end = dt.datetime.fromisoformat(authority['weekly_window']['ends_at'].replace('Z', '+00:00'))
+     w.require(window_end.tzinfo is not None and window_end <= dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00')), 'weekly authorization deadline')
+@@ -144,14 +152,21 @@ def prefix(path, expected):
+ 
+ def admission(plan, authority, state, events, resources, reservations, row, *, now, gpu_idle):
+     """Caller holds normal runner/state locks; all balances come from journals."""
+-    c.require_row(row)
++    selected = c.cohort(plan)
++    c.require_row(row, plan.get('worktree', c.ROOT), cohort=selected)
++    if selected == c.RECOVERY_COHORT:
++        from scripts.qd_ed_n36_recovery import validate_authority, preserve_charge
++        validate_authority(plan, authority)
++        preserve_charge(events)
+     w.require(authority.get('automatic_recoveries')==0, 'zero automatic recoveries')
+     w.require(authority['weekly_window']['origin_gpu_hours']==53.08404692669838
+         and authority['weekly_window']['increment_gpu_hours']==168., 'exact dual cumulative caps')
+     from scripts import qd_ed_n36_supervise as supervisor
+-    rows = c.expected_rows()
++    rows = c.plan_rows(plan)
++    w.require(plan.get('episodes', rows) == rows, 'admission exact cohort rows')
+     # Accounting continuity only; runner separately reverifies native terminals.
+-    reconciled = supervisor.reconcile({'episodes': rows, 'worktree': str(c.ROOT)}, events, lambda *args: None)
++    reconciled = supervisor.reconcile({**c.operational_binding(plan), 'episodes': rows,
++        'worktree': str(plan.get('worktree', c.ROOT))}, events, lambda *args: None)
+     w.require(reconciled['next_row'] == row, 'accounting requires next fresh contiguous row')
+     caps, budget = authority['caps'], state['budget']
+     validate_caps(caps)
+@@ -177,9 +192,12 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
+               bucket_caps=caps['buckets'], amendment=budget['amendment']) == 1800, 'weekly full1840s admission')
+     protected = sum(max(0., h - snap['gpu_hours_by_bucket'][k]) for k, h in caps['protected_gpu_hours'].items())
+     local = c.cohort_events(rows, events)
+-    local_ids = {e['resource_id'] for e in resources if e.get('cohort') == c.COHORT
+-                 or e.get('kind') == 'n36_resource_preparation_v1'}
++    local_ids = {e['resource_id'] for e in resources if e.get('cohort') == selected
++                 or (selected == c.COHORT and e.get('kind') == 'n36_resource_preparation_v1')}
+     local_resources = [e for e in resources if e['resource_id'] in local_ids]
++    if selected == c.RECOVERY_COHORT:
++        from scripts.qd_ed_n36_recovery import resource_events
++        local_resources = resource_events(plan, resources)
+     w.require(not any(e['event']=='aborted' for e in local_resources),
+               'N36 healthcheck invalidity stop; no automatic replay')
+     cohort = r.budget_snapshot(local, local_resources)
+@@ -187,7 +205,8 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
+               'N36 bucket ceilings')
+     w.require(cohort['by_bucket'][row['budget_bucket']] < c.LIMITS[row['budget_bucket']], 'N36 bucket exhausted')
+     from scripts import qd_ed_n36_accounting as accounting
+-    margin=accounting.retained_margin(c.ROOT,authority['accounting'])
++    margin=accounting.retained_margin(c.ROOT,authority['accounting']) if selected == c.COHORT else accounting.retained_margin(
++        c.ROOT, w.read_ref(authority['accounting'])['inherited_accounting'])
+     reservation=accounting.headroom(snap,cohort,retained_margin_hours=margin,protected_hours=protected)
+     allowance = {'authority_starts_at': authority['starts_at'],
+                  'authority_ends_at': min(authority['coordinator_ends_at'], window['ends_at']),
+@@ -202,5 +221,5 @@ def admission(plan, authority, state, events, resources, reservations, row, *, n
+                  'protected_attempts_remaining': sum(max(0, caps['buckets'][k] - snap['by_bucket'][k]) for k in ('validation', 'formal')),
+                  'cohort_attempts_remaining': 40 - cohort['reserved_attempts']}
+     w.require(cohort['gpu_healthcheck_hours']*3600 <= c.LIMITS['healthcheck_seconds'], 'bounded cumulative healthcheck allowance')
+-    c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'])
++    c.pre_dispatch(row, allowance, now=now, stop_path=plan['stop_path'], cohort=selected)
+     return {**snap, "n36_reservation":reservation}
+diff --git a/scripts/qd_ed_n36_runner.py b/scripts/qd_ed_n36_runner.py
+index 9e4ba56..33ee252 100644
+--- a/scripts/qd_ed_n36_runner.py
++++ b/scripts/qd_ed_n36_runner.py
+@@ -107,7 +107,7 @@ def execute_one(plan_ref, release_ref):
+             w.atomic_json(context_path, worker.context_for(plan_ref, row, release_ref))
+             context_ref = c.ref(context_path)
+             command = worker_command(manifest['argv'][0], root, context_path, context_ref['sha256'])
+-            base = {'attempt_id': row['episode_key'], 'episode_key': row['episode_key'], 'identity': supervisor.c_identity(row),
++            base = {**c.operational_binding(plan), 'attempt_id': row['episode_key'], 'episode_key': row['episode_key'], 'identity': supervisor.c_identity(row),
+                     'budget_bucket': row['budget_bucket'], 'replacement': row['replacement'], 'plan_sha256': plan_ref['sha256'], 'release': release_ref,
+                     'source_commit': plan['source']['commit'], 'runtime_manifest_sha256': plan['runtime']['sha256'],
+                     'runtime_inventory_sha256': plan['runtime_inventory_sha256'], 'init_row_sha256': row['init_row_sha256'],
+diff --git a/scripts/qd_ed_n36_supervise.py b/scripts/qd_ed_n36_supervise.py
+index b0c04f6..2d5331e 100644
+--- a/scripts/qd_ed_n36_supervise.py
++++ b/scripts/qd_ed_n36_supervise.py
+@@ -5,8 +5,12 @@ from scripts import qd_ed_n23_worker as w, qd_ed_n36_contract as c
+ def reconcile(plan, events, verify_terminal, *, live_handles=()):
+     """Reverify the unique contiguous prefix; never select/retry a duplicate cell."""
+     rows = plan['episodes']
+-    w.require(rows == c.expected_rows(plan['worktree']), 'exact task-major matrix')
++    w.require(rows == c.plan_rows(plan), 'exact task-major matrix')
+     local = c.cohort_events(rows, events)
++    if c.cohort(plan) == c.RECOVERY_COHORT:
++        binding = c.operational_binding(plan)
++        w.require(all(all(e.get(k) == v for k, v in binding.items()) for e in local),
++                  'N36R1 event protocol/accounting binding')
+     groups = []
+     for event in local:
+         w.require(all(event.get(k) is None for k in ('retry_of', 'recovery_of')), 'zero automatic recovery')
+@@ -74,5 +78,5 @@ def next_dispatch(plan, events, verify_terminal, allowance, *, now, live_handles
+     c.validate_draft(plan)
+     result = reconcile(plan, events, verify_terminal, live_handles=live_handles)
+     if result['next_row'] is not None:
+-        c.pre_dispatch(result['next_row'], allowance, now=now, stop_path=plan['stop_path'])
++        c.pre_dispatch(result['next_row'], allowance, now=now, stop_path=plan['stop_path'], cohort=c.cohort(plan))
+     return result
+diff --git a/scripts/qd_ed_n36_worker.py b/scripts/qd_ed_n36_worker.py
+index 98bc778..10e74f3 100644
+--- a/scripts/qd_ed_n36_worker.py
++++ b/scripts/qd_ed_n36_worker.py
+@@ -365,6 +365,8 @@ def verify_terminal(plan_ref, row, terminal, release_ref=None):
+               and terminal['required_cost_telemetry_complete'] is True and type(terminal['success']) is bool,
+               'generic terminal identity/cost differs')
+     c.event_binding(row, terminal)
++    w.require(all(terminal.get(k) == v for k, v in c.operational_binding(plan).items()),
++              'terminal protocol/accounting binding')
+     c.finite(terminal['gpu_process_wall_seconds'], 'terminal charge')
+     context_ref = c.ref(output / 'n36-worker-context.json')
+     context = w.read_ref(context_ref)
+diff --git a/tests/test_n36_recovery.py b/tests/test_n36_recovery.py
+new file mode 100644
+index 0000000..12e4f03
+--- /dev/null
++++ b/tests/test_n36_recovery.py
+@@ -0,0 +1,254 @@
++"""CPU identity contracts; synthetic deployment leaves never authorize a run."""
++import copy
++import datetime as dt
++import json
++from pathlib import Path
++import pytest
++from scripts import qd_ed_n36_contract as c, qd_ed_n36_recovery as recovery
++from scripts import qd_ed_n36_release as release, qd_ed_n36_bridge as b
++from scripts import qd_ed_n36_worker as worker, qd_ed_n36_supervise as supervisor
++from scripts import qd_ed_n36_accounting as accounting, qd_ed_n23_worker as w
++from test_n36_release import boundary, freeze, PROTOCOL
++from test_n36_composition import prospective_base, write
++from test_n36_runner import budget_fixture, historical, NOW
++
++ALLOCATION = {'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001203/recovery-preparation/attempt-allocation.draft-v1.json',
++              'sha256': recovery.ALLOCATION_SHA}
++REVIEW = {'path': '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001151/protocol-root-review-v1.json',
++          'sha256': c.PROTOCOL_REVIEW_SHA}
++
++
++def inherit(plan, root):
++    plan['cohort'] = c.RECOVERY_COHORT
++    plan['episodes'] = c.plan_rows(plan)
++    ledger = {'schema': 'n36r1-accounting-inheritance-v1', 'cohort': c.RECOVERY_COHORT,
++              'inherited_accounting': w.read_ref(PROTOCOL)['accounting'], 'allocation': ALLOCATION,
++              'preserved_attempt': recovery.PRESERVED_ATTEMPT,
++              'automatic_recoveries': 0, 'new_budget_authority': False}
++    plan['accounting'] = write(root/'accounting-amendment.json', ledger)
++    plan['protocol_review'] = REVIEW
++    protocol = {'schema': 'n36r1-operational-protocol-v1', 'cohort': c.RECOVERY_COHORT,
++                'inherited_protocol': PROTOCOL, 'inherited_protocol_review': REVIEW,
++                'accounting': plan['accounting'], 'allocation': ALLOCATION,
++                'episodes': plan['episodes'], 'automatic_recoveries': 0, 'scientific_changes': False}
++    plan['protocol'] = write(root/'protocol-amendment.json', protocol)
++
++
++@pytest.fixture
++def fresh(boundary):
++    f = boundary
++    inherit(f.plan, f.root)
++    f.plan['expected_manifests'] = {row['episode_key']: write(f.root/(row['episode_key']+'.json'),
++        {'row': row, 'argv': ['python', 'synthetic-main']}) for row in f.plan['episodes']}
++    f.authority.update(cohort=c.RECOVERY_COHORT, protocol=f.plan['protocol'],
++                       accounting=f.plan['accounting'], amendment=f.plan['accounting'])
++    f.plan['authority'] = write(f.root/'authority.json', f.authority)
++    return f
++
++
++def test_fresh_release_all40_worker_and_old_release_rejection(fresh):
++    f = fresh
++    refs = freeze(f)
++    plan, _, authority = release.validate_release(*refs)
++    assert len(plan['episodes']) == f.calls.count('manifest') == 40
++    assert authority['amendment'] == plan['accounting']
++    row = plan['episodes'][3]
++    context = worker.context_for(refs[0], row, refs[1])
++    assert worker.validate_context(write(f.root/'context.json', context))[3] == row
++    old = copy.deepcopy(f.plan)
++    old.pop('cohort'); old.pop('accounting')
++    old['episodes'] = c.expected_rows(); old['protocol'] = PROTOCOL
++    f.plan = old
++    _, old_release = freeze(f)
++    # The detached release cannot transfer, even with a supported fresh row set.
++    fresh_ref = write(f.root/'fresh-plan.json', plan)
++    with pytest.raises(ValueError, match='external release'):
++        release.validate_release(fresh_ref, old_release)
++
++
++@pytest.mark.parametrize('fault', ['old_rows', 'mixed_rows', 'unknown_cohort', 'seed', 'order',
++    'validation', 'formal', 'recovery', 'old_protocol', 'accounting_ref', 'review_ref',
++    'authority_protocol', 'authority_accounting', 'authority_amendment', 'authority_cohort'])
++def test_release_rejects_cross_binding_even_with_new_synthetic_review(fresh, fault):
++    f = fresh
++    if fault == 'old_rows': f.plan['episodes'] = c.expected_rows()
++    elif fault == 'mixed_rows': f.plan['episodes'][0] = c.expected_rows()[0]
++    elif fault == 'unknown_cohort': f.plan['cohort'] = 'N36R2_UNAPPROVED'
++    elif fault == 'seed': f.plan['episodes'][0]['policy_seed'] += 1
++    elif fault == 'order': f.plan['episodes'].reverse()
++    elif fault in ('validation', 'formal'): f.plan['phase_authorization'][fault] = True
++    elif fault == 'recovery': f.plan['limits']['automatic_recoveries'] = 1
++    elif fault == 'old_protocol': f.plan['protocol'] = PROTOCOL
++    elif fault == 'accounting_ref': f.plan['accounting'] = w.read_ref(PROTOCOL)['accounting']
++    elif fault == 'review_ref': f.plan['protocol_review'] = PROTOCOL
++    elif fault.startswith('authority_'):
++        key = fault.removeprefix('authority_')
++        f.authority[key] = c.COHORT if key == 'cohort' else PROTOCOL
++        f.plan['authority'] = write(f.root/'authority.json', f.authority)
++    with pytest.raises((ValueError, KeyError)):
++        release.validate_release(*freeze(f))
++
++
++@pytest.mark.parametrize('fault', ['science', 'self_expected_hash', 'allocation', 'inherited_protocol',
++                                  'inherited_accounting', 'charge', 'automatic_recovery', 'new_budget'])
++def test_structural_amendment_cannot_rewrite_science_or_cost(fresh, fault):
++    f = fresh
++    protocol = w.read_ref(f.plan['protocol'])
++    ledger = w.read_ref(f.plan['accounting'])
++    if fault == 'science': protocol['scientific_contract'] = {'threshold': 0}
++    elif fault == 'self_expected_hash':
++        protocol['expected_protocol_sha256'] = 'a'*64
++    elif fault == 'allocation': protocol['allocation'] = PROTOCOL
++    elif fault == 'inherited_protocol':
++        counterfeit = w.read_ref(PROTOCOL); counterfeit['scientific_contract'] = {}
++        protocol['inherited_protocol'] = write(f.root/'counterfeit.json', counterfeit)
++    elif fault == 'inherited_accounting': ledger['inherited_accounting'] = PROTOCOL
++    elif fault == 'charge': ledger['preserved_attempt']['gpu_seconds'] = 0
++    elif fault == 'automatic_recovery': ledger['automatic_recoveries'] = 1
++    elif fault == 'new_budget': ledger['new_budget_authority'] = True
++    f.plan['accounting'] = write(f.root/'accounting-amendment.json', ledger)
++    protocol['accounting'] = f.plan['accounting']
++    f.plan['protocol'] = write(f.root/'protocol-amendment.json', protocol)
++    with pytest.raises((ValueError, KeyError)):
++        recovery.validate_protocol(f.plan)
++
++
++def journal(plan, outcomes):
++    events = []
++    for row, success in zip(plan['episodes'], outcomes):
++        base = {**c.operational_binding(plan), 'attempt_id': row['episode_key'],
++                'episode_key': row['episode_key'], 'identity': supervisor.c_identity(row),
++                'budget_bucket': row['budget_bucket'], 'replacement': None}
++        events += [{**base, 'event': 'reserved'}, {**base, 'event': 'dispatched'},
++                   {**base, 'event': 'valid', 'success': success, 'outcome_valid': True,
++                    'required_cost_telemetry_complete': True}]
++    return events
++
++
++def test_fresh_controller_history_futility_and_all40(fresh):
++    plan = {k: v for k, v in fresh.plan.items() if k != 'schema'}
++    old = historical(recovery.PRESERVED_ATTEMPT['gpu_seconds'], 'baseline',
++                     recovery.PRESERVED_ATTEMPT['attempt_id'], c.COHORT, 'aborted')
++    for event in old:
++        event.update(identity=supervisor.c_identity(c.expected_rows()[0]), replacement=None)
++    def reconcile(outcomes):
++        return supervisor.reconcile(plan, old+journal(plan, outcomes), lambda *args: None)
++    assert reconcile([])['next_row'] == plan['episodes'][0]
++    assert reconcile([False]*20)['status'] == 'READY_FOR_ROOT_RELEASE'
++    assert reconcile([False]*23)['next_row']['profile'] == 'N36'
++    assert reconcile([False]*24)['status'] == 'NUMERIC_FUTILITY'
++    assert reconcile([True]*39)['next_row'] == plan['episodes'][-1]
++    assert reconcile([True]*40)['status'] == 'COMPLETE'
++    assert c.cohort_events(c.expected_rows(), old) == old
++
++
++@pytest.mark.parametrize('fault', ['spoof_iteration', 'unknown_key', 'old_key', 'bucket', 'replacement',
++                                  'retry_of', 'recovery_of', 'protocol', 'accounting', 'protocol_review'])
++def test_fresh_event_binding_fail_closed(fresh, fault):
++    plan = {k: v for k, v in fresh.plan.items() if k != 'schema'}
++    events = journal(plan, [True])
++    if fault == 'spoof_iteration': events[0]['identity']['iteration'] = c.COHORT
++    elif fault == 'unknown_key': events[0]['attempt_id'] = 'n36r1_dev_spoof'
++    elif fault == 'old_key': events[0]['attempt_id'] = c.expected_rows()[0]['episode_key']
++    elif fault == 'bucket': events[0]['budget_bucket'] = 'recovery'
++    else: events[0][fault] = 'spoof'
++    with pytest.raises(ValueError): supervisor.reconcile(plan, events, lambda *args: None)
++
++
++def test_fresh_real_composed_manifests_and_disabled_draft(prospective_base, tmp_path):
++    plan, runtime, _ = copy.deepcopy(prospective_base)
++    old_manifests = [w.read_ref(plan['expected_manifests'][r['episode_key']])
++                     for r in plan['episodes']]
++    inherit(plan, tmp_path)
++    plan['expected_manifests'] = {}
++    for row, old in zip(plan['episodes'], old_manifests):
++        manifest = b.manifest(plan, runtime, row)
++        assert manifest['protocol'] == plan['protocol']
++        assert manifest['accounting'] == plan['accounting']
++        assert row['episode_key'] in ' '.join(manifest['argv'])
++        # Only the operational run ID/output paths change, including mechanism logging.
++        normalized = json.loads(json.dumps(old['resolved_config']).replace(
++            old['row']['episode_key'], row['episode_key']))
++        assert w.canonical_sha(manifest['resolved_config']) == w.canonical_sha(normalized)
++        if row['profile'] in ('N34', 'N36'):
++            assert manifest['expected_runtime']['binding']['run_id'] == row['episode_key']
++        reference = write(tmp_path/(row['episode_key']+'.json'), manifest)
++        plan['expected_manifests'][row['episode_key']] = reference
++        assert b._verify_manifest_bound(reference, plan, runtime, row) == json.loads(json.dumps(manifest))
++    c.validate_draft(plan)
++    with pytest.raises(ValueError): c.require_release(plan)
++    row = plan['episodes'][0]
++    bad = copy.deepcopy(w.read_ref(plan['expected_manifests'][row['episode_key']]))
++    bad['accounting'] = PROTOCOL
++    with pytest.raises(ValueError, match='external manifest'):
++        b._verify_manifest_bound(write(tmp_path/'bad.json', bad), plan, runtime, row)
++    with pytest.raises(ValueError): b.command(plan, runtime, c.expected_rows()[0])
++
++
++def test_prepare_emits_disabled_fresh_draft_only(fresh, monkeypatch):
++    from scripts import qd_ed_n36_prepare as prepare
++    f = fresh
++    monkeypatch.setattr(b.closure, 'source_record', lambda *args: f.plan['source'])
++    monkeypatch.setattr(b, 'manifest', lambda plan, runtime, row:
++                        {**c.operational_binding(plan), 'row': row, 'synthetic_only': True})
++    plan = prepare.prepare(f.root/'disabled-draft', f.plan['runtime'],
++        runtime_closure_ref=f.plan['runtime_closure'], controller_semantics_ref=f.plan['controller_semantics'],
++        native_build_ref=f.plan['native_build'], recovery_protocol_ref=f.plan['protocol'])
++    c.validate_draft(plan)
++    assert plan['episodes'] == c.expected_rows(cohort=c.RECOVERY_COHORT)
++    assert len(plan['expected_manifests']) == 40
++    assert not plan['release_enabled'] and not plan['frozen']
++    assert plan['root_review'] is plan['execution_release'] is plan['authority'] is None
++    assert plan['phase_authorization'] == dict(dev=False, validation=False, formal=False)
++
++
++@pytest.mark.parametrize('fault', [None, 'cohort', 'protocol', 'accounting', 'protocol_review', 'old_id', 'kind'])
++def test_healthcheck_history_uses_fresh_identity_and_refs(fresh, fault):
++    plan = fresh.plan
++    base = {**c.operational_binding(plan), 'resource_id': 'n36_healthcheck_n36r1_preparation_001203',
++            'kind': 'n36r1_resource_preparation_v1'}
++    events = [{**base, 'event': kind} for kind in ('reserved', 'dispatched', 'completed')]
++    if fault == 'old_id': events[0]['resource_id'] = 'n36_healthcheck_preparation'
++    elif fault: events[0][fault] = 'spoof'
++    if fault:
++        with pytest.raises(ValueError): recovery.resource_events(plan, events)
++    else:
++        old = {'cohort': c.COHORT, 'kind': 'n36_resource_preparation_v1',
++               'resource_id': 'n36_healthcheck_preparation'}
++        assert recovery.resource_events(plan, [old, *events]) == events
++
++
++@pytest.mark.parametrize('fault', [None, 'old_row', 'missing_charge', 'changed_charge', 'amendment',
++                                  'protected', 'recovery', 'STOP', 'deadline'])
++def test_fresh_admission_preserves_failed_charge_and_gates(fresh, tmp_path, monkeypatch, fault):
++    old = historical(recovery.PRESERVED_ATTEMPT['gpu_seconds'], 'baseline',
++                     recovery.PRESERVED_ATTEMPT['attempt_id'], c.COHORT, 'aborted')
++    plan, authority, state, reservations = budget_fixture(tmp_path, old)
++    plan.update(c.operational_binding(fresh.plan), episodes=fresh.plan['episodes'], worktree=str(c.ROOT))
++    authority.update(cohort=c.RECOVERY_COHORT, protocol=plan['protocol'], accounting=plan['accounting'],
++                     amendment=plan['accounting'])
++    state['budget']['amendment'] = plan['accounting']
++    row = plan['episodes'][0]
++    inherited = w.read_ref(plan['accounting'])['inherited_accounting']
++    def margin(root, reference):
++        assert reference == inherited
++        return .23357169027962
++    monkeypatch.setattr(accounting, 'retained_margin', margin)
++    if fault == 'old_row': row = c.expected_rows()[0]
++    elif fault == 'missing_charge': old.clear()
++    elif fault == 'changed_charge': old[-1]['gpu_process_wall_seconds'] = 0
++    elif fault == 'amendment': authority['amendment'] = PROTOCOL
++    elif fault == 'protected': state['budget']['gpu_hour_reservations']['validation'] = 0
++    elif fault == 'recovery': authority['automatic_recoveries'] = 1
++    elif fault == 'STOP': Path(plan['stop_path']).touch()
++    now = dt.datetime.fromisoformat(c.DEADLINE.replace('Z', '+00:00')) if fault == 'deadline' else NOW
++    def admit():
++        return release.admission(plan, authority, state, old, [], reservations, row, now=now, gpu_idle=True)
++    if fault is not None:
++        with pytest.raises((ValueError, release.r.GateError)): admit()
++    else:
++        result = admit()
++        assert result['dispatched'] == result['aborted'] == 1
++        assert result['gpu_hours_consumed'] == pytest.approx(86.40354533703066/3600)
++        assert result['n36_reservation']['reserved_gpu_seconds'] == 1840
++        assert result['n36_reservation']['cohort_charged_gpu_hours'] == 0
+diff --git a/tests/test_n36_release.py b/tests/test_n36_release.py
+index d05515b..bbb8d8b 100644
+--- a/tests/test_n36_release.py
++++ b/tests/test_n36_release.py
+@@ -68,6 +68,7 @@ def boundary(tmp_path,monkeypatch):
+ def freeze(f):
+     ref=write(f.root/'plan.json',f.plan)
+     expected={'schema':'n36-execution-release-v1','approved':True,'plan':ref,
++        **({k:f.plan[k] for k in ('cohort','accounting')} if f.plan.get('cohort')==c.RECOVERY_COHORT else {}),
+         **{k:f.plan[k] for k in ('native_build','authority','protocol','protocol_review','source','scientific_source','runtime_closure','controller_semantics','runtime','limits','phase_authorization')}}
+     review=write(f.root/'review.json',{**expected,'schema':'n36-root-production-review-v1','decision':'APPROVED'})
+     return ref,write(f.root/'release.json',{**expected,'root_review':review})

@@ -1,0 +1,3 @@
+N36R1 remains active on GPU7. Verified live process identities, frozen bindings, and intact ledger prefixes; no duplicate dispatch or restart.
+
+Saved the hash-bound turn 1240 operational summary. Next: monitor the existing controller and reconcile terminal audits/accounting. Validation, formal, and required ablation evidence remain outstanding.

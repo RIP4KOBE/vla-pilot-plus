@@ -1,0 +1,3 @@
+N34R7 remains active on GPU7. Controller and worker identities match; logs are advancing. Frozen source `5dcbd06`, plan, and private ledger history remain intact.
+
+Recorded turn 683’s operational summary. Next: monitor terminal receipts and reconcile validity and costs. Validation, formal evaluation, and required ablation evidence remain incomplete; the local driver continues coordination.

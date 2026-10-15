@@ -1,0 +1,3 @@
+Reconciled the completed N36 repair: all 72 artifact hashes verified; ledgers and scientific settings preserved. Recorded the terminal state and operational summary.
+
+Next: review changed runtime bindings before graph admission. GPU dispatch remains disabled; validation, formal, and ablation goals remain unproven.

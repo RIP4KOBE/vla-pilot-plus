@@ -1,0 +1,3 @@
+N36 CPU implementation is running in its isolated worktree; executor PID 4087136 is verified live. Owning source and ledger remain unchanged.
+
+Operational summary recorded. Next: independent source, audit, and runtime review before GPU release. Validation, formal evaluation, and required ablation evidence remain outstanding.

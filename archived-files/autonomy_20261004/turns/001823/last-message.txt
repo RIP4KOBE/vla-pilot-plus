@@ -1,0 +1,3 @@
+Verified authority, live process identities, and unchanged private ledgers. The existing N36 CPU repair remains active; no duplicate was launched.
+
+Recorded turn 001823’s operational summary. Next: review the repair’s terminal evidence before any release. Validation, formal evaluation, and ablation goals remain unmet.

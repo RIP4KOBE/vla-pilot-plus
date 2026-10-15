@@ -1,0 +1,50 @@
+{
+  "schema": "n34-root-cpu-source-review-v1",
+  "at": "2026-10-08T15:15:19.824016+00:00",
+  "decision": "ACCEPT_CPU_SOURCE_INTEGRATION_ONLY",
+  "implementation_commit": "a4edcfd650f94d5e40ab437c46d591058ccb6e73",
+  "base_source": "04d1255016fa13a2d467995b9e37a6a829356a1c",
+  "reviewed_files": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/implementation_worktree/scripts/qd_ed_n34_native.py",
+      "sha256": "2d96c9c17704bc614adca716c8558cf81051af3934aa0744b8a50cfe1f54bc6c"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/implementation_worktree/scripts/qd_ed_n34_reference.py",
+      "sha256": "e6645381d4bc9ce709d647f3b3f49c047a76ecff7e8e9f57679a34f0eb459d1c"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/implementation_worktree/tests/test_n34_observed_jaw.py",
+      "sha256": "db5ee0c68ba28ed7544fa7dd100c0dfea3d5e3f88b9c3e236bec846e08f3ec7f"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/implementation_worktree/core/qd_observed_jaw_approach.py",
+      "sha256": "532d5a4399b389e14e6941bb4f41838b85de7e6916f45d0db3fbf631517e7dca"
+    }
+  ],
+  "method": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000514/ideation-v1.md",
+    "sha256": "436237a04963775696b35f8cd529676a99a9aea7a3d284586f49d3c80360d011"
+  },
+  "terminal_reconciliation": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000523/n34-terminal-reconciliation-v1.json",
+    "sha256": "6aa5cca68de0a98a7129ae872cd7eeaa97ef33761a89400edf33b4c5ecdeab41"
+  },
+  "findings": [
+    "Independent reference uses binary64 observed jaw prism, normalized xyzw rotation, eight-step .08 denominator, clipped open approach and observed-entry close-dwell; writes only native first8 action channels.",
+    "Audit reconstructs proposal without production proposal imports; binds archive best template, canonical score populations, ordinary retention and tie ordering, final native decode, commit and actual executed prefix.",
+    "External runtime anchor is mandatory for N34. CPU fixture config anchor comes from fixture evidence and therefore is not a production release attestation.",
+    "Reviewed negative corruption tests for candidate, other15, suffix, selection, execution, source, run binding, observation, missing event and cost. Reviewed disabled exact-base parity for C0/Q0/N31/N32, production encoder mapping, ordinary selection and rotated asymmetric center tests.",
+    "Existing 84 focused N34 test cases and 37 N31 regression passes retained; no unnecessary broad rerun. Native cell assignments remain recorded GPU inputs, not independently recomputed; model output not replayed."
+  ],
+  "release_requirements": [
+    "Distinct N34 worker/controller integration, loaded-module and pinned submodule source closure.",
+    "Externally frozen config/source expected manifest, actual deployed controller delta semantics verification.",
+    "Unchanged generic audit plus N34 native gate; fresh matched C0/Q0/N34 Dev identities and prospective frozen protocol/accounting."
+  ],
+  "scientific_score": null,
+  "gpu_dispatch_authorized": false,
+  "validation_authorized": false,
+  "formal_authorized": false,
+  "goal_met": false
+}

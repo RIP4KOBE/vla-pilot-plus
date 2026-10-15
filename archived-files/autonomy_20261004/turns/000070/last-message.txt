@@ -1,0 +1,3 @@
+Continuation recorded. N31 remains rejected: C0/Q0/N31 each achieved 0/6.
+
+N32’s bounded CPU feasibility analysis is running under verified handles. Source, ledgers and protected reserves remain unchanged. Next: review additional archive eligibility before considering integration. Validation, formal and ablation goals remain unmet.

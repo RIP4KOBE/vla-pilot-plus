@@ -1,0 +1,3 @@
+N31 remains active on GPU7 under the verified controller; source `7428ce8` is unchanged. Five cells are audited, and task 1’s N31 cell is running.
+
+Ledger history is preserved. No restart or duplicate dispatch occurred. Turn 13’s operational summary is saved; the driver will continue monitoring. Validation, formal evaluation, and ablation completion remain unproven.

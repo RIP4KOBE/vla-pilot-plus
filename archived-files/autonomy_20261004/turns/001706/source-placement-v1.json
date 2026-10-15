@@ -1,0 +1,24 @@
+{
+  "schema": "n36-source-placement-v1",
+  "at": "2026-10-11T00:10:09.655627+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001706/source-placement-authority-v1.json",
+    "bytes": 3109,
+    "sha256": "b63360a78a46947420a521bfab46dc2267ee27f003316969574cb8b30cbb72fd"
+  },
+  "worktree": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "before": "a14f3a8b9dff175145504c7ca9ed8569a9b3dafb",
+  "after": "d3225489f6edfd2e49f472dc1ea9307f14f8be70",
+  "tree": "2bd7e6b976c4d504680b52d7a7766ce5ea2fdf35",
+  "tracked_clean": true,
+  "complete_committed_inventory": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001706/placed-committed-inventory-v1.txt",
+    "bytes": 546211,
+    "sha256": "4b7b1b1201b1d6e9ffaed7f3b59f4cf8d203ea21021c93783740b3f06cc05d7e"
+  },
+  "reviewed_changed_files_match": true,
+  "operation_output": "Updating a14f3a8..d322548\nFast-forward\n .../n36_engineering_r1_spec.disabled.json          |  12 +-\n scripts/qd_ed_n36_engineering_r1.py                |   7 +-\n scripts/qd_ed_n36_readiness_prepare.py             | 128 +++++++-\n tests/test_n36_engineering_r1.py                   |  19 ++\n tests/test_n36_readiness_prepare.py                | 337 ++++++++++++++++++---\n 5 files changed, 459 insertions(+), 44 deletions(-)\n",
+  "source_adopted": false,
+  "gpu_dispatch": false,
+  "graph_refresh_performed": false
+}

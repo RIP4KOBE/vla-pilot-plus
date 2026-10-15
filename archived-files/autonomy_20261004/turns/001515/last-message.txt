@@ -1,0 +1,3 @@
+Existing CPU executor remains live with verified identity; its two targeted integration tests are still running. Ledger prefixes are unchanged, and no duplicate work or GPU dispatch was started.
+
+Turn 1515’s hash-bound operational summary is saved. Next: reconcile the executor’s results on exit. Validation, formal evaluation and required ablation evidence remain incomplete.

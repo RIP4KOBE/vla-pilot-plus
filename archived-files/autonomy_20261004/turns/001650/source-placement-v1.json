@@ -1,0 +1,16 @@
+{
+  "schema": "n36-source-placement-v1",
+  "at": "2026-10-10T21:52:52.695050+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001650/prospective-readiness-amendment-v1.json",
+    "bytes": 13498,
+    "sha256": "98d150c38fb8dd23fedcc1c8b711d2615ce978638d7e6222e8a36c2c79d4d0a8"
+  },
+  "worktree": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "before": "f256fecedbcf0d47b807aeaa196407cb24933a41",
+  "after": "bd5dd4dabcb5a1f7823a9e2f51c849cd67767cb6",
+  "tracked_clean": true,
+  "operation_output": "Updating f256fec..bd5dd4d\nFast-forward\n .../n36_engineering_r1_spec.disabled.json          |  38 +++++++-\n scripts/qd_ed_n36_engineering_r1.py                |  56 ++++++++++-\n tests/test_n36_engineering_r1.py                   | 107 ++++++++++++++++++++-\n 3 files changed, 192 insertions(+), 9 deletions(-)\n",
+  "source_adopted": false,
+  "gpu_dispatch": false
+}

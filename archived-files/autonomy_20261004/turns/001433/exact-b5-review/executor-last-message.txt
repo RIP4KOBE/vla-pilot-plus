@@ -1,0 +1,5 @@
+PASS_PREPARATION_REQUIRES_ROOT_RELEASE. Verified all 40 manifests; no unresolved CPU B5 blockers.
+
+Saved [report-v1.md](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001433/exact-b5-review/report-v1.md), JSON report, and exact consumer receipt.
+
+Root accounting/adoption, fresh charged health, and first-C0 G3 remain required. Release disabled; score null; target_met false.

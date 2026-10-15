@@ -1,0 +1,3 @@
+Recorded N36’s CPU feasibility review: six Dev windows pass the trigger and native encoding checks. Ordinary-selection feasibility remains the next gate.
+
+Source, ledger, and reserves are unchanged; no GPU cohort is active. Operational handoff saved. Validation, formal evaluation, and required ablation evidence remain incomplete.

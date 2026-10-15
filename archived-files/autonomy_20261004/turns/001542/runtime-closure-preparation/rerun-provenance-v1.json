@@ -1,0 +1,14 @@
+{
+  "prior_script": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001539/runtime-closure-preparation/prepare-disabled-v1.py",
+    "sha256": "96c44c5b5f9bb78d6221d6eb2881f7197968a309387d7532910081a24a036b2f",
+    "bytes": 17831
+  },
+  "script": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001542/runtime-closure-preparation/prepare-disabled-v1.py",
+    "sha256": "5526af4b7d8adc224834f428bb75d6034f0975df8a24b1d35e276a92429027df",
+    "bytes": 17831
+  },
+  "only_script_change": "LEX output directory 001539 to 001542",
+  "scientific_changes": false
+}

@@ -1,0 +1,9 @@
+G2 remains **blocked** for `3849c4d3c75fe2fdc7853d3b923d9cc4e9966e0d`.
+
+- Runtime module closure, generated Torch provenance, and frozen alias checks passed.
+- Missing: 537 pinned source files and 697 runtime files.
+- Production tooling rejects fresh N36R3 identities: `unsupported N36 cohort`.
+
+Reusable partial artifacts, hashes, failed commands, and bounded repairs are recorded in [report-v1.json](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001314/production-closure/report-v1.json>) and [report-v1.md](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001314/production-closure/report-v1.md>).
+
+No source edits or dispatch. G3/G4 remain open. `score=null`, `production_accepted=false`, `release_enabled=false`.

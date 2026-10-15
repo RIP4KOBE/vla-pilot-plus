@@ -1,0 +1,5 @@
+Continued N36 with a bounded CPU-only canonical-path repair on source `a5b32cde`. Executor PID `3459679` is identity-verified; the driver remains active.
+
+All four private ledgers are unchanged. Next: reconcile repair outputs, run production checks, then independent review. Validation, formal evaluation and required ablations remain unproven.
+
+Operational summary recorded in turn `001779`.

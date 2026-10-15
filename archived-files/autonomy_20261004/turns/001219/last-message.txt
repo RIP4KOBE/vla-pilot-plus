@@ -1,0 +1,3 @@
+Reconciled the completed CPU repair and launched a bounded repair for the remaining 160 runtime dependency paths. GPU dispatch remains disabled; source and ledgers are unchanged.
+
+Recorded live handles and next steps in turn 001219’s operational summary. Validation, formal evaluation and required ablation evidence remain incomplete.

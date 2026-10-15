@@ -1,0 +1,3 @@
+Reconciled B5 CPU preparation: executor exited successfully; source and report hashes verified. All 504 attempts and 75.49265 GPU-hours remain preserved.
+
+GPU release remains disabled pending independent admission review and runtime evidence. The driver remains active; the next bounded step is recorded. Validation, formal, and required ablation goals remain unmet.

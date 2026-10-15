@@ -1,0 +1,3 @@
+N35 remains active on GPU7 with verified controller/worker identities and an intact ledger. Eleven completed episodes are valid task failures; task-2 N35 is still running.
+
+Preserved frozen source and protocol, avoided duplicate dispatch, and saved turn 994’s operational summary. Next step is continued monitoring, followed by native-audit and accounting reconciliation at termination. Validation/formal/ablation completion remains unproven.

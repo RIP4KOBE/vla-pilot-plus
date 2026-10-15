@@ -1,0 +1,3 @@
+N32R2 remains running: controller `1818171`, worker `3633471`, source `1065f381`. Identity, frozen hashes, and ledger integrity verified; task1 Q0 shows fresh activity.
+
+Operational summary saved for turn 201. Next step is continued monitoring. Validation, formal, and required ablation evidence remain outstanding.

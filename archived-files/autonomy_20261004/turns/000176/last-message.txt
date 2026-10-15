@@ -1,0 +1,3 @@
+N32R2 remains active: controller 1818171 and worker 2728485 have verified identities. Frozen source `1065f381`, plan hashes, and private ledger history are intact.
+
+Task 0 C0/Q0 are valid failures; candidate outcome is pending. No restart or duplicate dispatch occurred. Turn 176’s operational summary is saved. Next: monitor terminal receipts and the matched triple. Original completion evidence remains outstanding.

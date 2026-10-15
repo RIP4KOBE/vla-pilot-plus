@@ -1,0 +1,9 @@
+# Turn 001065 operational summary
+
+Current frozen source `52a87af0bf11f95b21ce17aba456dc98944d9774`. Controller `{'pid': 2632351, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 141061885, 'state': 'R', 'cpu_ticks': 759056}`; driver `{'pid': 268073, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 97715947, 'state': 'S', 'cpu_ticks': 41365}`; current coordinator `{'pid': 3590849, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 143406965, 'state': 'S', 'cpu_ticks': 295}`. Controller children: []. Controller remains active with increasing CPU ticks, result absent; no duplicate dispatch or restart.
+
+Verified handoff/authority hashes, active launch/plan/release bindings, prior turn normal exit and owning ledger prefix. Resource isolation ACTIVE/PASS. STOP present: False; deadline elapsed: False; authorization ends 2026-10-11T11:13:13Z. Ledger: 1485 rows, 7410255 bytes, SHA256 `93c8f63062ff7fc2abad0992946ca0cf2c06165a9c2bfe9ab3171d6ac7f5f025`. Interim Dev: {"C0": {"valid": 6, "success": 1}, "Q0": {"valid": 5, "success": 0}, "N34": {"valid": 5, "success": 0}, "N35": {"valid": 5, "success": 0}}. In flight: []. Latest settled cell remains task5 C0 success. Task5 is incomplete; partial denominators do not establish promotion.
+
+No scientific source, protocol, authoritative state, ledger, budget or process mutations; no protected results accessed. Generic state next_action is stale relative to active N35 controller. Next bounded step: monitor existing controller for task5 Q0 admission/progress. On termination reconcile native audits, denominators and cost before disposition. Original validation/formal/required ablation evidence remains incomplete. Preserve charges, telemetry unknowns and protected reserves.
+
+Reconciliation: `end-reconciliation-v1.json`, SHA256 `47df0d7d6596c39ace8aedb02b719d72c9578cd0aace0e724e00b5eee8a7e70a`.

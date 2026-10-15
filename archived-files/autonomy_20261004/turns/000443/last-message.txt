@@ -1,0 +1,3 @@
+Reconciled N32R2’s stale running state: controller and worker exited; 14 valid cells and one invalid cell retained, including 4.42754 GPU-hours. Source remains `1065f381`.
+
+Driver PID 268073 remains live. Recorded the operational handoff; next is native-receipt review and bounded Stage transport diagnosis. Validation, formal, and ablation goals remain unmet.

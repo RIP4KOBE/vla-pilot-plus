@@ -1,0 +1,5 @@
+Committed `cf11e91d2d9a4a0def0111c1ab24d0111c75988b`. Git is clean; 556 focused tests passed.
+
+N34R10 identities, exact turn704 binding, and all ten invalid histories are covered. No science/runtime changes or GPU launches.
+
+Wrote `implementation-result-v1.json` and `report-v1.md` in the designated output directory. Report documents the pre-existing scientific-reference discrepancy and incidental out-of-scope search output. Ready for root review/adoption.

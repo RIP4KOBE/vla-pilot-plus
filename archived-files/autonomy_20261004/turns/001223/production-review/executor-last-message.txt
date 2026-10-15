@@ -1,0 +1,10 @@
+**BLOCKED.** Found four production blockers:
+
+- Bootstrap worker command conflicts with terminal verifier’s old `python -m` expectation.
+- Runner uses stale implementation journals.
+- Execution state does not match the adopted authority/amendment.
+- Final deadline guards fail to preserve the full 1,840-second allowance.
+
+[Report](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001223/production-review/report-v1.md>) and [JSON](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001223/production-review/report-v1.json>) include evidence hashes, exact validator schema and remediation requirements.
+
+Candidate remains disabled. No source changes, readiness claims, approval artifact or execution release.

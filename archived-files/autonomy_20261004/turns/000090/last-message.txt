@@ -1,0 +1,3 @@
+N32’s CPU executor remains live with verified identity; no duplicate was launched. N31 is closed for numeric futility, and private ledgers remain intact.
+
+Recorded turn 90’s operational summary. Next: review N32’s completed adapter before GPU release. Validation, formal, and ablation evidence remain outstanding.

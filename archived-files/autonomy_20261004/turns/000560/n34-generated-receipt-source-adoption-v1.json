@@ -1,0 +1,44 @@
+{
+  "schema": "n34-generated-receipt-source-adoption-v1",
+  "at": "2026-10-08T17:28:18.569764+00:00",
+  "source_before": "9b63eff8b848d1a5d03bf1611503215eb7526261",
+  "source_after": "e660da4c73a6dd328ec8d2f870a3a1cb615b3f74",
+  "implementation_commit": "dc327becc00cd205bda0bd7905c24e6ade8efd6b",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000560/n34-generated-receipt-root-review-v1.json",
+    "sha256": "967a44e4d4cf7f43ea871192cbfc4496de4da1be47d29ce0bbc25f9f25a0b2bf"
+  },
+  "identical_integrated_files": [
+    {
+      "path": "scripts/qd_ed_n34_source.py",
+      "sha256": "aa90ce0724fe7eeaf068f84a3d879c3e82920e1a038ab802ef5e2934462aa1be"
+    },
+    {
+      "path": "scripts/qd_ed_n34_worker.py",
+      "sha256": "80932b47be5e9b3beedd13c3d07c281fcb47a4cdc119687f21fbda9ab3208325"
+    },
+    {
+      "path": "tests/test_n34_generated_receipt.py",
+      "sha256": "66b73fc699c4d09125e85c1e3dabbe7babc9e5e4976038d790c3d817c0a004ce"
+    },
+    {
+      "path": "docs/n34-generated-runtime-binding-v1.md",
+      "sha256": "f218b068d35fe83f3f0dfd309045ec886398db3e9cd54a7090c65a863f635a97"
+    }
+  ],
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6659252,
+      "lines": 1326,
+      "sha256": "229878bc3a9d99fd596f363835f4ef1ae3c2757b7f34aa43e0aef985de1aa0f2"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "lines": 66,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7"
+    }
+  },
+  "gpu_dispatched": false,
+  "scientific_promotion": false,
+  "next_step": "Complete N34 deployed runtime/lazy-import closure on adopted source e660da4, then finite accounting and 30 fresh prospective manifests with detached release. No GPU dispatch until release gates pass; validation/formal require scientific promotion."
+}

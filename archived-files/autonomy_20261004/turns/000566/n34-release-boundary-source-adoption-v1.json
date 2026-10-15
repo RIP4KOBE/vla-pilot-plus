@@ -1,0 +1,42 @@
+{
+  "schema": "n34-release-boundary-source-adoption-v1",
+  "at": "2026-10-08T17:54:03.827917+00:00",
+  "source_before": "e660da4c73a6dd328ec8d2f870a3a1cb615b3f74",
+  "source_after": "3acfda1adea7b4d9880c81dab7e3882f1587d4d0",
+  "implementation_commit": "60fc00a55b1b8dfb5c98b52e92d979b0869b4cad",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000566/n34-release-boundary-root-review-v1.json",
+    "sha256": "b9c87e8a9d41010305ea84f8759f78455fc6b9b7ff75e8b7d0f5e7b0d8f73ae0"
+  },
+  "identical_integrated_files": [
+    "docs/n34-detached-release-boundary-v1.md",
+    "scripts/qd_ed_n34_contract.py",
+    "scripts/qd_ed_n34_release.py",
+    "scripts/qd_ed_n34_worker.py",
+    "tests/test_n34_production_integration.py",
+    "tests/test_n34_release_boundary.py"
+  ],
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6659252,
+      "sha256": "229878bc3a9d99fd596f363835f4ef1ae3c2757b7f34aa43e0aef985de1aa0f2",
+      "prior_prefix_preserved": true,
+      "unchanged": true
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7",
+      "prior_prefix_preserved": true,
+      "unchanged": true
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+      "prior_prefix_preserved": true,
+      "unchanged": true
+    }
+  },
+  "gpu_dispatched": false,
+  "scientific_promotion": false,
+  "next_step": "On adopted source 3acfda1 regenerate N34 source/runtime/lazy-import closure and all30 prospective manifests; use turn563 accounting review to bind finite30-attempt/5GPUh protocol/window, independently freeze exact detached root review/release and verify full real public closure before locked GPU7 admission. No validation/formal promotion."
+}

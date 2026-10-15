@@ -1,0 +1,8 @@
+Turn 772 operational summary
+
+Current source 4b390b3e0c6b708572736939749a0fab0fb7ef37; scientific source 1065f38122379a515b60a9a424f574330405b66f remains frozen.
+Controller PID 1322966 / boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7 / start_ticks 137471973 verified live; its worker PID 1681366 / start_ticks 138293934 remains on assigned GPU7 UUID GPU-48473162-9548-1a19-04aa-ea86c5349187 (17757 MiB). Driver PID 268073 and coordinator PID 1689165 identities match.
+Bound handoff and exact authority verified. State/checkpoint active controller agrees; launch, plan, release, continuation context and completion-contract hashes verified. Three private ledger prefixes preserved. Isolation ACTIVE/PASS; prior turn771 completed normally. STOP absent; authorization deadline 2026-10-11T11:13:13Z not reached.
+N34R11 has eight valid completed outcomes, zero successes; task2 N34 remains dispatched and running. Controller terminal result absent. Launch-time controller status is static; live worker identity establishes continued process liveness, not scientific success.
+No dispatch, replay, restart, process signal, source/state/ledger change or coordinator lock acquisition. Historical charges, unknown telemetry and reserves preserved. Initial historical status/checkpoint reads were oversized and truncated; subsequent reads selected only current fields.
+Next bounded step: monitor the existing controller and task2 N34 attempt. At cohort termination reconcile native receipts, denominators, accounting and frozen gates before recovery or promotion. Original validation/formal/required ablation evidence remains incomplete; no completion record created.

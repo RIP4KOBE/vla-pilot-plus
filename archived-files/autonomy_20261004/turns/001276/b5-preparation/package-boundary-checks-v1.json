@@ -1,0 +1,268 @@
+{
+  "disabled_protocol_pass": true,
+  "negative_cases": [
+    {
+      "case": "draft release validation",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t00_c0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t00_n34_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t00_n36_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t00_q0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t01_c0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t01_n34_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t01_n36_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t01_q0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t02_c0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t02_n34_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t02_n36_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t02_q0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t03_c0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t03_n34_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t03_n36_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t03_q0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t04_c0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t04_n34_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t04_n36_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t04_q0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t05_c0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t05_n34_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t05_n36_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t05_q0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t06_c0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t06_n34_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t06_n36_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t06_q0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t07_c0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t07_n34_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t07_n36_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t07_q0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t08_c0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t08_n34_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t08_n36_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t08_q0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t09_c0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t09_n34_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t09_n36_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "disabled worker context.n36r2_dev_t09_q0_001250.disabled.json",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "accounting arithmetic conservative_after_cohort_gpu_hours",
+      "exception": "ValueError",
+      "reason": "N36R2 exact finite planning arithmetic"
+    },
+    {
+      "case": "accounting arithmetic protected_total_remaining_gpu_hours",
+      "exception": "ValueError",
+      "reason": "N36R2 exact finite planning arithmetic"
+    },
+    {
+      "case": "accounting arithmetic effective_cap_gpu_hours",
+      "exception": "ValueError",
+      "reason": "N36R2 exact finite planning arithmetic"
+    },
+    {
+      "case": "missing accounting healthchecks",
+      "exception": "ValueError",
+      "reason": "N36R2 finite accounting differs"
+    },
+    {
+      "case": "missing accounting preserved_attempts",
+      "exception": "ValueError",
+      "reason": "N36R2 finite accounting differs"
+    },
+    {
+      "case": "missing accounting caps",
+      "exception": "ValueError",
+      "reason": "N36R2 finite accounting differs"
+    },
+    {
+      "case": "missing provenance source",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "missing provenance protocol",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "missing provenance accounting",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "missing provenance runtime",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    },
+    {
+      "case": "missing provenance runtime_closure",
+      "exception": "ValueError",
+      "reason": "released plan contract"
+    }
+  ],
+  "all40_contexts_checked": 40,
+  "production_execution": false,
+  "release_enabled": false
+}

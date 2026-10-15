@@ -1,0 +1,199 @@
+--- frozen-parent-engineering.py
++++ prospective-engineering-r1.py
+@@ -1,4 +1,7 @@
+-"""One-use N36 engineering diagnostic, separate from scientific cohort authority.
++"""Prospective R1 fork of the frozen parent engineering adapter.
++
++Parent source remains unchanged; only exact amended terminal history is admitted.
++One-use N36 engineering diagnostic, separate from scientific cohort authority.
+ 
+ This module consumes external, hash-bound approvals. It never creates an
+ approval, adopts source/accounting, or supplies a continuation/retry entrypoint.
+@@ -8,6 +11,7 @@
+ does not create those authorities or establish scientific success.
+ """
+ import datetime as dt
++import hashlib
+ import json
+ from pathlib import Path
+ import subprocess
+@@ -20,7 +24,7 @@
+ from scripts import qd_ed_n36_accounting as accounting
+ from scripts.qd_ed_n36r2_admission import OWNER, SESSION
+ 
+-BASE = '813f25bc89a3920149739a2bf957b2e1b3db29c4'
++BASE = 'b8d6b98164f24a599a9aa1fa6ce862b12cb2fcf6'
+ SOURCE = SESSION / 'variants/n36_engineering_adapter_001482/implementation_worktree'
+ PREPARATION = OWNER.parent / 'autonomy_20261004/turns/001479/bounded-engineering-preparation'
+ # Existing lexical mapping bound by the 001352 owner-alias repair authority
+@@ -30,12 +34,12 @@
+     'path': str(OWNER.parent / 'autonomy_20261004/turns/001352/owner-alias-repair/alias-evidence-v1.json'),
+     'sha256': '70097b35181e55589df8bb053857b11840f08542fb8ed8bec57635ba493b22a2'}
+ HISTORICAL_OWNER = '/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z'
+-SPECIFICATION = {'path': str(PREPARATION / 'engineering-adapter-spec-v1.json'),
+-                 'sha256': '9df1dbbbe985df1d02e88770356b59e47d346a9f546629e0d7262cb9e51ecd15'}
+-IDENTITY = 'N36_ENGINEERING_C0_TASK0_001479'
+-EPISODE_KEY = 'n36_engineering_t00_c0_001479'
+-HEALTH_ID = 'n36_healthcheck_engineering_t00_c0_001479'
+-HEALTH_KIND = 'n36_engineering_resource_preparation_v1'
++SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001617/recovery-implementation/engineering-r1-spec.disabled-v1.json', 'sha256': 'ccd1991b59cdc30043d6b7061cf4ad73f0ae6c867dd6ae0a9f3e72b1d71d6162'}
++AMENDMENT = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json', 'sha256': 'fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba'}
++IDENTITY = 'N36_ENGINEERING_R1_C0_TASK0_001616'
++EPISODE_KEY = 'n36_engineering_r1_t00_c0_001616'
++HEALTH_ID = 'n36_healthcheck_engineering_r1_t00_c0_001616'
++HEALTH_KIND = "n36_engineering_r1_resource_preparation_v1"
+ PURPOSE = 'engineering_diagnostic_only'
+ PLAN_SCHEMA = 'n36-engineering-execution-plan-v1'
+ AUDIT_SCHEMA = 'n36-engineering-audit-view-v1'
+@@ -52,10 +56,11 @@
+                   'seed_plan_path', 'seed_plan_sha256', 'input_contract_label')
+ # Changes outside these operational files require a different specification.
+ OPERATIONAL_FILES = frozenset({
+-    'scripts/qd_ed_n36_engineering.py', 'scripts/qd_ed_n36_release.py',
++    'scripts/qd_ed_n36_engineering_r1.py', 'scripts/qd_ed_n36_engineering_api.py',
++    'configs/qd_ed_final/n36_engineering_r1_spec.disabled.json', 'tests/test_n36_engineering_r1.py', 'scripts/qd_ed_n36_release.py',
+     'scripts/qd_ed_n36_bridge.py', 'scripts/qd_ed_n36_worker.py',
+     'scripts/qd_ed_n36_runner.py', 'scripts/qd_ed_n36_healthcheck.py',
+-    'scripts/qd_ed_n36_report.py', 'tests/test_n36_engineering.py',
++    'scripts/qd_ed_n36_report.py', 'tests/test_n36_engineering.py', 'tests/test_n36_stop_guard.py',
+     'tests/test_n36_engineering_integration.py', 'tests/n36_engineering_cpu_fixture.py'})
+ 
+ 
+@@ -78,7 +83,58 @@
+ 
+ 
+ def specification():
+-    return read(SPECIFICATION)
++    spec = read(SPECIFICATION)
++    exact(spec['prospective_amendment'], AMENDMENT, 'R1 pinned amendment')
++    read(AMENDMENT)
++    return spec
++
++
++def terminal_parent_prefix():
++    """Read exact bytes, never infer permission by filtering old identities.
++
++    This is historical evidence only. Every new event is checked separately;
++    no historical outcome is replayed or subtracted from global accounting.
++    """
++    from scripts import qd_ed_n36_engineering as parent
++    amendment = read(AMENDMENT)
++    terminal = read(amendment['parent_terminal'])
++    parent_plan = read(amendment['parent_plan'])
++    spec = specification()
++    exact(spec['retained_ledger_prefixes'], amendment['ledger_prefixes'], 'R1 amended prefixes')
++    exact(terminal['ledger_prefixes'], amendment['ledger_prefixes'], 'R1 terminal prefixes')
++    exact(parent_plan['cohort'], parent.IDENTITY, 'R1 parent identity')
++    baseline = {}
++    for name in JOURNALS:
++        anchor = amendment['ledger_prefixes'][name]
++        path = Path(anchor['path'])
++        full.prefix(path, anchor)
++        with path.open('rb') as stream:
++            data = stream.read(anchor['bytes'])
++        w.require(len(data) == anchor['bytes']
++                  and hashlib.sha256(data).hexdigest() == anchor['sha256'],
++                  'R1 historical ledger prefix changed during read')
++        w.require(data.endswith(b'\n'), 'R1 complete journal prefix')
++        baseline[name] = [json.loads(line) for line in data.splitlines() if line.strip()]
++    groups = r.event_groups(baseline[JOURNALS[0]])
++    w.require(all(group[-1]['event'] in r.TERMINAL for group in groups.values()),
++              'R1 live parent attempt')
++    old = [event for event in baseline[JOURNALS[0]]
++           if str(event.get('attempt_id', '')).startswith('n36_engineering_')
++           or str(event.get('cohort', '')).startswith('N36_ENGINEERING')]
++    exact(old, terminal['episode_events'], 'R1 known parent terminal events only')
++    parent.episode_events(parent_plan, old)
++    w.require(old and old[-1]['event'] == 'aborted'
++              and terminal['classification'] == 'INVALID'
++              and terminal['scientific_eligible'] is False,
++              'R1 exact terminal parent failure')
++    health_groups = {}
++    for event in baseline[JOURNALS[1]]:
++        health_groups.setdefault(event['resource_id'], []).append(event)
++    w.require(all(group[-1]['event'] in ('completed', 'aborted')
++                  for group in health_groups.values()), 'R1 live parent health')
++    snapshot = r.budget_snapshot(baseline[JOURNALS[0]], baseline[JOURNALS[1]])
++    exact(snapshot, spec['retained_snapshot'], 'R1 charged terminal snapshot')
++    return baseline
+ 
+ 
+ def row():
+@@ -163,6 +219,7 @@
+ def validate_audit_view(plan, *, require_manifests=True):
+     """Keep all forty scientific rows and gates in a disabled audit-only view."""
+     spec = specification()
++    exact(plan['runtime'], spec['canonical_runtime'], 'R1 canonical runtime reference')
+     original_ref = {k: spec['full_audit_view']['immutable_original_plan'][k] for k in ('path', 'sha256')}
+     original = read(original_ref)
+     fields = {'schema', 'original_plan', 'dispatch_authority', 'frozen', 'release_enabled',
+@@ -226,6 +283,7 @@
+               and (not released or plan['release_enabled'] is True)
+               and plan['cohort'] == IDENTITY and plan['purpose'] == PURPOSE,
+               'distinct released engineering plan required')
++    exact(plan['runtime'], specification()['canonical_runtime'], 'R1 canonical runtime reference')
+     exact(plan['limits'], LIMITS, 'engineering finite limits')
+     exact(plan['episodes'], [row()], 'one engineering episode')
+     exact(plan['worker_contract'], c.WORKER_CONTRACT, 'unchanged worker gates')
+@@ -304,7 +362,7 @@
+     exact(amendment, {'schema': 'n36-engineering-owning-accounting-v1', 'approved': True,
+           **bindings, 'source_adoption': authority['source_adoption'], 'caps': c.CAPS,
+           'limits': LIMITS, 'ledger_prefixes': authority['ledger_prefixes'],
+-          'snapshot': retained['retained_snapshot'], 'arithmetic': spec['accounting_proposal'],
++          'snapshot': spec['retained_snapshot'], 'arithmetic': spec['accounting_proposal'],
+           'margin_reference': authority['margin_reference'], 'automatic_recoveries': 0},
+           'owning engineering accounting adoption')
+     baseline = {}
+@@ -316,13 +374,14 @@
+         with path.open('rb') as stream:
+             baseline[name] = [json.loads(line) for line in stream.read(anchor['bytes']).splitlines() if line.strip()]
+     snap = r.budget_snapshot(baseline[JOURNALS[0]], baseline[JOURNALS[1]])
+-    exact(snap, retained['retained_snapshot'], 'whole retained snapshot')
+-    w.require(snap['reserved_attempts'] == snap['dispatched'] == 506
+-              and snap['gpu_hours_consumed'] == 75.60616276674473
++    exact(snap, spec['retained_snapshot'], 'whole retained snapshot')
++    w.require(snap['reserved_attempts'] == snap['dispatched'] == 507
++              and snap['gpu_hours_consumed'] == 75.64264702604362
+               and all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(baseline[JOURNALS[0]]).values()),
+               'retained charges/unsettled attempts')
+     margin = accounting.retained_margin(OWNER, authority['margin_reference'])
+     w.require(Decimal(str(margin)) == Decimal('0.23357169027962'), 'unchanged retained margin')
++    exact(baseline, terminal_parent_prefix(), 'R1 authority terminal parent prefix')
+     return baseline
+ 
+ 
+@@ -452,6 +511,7 @@
+ 
+ def _journal_suffixes(plan, baseline, events, resources, reservations):
+     # Pure comparison after live authority/prefix validation; no admission token.
++    exact(baseline, terminal_parent_prefix(), 'R1 exact terminal baseline required')
+     suffix = {}
+     for name, current in zip(JOURNALS, (events, resources, reservations)):
+         old = baseline[name]
+@@ -483,10 +543,10 @@
+     """A reservation exhausts the scope forever, independently of pause flags."""
+     require_row(plan['episodes'][0])
+     w.require(plan['episodes'] == [row()], 'engineering single row reconciliation')
+-    local = [event for event in events if event.get('cohort') == IDENTITY
+-             or event.get('identity', {}).get('iteration') == IDENTITY
+-             or str(event.get('attempt_id', '')).startswith('n36_engineering_')
+-             or str(event.get('episode_key', '')).startswith('n36_engineering_')]
++    baseline = terminal_parent_prefix()
++    old = baseline[JOURNALS[0]]
++    exact(events[:len(old)], old, 'R1 exact terminal parent prefix required')
++    local = events[len(old):]
+     episode_events(plan, local)
+     result = {'purpose': PURPOSE, 'scope_exhausted': bool(local), 'continuation_authorized': False,
+               'scientific_eligible': False, 'next_row': None, 'outcomes': []}
+@@ -724,8 +784,9 @@
+     # the real durable sequence, never a synthetic prefix, is mandatory here.
+     if resources is None:
+         resources = r.read_events(OWNER / 'data/gpu-healthcheck-ledger.jsonl')
+-    group = [event for event in resources if event.get('resource_id') == HEALTH_ID
+-             or event.get('cohort') == IDENTITY or event.get('kind') == HEALTH_KIND]
++    baseline = terminal_parent_prefix()[JOURNALS[1]]
++    exact(resources[:len(baseline)], baseline, 'R1 readiness terminal parent prefix')
++    group = resources[len(baseline):]
+     resource_events(plan, group)
+     w.require([event['event'] for event in group] == ['reserved', 'dispatched', 'completed']
+               and group[-1] == terminal, 'engineering health not durably settled')

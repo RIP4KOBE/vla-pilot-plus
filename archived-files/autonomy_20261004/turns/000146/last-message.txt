@@ -1,0 +1,3 @@
+N32R2 CPU preparation finished. Provisioned 696 missing dependency files and verified every hash; source `1065f381` and ledgers remain unchanged.
+
+Driver remains active; no GPU cohort is running. Recorded turn 146’s summary. Next: full runtime verification and independent release review. Validation, formal and ablation goals remain unproven.

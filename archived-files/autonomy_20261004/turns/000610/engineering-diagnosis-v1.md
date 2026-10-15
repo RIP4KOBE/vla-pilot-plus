@@ -1,0 +1,22 @@
+# N34 pre-main timeout: bounded engineering diagnosis
+
+N34 primary n34_dev_t00_c0_20261008 is INVALID_STOP, not a measured task failure. The terminal ledger/artifact match; all 1800.0657490990125 seconds remain charged. No eds_eval/n34-worker-start.json or native receipt exists; runner.log is empty. Exact execution phase remains unknown. No source, plan, thresholds, result, or ledger bytes were changed for diagnosis.
+
+Established call structure in frozen source 3acfda1adea7b4d9880c81dab7e3882f1587d4d0:
+- scripts/qd_ed_n34_worker.py: main -> validate_context; run_worker -> validate_context; _run_in_process -> validate_context, all before the start receipt at line164. Each context verification calls full release verification plus another selected-manifest verification.
+- scripts/qd_ed_n34_release.py: verify_prospective_release checks source/runtime closure once, then calls bridge.verify_manifest for every one of 30 episodes.
+- scripts/qd_ed_n34_bridge.py: verify_manifest repeats full operational/scientific source and runtime closure checks for each row.
+- scripts/qd_ed_n34_source.py: source_record reads each committed blob using separate git subprocesses, re-resolving submodule pins per file. Source records contain 1314 operational and 217 scientific files. Static pre-start path therefore repeats 32 source/runtime verifications per context, three contexts: 146976 source-file comparisons before Main. This count assumes successful passage through all checks; it does not assert this attempt reached them.
+- Runtime closure has 6490 modules totaling665341597 bytes by stat. Runtime inputs have3291 files totaling1106729032 bytes. These are inventory sizes, not measured read totals.
+
+Bounded CPU probe validated only five regular and five pinned dependency files against frozen commit bytes. Regular sample:11 git calls/0.03545s. Dependency sample:26 git calls/0.07804s. Exact measurements and source records are in bounded-source-diagnosis-v1.json. No full release rerun, model initialization, GPU dispatch or scientific evaluation was performed. Samples are insufficient for a reliable full-runtime estimate.
+
+Inference: repeated full validation and per-file git subprocess overhead are credible engineering causes of exhausting the 1800-second worker bound before Main. Import/setup or another pre-start check cannot be excluded without phase timing. Prior turn608 observed advancing worker CPU ticks; this proves activity only.
+
+Next bounded executor task: in an isolated owning variant worktree, add phase timing evidence before expensive validation and optimize source object reads with batched local git object access, retaining --no-replace-objects and GIT_NO_LAZY_FETCH=1, commit/gitlink/database binding, exact path/mode/type checks, symlink rejection, byte comparisons, canonical record schema, and independently trusted manifest hashes. Scope verification to one transaction without repeated whole-cohort closure per row; standalone manifest/context entrypoints must still perform full verification. Never use persistent positive verification caches or trust candidate receipts. Preserve before/after runtime and loaded-module audits, native audits, all scientific settings and 1800-second episode bound. A phase receipt must not become scientific success evidence.
+
+Focused tests must reject changed source after a prior successful check; tampered blob/type/mode/gitlink; missing/linked/traversal paths; wrong runtime/module bytes; modified unselected manifest; missing detached authority; and wrong module entrypoint. Demonstrate equivalent source records and bounded git-call counts, then measure a single full CPU release verification under an explicit bound before GPU admission. Avoid broad historical test repeats.
+
+No recovery is released. The original primary identity cannot be replayed. Recovery requires a separate finite prospective amendment/identity, linkage to this invalid attempt, budget arithmetic preserving protected reserves, independent source/protocol/test review and fresh GPU7 admission. Do not simply increase the timeout or weaken audits. The standing user authority covers engineering work and finite amendments, not scientific promotion.
+
+Executor delegation through collaboration was attempted but failed with no thread found; no child was created or ran. A subsequent turn can use the already authorized official current-login gpt-6-astra CLI executor path. No fallback account/provider is allowed.

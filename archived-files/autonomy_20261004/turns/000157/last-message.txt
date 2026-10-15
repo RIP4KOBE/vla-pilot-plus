@@ -1,0 +1,3 @@
+N32R2 controller 1818171 remains live on frozen source `1065f381`. Task0 C0 worker exited after logging failure; audited acceptance and accounting remain pending.
+
+Recorded turn 157’s operational summary and verified ledger preservation. Next: monitor terminal receipts without restarting the cohort. Validation, formal and required ablation completion remain unproven.

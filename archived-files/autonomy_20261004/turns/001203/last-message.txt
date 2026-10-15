@@ -1,0 +1,3 @@
+Continued N36 recovery with a live CPU-only executor preparing corrected runtime metadata and fresh attempt identities. Frozen science, strict audits, failed-attempt charges, and protected reserves remain intact.
+
+Checkpoint and operational summary recorded. Next: review the preparation before any GPU release. Validation, formal evaluation, and required ablations remain incomplete.

@@ -1,0 +1,5 @@
+Preparation is blocked: 537 pinned dependency source files are missing. Strict preparation generated **0/40 manifests**. Static checks passed; source and ledgers remain unchanged. `runtime_ready=false`; no GPU use or release.
+
+[Report and root commands](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001214/runtime-preparation/report-v1.md)
+
+Scope exception: two failed Git archive attempts triggered LFS error-log writes outside the output directory. Archive operations stopped; details are recorded in the report.

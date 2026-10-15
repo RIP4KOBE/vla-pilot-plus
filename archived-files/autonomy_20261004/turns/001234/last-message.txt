@@ -1,0 +1,3 @@
+N36R1’s existing CPU review remains live; all 40 manifest checks passed. Source and ledgers are unchanged, with no duplicate dispatch.
+
+Recorded turn 1234’s hash-bound operational summary. Next: reconcile the final review and complete release checks. Validation, formal evaluation, and required ablation evidence remain outstanding.

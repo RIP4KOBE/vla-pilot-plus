@@ -1,0 +1,3 @@
+N32’s existing CPU executor remains live and progressing. N31 is closed as rejected; ledger history is intact, with no duplicate dispatch.
+
+Recorded turn 86’s operational summary. Next: review N32’s completed release package before development execution. Validation, formal evaluation, and ablation evidence remain outstanding.

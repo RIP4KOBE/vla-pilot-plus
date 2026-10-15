@@ -1,0 +1,22 @@
+{
+  "supersedes_failed_release": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000917/execution-release-v1.json",
+    "sha256": "1d259f1f1be488e3dc5e25fb5656ab4ca6de81d6c015583f047b4c91275628a9"
+  },
+  "reason": "Draft omits root-added generic runtime input bindings; public validator failed before admission. Add exact existing inventory/seed references and input repair disclosure. No source, manifest, scientific or runtime changes.",
+  "added_keys": [
+    "runtime_inventory_path",
+    "runtime_inventory_sha256",
+    "seed_plan_path",
+    "seed_plan_sha256",
+    "input_contract_label"
+  ],
+  "plan": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000917/plan.frozen-v2.json",
+    "sha256": "03d11039bdad617a44636b0a1aaaa6c19f3e9fdc334d3b90dc29d4560070344b"
+  },
+  "release": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000917/execution-release-v2.json",
+    "sha256": "f679b2ecdf5b4303492ebc5a9083e50f7e7577bbfe94d27e700979cbb74f84c2"
+  }
+}

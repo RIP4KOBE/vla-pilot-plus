@@ -1,0 +1,143 @@
+{
+  "schema": "n36r1-root-source-accounting-adoption-v1",
+  "at": "2026-10-10T01:11:36.366363+00:00",
+  "status": "SOURCE_AND_ACCOUNTING_ADOPTED_RUNTIME_REBIND_PENDING",
+  "source_before": "066f2bf57e05111fea329ff7c393ac3e002d7c0f",
+  "source_after": "ca4e6a96d049c7ebb1f302d755883388ddbfdbd8",
+  "owner": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree",
+  "root_source_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001228/root-source-review-v1.json",
+    "sha256": "fbde437c39e98f0112f7aaad8a6ef7b000d0f6d482e62202d300006d7b32083d"
+  },
+  "repair": {
+    "status": "CPU_PRODUCTION_REPAIR_ROOT_ACCEPTED",
+    "node_id": "15.6",
+    "authority": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001225/production-repair/authority-v1.json",
+      "sha256": "5983d02252e794f6de8a8ab4ece6b253e320af3c614cb68b616810daa06b650b"
+    },
+    "process_record": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001225/production-repair/executor-process-v1.json",
+      "sha256": "060b05f19533e327670da853d2149e843818f375b4053bd32e2cc09f0aff96ac"
+    },
+    "handles": {
+      "wrapper": {
+        "pid": 330934,
+        "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+        "start_ticks": 145692429,
+        "state": "R"
+      },
+      "executor": {
+        "pid": 330935,
+        "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+        "start_ticks": 145692431,
+        "state": "R"
+      }
+    },
+    "worktree": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n36_nonprogress_tangent/implementation_worktree",
+    "output_directory": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001225/production-repair",
+    "gpu_authorized": false,
+    "source_edits_authorized": true,
+    "executor_exited": true,
+    "live_handles": [],
+    "report": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001225/production-repair/report-v1.json",
+      "sha256": "215514b05b86c1f0764464a474604c51a2aa53e6687a2727e6610f4c23364833"
+    },
+    "exit": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001225/production-repair/executor-exit-v1.json",
+      "sha256": "20e58e56e54c10c117ab4553ba0c8d04a83fe349e691c87f62d7f8e24821c68e"
+    },
+    "root_review": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001228/root-source-review-v1.json",
+      "sha256": "fbde437c39e98f0112f7aaad8a6ef7b000d0f6d482e62202d300006d7b32083d"
+    }
+  },
+  "previous_state_files": {
+    "research-state.yaml": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001228/before-research-state.yaml",
+      "sha256": "2ce59c4ff3a7a9a23e1b40908e7d980d770100fe620d7365a47ab9325bcb646e"
+    },
+    "checkpoint.json": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001228/before-checkpoint.json",
+      "sha256": "6d814089c027b6e9cdda5176b3597952ba2862e829c4df5aaa5db6720547e434"
+    },
+    "idea_tree.json": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001228/before-idea_tree.json",
+      "sha256": "3b4eaa7076a3e4ceb413aba25a611e0a362412deeb179b1cd682f56cdf46b44a"
+    }
+  },
+  "previous_amendment_archive": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001228/previous-budget-amendment-envelope-v1.json",
+    "sha256": "5acd06f51f7ce9f2f294244cc0b31cd57b5f1ad8a6b36f48d8cc3292b3354317"
+  },
+  "adopted_authority": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001222/budget-authority-v1.json",
+    "sha256": "4b8721b2553e5759748ad261a372791ffcc78fd8b255f935151094f8748e1dfd"
+  },
+  "adopted_amendment": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001205/identity-repair/accounting.n36r1.unsigned-v1.json",
+    "sha256": "7904271b18c0c25d16005bec5712841a072072c8486cfab2d390848421c6c44d"
+  },
+  "accounting_reused": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001222/accounting-reconciliation-v1.json",
+    "sha256": "0eae61e806602a6c12a3e792d01b7f97a717dcc1289c0aa3267a00251295c420"
+  },
+  "unchanged_ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "sha256": "0114e1900a3a815a66a29ed91da695783ce3d8123fdd707d4544be7e305363f8",
+      "bytes": 7521060,
+      "prior_prefix_matches": true
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "sha256": "b4df8fb3c8e45bbe24e560e55262819430d0c5a4da9754f09062d59fdb480ff6",
+      "bytes": 71240,
+      "prior_prefix_matches": true
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+      "bytes": 401,
+      "prior_prefix_matches": true
+    }
+  },
+  "retained_snapshot": {
+    "dispatched": 503,
+    "aborted": 22,
+    "valid": 463,
+    "invalid": 18,
+    "completed": 481,
+    "running": 0,
+    "gpu_hours_consumed": 75.26779409697457,
+    "by_bucket": {
+      "baseline": 103,
+      "development": 313,
+      "validation": 60,
+      "formal": 0,
+      "recovery": 27
+    },
+    "reserved_attempts": 503,
+    "gpu_hours_by_bucket": {
+      "baseline": 15.422907127395327,
+      "development": 48.05656184449396,
+      "validation": 7.7591759975691845,
+      "formal": 0.0,
+      "recovery": 4.029149127516051
+    },
+    "gpu_healthcheck_hours": 0.23655687199321304,
+    "gpu_healthcheck_inflight": 0
+  },
+  "retained_margin_gpu_hours": "0.23357169027962",
+  "conservative_charge_gpu_hours": "75.50136578725419",
+  "arithmetic": "40*(1800+40)+1800+200=75600 seconds=21 hours; baseline10 development30 zero recovery attempts",
+  "protected_remaining_gpu_hours": "36.2408240024308155",
+  "unprotected_after_full_21h": "88.3418571370133745",
+  "attempts_after_all40": 543,
+  "remaining_wall_hours": 34.02684267694445,
+  "caps_changed": false,
+  "scientific_gates_changed": false,
+  "gpu_dispatch": false,
+  "next_action": "Prepare fresh N36R1 runtime/source-closure/controller/all40 bindings using owning study_worktree at ca4e6a96d049c7ebb1f302d755883388ddbfdbd8. PR-01/04 repaired and independently CPU-tested; PR-02 source and PR-03 exact authority/amendment references adopted in turn1228. Reuse verified unchanged runtime/native evidence narrowly; bind turn1223 readiness to final owner/source. Obtain fresh independent production review and full public detached-release validation before one GPU7 Dev worker. No validation/formal promotion; no duplicate repair launch."
+}

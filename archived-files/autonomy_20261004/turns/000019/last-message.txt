@@ -1,0 +1,5 @@
+N31 remains active on GPU7; controller, monitor and worker identities verified. Frozen source `7428ce8` is unchanged.
+
+Seven audited cells: C0 0/3, Q0 0/2, N31 0/2. Task-2 Q0 continues. No restart or duplicate dispatch.
+
+Turn-19 operational summary recorded. Next: monitor cohort completion, then review native evidence and accounting. Validation/formal/ablation completion remains unproven.

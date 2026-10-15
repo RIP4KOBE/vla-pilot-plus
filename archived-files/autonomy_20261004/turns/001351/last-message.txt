@@ -1,0 +1,3 @@
+Recorded and validated N36R3’s finite accounting; all prior charges and protected reserves remain intact.
+
+No GPU worker is active. Release remains blocked by an owning-path admission mismatch, recorded for bounded repair. Source is unchanged; validation, formal, and ablation evidence remain incomplete. The driver’s continuation summary is saved.

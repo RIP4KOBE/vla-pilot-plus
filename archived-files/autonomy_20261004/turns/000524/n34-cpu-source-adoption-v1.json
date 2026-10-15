@@ -1,0 +1,32 @@
+{
+  "schema": "n34-cpu-source-adoption-v1",
+  "at": "2026-10-08T15:16:00.749458+00:00",
+  "source_before": "04d1255016fa13a2d467995b9e37a6a829356a1c",
+  "source_after": "71ffff1a0f70d9874b309db9ef1843c02bf17ebf",
+  "implementation_commit": "a4edcfd650f94d5e40ab437c46d591058ccb6e73",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000524/n34-root-cpu-source-review-v1.json",
+    "sha256": "1d1473521df2d94f3a93fd86ad8144b7f7c168c3727ca779b0f2947196c9fff3"
+  },
+  "identical_integrated_files": [
+    "configs/config.yaml",
+    "configs/qd_ed_final/candidate_n34.json",
+    "core/qd_observed_jaw_approach.py",
+    "core/rdt_libero_action_converter.py",
+    "core/rdt_policy_steer.py",
+    "docs/experiments/n34_cpu_implementation.md",
+    "main.py",
+    "scripts/qd_ed_n34_native.py",
+    "scripts/qd_ed_n34_reference.py",
+    "tests/test_n34_observed_jaw.py"
+  ],
+  "diff_check": true,
+  "ledger": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+    "sha256": "229878bc3a9d99fd596f363835f4ef1ae3c2757b7f34aa43e0aef985de1aa0f2"
+  },
+  "gpu_dispatch_authorized": false,
+  "scientific_promotion": false,
+  "goal_met": false,
+  "next_action": "Prepare isolated N34 production worker/controller integration using docs/experiments/n34_cpu_implementation.md and existing N32R3 source-closure patterns. Bind external expected config/source manifest, pinned RDT modules and actual controller delta semantics; freeze fresh matched Dev protocol, finite accounting/reserves and release before any GPU dispatch. CPU source accepted/integrated; do not repeat completed N34 implementation or broad CPU review."
+}

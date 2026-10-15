@@ -1,0 +1,7 @@
+Implemented F1–F4 and committed as `d3225489f6edfd2e49f472dc1ea9307f14f8be70`.
+
+- **186 targeted CPU tests passed**; worktree clean.
+- No real GPU/provider, deployment, owner-state, or production effects.
+- Deployed predispatch validation remains pending independent review, source placement, and disabled graph refresh.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/report-v1.json>) and `report-v1.sha256` contain commands, outcomes, limitations, and next requirements.

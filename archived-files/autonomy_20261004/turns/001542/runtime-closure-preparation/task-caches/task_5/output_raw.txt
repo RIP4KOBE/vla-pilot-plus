@@ -1,0 +1,37 @@
+```python
+# Task breakdown:
+# Stage 1: Move gripper to grasp tomato sauce (keypoint 0).
+# Stage 2: Move gripper with tomato sauce to basket (basket keypoints in the current mapping). No guidance needed for stage 2.
+
+num_stages = 2
+
+### Stage 1 guidance
+def stage1_guidance(keypoints, action_sequence):
+    # This function guides the robot to grasp the alphabet soup can at keypoint 0.
+    T = action_sequence.shape[1]
+    timesteps = torch.arange(T, device=action_sequence.device)
+    final_start = int(0.7 * T)
+    
+    # Higher weight near the end of the trajectory
+    weights = torch.where(
+        timesteps >= final_start,
+        torch.tensor(3.0, device=action_sequence.device),
+        torch.tensor(1.0, device=action_sequence.device)
+    )
+    weights = weights / weights.sum()
+
+    # Index for alphabet soup can (keypoint 0)
+    target_idx = torch.tensor([0], dtype=torch.long, device=keypoints.device)
+    target_pos = keypoints[target_idx][0]  # Shape: (3,)
+
+    # Compute 3D distance for guidance
+    all_dists = torch.norm(action_sequence - target_pos, dim=-1)  # Shape: (B, T)
+    reward = -(all_dists ** 2 * weights).sum(dim=1)  # Weighted sum of squared distances
+    return reward.mean()  # Return scalar reward
+
+### Stage 2 guidance
+def stage2_guidance(keypoints, action_sequence):
+    # No guidance needed for placing into the basket; the policy handles this step.
+    return torch.tensor(0.0, device=action_sequence.device)
+
+```

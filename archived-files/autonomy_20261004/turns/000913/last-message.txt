@@ -1,0 +1,3 @@
+Adopted reviewed N35 source `52a87af`; preserved all ledgers and existing changes. Recorded the operational handoff.
+
+Next: runtime/probe verification and prospective release. No GPU cohort launched; validation, formal evaluation, and ablation evidence remain outstanding.

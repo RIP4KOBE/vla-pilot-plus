@@ -1,0 +1,3 @@
+Reconciled the completed review and recorded turn 1729’s hash-bound summary. Source `1c10f9d` and all ledger charges remain unchanged; driver PID 268073 is live, with no GPU cohort running.
+
+Next: repair recovery-prefix validation and regenerate artifacts at fresh paths. Validation, formal evaluation and required ablations remain incomplete.

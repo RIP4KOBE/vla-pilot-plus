@@ -1,0 +1,3 @@
+PASS_SCOPED_B5. Wrote the production-schema [review-v1.json](./review-v1.json), hash sidecar and hash-bound [file-manifest-v1.json](./file-manifest-v1.json). All 15 scoped checks passed.
+
+Retained charges and unknown telemetry remain preserved. Root accounting/adoption, finite preparation release, measured readiness, external acceptance, and separate health/episode releases remain pending. No GPU authorization or scientific success granted.

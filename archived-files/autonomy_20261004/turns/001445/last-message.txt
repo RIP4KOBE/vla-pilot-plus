@@ -1,0 +1,3 @@
+Reconciled the stopped N36R3 binding run and launched a bounded CPU repair for stale accounting and a spent health-check identity.
+
+All charges remain preserved: 505 attempts, 75.533353 GPU-hours. Owning source is unchanged; no GPU dispatch occurred. Operational handoff recorded. Validation, formal evaluation and required ablations remain outstanding.

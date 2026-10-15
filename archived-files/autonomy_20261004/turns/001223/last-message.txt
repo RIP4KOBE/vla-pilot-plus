@@ -1,0 +1,5 @@
+Continued N36R1 on source `066f2bf`. Readiness checks passed; the official CLI production reviewer remains active with verified process identities.
+
+No GPU episode dispatched; ledgers and reserves are unchanged. Next: reconcile the review, complete release validation, then dispatch. Original validation/formal/ablation evidence remains outstanding.
+
+Operational summary saved for driver continuation.

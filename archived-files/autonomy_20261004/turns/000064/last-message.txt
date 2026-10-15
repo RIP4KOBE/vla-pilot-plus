@@ -1,0 +1,5 @@
+N31 remains rejected at 0/6. Verified live driver identity, closed controller handles, and unchanged ledgers.
+
+Recorded that tracking reads current simulator poses; physical capture remains unproven. Updated the checkpoint for successor ideation. Source remains `7428ce8`; no GPU worker is active.
+
+Validation, formal evaluation, and required ablations remain unmet. Operational handoff saved for continued execution.

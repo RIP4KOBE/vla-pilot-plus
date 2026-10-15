@@ -1,0 +1,3 @@
+N34R8 runtime regeneration passed CPU checks; 30 fresh manifests are prepared. State, checkpoint, and operational summary are recorded; all charges remain intact.
+
+No GPU cohort is active. Next is frozen release validation before GPU admission. Validation, formal evaluation, and required ablations remain outstanding; the local driver continues.

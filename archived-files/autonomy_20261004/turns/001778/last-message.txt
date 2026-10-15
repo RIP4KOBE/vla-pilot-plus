@@ -1,0 +1,3 @@
+Reconciled the executor’s clean exit and verified final artifact hashes. Static checks still reject the canonical runtime-reference path; GPU dispatch remains closed.
+
+Ledgers and scientific source are unchanged. Saved the operational summary and terminal reconciliation. Next: narrowly repair artifact references and rerun admission checks. Validation, formal evaluation and required ablations remain unproven.

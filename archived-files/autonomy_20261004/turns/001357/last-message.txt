@@ -1,0 +1,3 @@
+Reconciled the completed N36R3 CPU refresh and recorded a hash-bound controller review. All three ledgers remain unchanged: 505 attempts, 75.5273 GPU-hours.
+
+Next: refresh affected bindings and obtain independent B5 review before GPU release. Validation, formal evaluation, and required ablations remain outstanding. Driver continuation remains active.

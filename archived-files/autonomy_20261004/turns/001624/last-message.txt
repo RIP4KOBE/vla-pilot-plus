@@ -1,0 +1,3 @@
+Reconciled CPU recovery commit `f256fec`: executor exited normally, evidence hashes and recorded tests verified, and ledgers preserved. State/checkpoint and operational summary are updated.
+
+Next: independent source review, then required binding and release checks. No GPU dispatched; validation, formal evaluation, and ablations remain incomplete.

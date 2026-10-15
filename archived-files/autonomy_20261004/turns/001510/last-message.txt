@@ -1,0 +1,3 @@
+Recorded hash-bound turn 1510 summary. The CPU executor committed its repair before reaching its time limit; no processes remain in its group. Changes remain unadopted pending independent review and incomplete integration checks.
+
+Ledgers are unchanged. GPU dispatch remains vetoed; validation/formal/ablation completion is still unproven. The driver remains active.

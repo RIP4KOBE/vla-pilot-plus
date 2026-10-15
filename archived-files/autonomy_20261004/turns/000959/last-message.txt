@@ -1,0 +1,5 @@
+N35 remains active on frozen source `52a87af0`: controller `2632351`, worker `2914465`, both identity-verified. Seven cohort episodes are valid with zero successes; one is running.
+
+Authorization, release hashes, and ledger continuity verified. No restart or scientific changes made. Operational summary recorded for turn 959.
+
+Next: monitor the controller, then evaluate its audited outcomes against frozen gates. Validation, formal, and required-ablation evidence remain outstanding.

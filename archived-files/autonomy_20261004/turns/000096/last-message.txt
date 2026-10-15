@@ -1,0 +1,3 @@
+N32’s existing CPU executor remains live with verified identity. It committed the adapter and reports 143 N32 tests plus 37 regressions passing; hash-bound delivery is pending.
+
+Source and ledgers remain unchanged. Operational summary saved for turn 96. Next: review the completed delivery before GPU release. Validation, formal, and ablation evidence remain outstanding.

@@ -1,0 +1,103 @@
+{
+  "schema": "qd-ed-shared-current-resource-contract-v1",
+  "recorded_at": "2026-09-24T03:44:31.960804+00:00",
+  "status": "ACTIVE_FOR_CURRENT_GPU3_N4_CONTINUATION",
+  "user_steering_verbatim": "\u7ee7\u7eed\u6267\u884c\u4efb\u52a1",
+  "interpretation": "Continue the currently authorized GPU3 Arbor task after the resource-priority question; original task contract permits autonomous prospective allocation within its unchanged original caps. This does not claim separately uttered numerical-transfer approval.",
+  "coordinator_decision": "Original-cap resource option A, explicit prospective resumption after external cohort closure; one current allocation, no second budget pool.",
+  "authority_worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+  "run_name": "rdt-qd-ed-final-20260921T093925Z",
+  "physical_gpu": 3,
+  "gpu_uuid": "GPU-62052fa1-37e0-79dc-21aa-5c0f25c0c315",
+  "max_owned_GPU_workers": 1,
+  "global_max_attempts": 240,
+  "global_max_gpu_hours": 48.0,
+  "bucket_caps": {
+    "baseline": 20,
+    "development": 100,
+    "validation": 60,
+    "formal": 40,
+    "recovery": 20
+  },
+  "protected_gpu_hours": {
+    "validation": 14.0,
+    "formal": 10.0
+  },
+  "protected_original_attempts": {
+    "validation": 60,
+    "formal": 40
+  },
+  "settled_resource_snapshot": {
+    "dispatched": 112,
+    "aborted": 10,
+    "valid": 92,
+    "invalid": 10,
+    "completed": 102,
+    "running": 0,
+    "gpu_hours_consumed": 15.739958095529593,
+    "by_bucket": {
+      "baseline": 11,
+      "development": 94,
+      "validation": 0,
+      "formal": 0,
+      "recovery": 7
+    },
+    "reserved_attempts": 112,
+    "gpu_hours_by_bucket": {
+      "baseline": 1.0068434539688518,
+      "development": 13.568634138405747,
+      "validation": 0.0,
+      "formal": 0.0,
+      "recovery": 1.1644805031549907
+    },
+    "gpu_healthcheck_hours": 0.2602564145160282,
+    "gpu_healthcheck_inflight": 0
+  },
+  "amendment": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-resumption-v1/resource-resumption-amendment-v1.md",
+    "sha256": "a08b37836b5a9283118821bb5b6b2b2f2ccf3683bc145a6023f199484e4557dd"
+  },
+  "amendment_commit": "09ac7d92ac5e2f992947512c2ac4f04a92db777d",
+  "independent_amendment_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-resumption-v1/amendment-independent-review-v1.json",
+    "sha256": "59d9838a04a4ccee21d954faeaf838e511782f5c522c845d8dbe24c830c5f7bd"
+  },
+  "resource_release_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-resumption-v1/resource-release-v2.json",
+    "sha256": "319d74bd32c112ed23f51da453fbe289dd168340503fcef6b6aec40867143771"
+  },
+  "prior_coordination_snapshot": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-resumption-v1/prior-GPU2-coordination.md",
+    "sha256": "43f474d0d6a53cefc1ed87370473a467282be5ee43aaf32cc365ff2d2783f29c"
+  },
+  "prior_external_approval_preserved": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/resource/n1u-budget-approval/authorization.json",
+    "sha256": "ebd43aa5ad751aee9de02c956f9da91ffaa1e76312189ebcf07c3a99b682ea55"
+  },
+  "N4_original_allocation": {
+    "baseline": [
+      "t00-C0",
+      "t00-Q0",
+      "t03-C0",
+      "t03-Q0",
+      "t06-C0",
+      "t09-C0"
+    ],
+    "development": [
+      "t00-N4",
+      "t03-N4",
+      "t06-Q0",
+      "t06-N4",
+      "t09-Q0",
+      "t09-N4"
+    ]
+  },
+  "eligible_recovery_cap": 4,
+  "per_cell_recovery_cap": 1,
+  "local_dispatch_cap": 16,
+  "local_gpu_hour_cap_including_new_health": 8.5,
+  "future_admission": "Real shared runner lease; recompute costs, preserve protected reserves, full1800+40s; exact later source/runtime/profile/protocol/plan/audit guards required.",
+  "GPU_launch_authorized_by_this_record": false,
+  "episode_reservations_or_dispatches_created": 0,
+  "external_source_plan_approval_or_journal_history_mutated": false
+}

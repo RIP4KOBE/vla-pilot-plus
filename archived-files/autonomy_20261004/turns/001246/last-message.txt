@@ -1,0 +1,3 @@
+Existing CPU repair remains live; its test suite passed. Owning ledgers are unchanged, and no duplicate GPU run was launched.
+
+Turn 001246’s hash-bound summary is recorded. Next: reconcile the repair report and obtain independent review before recovery. Validation, formal, and required ablation evidence remain unmet.

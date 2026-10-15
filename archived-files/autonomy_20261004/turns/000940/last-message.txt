@@ -1,0 +1,3 @@
+N35 remains active with verified controller/worker identities and advancing logs. Authorization, frozen bindings, and ledger continuity are verified.
+
+Turn 940’s operational summary is saved. The existing driver continues monitoring; candidate results and validation/formal/ablation evidence remain pending.

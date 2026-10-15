@@ -1,0 +1,9 @@
+Turn 582 — 2026-10-08T18:47:47.959493+00:00
+
+Source 3acfda1adea7b4d9880c81dab7e3882f1587d4d0; frozen N34 scientific source 71ffff1a0f70d9874b309db9ef1843c02bf17ebf. Legacy state scientific_source_commit remains 1065f38122379a515b60a9a424f574330405b66f; current frozen plan is the N34 authority. No source/state/plan changes this turn.
+
+Verified bound handoff, authorization, continuation and completion-contract hashes. Resource isolation ACTIVE/PASS. Driver STOP absent; authorization ends October11 11:13:13Z. Prior turn581 completed its operational wrapper repair and recorded replacement launch; its actual side effects match authoritative controller and unchanged private ledger prefixes.
+
+Live controller {'pid': 3365423, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 134786452, 'state': 'R', 'cpu_ticks': 9479, 'children': []}; driver {'pid': 268073, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 97715947, 'state': 'S', 'cpu_ticks': 23208, 'children': ['3385639']}; coordinator {'pid': 3385639, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 134796199, 'state': 'S', 'cpu_ticks': 1340, 'children': []}. Status RUNNING_RELEASE_REVALIDATION_AND_LOCKED_ADMISSION; terminal result present False. Controller CPU progressed from7318 ticks during first live observation to9479; preserve existing process. Frozen plan/release/launch hashes verified. Private ledger prefixes unchanged: True. Retained accounting remains442 dispatches/62.81145837588456GPUh; no new N34 dispatch recorded at observation.
+
+Next bounded step: monitor existing controller through release revalidation and locked GPU7 admission; reconcile eventual result/native receipts and exact private ledger before any recovery. Do not duplicate or replay. Original validation20/formal10/required matched ablations and actual efficacy/validity evidence remain unresolved. No completion claim or completion record; driver continues.

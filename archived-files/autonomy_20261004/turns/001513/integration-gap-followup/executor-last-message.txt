@@ -1,0 +1,9 @@
+Committed `b4295b3` with only the two requested test files changed.
+
+- Context rejection test passed.
+- Fresh episode test reached a late status mismatch; expectation corrected, but not rerun within budget. Failed log retained.
+- Focused tests: 951.09 seconds.
+- Production code, weekly ceiling, and GPU veto unchanged. No owner adoption or GPU/release authorization.
+- Reports written; `goal_complete: false`.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001513/integration-gap-followup/report-v1.md>)

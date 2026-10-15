@@ -1,0 +1,8 @@
+Created and verified the [disabled v3 packet and report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001827/disabled-v3-binding/report-v1.json>).
+
+- Preserved all three raw predecessor sequences, including completed/true, and 631.4651556015015 seconds.
+- Fresh identity has zero occurrences across all four ledgers.
+- Included arithmetic, later-release commands, hashes, and check results.
+- Retained blockers: root reconciliation, controller/graph review, adapter source placement, and pre-existing parity failure.
+
+No source deployment, owner writes, measurement, adoption, or release. Completed in 428 seconds.

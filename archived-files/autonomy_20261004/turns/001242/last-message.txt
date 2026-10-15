@@ -1,0 +1,3 @@
+Reproduced an import-order-dependent `_cyutility` provenance mismatch in CPU probes. N36R1 remains invalid; all charges and ledgers are preserved.
+
+Recorded diagnosis and checkpoint for a prospective repair that preserves strict audits. No GPU dispatch occurred. Validation, formal, and ablation goals remain unmet.

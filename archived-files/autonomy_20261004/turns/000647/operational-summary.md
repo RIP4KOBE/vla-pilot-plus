@@ -1,0 +1,11 @@
+Turn647 — 2026-10-08T22:01:34.789240+00:00
+
+Current owning source: 3dc01fbca919dbddacfd5acd0e08a66d8eb98b3a. No source, protocol, thresholds, state, checkpoint or tree changes this turn. Entry state scientific_source_commit is 1065f38122379a515b60a9a424f574330405b66f; prior turn prose cited 71ffff1a0f70d9874b309db9ef1843c02bf17ebf as scientific source; provenance naming must be resolved from current N34 adoption records before release, not inferred from prose.
+
+Bound handoff and exact authority hashes verified, plus continuation and completion contract. Prior turn646 exited normally; its sole CPU executor was monitored without restart and exited during the final observation. Driver268073/start97715947, coordinator724361/start135958876, CPU wrapper718852/start135950319 and executor718853/start135950321 initially verified, both absent at final observation on boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. No active GPU controller; STOP absent; deadline2026-10-11T11:13:13Z.
+
+Existing N34R4 executor reports230 focused CPU tests passing and identity-only scope verification. Final observation found implementation-result-v1.json, report-v1.md and executor-last-message.txt. Independent review and adoption remain pending. Output directory: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/recovery4-identity-repair-v1. All three private ledgers unchanged and equal the prospective authority prefixes. Retained446dispatches/63.6001770799448GPUh, all invalid charges and protected reserves preserved. No new dispatch, resource changes, duplicate executor or driver lock acquisition.
+
+Next bounded step: reconcile the now-exited CPU executor terminal receipt and independently review scoped commit and focused test evidence. Then adopt only the authorized operational identity repair, regenerate runtime from turn645 corrected inventory and freeze fresh prospective accounting/protocol/30 manifests/root review/release with full public validation before GPU7 admission. Do not adopt partial running-executor outputs.
+
+Unresolved: runtime validity, matched Dev efficacy, scientific promotion, validation20/formal10/required ablations and hash-bound original-goal completion. No completion claim. Driver continues.

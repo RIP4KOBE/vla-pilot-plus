@@ -1,0 +1,38 @@
+{
+  "parents": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001419/binding-refresh/refresh-bindings-v1.py",
+      "bytes": 13284,
+      "sha256": "77d302af793a2845ac99555fb780331bdc4bea883fef3b754245a9d9f63fa456"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001419/binding-refresh/complete-bindings-v1.py",
+      "bytes": 7706,
+      "sha256": "35117d594259ddd76e1f526eafccf4cfa7e2b476079576caa5b38dd4bb389c2e"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001421/manifest-refresh/refresh-v1.py",
+      "bytes": 3833,
+      "sha256": "4e9f9d5487ebaf5edfe763e4736d6fedfde32cbb14131ca7799fcf7354cb4a98"
+    }
+  ],
+  "new_copies": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001429/binding-refresh/refresh-bindings-v1.py",
+      "bytes": 12965,
+      "sha256": "02884bed16dbb5214b6009fe813b1d958f4b32d163971d5b25179204e6bf87ec"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001429/binding-refresh/complete-bindings-v1.py",
+      "bytes": 7752,
+      "sha256": "8bdaa41bd8aba52df2ee93625183b7daa4e34b0724b2111ff62be1e1241ed12e"
+    }
+  ],
+  "adaptations": [
+    "Current authority/repair acceptance schema",
+    "Exact changed paths from accepted repair",
+    "Parent plan used directly without recursive prior adoption",
+    "Observe owner Git head without source adoption",
+    "Repaired production accounting API; no fallback"
+  ]
+}

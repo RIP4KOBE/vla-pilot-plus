@@ -1,0 +1,5 @@
+N32R2 remains live on source `1065f381`: controller `1818171`, worker `3171608`. Frozen hashes and ledger prefixes verified; no restart or duplicate dispatch.
+
+Task0 C0/Q0/N32 each recorded a valid failure. Task1 C0 remains pending. Validation, formal, and ablation evidence remain outstanding.
+
+Turn 188 operational summary saved. Next step: monitor the existing controller and reconcile terminal evidence.

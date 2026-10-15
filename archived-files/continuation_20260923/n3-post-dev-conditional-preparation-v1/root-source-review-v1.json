@@ -1,0 +1,55 @@
+{
+  "schema": "n3-post-dev-conditional-source-review-v1",
+  "status": "CONTINGENT_PREPARATION_ONLY",
+  "time_utc": "2026-09-23T21:27:51.062290+00:00",
+  "memo": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n3-post-dev-conditional-preparation-v1/source-only-memo-v1.md",
+    "sha256": "13b87184d2ce47fdab63eb55ac98bee684c45978deffa238ece905d535559dcd"
+  },
+  "source_files_verified": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_003_executed_feedback/protocol.md",
+      "sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_report.py",
+      "sha256": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/audit_decision_evidence.py",
+      "sha256": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/qd_executed_feedback.py",
+      "sha256": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/qd_ed.py",
+      "sha256": "5c86385a8271c3311aa715332d1307850b18ec37486f20ac53c19747fe4f207b"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_policy_steer.py",
+      "sha256": "05d9afca7cea50ea943fd8a32f4cd888c6d37df353ec4f896c51f0c5e2e4a144"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-decision-evidence-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/full-dev-closed-loop-preparation/read_full_dev.py",
+      "sha256": "b19331ff6861210056858d56da6dcbd2d6a24f06fc91e24dcc1beb0d4df18b3e"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/selected-tracking-preparation/read_selected_tracking.py",
+      "sha256": "a33714747a47415c8a8d64ba3297a016550e95b6f54a174a1654875603deec26"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-review-preparation/review_first3.py",
+      "sha256": "a2ee7ae750805d84810badc08333c7944f8cd4b895e0ce0d23dfb1d5a90ab9b0"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-executed-quality-20260923/docs/03_evidence/qd_ed_final/continuation_20260923/n3-first3-review-preparation/protocol-v2.md",
+      "sha256": "619cd111604b94158fb8a311530af9d667c311d13934aa2f6617ce3ad7c1dc76"
+    }
+  ],
+  "actual_payload_read_authorized": false,
+  "new_candidate_authorized": false,
+  "production_implementation_changed": false,
+  "GPU_calls": 0
+}

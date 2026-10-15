@@ -1,0 +1,7 @@
+Composed all 40 audit manifests, separate engineering manifest, native inventory, scientific equivalence, plan, and disabled candidate graph.
+
+Production admission remains blocked by `R1 canonical runtime reference path`: the unchanged policy pins a noncanonical path. Release and readiness remain false; no independent-review pass claimed. History and both consumed predecessors are preserved.
+
+Next: root-authorized canonical-path rebinding, focused revalidation, then independent B5/root review.
+
+[Final report](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001776/disabled-graph-composition/final-result/report-v1.json) · [Hash-bound artifact manifest](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001776/disabled-graph-composition/artifact-manifest-v1.json)

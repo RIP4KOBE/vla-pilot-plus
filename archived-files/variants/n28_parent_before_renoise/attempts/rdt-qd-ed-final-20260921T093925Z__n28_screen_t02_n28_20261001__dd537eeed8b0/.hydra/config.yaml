@@ -1,0 +1,361 @@
+backend:
+  backend: libero
+  libero:
+    suite_name: libero_object_swap
+    task_id: 0
+    camera_name: agentview_image, robot0_eye_in_hand_image
+    obs_type: pixels_agent_pos
+    render_mode: rgb_array
+    observation_width: 128
+    observation_height: 128
+    visualization_width: 640
+    visualization_height: 640
+    init_states: true
+    num_steps_wait: 5
+    max_episode_steps: 720
+    vlm_camera: agentview
+    auto_apply_perturbations: true
+    strict_perturbations: true
+    task_ids_filter:
+    - 2
+perception:
+  keypoint_detector:
+    num_candidates_per_mask: 5
+    min_dist_bt_keypoints: 0.05
+    max_mask_ratio: 0.5
+    device: ${device}
+    seed: ${seed}
+    bounds_min:
+    - -1.0
+    - -0.75
+    - -0.1
+    bounds_max:
+    - 1.0
+    - 0.75
+    - 1.2
+    feature_extractor: dinov2_vitb14
+  vlm_agent:
+    base_url: null
+    model: gpt-4o
+    api_key: null
+    temperature: 1.0
+    max_completion_tokens: 2000
+    api_max_retries: 8
+    api_retry_backoff_seconds: 5.0
+    api_retry_max_backoff_seconds: 30.0
+    query_template_dir: vlm_query/
+  sam3:
+    enabled: false
+  gemini_grounding:
+    enabled: false
+    api_key: null
+    model: gemini-2.5-flash
+    default_objects:
+    - drawer handle
+    - sliding handle
+    - slider handle
+    - black switch
+    - red cube
+    - blue cube
+    - pink cube
+  gemini:
+    backend: codex_cli
+    api_key: null
+    model: gpt-6-astra
+    reasoning_effort: low
+    timeout_seconds: 180
+    cli_path: /home/hynx/.codex/packages/standalone/releases/0.155.1-x86_64-unknown-linux-musl/bin/codex
+    disabled_skill_paths:
+    - /home/hynx/.codex/skills/.system/imagegen
+    - /home/hynx/.codex/skills/.system/openai-docs
+    - /home/hynx/.codex/skills/.system/plugin-creator
+    - /home/hynx/.codex/skills/.system/review-agent
+    - /home/hynx/.codex/skills/.system/skill-creator
+    - /home/hynx/.codex/skills/.system/skill-installer
+    - /home/hynx/.codex/skills/0-autoresearch-skill
+    - /home/hynx/.codex/skills/a-evolve
+    - /home/hynx/.codex/skills/academic-plotting
+    - /home/hynx/.codex/skills/accelerate
+    - /home/hynx/.codex/skills/arbor-agent-coordinator
+    - /home/hynx/.codex/skills/arbor-agent-executor
+    - /home/hynx/.codex/skills/arbor-agent-ideate
+    - /home/hynx/.codex/skills/arbor-agent-merge-eval
+    - /home/hynx/.codex/skills/arbor-agent-orchestrator
+    - /home/hynx/.codex/skills/arbor-agent-plugins-hitl-budget
+    - /home/hynx/.codex/skills/arbor-agent-resume-report
+    - /home/hynx/.codex/skills/arbor-agent-search
+    - /home/hynx/.codex/skills/arbor-agent-setup-intake
+    - /home/hynx/.codex/skills/arbor-agent-tools
+    - /home/hynx/.codex/skills/arbor-research-agent
+    - /home/hynx/.codex/skills/audiocraft
+    - /home/hynx/.codex/skills/autogpt
+    - /home/hynx/.codex/skills/autoresearch
+    - /home/hynx/.codex/skills/awq
+    - /home/hynx/.codex/skills/axolotl
+    - /home/hynx/.codex/skills/bigcode-evaluation-harness
+    - /home/hynx/.codex/skills/bitsandbytes
+    - /home/hynx/.codex/skills/blip-2
+    - /home/hynx/.codex/skills/brainstorming-research-ideas
+    - /home/hynx/.codex/skills/chroma
+    - /home/hynx/.codex/skills/clip
+    - /home/hynx/.codex/skills/compiler
+    - /home/hynx/.codex/skills/constitutional-ai
+    - /home/hynx/.codex/skills/cosmos-policy
+    - /home/hynx/.codex/skills/creative-thinking-for-research
+    - /home/hynx/.codex/skills/crewai
+    - /home/hynx/.codex/skills/deepspeed
+    - /home/hynx/.codex/skills/dspy
+    - /home/hynx/.codex/skills/faiss
+    - /home/hynx/.codex/skills/flash-attention
+    - /home/hynx/.codex/skills/gguf
+    - /home/hynx/.codex/skills/gptq
+    - /home/hynx/.codex/skills/grpo-rl-training
+    - /home/hynx/.codex/skills/guidance
+    - /home/hynx/.codex/skills/hqq
+    - /home/hynx/.codex/skills/huggingface-tokenizers
+    - /home/hynx/.codex/skills/instructor
+    - /home/hynx/.codex/skills/knowledge-distillation
+    - /home/hynx/.codex/skills/lambda-labs
+    - /home/hynx/.codex/skills/langchain
+    - /home/hynx/.codex/skills/langsmith
+    - /home/hynx/.codex/skills/litgpt
+    - /home/hynx/.codex/skills/llama-cpp
+    - /home/hynx/.codex/skills/llama-factory
+    - /home/hynx/.codex/skills/llamaguard
+    - /home/hynx/.codex/skills/llamaindex
+    - /home/hynx/.codex/skills/llava
+    - /home/hynx/.codex/skills/lm-evaluation-harness
+    - /home/hynx/.codex/skills/long-context
+    - /home/hynx/.codex/skills/mamba
+    - /home/hynx/.codex/skills/megatron-core
+    - /home/hynx/.codex/skills/miles
+    - /home/hynx/.codex/skills/ml-paper-writing
+    - /home/hynx/.codex/skills/ml-training-recipes
+    - /home/hynx/.codex/skills/mlflow
+    - /home/hynx/.codex/skills/modal
+    - /home/hynx/.codex/skills/model-merging
+    - /home/hynx/.codex/skills/model-pruning
+    - /home/hynx/.codex/skills/moe-training
+    - /home/hynx/.codex/skills/nanogpt
+    - /home/hynx/.codex/skills/nemo-curator
+    - /home/hynx/.codex/skills/nemo-evaluator
+    - /home/hynx/.codex/skills/nemo-guardrails
+    - /home/hynx/.codex/skills/nnsight
+    - /home/hynx/.codex/skills/openpi
+    - /home/hynx/.codex/skills/openrlhf
+    - /home/hynx/.codex/skills/openvla-oft
+    - /home/hynx/.codex/skills/outlines
+    - /home/hynx/.codex/skills/peft
+    - /home/hynx/.codex/skills/phoenix
+    - /home/hynx/.codex/skills/pinecone
+    - /home/hynx/.codex/skills/presenting-conference-talks
+    - /home/hynx/.codex/skills/prompt-guard
+    - /home/hynx/.codex/skills/pytorch-fsdp2
+    - /home/hynx/.codex/skills/pytorch-lightning
+    - /home/hynx/.codex/skills/pyvene
+    - /home/hynx/.codex/skills/qdrant
+    - /home/hynx/.codex/skills/ray-data
+    - /home/hynx/.codex/skills/ray-train
+    - /home/hynx/.codex/skills/research-manager
+    - /home/hynx/.codex/skills/rigor-reviewer
+    - /home/hynx/.codex/skills/rwkv
+    - /home/hynx/.codex/skills/saelens
+    - /home/hynx/.codex/skills/segment-anything
+    - /home/hynx/.codex/skills/sentence-transformers
+    - /home/hynx/.codex/skills/sentencepiece
+    - /home/hynx/.codex/skills/sglang
+    - /home/hynx/.codex/skills/simpo
+    - /home/hynx/.codex/skills/skypilot
+    - /home/hynx/.codex/skills/slime
+    - /home/hynx/.codex/skills/speculative-decoding
+    - /home/hynx/.codex/skills/stable-diffusion
+    - /home/hynx/.codex/skills/swanlab
+    - /home/hynx/.codex/skills/systems-paper-writing
+    - /home/hynx/.codex/skills/tensorboard
+    - /home/hynx/.codex/skills/tensorrt-llm
+    - /home/hynx/.codex/skills/torchforge
+    - /home/hynx/.codex/skills/torchtitan
+    - /home/hynx/.codex/skills/transformer-lens
+    - /home/hynx/.codex/skills/trl-fine-tuning
+    - /home/hynx/.codex/skills/unsloth
+    - /home/hynx/.codex/skills/verl
+    - /home/hynx/.codex/skills/vllm
+    - /home/hynx/.codex/skills/weights-and-biases
+    - /home/hynx/.codex/skills/whisper
+    allow_recovered_error_events: true
+policy:
+  type: rdt
+  diffusion:
+    pretrained_path: Vision-Language-Steering/vls_calvin_base
+    num_inference_steps: 100
+    n_obs_steps: 2
+    action_chunk_horizon: 16
+  pi05:
+    pretrained_path: lerobot/pi05_libero_finetuned_v044
+    num_inference_steps: 10
+    action_chunk_horizon: 10
+  rdt:
+    pretrained_path: /mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object
+    weight_variant: ema
+    text_encoder: /mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl
+    vision_encoder: /mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384
+    num_inference_steps: null
+    action_chunk_horizon: 8
+    control_frequency: 20
+    debug_first_step: false
+    undo_libero_preprocessor_flip: false
+    fail_on_zero_language_embedding: true
+    semantics: libero_gt_rollout
+device: cuda
+seed: 496956836
+main:
+  episode_num: 1
+  episode_start_index: 0
+  episode_seed_schedule:
+  - 496956836
+  max_episode_steps: 240
+  output_dir: ${hydra:run.dir}
+  cached_functions_dir: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_2
+  keypoint_detection_max_attempts: 3
+  visualize_trajectory: true
+  debug_draw_trajectory: true
+  render: true
+  use_guidance: true
+  guidance_type: eds
+  use_vlm_stage_recognition: true
+  decision_evidence:
+    enabled: true
+  passive_physics_trace: false
+  vlm_query_limit: 50
+  execution_horizon_mode: fixed
+  execution_horizon_far: 8
+  execution_horizon_near: 4
+  execution_horizon_contact: 2
+  execution_near_distance: 0.08
+  execution_contact_distance: 0.04
+  vls_config:
+    use_diversity: true
+    sample_batch_size: 20
+    guide_scale: 40.0
+    diversity_scale: 10.0
+    start_ratio: null
+    MCMC_steps: 4
+    sigmoid_k: 25.0
+    sigmoid_x0: 0.75
+    use_fkd: true
+    fkd:
+      potential_type: max
+      lmbda: 10.0
+      adaptive_resampling: true
+      resample_frequency: 5
+  eds_config:
+    population_size: 16
+    use_cem: false
+    cem_iters: 10
+    num_elites: 16
+    temperature: 0.1
+    renoise_t_max: 3
+    renoise_t_min: 1
+    initial_population_cache: null
+    ed_population_cache: null
+    use_initial_cache: false
+    save_initial_cache: false
+    save_ed_cache: false
+    diversity_input_source: model_output_sample_v1
+    diversity_update_mode: feasible_ray_v1
+    rollout_diversity_placement: parent_before_renoise_v1
+    initial_sampling_mode: rbf_diverse_denoise
+    initial_diversity_descriptor_mode: actuator_clipped_eef_v1
+    initial_diversity_scale: 20.0
+    initial_diversity_start_ratio: 0.8
+    initial_diversity_fallback: iid
+    initial_cache_metadata: true
+    truncated_rollout_mode: rbf_diverse
+    rollout_diversity_scale: 20.0
+    rollout_diversity_start_ratio: 0.6
+    rollout_diversity_iters: all
+    rollout_diversity_skip_final_steps: 0
+    rollout_diversity_descriptor_mode: actuator_clipped_eef_v1
+    direction_rbf_direction_weight: 0.6
+    direction_rbf_shape_weight: 0.3
+    direction_rbf_endpoint_weight: 0.1
+    direction_rbf_endpoint_scale_m: 0.05
+    direction_rbf_path_epsilon: 1.0e-06
+    direction_rbf_distance_epsilon: 1.0e-06
+    parent_weighting_mode: legacy_temperature
+    selection_ess_target_ratio: 0.6
+    selection_beta_max: 100.0
+    selection_bisection_steps: 24
+    parent_coverage_mode: none
+    parent_anchor_count: 0
+    parent_anchor_reward_quantile: 0.5
+    elite_carryover_count: 0
+    rollout_diversity_control_mode: fixed
+    rollout_diversity_target_ratio: 1.0
+    rollout_diversity_band_ratio: 0.2
+    rollout_diversity_scale_min: 0.0
+    rollout_diversity_scale_max: 20.0
+    rollout_diversity_decay_floor: 0.25
+    chunk_population_mode: fresh
+    chunk_memory_fraction: 0.0
+    chunk_memory_renoise_steps: 2
+    chunk_memory_reward_guard_quantile: 0.25
+    search_schedule_mode: legacy_linear
+    adaptive_min_cem_iters: 4
+    adaptive_early_stop_patience: 2
+    adaptive_reward_improvement_eps: 0.001
+    qd_archive_mode: grid_archive
+    qd_degenerate_fallback_policy: none
+    qd_descriptor: target_xy_quadrant_signed_height_v1
+    qd_quality_mode: actuator_clipped_provider_v1
+    qd_gripper_rescue_mode: none
+    qd_final_selection_mode: terminal_grasp_proximity_v1
+    qd_grid_shape:
+    - 4
+    - 4
+    qd_cell_capacity: 1
+    qd_secondary_lane_mode: none
+    qd_parent_sampling: sparse_priority
+    qd_global_quality_anchor_count: 0
+    qd_parent_survivor_count: 0
+    qd_sparse_exponent: 1.0
+    qd_bounds_quantiles:
+    - 0.05
+    - 0.95
+    qd_bounds_expand_fraction: 0.1
+    qd_min_axis_span_m: 0.08
+    qd_bounds_update_policy: fixed_initial
+    qd_overflow_policy: clamp_edge
+    qd_tie_break: stable_fingerprint
+    qd_metrics_observer: true
+  eds_eval:
+    enabled: true
+    write_metrics: true
+    save_qualitative: true
+    output_dir: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/attempts/rdt-qd-ed-final-20260921T093925Z__n28_screen_t02_n28_20261001__dd537eeed8b0/eds_eval
+    report_dir: /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/docs/03_evidence/qd_ed_final
+    method_label: N27__input_repaired__codex_login_astra_low_n10_e2_t180_recovered_pre_final_v1
+    job_id: rdt-qd-ed-final-20260921T093925Z__n28_screen_t02_n28_20261001__dd537eeed8b0
+    reward_mode: normal
+    shuffle_seed: 0
+    max_visual_chunks_per_episode: 2
+    save_population_cloud: true
+    save_per_iter_best: true
+    save_initial_vs_final: true
+  eds_mechanism_pretest:
+    enabled: true
+    first_chunk_only: false
+    save_single_step: true
+    save_full_process: true
+    save_tensors: true
+    plot_3d: true
+    output_dir: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n28_parent_before_renoise/attempts/rdt-qd-ed-final-20260921T093925Z__n28_screen_t02_n28_20261001__dd537eeed8b0/mechanism
+    output_mode: qualitative_chunk
+    run_id: rdt-qd-ed-final-20260921T093925Z__n28_screen_t02_n28_20261001__dd537eeed8b0
+    max_chunks: 2
+    max_full_process_iters: 10
+  require_task_cache_identity: true
+experiment:
+  name: ${backend.backend}
+  tags:
+  - ${backend.backend}

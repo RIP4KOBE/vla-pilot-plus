@@ -1,0 +1,201 @@
+{
+  "attempt_id": "rdt-qd-ed-final-20260921T093925Z__n4_same_state_t09_20260925__0f1fa0322193",
+  "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+  "budget_bucket": "development",
+  "checkpoint": {
+    "exists": true,
+    "path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema/model.safetensors",
+    "realpath": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object/ema/model.safetensors",
+    "sha256": "b4e3631db326689297cd2f0b02d32ade9dc6ee9ae09c03171add64b80e86aaa1",
+    "size_bytes": 2456705456
+  },
+  "child_sha256": "003e176f047f16bdf5e4c5f7ebbb2738f6bb2d611e1007d8c3f9f19f5fc2775b",
+  "cleanup_seconds": 40,
+  "contrast_branches_max": 2,
+  "critical_code": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/main.py",
+      "sha256": "f9add8568d45ec799e4030b1108f069f4af88bf3b63c62d7f836d59539a427a7"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_policy_steer.py",
+      "sha256": "edebea0873ca1d3868741c0602d1d7a2d0b92f5b0d0eef848288a10f4e0956ac"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/qd_ed.py",
+      "sha256": "5c86385a8271c3311aa715332d1307850b18ec37486f20ac53c19747fe4f207b"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/qd_terminal_population.py",
+      "sha256": "6b927f824ce17dd8ea939709c9f92539767291189426818136b8238030534dcf"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/decision_evidence.py",
+      "sha256": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_libero_action_converter.py",
+      "sha256": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/env_adapters/libero_adapter.py",
+      "sha256": "f2130791c4c975603d8bab4fad4739374cbbba967df2fa2334ea881b6557d6bf"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py",
+      "sha256": "fc1a7cdda18af2d013ea90cab581ddf89c7088fc1c22fe5e5139995ffce0c6ed"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/policy.yaml",
+      "sha256": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/perception.yaml",
+      "sha256": "428b7ef08eaca1c284145502938637bfab99967b5519909110f5d83a2d04feb7"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/backend/libero.yaml",
+      "sha256": "e1d1f41f178c7e5968e04b8337c13e8f37b691a7b3e93f9f8e9f7bb5796deb14"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/vlm_query/vlm_agent.py",
+      "sha256": "64a2f470045ab5be8840eb9758c1d8cb13cc2487d5993f2c47862052f8679494"
+    }
+  ],
+  "decision_count_max": 1,
+  "diagnostic_only": true,
+  "egl_device_index": 0,
+  "encoder_files": [
+    {
+      "exists": true,
+      "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/config.json",
+      "realpath": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/blobs/5a439fe1a8c4a05c6b1e4bf6a11821b497bf0136",
+      "sha256": "a58c2192a7166501ad2382c3d7ca3d694a1259b71a23a1925887e5afe7adcbd8",
+      "size_bytes": 593
+    },
+    {
+      "exists": true,
+      "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/pytorch_model.bin",
+      "realpath": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/blobs/c8407a9ae21075667be98f84f4c93e8a7bfc772a352cd2e6998f5916f7181db8",
+      "sha256": "c8407a9ae21075667be98f84f4c93e8a7bfc772a352cd2e6998f5916f7181db8",
+      "size_bytes": 44541587809
+    },
+    {
+      "exists": true,
+      "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/special_tokens_map.json",
+      "realpath": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/blobs/881bdbffc06e471924ecea57f962bc5f8e2a9f21",
+      "sha256": "4720c0fddbe4c5991334f85ad7073d9bd0a294a8ba4641a2f8dab614ca825949",
+      "size_bytes": 1786
+    },
+    {
+      "exists": true,
+      "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/spiece.model",
+      "realpath": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/blobs/4e28ff6ebdf584f5372d9de68867399142435d9a",
+      "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+      "size_bytes": 791656
+    },
+    {
+      "exists": true,
+      "path": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/tokenizer_config.json",
+      "realpath": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl/blobs/b114c318caf72f6e89ea92e0755c41327a453198",
+      "sha256": "b971dce1d2805c2a66da8657156e7114a30501c6ba602fc947c8bf607a3ead2d",
+      "size_bytes": 1857
+    },
+    {
+      "exists": true,
+      "path": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/config.json",
+      "realpath": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/blobs/a513b447f6b05f640f9980d25f4d8a5cff6cd25d",
+      "sha256": "adc04928d8fd19a61822584fe0cf2e813e5ebac17f3e49fb1ea096860ae6457b",
+      "size_bytes": 576
+    },
+    {
+      "exists": true,
+      "path": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/model.safetensors",
+      "realpath": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/blobs/ea2abad2b7f8a9c1aa5e49a244d5d57ffa71c56f720c94bc5d240ef4d6e1d94a",
+      "sha256": "ea2abad2b7f8a9c1aa5e49a244d5d57ffa71c56f720c94bc5d240ef4d6e1d94a",
+      "size_bytes": 3511950624
+    },
+    {
+      "exists": true,
+      "path": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/preprocessor_config.json",
+      "realpath": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384/blobs/051261b5a784a2e7e5f93de1f86d170d69a9efd9",
+      "sha256": "f59da2f87c3cd079bd4f8f3037e81b277c60c498e279a8020331f67a5a3157e8",
+      "size_bytes": 368
+    }
+  ],
+  "env_seed": 1045350852,
+  "formal_authorized": false,
+  "gpu_uuid": "GPU-62052fa1-37e0-79dc-21aa-5c0f25c0c315",
+  "init_index": 0,
+  "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+  "max_diagnostic_transitions": 32,
+  "max_settling_steps": 40,
+  "output_dir": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n4-same-state-v1/rdt-qd-ed-final-20260921T093925Z__n4_same_state_t09_20260925__0f1fa0322193",
+  "phase": "dev",
+  "physical_gpu": 3,
+  "policy_seed": 1045350852,
+  "protocol": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260925/n4-same-state-v1/protocol-v1.md",
+  "protocol_sha256": "b12bc661bea31d601b2e69739d8bcd26c875bc573b96ca1d88130d1cb02eafcb",
+  "runtime_manifest": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/runtime-manifest.json",
+  "runtime_manifest_sha256": "d502d430d1fb6a6198874c4e139c877e04205b4f4cc83a3a6779a9b6856fc854",
+  "schema": "n4-same-state-diagnostic-plan-v1",
+  "source_commit": "b2a3076136b1abf2f22757bc73b6aa6456a43600",
+  "source_config": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n4e1_dev_t09_n4_20260924__7a16cf55edcc/.hydra/config.yaml",
+  "source_config_sha256": "9f82747337862c4fe10124f4fed6c6bb0a69fd17c7e3f4d3f1bf3273fa6f623c",
+  "source_plan": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/plan.frozen.json",
+  "source_plan_sha256": "c13e38a59f46b0a2ebe6175bb0a045991447dbc12c97ede800405c3339ea59e3",
+  "supervisor_sha256": "f9bf1705603f38cf5e29b970e8aed8ad5f8bc408f9590b61e8a3c77491dbc6eb",
+  "task_id": 9,
+  "task_input_files": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/libero_inputs/bddl_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.bddl",
+      "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/libero_inputs/bddl_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.bddl",
+      "sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+      "size_bytes": 2132
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/libero_inputs/init_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.pruned_init",
+      "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/libero_inputs/init_files/libero_object_swap/pick_up_the_orange_juice_and_place_it_in_the_basket.pruned_init",
+      "sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+      "size_bytes": 3361
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/metadata.json",
+      "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/metadata.json",
+      "sha256": "ea78f783369bab063d6d2a4adb6066c29ec49d374fdc0fe025e5124a2d8baf6d",
+      "size_bytes": 2709
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/output_raw.txt",
+      "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/output_raw.txt",
+      "sha256": "88c3354f33c649eb154de9f0fab13a694b90bf2f269e3aacc2d17d26c60cf9df",
+      "size_bytes": 1450
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/prompt.txt",
+      "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/prompt.txt",
+      "sha256": "893c8b78af34e701e6fc587da2666aaa49bafcafe0169510adc74ccd9a687357",
+      "size_bytes": 12546
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/query_img.png",
+      "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/query_img.png",
+      "sha256": "c4dc0ab0c9740f98aa22d8f5efdad04f8e7231ebe8a1f465be68d4a0b0c53333",
+      "size_bytes": 583814
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/stage1_guidance.txt",
+      "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/stage1_guidance.txt",
+      "sha256": "d374557f569b8c69f898a1596dfefd32a21774929511bb969d5d27e0050d4830",
+      "size_bytes": 979
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/stage2_guidance.txt",
+      "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/guidance/task_9/stage2_guidance.txt",
+      "sha256": "ca058cc1dcf87ce5910181800bb2f65b8cd4d92788b27f3b10b1e33dbc103f84",
+      "size_bytes": 194
+    }
+  ],
+  "timeout_seconds": 1800,
+  "validation_authorized": false
+}

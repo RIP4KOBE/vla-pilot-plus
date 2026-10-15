@@ -1,0 +1,3 @@
+The focused CPU abort/restart test passed; scoped acceptance and the operational handoff are recorded. Ledgers and costs remain unchanged.
+
+Next: resolve production runtime bindings. GPU dispatch remains disabled, and validation/formal/ablation completion is still unproven.

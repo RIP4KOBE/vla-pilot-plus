@@ -1,0 +1,24 @@
+{
+  "schema": "n36-reviewed-source-placement-authority-v1",
+  "at": "2026-10-11T03:34:47.232011+00:00",
+  "source_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001770/recovery-source-review/review-v1.json",
+    "sha256": "cee0b13bcea16a755388dd591afe46b382b396d23c17f8f7a1618ac6ed39bdcc",
+    "bytes": 6048
+  },
+  "standing_authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c",
+    "bytes": 1942
+  },
+  "destination": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "before": "89506fe1d9e2c753b66f6d3349963f6e9b316560",
+  "target": "a5b32cdefc0879e98011f86b1559e4250926ba62",
+  "operation": "git merge --ff-only; exact already-reviewed source placement",
+  "tracked_clean_before": true,
+  "live_source_processes": [],
+  "gpu_authorized": false,
+  "measurement_authorized": false,
+  "scientific_changes": false,
+  "reason": "Resolve recorded deployment route mismatch without source edits or scientific changes; current study owns destination and no live cohort exists."
+}

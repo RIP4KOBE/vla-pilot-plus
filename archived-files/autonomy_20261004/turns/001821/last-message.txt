@@ -1,0 +1,3 @@
+Reconciled all three preparation records, preserving charges and telemetry. Found a recovery-validator blocker: it cannot retain a completed predecessor.
+
+Source remains `f661a570`; driver identity verified; no GPU cohort running. Saved the hash-bound operational handoff and next repair step. Validation/formal/ablation completion remains unproven.

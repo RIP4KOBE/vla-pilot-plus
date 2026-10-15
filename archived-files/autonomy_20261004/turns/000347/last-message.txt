@@ -1,0 +1,3 @@
+N32R2 remains live on GPU7; task 4 Q0 is running. Verified process identities, frozen source `1065f381`, and retained ledger prefixes. No restart or duplicate dispatch.
+
+Recorded turn 347’s operational summary. Next: monitor the matched cohort and audit terminal evidence. Validation, formal evaluation, and required ablations remain outstanding.

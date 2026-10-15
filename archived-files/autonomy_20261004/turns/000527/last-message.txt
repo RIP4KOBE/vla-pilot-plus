@@ -1,0 +1,3 @@
+N34 CPU integration is progressing under the verified existing executor. No duplicate launch or GPU dispatch occurred; accounting remains unchanged.
+
+Recorded turn 527’s operational summary. Next: review completed integration, tests, and release evidence. Validation, formal, and ablation goals remain unmet.

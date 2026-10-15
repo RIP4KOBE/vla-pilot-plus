@@ -1,0 +1,3 @@
+Reconciled and accepted the completed N36R3 CPU repair; focused tests passed. All 505 attempts and 75.53335346582918 GPU-hours remain recorded.
+
+Checkpoint and operational summary saved. Next: exact-source bindings and independent audit before GPU release. Validation, formal evaluation, and required ablations remain incomplete; the driver continues.

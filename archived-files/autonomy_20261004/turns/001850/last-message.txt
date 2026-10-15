@@ -1,0 +1,3 @@
+Continued N36 on source `808e27f7`. Corrected the CPU invocation, verified the retained runtime receipt, and saved the updated disabled artifacts and hash-bound handoff.
+
+No GPU cohort is active; all ledger charges remain intact. Next: full production audit and release review. Validation, formal evaluation, and required ablations remain incomplete.

@@ -1,0 +1,3 @@
+N36’s existing CPU audit remains active; PID/boot/start identities verified. Source `808e27f7` and all four private ledgers remain unchanged.
+
+Saved the hash-bound operational summary for turn 001854. Next: inspect terminal audit records, then proceed through required review gates. Validation, formal, and ablation evidence remain incomplete.

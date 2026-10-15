@@ -1,0 +1,3 @@
+Reconciled N34’s invalid timeout and preserved all charges: 443 attempts, 63.311477 GPU-hours. No experiment worker remains live.
+
+Bounded diagnosis identified repeated pre-start verification as a likely bottleneck. Recorded the repair scope and continuation summary; recovery needs a reviewed prospective release. Validation, formal evaluation, and ablations remain unresolved.

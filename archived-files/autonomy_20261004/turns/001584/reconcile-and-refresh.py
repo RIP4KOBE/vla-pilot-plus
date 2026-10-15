@@ -1,0 +1,43 @@
+import pathlib,json,hashlib,datetime,subprocess,os,time,fcntl,yaml
+W=pathlib.Path.cwd();A=W.parent/'autonomy_20261004';T=A/'turns/001584';R=A/'turns/001582/independent-b5';O=T/'runtime-graph-refresh';C=W/'.arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator'
+def ref(p):
+ b=p.read_bytes();return dict(path=str(p),bytes=len(b),sha256=hashlib.sha256(b).hexdigest())
+def put(p,d):
+ q=p.with_suffix('.tmp');q.write_text(json.dumps(d,indent=2)+'\n');q.replace(p)
+def ident(h):
+ p=pathlib.Path('/proc')/str(h['pid'])/'stat';v=dict(h)
+ if p.exists():
+  a=p.read_text().rsplit(')',1)[1].split();v.update(observed_start_ticks=int(a[19]),state=a[0]);v['live']=a[0]!='Z' and int(a[19])==h['start_ticks'] and h['boot_id']==pathlib.Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+ else:v.update(live=False,state=None)
+ return v
+old=json.loads((A/'turns/001583/operational-summary-v1.json').read_text());report=json.loads((R/'report-v1.json').read_text());ex=json.loads((R/'exit-v1.json').read_text());proc=json.loads((R/'process-v1.json').read_text());now=datetime.datetime.now(datetime.timezone.utc).isoformat();E=pathlib.Path(report['worktree'])
+assert ref(R/'report-v1.json')['sha256']==(R/'report-v1.sha256').read_text().split()[0]
+assert ex['exit']==0 and not ex['timeout'] and report['decision']=='FAIL'
+handles={k:ident(proc[k]) for k in ['wrapper','executor']};assert not any(h['live'] for h in handles.values())
+assert ident(old['driver'])['live'];assert not any(ident(h)['live'] for h in old['prior_cohort_handles'].values())
+for v in old['ledger_prefixes'].values():assert ref(pathlib.Path(v['path']))==v
+assert not os.path.lexists(A/'STOP');assert datetime.datetime.now(datetime.timezone.utc)<datetime.datetime.fromisoformat(old['deadline'].replace('Z','+00:00'))
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=E,text=True).strip()==report['source']
+assert not subprocess.check_output(['git','status','--porcelain','--untracked-files=no'],cwd=E,text=True).strip()
+review=dict(schema='n36-b5-root-terminal-reconciliation-v1',at=now,status='TERMINAL_FAIL_STALE_RUNTIME_GRAPH_ROOT_ACCEPTED',source=report['source'],report=ref(R/'report-v1.json'),exit=ref(R/'exit-v1.json'),terminal_handles=handles,blockers=report['blockers'],private_ledgers_unchanged=True,source_adopted=False,release_enabled=False,target_met=False)
+put(T/'terminal-reconciliation-v1.json',review)
+assert not O.exists();O.mkdir()
+auth=dict(schema='n36-disabled-runtime-graph-refresh-authority-v1',at=now,node_id='15.6',source=report['source'],worktree=str(E),standing_authority=ref(A/'user-authorization-v1.json'),root_reconciliation=ref(T/'terminal-reconciliation-v1.json'),failure_report=ref(R/'report-v1.json'),scope='CPU-only new disabled artifacts repairing stale runtime/closure source fingerprints and affected references. No source edits, approvals, adoption or GPU execution.',gpu_authorized=False,source_edits_authorized=False,release_enabled=False,timeout_seconds=1200,deadline=old['deadline']);put(O/'authority-v1.json',auth)
+(O/'prompt.txt').write_text(f'''Continue authorized Arbor node15.6 as bounded CPU artifact executor. Read {O/'authority-v1.json'} and exact B5 FAIL {R/'report-v1.json'}. Source {report['source']} at {E} is immutable. Repair only identified stale runtime/closure source fingerprints and affected transitive graph under NEW files in {O}. Start from canonical turn001579/g7-affected-graph-refresh/final report and inputs named by B5 report; reuse its helper methods as useful. Preserve all original and failed outputs. Update actual bytes/hashes/sizes for three changed scripts in runtime and runtime closure, preserving all external dependency evidence. Refresh affected reference bindings through controller semantics/review evidence, all40 manifests, engineering manifest, audit view, disabled plan, graph roots, matrix and final B5 input/report. Root authorizes preparing changed-reference versions of existing controller evidence ONLY with exact unchanged semantic findings and explicit lineage; no new root approval or independent certification may be asserted. If consumer requires additional root attestation, produce clearly disabled proposed artifact and identify exact remaining root gate. Do not alter acceptance predicates to pass. Execute focused unmodified passive runtime checks to establish six prior mismatches are resolved and verify affected consumers; no broad tests, recursive old provenance rebuild, native/model/provider/GPU work. Preserve source, frozen scientific protocol, all40 cells, configs, thresholds, algorithms, accounting/ledger prefixes/reserves and all prior costs. No scientific success claim. All roots remain release_enabled=false, b5_review=null, no source/accounting adoption or authority grant. Deliver hash-bound report-v1.json, report-v1.sha256, independent-b5-inputs-v1.json, canonical root references and changed/reused evidence matrix including exact blockers if any. No owner state/tree/ledger writes or source edits/commits. Check STOP/deadline before work and finalization, deadline {old['deadline']}. CPU1200s limit, CUDA_VISIBLE_DEVICES empty. Official current-login gpt-6-astra only, no delegation, alternate accounts/API/Poe, credentials, protected validation/formal results, prohibited untracked 2026-08-10-eds-qd-stage-guidance-transition-design.md or Superpowers. Complete bounded graph repair and report; independent B5 is subsequent coordinator work.''')
+(O/'run-executor.py').write_text((A/'turns/001579/g7-affected-graph-refresh/run-executor.py').read_text())
+with (O/'wrapper.log').open('wb') as log:p=subprocess.Popen(['/home/hynx/miniconda3/envs/vla-pilot/bin/python',str(O/'run-executor.py')],cwd=E,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+put(O/'wrapper-launch-v1.json',dict(pid=p.pid,at=now))
+for _ in range(40):
+ if (O/'process-v1.json').exists():break
+ time.sleep(.1)
+h=json.loads((O/'process-v1.json').read_text());op=dict(status='CPU_DISABLED_RUNTIME_GRAPH_REFRESH_RUNNING',source=report['source'],worktree=str(E),authority=ref(O/'authority-v1.json'),output_directory=str(O),process_record_path=str(O/'process-v1.json'),exit_path=str(O/'exit-v1.json'),wrapper=h['wrapper'],executor=h['executor'],gpu_authorized=False,source_edits_authorized=False,release_enabled=False)
+nextstep='Monitor turn001584 runtime-graph-refresh by boot/start identity; reconcile repaired disabled runtime/closure and affected consumer references, resolve explicit root evidence gates, then obtain fresh independent B5. No GPU dispatch before prospective release gates.'
+with (C/'state.lock').open('a') as lock:
+ fcntl.flock(lock,fcntl.LOCK_EX)
+ for path,is_yaml in [(W/'research-state.yaml',True),(C/'checkpoint.json',False)]:
+  d=yaml.safe_load(path.read_text()) if is_yaml else json.loads(path.read_text());d['n36_engineering_g7_independent_b5'].update(status=review['status'],terminal_reconciliation=ref(T/'terminal-reconciliation-v1.json'),live_handles=[]);d['n36_engineering_runtime_graph_refresh']=op;d['next_action']=nextstep;d['updated_at']=now
+  if is_yaml:
+   q=path.with_suffix('.tmp');q.write_text(yaml.safe_dump(d,sort_keys=False,allow_unicode=True));q.replace(path)
+  else:put(path,d)
+ tree=json.loads((C/'idea_tree.json').read_text());tree['nodes']['15.6'].update(result='B5_FAIL_STALE_RUNTIME_GRAPH_REFRESH_RUNNING',insight='Independent B5 rejected stale source fingerprints in runtime and runtime closure (six exact consumer rejections). Failure retained; bounded CPU artifact refresh launched, source immutable and GPU release disabled.');put(C/'idea_tree.json',tree)
+old.update(at=now,turn=1584,live_handles={k:ident(h[k]) for k in ['wrapper','executor']},driver=ident(old['driver']),executor_authority=ref(O/'authority-v1.json'),terminal_reconciliation=ref(T/'terminal-reconciliation-v1.json'),next_bounded_step=nextstep,executor_exit_exists=False,unresolved_evidence=['Runtime graph repair and fresh independent B5 remain pending; no GPU release or source/accounting adoption.','Original validation/formal/required ablation completion remains unestablished.'],completed_work=['Verified bound authorization, driver identity, absent prior cohort handles and unchanged private ledgers.','Reconciled normal reviewer exit and hash-bound B5 FAIL with six stale-source predicate rejections.','Preserved source and failed review; launched one bounded official-login CPU artifact refresh and updated owning state/checkpoint/node.']);old.pop('executor_events_bytes',None);put(T/'operational-summary-v1.json',old);(T/'operational-summary-v1.sha256').write_text(ref(T/'operational-summary-v1.json')['sha256']+'\n');print(json.dumps(op,indent=2))

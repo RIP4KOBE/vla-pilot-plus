@@ -1,0 +1,3 @@
+The CPU executor finished successfully with a partial adapter implementation; GPU dispatch remains disabled. Its report records 190 passing focused tests, with integration coverage and independent review still pending.
+
+Ledger history is unchanged. Turn 1492’s hash-bound operational summary records the terminal handles and next reconciliation step. The original research goal remains unmet.

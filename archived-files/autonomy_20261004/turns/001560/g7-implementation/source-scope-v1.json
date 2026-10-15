@@ -1,0 +1,43 @@
+{
+  "starting_commit": "dcd890474b733743414d2a7711069bb0d2b0337e",
+  "changed_paths": [
+    "scripts/qd_ed_n36_engineering.py",
+    "scripts/qd_ed_n36_healthcheck.py",
+    "scripts/qd_ed_n36_runner.py",
+    "scripts/qd_ed_n36_worker.py",
+    "tests/n36_engineering_cpu_fixture.py",
+    "tests/test_n36_engineering.py",
+    "tests/test_n36_engineering_integration.py"
+  ],
+  "all_changes_operational_or_tests": true,
+  "files": {
+    "scripts/qd_ed_n36_engineering.py": {
+      "bytes": 45703,
+      "sha256": "d93eed25e93fb4a211180cc9abdc76d767ca278a7663dbedd1f29aee53874af1"
+    },
+    "scripts/qd_ed_n36_healthcheck.py": {
+      "bytes": 9191,
+      "sha256": "1613df34d6c0e9c1d59e75abae3d3eb706c9792d4db9c42aa38d444d8088bd55"
+    },
+    "scripts/qd_ed_n36_runner.py": {
+      "bytes": 14633,
+      "sha256": "b1bb84d3e41288d6366727c7f3735bb92248bb59cf5691c1b70a9031bdcc7284"
+    },
+    "scripts/qd_ed_n36_worker.py": {
+      "bytes": 32111,
+      "sha256": "4beb27d8b085f0dce156a779952f0c2902479460b1dbbb529fa426815d71cc56"
+    },
+    "tests/n36_engineering_cpu_fixture.py": {
+      "bytes": 44319,
+      "sha256": "e5bba9917592a3a79abd417216f654b9243c650cd6dab720783af9e01a22acfa"
+    },
+    "tests/test_n36_engineering.py": {
+      "bytes": 36200,
+      "sha256": "58d55f198fdc0e6baa9d6ae35e81e4d2a1b6838cc923e0f3d1aa0c9292d84042"
+    },
+    "tests/test_n36_engineering_integration.py": {
+      "bytes": 33231,
+      "sha256": "38a6964d09cb22c0ee452f7e21d753922b29aef1940e0859a24625f4619f94aa"
+    }
+  }
+}

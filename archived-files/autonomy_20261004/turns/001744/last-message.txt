@@ -1,0 +1,6 @@
+Continued the owning study and recorded turn 1744’s operational summary.
+
+- Source: `89506fe`; ledgers unchanged.
+- CPU review active: wrapper `3267437`, executor `3267439`; identities verified.
+- Next: assess controller/runtime binding evidence before graph reconstruction.
+- GPU7 remains idle. Validation, formal, and ablation evidence is still incomplete; no completion claimed.

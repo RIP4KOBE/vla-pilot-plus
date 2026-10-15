@@ -1,0 +1,3 @@
+Reconciled the CPU executor timeout and preserved its partial commit `3f6c4e8`. Verified evidence hashes, unchanged ledgers, and no surviving executor descendants; cleared stale in-flight records.
+
+The driver remains active. Next: independent review and remaining integration checks. GPU dispatch stays gated; validation/formal/ablation completion remains unproven. Turn 1511’s hash-bound operational summary is saved.

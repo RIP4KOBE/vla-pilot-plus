@@ -1,0 +1,3 @@
+Existing N36 CPU worker remains live with verified identities; ledgers are unchanged. Reviewed source: `f256fec`.
+
+Recorded turn 1629’s hash-bound operational summary. Next: reconcile the binding refresh, then independent review before GPU release. Validation, formal, and ablation completion remain unproven.

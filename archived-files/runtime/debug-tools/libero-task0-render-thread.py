@@ -1,0 +1,428 @@
+#!/usr/bin/env python3
+"""Dedicated render-thread variant; main-thread model load and one B1 are unchanged."""
+import argparse
+from contextlib import contextmanager
+import faulthandler
+import hashlib
+import gc
+import queue
+import threading
+import weakref
+import importlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import signal
+import subprocess
+import sys
+import time
+
+STATIC_SHA256 = '237f1c4125488379f2230c3cd854808c3bc330979d09c120ad10dfb7497fd115'
+SCHEMA = 'qd-ed-task0-render-thread-contract-v1'
+PROTOCOL = 'experiments/iteration_001_execution_intent/gpu3-render-thread-diagnostic.md'
+DEPENDENCY_MODULES = {'libero.libero.envs.env_wrapper', 'libero.libero.envs.bddl_base_domain',
+    'robosuite.environments.base', 'robosuite.environments.robot_env', 'robosuite.utils.binding_utils',
+    'robosuite.renderers.context.egl_context'}
+CAMERAS = [('agentview', 128, True), ('robot0_eye_in_hand', 128, True), ('agentview', 640, False)]
+
+
+def load_static():
+    path = Path(__file__).with_name('libero-task0-render-only.py')
+    if hashlib.sha256(path.read_bytes()).hexdigest() != STATIC_SHA256:
+        raise RuntimeError('validated static helper changed')
+    spec = importlib.util.spec_from_file_location('validated_static_scene', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+static = load_static()
+require, digest = static.require, static.digest
+
+
+def buffer_scalars(sim):
+    """Read existing struct fields only; no GL/EGL/context-changing calls."""
+    result = {}
+    for key, chain in {'context_offWidth': ('_render_context_offscreen', 'con', 'offWidth'),
+        'context_offHeight': ('_render_context_offscreen', 'con', 'offHeight'),
+        'model_offwidth': ('model', 'vis', 'global_', 'offwidth'),
+        'model_offheight': ('model', 'vis', 'global_', 'offheight')}.items():
+        try:
+            value = sim
+            for attribute in chain:
+                value = getattr(value, attribute)
+            result[key] = int(value)
+        except (AttributeError, TypeError, ValueError):
+            result[key] = None
+    return result
+
+
+class RenderModelGuard(static.Guard):
+    def render_observer(self, original):
+        guarded = super().render_observer(original)
+        def observed(sim, *args, **kwargs):
+            require(threading.get_ident() == self.render_thread_id, 'render executed outside its owner thread')
+            index = self.renders + 1
+            self.emit({'event': 'render_buffer_enter', 'phase': self.phase,
+                       'render_index': index, **buffer_scalars(sim)})
+            result = guarded(sim, *args, **kwargs)
+            self.emit({'event': 'render_buffer_exit', 'phase': self.phase,
+                       'render_index': index, **buffer_scalars(sim)})
+            return result
+        return observed
+
+
+@contextmanager
+def phase(emit, name):
+    emit({'event': 'phase_enter', 'phase': name})
+    started = time.monotonic()
+    try:
+        yield
+    except BaseException as exc:
+        emit({'event': 'phase_exception', 'phase': name, 'exception_type': type(exc).__name__,
+              'elapsed_seconds': time.monotonic() - started})
+        raise
+    else:
+        emit({'event': 'phase_exit', 'phase': name, 'elapsed_seconds': time.monotonic() - started})
+
+
+def validate_frame(record):
+    if record.get('event') == 'render_exit':
+        require(record['rgb_shape'] == [record['height'], record['width'], 3] and
+            record['rgb_dtype'] == 'uint8' and record['rgb_finite'] is True and
+            record['rgb_nonuniform'] is True and
+            (not record['depth'] or record['depth_finite'] is True),
+            'rendered frame is nonfinite, uniform, or has unexpected shape/dtype')
+
+
+def filtered_gpu_library_maps():
+    """Only loaded CUDA / GL driver library paths; no mappings or environment."""
+    paths = set()
+    for line in Path('/proc/self/maps').read_text().splitlines():
+        fields = line.split(None, 5)
+        if len(fields) != 6:
+            continue
+        path = fields[5].removesuffix(' (deleted)')
+        name = Path(path).name
+        if path.startswith('/') and name.startswith(('libcuda', 'libcudart', 'libEGL', 'libGLX', 'libnvidia')) and '.so' in name:
+            paths.add(path)
+    return sorted(paths)
+
+
+class RenderThreadFailure(RuntimeError):
+    """Worker traceback / native handles never cross into the main thread."""
+
+
+def render_worker(requests, replies, factory, init_row, guard, emit, main_ident):
+    env, initial_time = None, None
+    tracked, releases = {}, []
+    failure, cleanup_failure = None, None
+    owner = threading.get_ident()
+    guard.render_thread_id = owner
+    emit({'event': 'render_thread_started', 'thread_id': owner, 'native_thread_id': threading.get_native_id()})
+    require(owner != main_ident, 'render worker must differ from caller')
+    def track(name, value):
+        def released(_reference):
+            item = {'object': name, 'thread_id': threading.get_ident(), 'native_thread_id': threading.get_native_id()}
+            releases.append(item)
+            emit({'event': 'scene_object_released', **item})
+        return weakref.ref(value, released)
+    # Catch on this thread, then leave the except suite before dropping native refs.
+    # Queue responses contain only scalars; an exception traceback would retain env.
+    try:
+        while True:
+            command = requests.get()
+            require(threading.get_ident() == owner, 'render owner changed')
+            if command == 'close':
+                break
+            if command == 'start':
+                require(env is None, 'scene constructed twice')
+                guard.phase = 'construct'
+                with phase(emit, 'construct'):
+                    env = factory()
+                tracked = {'environment': track('environment', env), 'sim': track('sim', env.sim),
+                           'render_context': track('render_context', env.sim._render_context_offscreen)}
+                guard.phase = 'set_init_state'
+                with phase(emit, 'set_init_state'):
+                    env.set_init_state(init_row)
+                initial_time = float(env.sim.data.time)
+                emit({'event': 'scene_identity', 'sim_time': initial_time,
+                      'generated_model_xml_sha256': hashlib.sha256(env.env.model.get_xml().encode()).hexdigest()})
+            else:
+                require(command in ('before_model_load', 'after_model_load', 'after_prediction_sync') and env is not None,
+                        'unexpected render command')
+                guard.phase = command
+                require(guard.limit - guard.renders >= 3, 'insufficient total render budget for required boundary')
+                with phase(emit, command):
+                    require(float(env.sim.data.time) == initial_time, 'scene time changed before boundary')
+                    for camera, size, depth in CAMERAS:
+                        env.sim.render(camera_name=camera, width=size, height=size, depth=depth)
+                    require(float(env.sim.data.time) == initial_time, 'scene time changed after boundary')
+            replies.put({'ok': True, 'terminal': False, 'sim_time': initial_time,
+                         'render_thread_id': owner, 'render_native_thread_id': threading.get_native_id()})
+    except BaseException as exc:
+        failure = {'exception_type': type(exc).__name__, 'phase': guard.phase}
+        emit({'event': 'render_thread_exception', **failure})
+    try:
+        if env is not None:
+            guard.phase = 'close'
+            with phase(emit, 'close'):
+                env.close()
+    except BaseException as exc:
+        cleanup_failure = {'exception_type': type(exc).__name__, 'phase': 'close'}
+        emit({'event': 'render_thread_cleanup_exception', **cleanup_failure})
+    # No saved exception or traceback remains. All known native roots are local.
+    env = None
+    guard.phase = 'final_scene_release'
+    try:
+        with phase(emit, 'final_scene_release'):
+            collected = gc.collect()
+        released = {name: reference() is None for name, reference in tracked.items()}
+        require(not tracked or all(released.values()), 'scene/native reference survived worker cleanup')
+        require(all(item['thread_id'] == owner for item in releases), 'scene reference released on wrong thread')
+    except BaseException as exc:
+        cleanup_failure = {'exception_type': type(exc).__name__, 'phase': 'final_scene_release'}
+        emit({'event': 'render_thread_cleanup_exception', **cleanup_failure})
+        collected, released = None, {name: reference() is None for name, reference in tracked.items()}
+    evidence = {'render_thread_id': owner, 'render_native_thread_id': threading.get_native_id(),
+        'scene_references_released': released, 'scene_release_records': releases,
+        'worker_cleanup_gc_calls': 1, 'worker_gc_collected': collected,
+        'cleanup_success': cleanup_failure is None, 'sim_time_after_init': initial_time}
+    emit({'event': 'render_thread_stopped', **evidence})
+    replies.put({'ok': failure is None and cleanup_failure is None, 'terminal': True,
+                 'failure': failure or cleanup_failure, 'evidence': evidence})
+
+
+def workflow(factory, init_row, guard, emit, load_policy, predict_once):
+    """One synchronous render owner; original model load and B1 remain on caller."""
+    main_ident, main_native = threading.get_ident(), threading.get_native_id()
+    require(threading.current_thread() is threading.main_thread(), 'model caller must be main thread')
+    requests, replies = queue.Queue(), queue.Queue()
+    automatic_gc = gc.isenabled()
+    gc.disable()
+    emit({'event': 'automatic_gc_disabled', 'previously_enabled': automatic_gc})
+    worker = threading.Thread(target=render_worker, name='libero-render-owner',
+        args=(requests, replies, factory, init_row, guard, emit, main_ident), daemon=False)
+    terminal, primary_failure = None, False
+    worker.start()
+    def dispatch(command):
+        nonlocal terminal
+        require(threading.get_ident() == main_ident and terminal is None, 'invalid caller or stopped render worker')
+        requests.put(command)
+        reply = replies.get()
+        if reply['terminal']:
+            terminal = reply
+        if not reply['ok']:
+            failure = reply['failure'] or {'exception_type': 'Unknown', 'phase': command}
+            raise RenderThreadFailure('render worker failed: ' + failure['exception_type'] + ' at ' + failure['phase'])
+        return reply
+    try:
+        dispatch('start')
+        dispatch('before_model_load')
+        emit({'event': 'gpu_library_maps', 'boundary': 'before_model_load', 'libraries': filtered_gpu_library_maps()})
+        guard.phase = 'load_model'
+        with phase(emit, 'load_model'):
+            require(threading.get_ident() == main_ident, 'model load moved threads')
+            policy = load_policy()
+        emit({'event': 'gpu_library_maps', 'boundary': 'after_model_load', 'libraries': filtered_gpu_library_maps()})
+        dispatch('after_model_load')
+        guard.phase = 'predict_b1'
+        with phase(emit, 'predict_b1'):
+            require(threading.get_ident() == main_ident, 'prediction moved threads')
+            evidence = predict_once(policy)
+        emit({'event': 'gpu_library_maps', 'boundary': 'after_prediction_sync', 'libraries': filtered_gpu_library_maps()})
+        dispatch('after_prediction_sync')
+    except BaseException:
+        primary_failure = True
+        raise
+    finally:
+        # Parent's owned-process deadline handles a native hang; never move cleanup
+        # to main or restore guards while the render owner is still alive.
+        try:
+            if terminal is None:
+                requests.put('close')
+                while terminal is None:
+                    reply = replies.get()
+                    if reply['terminal']:
+                        terminal = reply
+            worker.join()
+        finally:
+            if not worker.is_alive() and automatic_gc:
+                gc.enable()
+            emit({'event': 'render_thread_joined', 'joined': not worker.is_alive(),
+                  'automatic_gc_previously_enabled': automatic_gc, 'automatic_gc_restored_enabled': gc.isenabled()})
+        if not primary_failure:
+            require(terminal['ok'], 'render worker cleanup failed')
+    return {**evidence, **terminal['evidence'], 'main_thread_id': main_ident, 'main_native_thread_id': main_native,
+            'render_thread_joined': True, 'automatic_gc_previously_enabled': automatic_gc,
+            'automatic_gc_restored_enabled': gc.isenabled()}
+
+def validate_compute(counters):
+    for name in ('model_forward_calls', 'vision_encoder_forward_calls', 'text_encoder_forward_calls'):
+        require(type(counters.get(name)) is int and counters[name] > 0, 'missing production model/encoder compute')
+    require(counters.get('model_batch_rows') == counters['model_forward_calls'] and
+            counters.get('denoising_invocations') == 1, 'compute is not exactly one B1 prediction')
+
+
+def audit_network(event, _args):
+    if event in {'socket.connect', 'socket.getaddrinfo', 'socket.sendto', 'socket.bind'}:
+        raise RuntimeError('network is outside scene/model diagnostic scope')
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--contract', type=Path, required=True)
+    parser.add_argument('--contract-sha256', required=True)
+    args = parser.parse_args(argv)
+    require(digest(args.contract) == args.contract_sha256, 'contract fingerprint mismatch')
+    contract = json.loads(args.contract.read_text())
+    require(contract['schema'] == SCHEMA and contract['source_script_sha256'] == digest(__file__), 'contract/script mismatch')
+    for label in ('runtime_manifest', 'seed_plan', 'profiles', 'runtime_inventory', 'policy_configuration'):
+        require(digest(contract[label + '_path']) == contract[label + '_sha256'], label + ' fingerprint mismatch')
+    runtime = json.loads(Path(contract['runtime_manifest_path']).read_text())
+    root = Path(runtime['worktree']).resolve()
+    require(subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip() == contract['source_commit'],
+            'source HEAD changed')
+    require(runtime['gpu_mapping']['physical_gpu'] == 3 and runtime['gpu_mapping']['egl_device_index'] == 0,
+            'expected physical GPU3/EGL0')
+    expected_env = {'CUDA_VISIBLE_DEVICES': '3', 'CUDA_DEVICE_ORDER': 'PCI_BUS_ID', 'MUJOCO_EGL_DEVICE_ID': '0',
+        'MUJOCO_GL': 'egl', 'PYOPENGL_PLATFORM': 'egl', 'HF_HUB_OFFLINE': '1', 'TRANSFORMERS_OFFLINE': '1',
+        'LIBERO_CONFIG_PATH': runtime['environment']['LIBERO_CONFIG_PATH']}
+    require(all(os.environ.get(name) == value for name, value in expected_env.items()), 'frozen GPU/offline/LIBERO environment mismatch')
+    source_records = contract['source_files']
+    require(len({row['path'] for row in source_records}) == len(source_records), 'duplicate source record')
+    for row in source_records:
+        source = (root / row['path']).resolve()
+        require(source.is_relative_to(root) and digest(source) == row['sha256'], 'source file fingerprint mismatch')
+    dependencies = contract['dependency_sources']
+    require({row['module'] for row in dependencies} == DEPENDENCY_MODULES and len(dependencies) == len(DEPENDENCY_MODULES),
+            'dependency source set differs from static scene contract')
+    for row in dependencies:
+        require(Path(row['path']).is_absolute() and digest(row['path']) == row['sha256'], 'dependency fingerprint mismatch')
+    sys.path.insert(0, str(root / 'scripts'))
+    sys.path.insert(0, str(root))
+    import qd_ed_policy_native_probe as native
+    required_sources = native.runner.REQUIRED_CODE | {native.SCRIPT_RELATIVE, PROTOCOL}
+    require(required_sources <= {row['path'] for row in source_records}, 'required source/protocol fingerprints missing')
+    profiles = json.loads(Path(contract['profiles_path']).read_text())
+    config = json.loads(Path(contract['policy_configuration_path']).read_text())
+    require(config == native.policy_configuration(root, profiles), 'policy configuration differs from frozen native B1')
+    seeds = json.loads(Path(contract['seed_plan_path']).read_text())
+    row, = [item for item in seeds['blocks']['dev'] if item['task_id'] == 0]
+    require(row['env_seed'] == row['policy_seed'] == 1969522881 and row['init_index'] == 0, 'scene seed/init mismatch')
+    task = runtime['tasks']['0']
+    require(digest(task['bddl_path']) == row['bddl_sha256'] and digest(task['init_path']) == row['init_file_sha256'],
+            'frozen task0 BDDL/init changed')
+    output = Path(contract['output_dir']).resolve()
+    require(output.is_relative_to(Path(runtime['artifact_root']).resolve()), 'output outside owned artifact root')
+    output.mkdir(parents=True, exist_ok=True)
+    events = output / 'render_thread_events.jsonl'
+    with events.open('x'):
+        pass
+    def emit(record):
+        with events.open('a') as stream:
+            stream.write(json.dumps({'monotonic_seconds': time.monotonic(), 'thread_id': threading.get_ident(),
+                'native_thread_id': threading.get_native_id(), **record}, sort_keys=True, allow_nan=False) + '\n')
+        validate_frame(record)
+    def deadline(_signum, _frame):
+        raise TimeoutError('scene/model diagnostic reached 600-second deadline')
+    signal.signal(signal.SIGALRM, deadline)
+    signal.alarm(600)
+    faulthandler.enable(all_threads=True)
+    sys.addaudithook(audit_network)
+    started = time.monotonic()
+    guard = RenderModelGuard(emit, 32)
+    prediction_calls = 0
+    try:
+        emit({'event': 'started', 'resource_id': contract['resource_id'], 'source_commit': contract['source_commit'],
+            'contract_sha256': args.contract_sha256, 'script_sha256': digest(__file__),
+            'static_helper_sha256': STATIC_SHA256, 'physical_gpu': 3, 'egl_device_index': 0,
+            'timeout_seconds': 600, 'total_render_cap': 32, 'action_vectors_executed': 0, 'stage_calls': 0})
+        import random
+        import numpy as np
+        import torch
+        sys.path.insert(0, str(root / 'third_party/libero_pro'))
+        import mujoco
+        from robosuite.utils.binding_utils import MjSim
+        guard.install(mujoco, MjSim)
+        from libero.libero.envs import OffScreenRenderEnv
+        for item in dependencies:
+            path = Path(importlib.import_module(item['module']).__file__).resolve()
+            require(path == Path(item['path']).resolve() and digest(path) == item['sha256'], 'loaded dependency source differs')
+        emit({'event': 'dependency_sources', 'files': {item['module']: item['sha256'] for item in dependencies}})
+        init_states = torch.load(task['init_path'], map_location='cpu', weights_only=False)
+        init_row = np.ascontiguousarray(np.asarray(init_states[0], dtype=np.float64))
+        require(init_row.shape == (110,) and hashlib.sha256(init_row.tobytes()).hexdigest() == row['init_row_sha256'],
+                'loaded init row differs')
+        np.random.seed(row['env_seed'])
+        def factory():
+            return OffScreenRenderEnv(bddl_file_name=task['bddl_path'], camera_heights=128, camera_widths=128,
+                camera_depths=True, camera_names=['agentview', 'robot0_eye_in_hand'], renderer='mujoco')
+        def load_policy():
+            from core.rdt_policy_steer import RDTSteer
+            require(torch.cuda.device_count() == 1, 'expected one visible CUDA device')
+            properties = torch.cuda.get_device_properties(0)
+            normalize = lambda value: str(value).lower().removeprefix('gpu-')
+            require(normalize(properties.uuid) == normalize(runtime['gpu_mapping']['uuid']), 'CUDA UUID differs from GPU3 runtime')
+            emit({'event': 'cuda_identity', 'torch_logical_device': 0, 'torch_uuid': str(properties.uuid)})
+            random.seed(native.SYNTHETIC_SEED)
+            np.random.seed(native.SYNTHETIC_SEED)
+            torch.manual_seed(native.SYNTHETIC_SEED)
+            torch.cuda.manual_seed_all(native.SYNTHETIC_SEED)
+            policy = RDTSteer.from_pretrained(config['pretrained_path'], num_inference_steps=config['num_inference_steps'],
+                vision_encoder=config['vision_encoder'], text_encoder=config['text_encoder'],
+                weight_variant=config['weight_variant'], control_frequency=int(config['control_frequency']))
+            policy.to('cuda:0')
+            policy.eval()
+            policy.post_init(adapter=None, postprocessor=lambda value: value, sample_batch_size=1, policy_config=config)
+            policy.reset()
+            emit({'event': 'model_loaded', 'synthetic_seed': native.SYNTHETIC_SEED,
+                'compute': policy.get_episode_compute_counters()})
+            return policy
+        def predict_once(policy):
+            nonlocal prediction_calls
+            require(prediction_calls == 0, 'second B1 prediction is forbidden')
+            prediction_calls += 1
+            from core.rdt_libero_obs_processor import RDTLiberoObsProcessor
+            require(isinstance(policy._obs_processor, RDTLiberoObsProcessor), 'production observation processor missing')
+            with phase(emit, 'process_synthetic_observation'):
+                converted = policy._obs_processor.process(native.synthetic_observation(np))
+            with phase(emit, 'encode_synthetic_task'):
+                text_embed = policy._get_lang_embed(converted.task)
+            with phase(emit, 'native_predict_unguided_b1'):
+                raw = policy._predict_unguided(converted.state_128, converted.state_mask_128, converted.images, text_embed, B=1)
+            with phase(emit, 'prediction_cuda_sync_and_inspect'):
+                torch.cuda.synchronize(0)
+                array = raw.detach().cpu().numpy()
+                require(list(array.shape) == [1, 64, 128] and bool(np.isfinite(array).all()), 'invalid raw B1 prediction')
+                counters = policy.get_episode_compute_counters()
+                validate_compute(counters)
+                evidence = {'raw_prediction_shape': list(array.shape), 'raw_prediction_dtype': str(array.dtype),
+                    'raw_prediction_finite': True, 'raw_prediction_sha256': hashlib.sha256(array.tobytes()).hexdigest(),
+                    'compute': counters, 'synthetic_seed': native.SYNTHETIC_SEED, 'num_inference_steps': policy._num_inference_steps}
+                emit({'event': 'prediction_evidence', **evidence})
+                return evidence
+        evidence = workflow(factory, init_row, guard, emit, load_policy, predict_once)
+        require(prediction_calls == 1 and guard.blocked_integrations == 0, 'scope counts differ')
+        evidence.update(schema=SCHEMA, resource_id=contract['resource_id'], diagnostic_only=True, task_success=None,
+            camera_render_calls=guard.renders, mj_step1_calls=guard.step1, mj_forward_calls=guard.forwards,
+            mj_step_or_mj_step2_calls=0, action_vectors_executed=0, stage_calls=0, dino_model_loads=0,
+            predict_unguided_invocations=prediction_calls, elapsed_seconds=time.monotonic() - started)
+        with (output / 'render-thread-evidence.json').open('x') as stream:
+            json.dump(evidence, stream, indent=2, sort_keys=True, allow_nan=False)
+            stream.write('\n')
+        emit({'event': 'completed', **evidence})
+        return 0
+    except BaseException as exc:
+        emit({'event': 'failed', 'exception_type': type(exc).__name__, 'elapsed_seconds': time.monotonic() - started,
+            'camera_render_calls': guard.renders, 'mj_step1_calls': guard.step1, 'mj_forward_calls': guard.forwards,
+            'refused_integration_calls': guard.blocked_integrations, 'prediction_calls_started': prediction_calls})
+        raise
+    finally:
+        guard.restore()
+        signal.alarm(0)
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

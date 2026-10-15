@@ -1,0 +1,3 @@
+Reconciled the completed fixture repair and accepted its test-only changes: 240 focused tests passed. Owning state, checkpoint and operational summary are updated; all ledger charges remain intact.
+
+No GPU cohort is running. Next is the prospective source-scope amendment and fresh readiness evidence. Validation, formal and ablation completion remain unproven.

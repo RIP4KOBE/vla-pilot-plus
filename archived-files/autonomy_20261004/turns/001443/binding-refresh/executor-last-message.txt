@@ -1,0 +1,7 @@
+Stopped on the production accounting audit: source requires stale `75.53031173955723` GPUh; actual accounting is **505 attempts / 75.53335346582918 GPUh**. No audit was weakened.
+
+Partial disabled source/runtime/native/controller bindings and all 40 manifests passed. Full bindings remain incomplete. Fresh health requires a later authorized identity; prior readiness cannot transfer.
+
+No source/ledger changes, release, replay, or GPU calls. **Score: null; goal incomplete.**
+
+Reports: [JSON](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001443/binding-refresh/report-v1.json>) · [Markdown](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001443/binding-refresh/report-v1.md>). Both report hashes and 64 artifact bindings verified.

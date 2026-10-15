@@ -1,0 +1,7 @@
+Completed the bounded readiness-binding refresh. [Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001598/readiness-binding-refresh/report-v1.json>) includes the evidence matrix, B5 inputs, and blockers.
+
+- 1,516 checks passed; readiness predicate passes.
+- Controller attestation and renewed B5/root bindings remain required.
+- Full closure remains unverified due to credential/native-import fences.
+- Source and prior artifacts preserved; all preparation roots remain release-disabled. No GPU dispatch.
+- STOP absent and deadline open at finalization. Scientific goal remains incomplete.

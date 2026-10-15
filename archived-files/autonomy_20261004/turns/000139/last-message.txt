@@ -1,0 +1,3 @@
+Adopted the reviewed worker-entrypoint repair at `6baa930`; its 16 focused tests passed. Preserved all ledger charges and recorded the operational handoff.
+
+No GPU cohort is active. Next is a fresh N32R2 recovery protocol and frozen release. Native execution, validation, formal evaluation and required ablations remain unproven.

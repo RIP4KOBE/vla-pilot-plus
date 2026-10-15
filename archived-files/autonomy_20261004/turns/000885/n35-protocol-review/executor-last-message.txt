@@ -1,0 +1,5 @@
+PASS: B1/B2 resolved, bound hashes verified, and scientific fields unchanged. No remaining blockers.
+
+Acceptance is limited to readiness for separately authorized isolated CPU implementation—no GPU, validation/formal release, or efficacy claim.
+
+Reports: [Markdown](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000885/n35-protocol-review/report-v1.md) · [JSON](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000885/n35-protocol-review/report-v1.json)

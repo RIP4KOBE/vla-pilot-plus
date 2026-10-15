@@ -1,0 +1,8 @@
+N34R11 release validation passed; the first Dev cell is running on GPU7.
+
+- Controller: 1322966; worker: 1325713.
+- Source remains frozen at `4b390b3`.
+- Historical charges and protected reserves preserved.
+- Operational summary recorded; next step is monitoring native audits and outcomes.
+
+Validation, formal evaluation, and required ablation evidence remain outstanding.

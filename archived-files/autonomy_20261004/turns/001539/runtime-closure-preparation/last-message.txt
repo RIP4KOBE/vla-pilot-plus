@@ -1,0 +1,5 @@
+Recorded **BLOCKED_EXACT_CONTRACT_MISMATCH** in [report-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001539/runtime-closure-preparation/report-v1.json).
+
+G3 found a retained-runtime hash mismatch for `third_party/lerobot/tests/artifacts/cameras/image_128x128.png`. G4 remains unexecuted; G5/G6/G7 unresolved.
+
+Accepted G2 was reused. Candidate remains immutable and unadopted; dispatch veto and costs preserved. Input/output hashes recorded.

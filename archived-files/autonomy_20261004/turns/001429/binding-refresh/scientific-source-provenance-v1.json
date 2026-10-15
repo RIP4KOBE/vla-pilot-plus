@@ -1,0 +1,17 @@
+{
+  "current_source": "d01bc1e2e7acc876653a43ddf157d0b4a641f88a",
+  "scientific_source": "d01bc1e2e7acc876653a43ddf157d0b4a641f88a",
+  "repair_acceptance": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001428/terminal-reconciliation-v1.json",
+    "bytes": 5544,
+    "sha256": "c8723c480c42d5597c39216c78c7ee2182e8ba0babc5c01a33bbe8ff548aa503"
+  },
+  "historical_baseline": "1065f38122379a515b60a9a424f574330405b66f",
+  "changed_paths": [
+    "scripts/qd_ed_n36_release.py",
+    "scripts/qd_ed_n36r3_admission.py",
+    "scripts/qd_ed_n36r3_preparation.py",
+    "tests/test_n36r3_accounting_health_repair.py"
+  ],
+  "production_Main_science_receipts_audits_unchanged": true
+}

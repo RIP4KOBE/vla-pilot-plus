@@ -1,0 +1,3 @@
+Continued monitoring the existing N36R4 review; process identities and ledger prefixes are intact. No GPU dispatch occurred.
+
+Operational summary recorded. Next: reconcile the reviewer’s report and check release readiness and deadline fit. Validation, formal, and ablation evidence remain incomplete.

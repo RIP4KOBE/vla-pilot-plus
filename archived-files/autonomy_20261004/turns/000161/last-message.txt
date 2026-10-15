@@ -1,0 +1,3 @@
+N32R2 remains active on frozen source `1065f381`. Controller `1818171` advanced to task 0 Q0; C0 completed as a valid failure. Authority, process identities, and ledger continuity verified.
+
+Turn 161’s operational summary is saved. Next: monitor the existing controller. Validation, formal evaluation, and required ablation evidence remain outstanding.

@@ -1,0 +1,7 @@
+Created the readiness-bound, nonreleased candidate. All40 configuration/join checks and 93 output hashes passed; dependencies are acyclic. Focused checks: 28.53 seconds, two threads.
+
+[Completion manifest and report/B5 input links](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001290/readiness-binding/completion-v1.json)
+
+Successful reports are under `candidate-v2`; the initial comparison failure is preserved without overwrite. External B5 review remains next. No approval tokens or worker receipts were minted.
+
+`score: null`, `target_met: false`, `release_enabled: false`.

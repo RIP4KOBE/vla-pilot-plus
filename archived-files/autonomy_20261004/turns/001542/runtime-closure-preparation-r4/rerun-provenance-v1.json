@@ -1,0 +1,12 @@
+{
+  "prior_script": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001542/runtime-closure-preparation-r3/prepare-disabled-v1.py",
+    "sha256": "3f60a0e7ff56a03bc1f0db992ff9dcafd85f63e0242899e138e2360ad8a85a5a"
+  },
+  "script": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001542/runtime-closure-preparation-r4/prepare-disabled-v1.py",
+    "sha256": "9ae6cc2ebe2f9febe129a0b38f6aa2f389f75f26d9a19c879cd9d3b1bcc20031"
+  },
+  "change": "Allow passive hashing only of exact frozen wandb/sdk/lib/credentials.py library source SHA256 5a655dccbd6b172ed2d162077f565877df3f79a1d3c4f294a1b45e4523d08013; no credential stores or imports.",
+  "output_route_changed": true
+}

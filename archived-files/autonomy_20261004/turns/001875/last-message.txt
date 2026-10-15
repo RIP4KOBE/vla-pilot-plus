@@ -1,0 +1,3 @@
+Reconciled the completed N36 readiness check: it failed on a noncanonical frozen plan path. Preserved all charges, evidence, and scientific rules; updated the owning state/checkpoint and hash-bound operational summary.
+
+Next step is a prospectively corrected release and audited readiness check. Validation, formal evaluation, and required ablation evidence remain incomplete.

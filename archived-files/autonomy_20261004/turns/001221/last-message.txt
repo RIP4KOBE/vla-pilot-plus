@@ -1,0 +1,3 @@
+N36R1’s CPU repair passed independent checks: 3,291 runtime files and 40 episode manifests verified. Owning state, checkpoint, and handoff summary are updated; no GPU cohort is running.
+
+Next: accounting reconciliation and production-release review. Validation, formal evaluation, and required ablation evidence remain outstanding.

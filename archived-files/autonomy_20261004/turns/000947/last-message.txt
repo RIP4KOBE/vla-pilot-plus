@@ -1,0 +1,3 @@
+N35 task1 Q0 remains active on GPU7. Controller identity, frozen hashes, and ledger continuity verified; no restart needed.
+
+Saved the [operational summary](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000947/operational-summary.md). Next: monitor the existing cohort and reconcile its terminal evidence. Validation/formal/ablation goals remain unmet.

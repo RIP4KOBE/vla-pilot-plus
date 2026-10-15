@@ -1,0 +1,3 @@
+Adopted N34’s receipt repair as `e660da4`; 44 focused tests passed independently. Executor exit, ledger integrity, and live driver identity are reconciled.
+
+Operational summary recorded. Next: deployed runtime closure and prospective release checks. Validation, formal evaluation, and ablations remain unresolved; the driver continues.

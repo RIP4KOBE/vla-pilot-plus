@@ -1,0 +1,3 @@
+N34R11 now has 1/6 valid successes; matched C0 and Q0 each have 0/6. The existing controller remains live on frozen source `4b390b3e`.
+
+Verified authorization, process identity, and ledger continuity; saved turn 836’s operational summary. The driver continues monitoring. Validation, formal evaluation, and required ablation evidence remain incomplete.

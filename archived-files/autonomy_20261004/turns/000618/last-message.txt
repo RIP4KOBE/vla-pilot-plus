@@ -1,0 +1,3 @@
+Verified authority, live process identities, and unchanged private ledgers. N34R1’s existing CPU executor is running; its identity/accounting repair is undergoing focused tests.
+
+Recorded turn 618’s operational summary. Next is terminal review before source adoption and GPU release. Validation, formal evaluation, and required ablations remain incomplete.

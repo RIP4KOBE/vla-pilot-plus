@@ -1,0 +1,5 @@
+N31 continues on GPU7 under source `7428ce8`. Controller `203563`, monitor `203562`, and worker `284821` have verified identities.
+
+C0/Q0 task-0 outcomes are valid failures; N31 remains pending. Ledger history and frozen rules are preserved. No restart or duplicate dispatch occurred.
+
+Operational summary saved to `autonomy_20261004/turns/000006/operational-summary.json`. Next: monitor the cohort, then audit terminal evidence against the frozen gate. Validation/formal/ablation completion remains unproven.

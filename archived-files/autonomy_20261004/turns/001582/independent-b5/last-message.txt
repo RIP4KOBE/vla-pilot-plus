@@ -1,0 +1,7 @@
+B5 **FAIL** for exact source `b8d6b98164f24a599a9aa1fa6ce862b12cb2fcf6`.
+
+Reused runtime and runtime-closure records retain stale hashes for the healthcheck, runner, and worker scripts. Six focused consumer checks confirmed rejection.
+
+Wrote and verified [report-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001582/independent-b5/report-v1.json), its SHA-256 seal, and human report.
+
+Next gate: refresh those records and affected references, then obtain fresh B5. No repairs, adoption, authority, GPU execution, or scientific success claimed.

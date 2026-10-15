@@ -1,0 +1,3 @@
+Existing N36 repair executor remains live; no duplicate launched. Authorization, process identities, isolation, and unchanged ledgers verified.
+
+Hash-bound operational summary saved for turn 001674. Next: reconcile the repair’s tests and commit after exit, then independent review. Validation, formal evaluation, and ablation completion remain unproven.

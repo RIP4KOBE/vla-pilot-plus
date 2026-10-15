@@ -1,0 +1,3 @@
+N34R5 ended invalid: the runtime audit rejected `OpenGL.arrays.nones`. Terminal closure is recorded; all charges remain preserved (448 attempts, 63.8737 GPU-hours).
+
+No GPU worker remains. Next is a bounded inventory repair and fresh reviewed recovery release. Validation, formal evaluation, and ablation evidence remain outstanding; the driver continues.

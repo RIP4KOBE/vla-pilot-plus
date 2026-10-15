@@ -1,0 +1,12 @@
+Drafted all four artifacts; reference hashes and document consistency checks passed.
+
+- [Protocol JSON](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001147/protocol-preparation/protocol-v1.json>)
+- [Protocol Markdown](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001147/protocol-preparation/protocol-v1.md>)
+- [Accounting proposal](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001147/protocol-preparation/prospective-accounting-v1.json>)
+- [Report and artifact hashes](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001147/protocol-preparation/report-v1.json>)
+
+Proposed maximum: **40 fresh attempts, 21 GPU-hours, zero automatic retries**. Scientific gates and protected reserves remain unchanged.
+
+Independent review must resolve the ten-update eligibility latch and approve the protocol/accounting choices. Implementation, native audits, runtime release, and separate N36 window adoption remain blockers. Nothing was adopted or dispatched.
+
+Report SHA-256: `8a6c6580a7656f7308029d302fb79a61aadeab59e6b933dc81b44c6fb89c084e`

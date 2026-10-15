@@ -1,0 +1,3 @@
+Continued N36R3 with one bounded CPU executor preparing release tooling and a mandatory review after the first production episode. Live identities and continuation records are saved; ledgers remain unchanged.
+
+Next: review its implementation and tests before GPU admission. Validation, formal evaluation, and required ablation evidence remain incomplete.

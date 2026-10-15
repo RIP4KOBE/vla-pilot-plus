@@ -1,0 +1,3 @@
+Existing CPU repair executor remains live and verified; no duplicate launched. Ledger history is unchanged at 506 attempts and 75.6062 GPU-hours.
+
+Recorded turn 1500’s hash-bound operational summary. Next: reconcile the repair’s terminal report and independent review. GPU release remains blocked; validation/formal/ablation completion is still unproven.

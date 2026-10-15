@@ -1,0 +1,10 @@
+Committed as `0d618606a933473eb0e5a02fc3659a3a0ea0ee25`.
+
+- Only the two authorized files changed.
+- Amendment hash verified.
+- Single final-source test run: **100 passed**.
+- No deployment, graph rebuild, GPU/provider calls, or owner-state writes.
+
+[Report with hashes, test command, and limitations](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001805/scope-admission/report-v1.json).
+
+Final commit review remains required. Engineering evidence only.

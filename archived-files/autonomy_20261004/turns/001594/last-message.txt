@@ -1,0 +1,7 @@
+Continued the owning study and recorded turn 1594.
+
+- Integrated the independent B5 preparation PASS into the controller’s exact review schema.
+- Cleared stale executor status; preserved source, ledgers, costs, and failures.
+- No GPU worker is running.
+
+Next: protocol/source/accounting adoption and native readiness checks. Validation, formal, and required ablation evidence remain incomplete.

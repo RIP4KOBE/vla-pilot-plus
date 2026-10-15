@@ -1,0 +1,7 @@
+Prepared **DISABLED** bindings for `711602acc32031cfd977a2b3ec2e7ef0582e7377`. All 40 manifests, passive runtime checks, and 70 artifact hashes verified.
+
+Retained **505 attempts / 75.53335346582918 GPUh**; prospective health identity **001445**. No source/ledger changes, GPU calls, release, replay, or readiness transfer.
+
+Remaining: root controller review, manifest refresh, exact B5, adoption/accounting, fresh charged health, and first-C0 G3 pause. **Score: null; goal incomplete.**
+
+Reports: [JSON](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001448/binding-refresh/report-v1.json>) · [Markdown](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001448/binding-refresh/report-v1.md>) · [SHA-256](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001448/binding-refresh/report-v1.sha256>)

@@ -1,0 +1,3 @@
+Continued under the existing authorization. Reconciled the interrupted CPU check and restarted it with durable exit capture; PID 4060451 is running.
+
+Source and private ledgers remain unchanged. State, checkpoint, and hash-bound operational summary are updated. Next: inspect the check’s result and complete admission review. Validation/formal/ablation completion remains unproven.

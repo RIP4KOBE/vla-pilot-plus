@@ -1,0 +1,3 @@
+Continuation recorded. The approved-login CPU executor is repairing the parity test; its live identity and next review step are saved in the owning checkpoint.
+
+No GPU cohort was dispatched. Ledgers and scientific rules remain unchanged. Validation, formal evaluation and required ablation evidence are still outstanding.

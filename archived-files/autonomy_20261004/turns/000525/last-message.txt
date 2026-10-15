@@ -1,0 +1,3 @@
+N34 production integration is running in an isolated CPU executor; live identities and continuation records are saved. Existing budget covers the proposed Dev cohort, with protected reserves preserved.
+
+Next: review integration and runtime evidence before GPU release. Validation, formal evaluation, and required ablations remain incomplete.

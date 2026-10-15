@@ -1,0 +1,10 @@
+Committed repair: `9f817b7c6b7c3861f4789a2d2ad1ab65af7a66a4`.
+
+- Added pinned LeRobot and tracked LIBERO source coverage.
+- **96 focused CPU tests passed.**
+- Verified **682 deployed source/config files**, including all 41 reported LeRobot modules.
+- Scientific bytes unchanged; no GPU/native runs.
+
+Release remains blocked on LeRobot object-database registration, production source materialization, and refreshed release inventories.
+
+[Report](submodule-source-repair-v1/report-v1.md) · [Implementation result](submodule-source-repair-v1/implementation-result-v1.json)

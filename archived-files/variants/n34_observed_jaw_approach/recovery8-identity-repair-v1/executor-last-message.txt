@@ -1,0 +1,10 @@
+Committed `7cc32546ef70f6a9e28170ac184f9d9d30fb9a33`; working tree clean.
+
+N34R8 identities and turn684 binding updated; all eight invalid histories retained. **471 focused tests passed.** Scientific behavior unchanged; no runtime preparation or GPU calls.
+
+Artifacts written to the authorized output directory:
+
+- `implementation-result-v1.json`
+- `report-v1.md`
+
+Report records the pre-existing scientific provenance discrepancy. Ready for root review/adoption.

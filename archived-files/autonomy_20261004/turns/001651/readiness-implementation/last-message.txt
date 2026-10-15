@@ -1,0 +1,5 @@
+Committed `fd75477b84211707afd86bf32b8411403cbf0a1e`; 108 CPU tests passed. Owning ledgers are unchanged.
+
+Implementation remains partial: the hardware/provider measurement runner and production allowlist correction are outstanding. Nothing was released.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/report-v1.json>) includes hashes, satisfied requirements, residual gates, and next steps.

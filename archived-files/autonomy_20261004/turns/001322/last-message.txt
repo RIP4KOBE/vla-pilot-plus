@@ -1,0 +1,3 @@
+Continued the owning study and recorded N36R3’s scoped CPU preparation review. No experiment worker is active; charges remain 505 attempts / 75.5273 GPU-hours.
+
+Next: fresh release/accounting/readiness bindings and actual production lifecycle proof. Validation, formal evaluation, and ablation completion remain unproven. Operational handoff saved for the driver.

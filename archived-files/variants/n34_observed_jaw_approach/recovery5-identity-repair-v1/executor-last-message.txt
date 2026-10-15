@@ -1,0 +1,5 @@
+Committed `77e759096d1a2b114ab8ea4dd1240115607935d8`; worktree clean.
+
+N34R5 identities and exact turn654 recovery binding are enforced. All five historical invalid charges remain retained; scientific behavior is unchanged. **328 focused tests passed.**
+
+Wrote `implementation-result-v1.json` and `report-v1.md` in the designated output directory. Ready for root review/adoption. No runtime preparation or GPU/provider calls performed.

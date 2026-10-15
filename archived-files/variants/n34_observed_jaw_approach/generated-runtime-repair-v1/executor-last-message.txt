@@ -1,0 +1,7 @@
+Committed as `1eeaddf1416e5a2d6b3ed3ab143f15cf5f85da81`; worktree clean.
+
+Added the prospective binding, documentation, and adversarial tests. **60 tests passed**, including separate-process Torch imports and tamper rejection.
+
+[Report](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/generated-runtime-repair-v1/report-v1.md) · [Implementation result](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/generated-runtime-repair-v1/implementation-result-v1.json)
+
+No release, GPU work, or scientific claim. Stopped for root’s independent review/adoption.

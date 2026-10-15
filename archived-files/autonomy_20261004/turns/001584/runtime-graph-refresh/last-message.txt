@@ -1,0 +1,7 @@
+Repaired all six stale fingerprints and refreshed the affected graph in new files. Passive checks passed; source, scientific payloads, accounting, and prior outputs remain unchanged.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001584/runtime-graph-refresh/report-v1.json>) binds the canonical roots and changed/reused evidence matrix. `report-v1.sha256` and `independent-b5-inputs-v1.json` are alongside it.
+
+Remaining blocker: controller consumer requires `ROOT_REVIEWED`; changed-reference evidence is explicitly proposed pending root attestation. Independent B5 remains subsequent coordinator work.
+
+All roots remain disabled, with `b5_review=null`. No adoption, authority grant, GPU execution, or scientific success claim.

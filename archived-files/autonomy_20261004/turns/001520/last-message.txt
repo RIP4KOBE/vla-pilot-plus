@@ -1,0 +1,3 @@
+Verified authority, live process identities, and unchanged owning ledgers. The existing N36 CPU executor remains active; no duplicate launch occurred.
+
+Saved the hash-bound turn 001520 summary. Next: reconcile its terminal results and review remaining integration gaps. GPU dispatch stays blocked; validation/formal/ablation completion remains unproven.

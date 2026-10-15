@@ -1,0 +1,32 @@
+{
+  "schema": "n32r3-command-path-source-adoption-v1",
+  "at": "2026-10-08T11:49:02.619840+00:00",
+  "source_before": "36aac818c8ea0ec3ce18413e678963818bb5bb5d",
+  "source_after": "04d1255016fa13a2d467995b9e37a6a829356a1c",
+  "scientific_source": "1065f38122379a515b60a9a424f574330405b66f",
+  "root_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000466/command-path-root-review.json",
+    "sha256": "248ab97859f39679574de668048e647b85ef922b4d939f159992a9e8a53e42f4",
+    "bytes": 3382
+  },
+  "preflight": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000467/source-adoption-preflight.json",
+    "sha256": "d6413d283aff740952511e94e323b8dfa6e396e4f80b2606562e928ace3f3d4b",
+    "bytes": 1016
+  },
+  "changed_paths": [
+    "scripts/qd_ed_n32r3_bridge.py",
+    "scripts/qd_ed_n32r3_contract.py",
+    "scripts/qd_ed_n32r3_paths.py",
+    "tests/test_n32r3_paths.py"
+  ],
+  "ledger_unchanged": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+    "sha256": "8294b4ed47b8f645f2b3ab6511329f548b5788a5f40d0822b54d3c6c8c814da6",
+    "bytes": 5694864
+  },
+  "gpu_dispatched": false,
+  "release_enabled": false,
+  "scientific_promotion": false,
+  "next_step": "Create fresh source inventory/continuity review and separately versioned composition input binding exact disabled path amendment; compose16 fresh manifests and validate detached production release."
+}

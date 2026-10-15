@@ -1,0 +1,29 @@
+[
+  {
+    "path": "archived-files/autonomy_20261004/turns/001185/runtime-preparation/materialized/lerobot/README.md",
+    "original_blob": "964af4c1df10eb1cca25eda2d586d51dd779b390",
+    "published_blob": "5161d529a81cfd7c487a298ea80f257f819e889d",
+    "original_sha256": "868cd7dca6325e38f078a7aed445ad4ddd554ac1ea05bed9b3445c94fa2994e8",
+    "published_sha256": "0bb0ced83bbb460a49789e6412a013ab96c86e14367dc8ca6eaaf11137280f96",
+    "original_bytes": 18721,
+    "published_bytes": 18441
+  },
+  {
+    "path": "archived-files/runtime/debug-tools/production-egl-identity-proposal.patch",
+    "original_blob": "5615e5e4215d34c634ce8a998cb53d1f0a0de5ad",
+    "published_blob": "9483647c524e38a747575f551885cf9a5b1c407d",
+    "original_sha256": "ccfe8ede68fe20e9c190078e1864f2fd17c9f3f575a3ff835f8808d134d51f33",
+    "published_sha256": "df030ae7f794fbfa849088cc1434cdabcaa0b61dd295b051fb78f7b91fd8a616",
+    "original_bytes": 25181,
+    "published_bytes": 25167
+  },
+  {
+    "path": "archived-files/runtime/debug-tools/test_production_egl_identity_observer.py",
+    "original_blob": "365cdde8104490849bde0cd23291a5f37a8ef142",
+    "published_blob": "a1dd2b95d87f57221c4d29969a4e397f8836698f",
+    "original_sha256": "f29e5fa189f385c0ea648cd885954cc308543aa2877b44bc662735d213ed4a35",
+    "published_sha256": "ade80ee87eb68fdba48c9a26813dd4c5d9b5ba9c635066332853c1f91b0f3a4b",
+    "original_bytes": 12967,
+    "published_bytes": 12953
+  }
+]

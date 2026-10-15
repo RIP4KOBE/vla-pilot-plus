@@ -1,0 +1,19 @@
+{
+  "schema": "n34-patch-source-adoption-v1",
+  "at": "2026-10-08T16:49:48.394171+00:00",
+  "source_before": "45f9d06acc34749f4b0de86ffcbf9d849a9e70ce",
+  "source_after": "6fdea5f57d5b4cf281786124c46863855f9035c9",
+  "implementation_commit": "fac4719a3acd5e6ba0ef8d2d0033d7ccfff39c45",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000548/n34-patch-source-root-review-v1.json",
+    "sha256": "cb43fd14cda82e44583b75c4d96696a954d9ce669a571467c2fc4a29f6313b71"
+  },
+  "identical_integrated_files": [
+    "scripts/qd_ed_n34_bridge.py",
+    "tests/test_n34_patch_source.py"
+  ],
+  "validation": "45 focused CPU tests confirmed from executor events; exact adopted bytes verified; whitespace check passed. No redundant broad rerun.",
+  "gpu_dispatched": false,
+  "scientific_promotion": false,
+  "next_step": "Resolve separately scoped prospective Torch generated-module origin binding using turn547 generated-runtime-origin-review-v1.json. Preserve generator/template/content/origin verification and reject unexpected modules; use isolated CPU executor with focused separate-process tests. Then complete runtime closure, finite accounting, 30 fresh manifests and detached release. GPU dispatch and validation/formal remain closed."
+}

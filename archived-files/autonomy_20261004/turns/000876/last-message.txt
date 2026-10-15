@@ -1,0 +1,3 @@
+Recorded the Dev mechanism comparison and updated the owning checkpoint. Source and ledgers remain unchanged; no duplicate dispatch.
+
+Task 5 succeeded without direct proposal selection; task 6 failed despite frequent selection. Next: inspect native jaw/target motion around task 6’s close-dwell event at step 536. Validation, formal evaluation, and ablation goals remain unmet.

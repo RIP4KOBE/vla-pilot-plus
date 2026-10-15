@@ -1,0 +1,3 @@
+N36R4 CPU repair finished at `813f25b`, reporting 93 passing tests. Verified commit hashes, preserved ledger history, and recorded the terminal handoff.
+
+Next: independent review and deadline-fit check before GPU release. Validation, formal, and ablation completion remain unproven.

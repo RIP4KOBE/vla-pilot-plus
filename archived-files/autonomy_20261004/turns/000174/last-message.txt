@@ -1,0 +1,5 @@
+N32R2 remains live: controller `1818171`, worker `2728485`, source `1065f381`. Frozen hashes and ledger continuity verified; no restart or duplicate dispatch.
+
+Task0 C0/Q0 are valid failures; candidate outcome is pending. Next: monitor and review the first matched triple. Validation/formal/ablation completion remains unproven.
+
+Operational summary saved for turn `000174`; driver continuation remains active.

@@ -1,0 +1,11 @@
+Turn 706 — 2026-10-09T01:18:14.840633+00:00
+
+Current owning source: 921019185ac9df6dec758200e857f80f33024272. Frozen scientific implementation remains unchanged. Bound handoff, user authority, continuation and completion contract hashes verified. Driver 268073/start 97715947 and current coordinator 1214507/start 137141409 match boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7. Prior turn 705 completed normally. Closed N34R9 controller 1160497 and worker 1163170 are absent; no active GPU cohort. STOP absent; authorization deadline 2026-10-11T11:13:13Z.
+
+Prepared hash-bound N34R10 CPU-only identity authority and launched one official current-login gpt-6-astra executor in the existing isolated production worktree. Wrapper 1217477/start 137150164; executor 1217478/start 137150166. Outputs: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/recovery10-identity-repair-v1. Scope: fresh recovery identities and focused rejection tests, 1800 seconds; no scientific edits, runtime preparation or GPU release. Owning state/checkpoint/node 15.4 bind the authority and live process records under the normal state lock. Driver locks untouched.
+
+All three owning ledger prefixes unchanged. Retained cost: 452 dispatches and 64.57233985826672 GPU hours. Prospective maximum 30 attempts/5 GPU hours gives 482/1800 attempts and 69.57233985826672/224 GPU hours; additional 1 recovery/9 baseline/20 development yields bucket totals 26/98/298. Protected remaining validation 24.240824002430816 and formal 12 GPU hours preserved. Ten invalid N34 executions retain charges and unknown telemetry.
+
+Next bounded step: Monitor existing N34R10 CPU identity executor by boot/PID/start; do not duplicate. After exit independently review scoped commit and focused tests, adopt operational identity repair, regenerate runtime with turn705 corrected inventory, and freeze fresh prospective accounting/protocol/30 manifests/root review/release with full public validation before GPU7 admission. Preserve N34R9 invalid charge and scientific gates.
+
+Unresolved: full native runtime validity, matched Dev efficacy, scientific promotion, validation/formal/required ablation evidence. Original goal remains unevidenced; no completion record. Local driver continues.

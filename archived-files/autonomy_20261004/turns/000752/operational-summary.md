@@ -1,0 +1,7 @@
+Turn752 operational summary — 2026-10-09T03:41:00.081166+00:00
+
+Current source: 4b390b3e0c6b708572736939749a0fab0fb7ef37; scientific source: 1065f38122379a515b60a9a424f574330405b66f. Frozen plan/release/launch and bound authorization/context/completion contract hashes verified.
+Live controller: {'pid': 1322966, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 137471973, 'state': 'S', 'ppid': 12479}. Children: [{'pid': 1512274, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 137921297, 'state': 'S', 'ppid': 1322966}, {'pid': 1552566, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 138007630, 'state': 'R', 'ppid': 1322966}]. Driver/coordinator identities verified. STOP present: False; deadline passed: False (authorization ends 2026-10-11T11:13:13Z).
+Completed work: prior turn751 completed normally. State/checkpoint agreement, ACTIVE/PASS isolation and three owning ledger prefixes verified. N34R11 has 5 valid development cells, 0 successes; task1 N34 remains in flight. No dispatch, replay, signals, source/state/budget edits, or recovery performed.
+Next bounded step: monitor existing controller; on termination reconcile receipts, complete matched denominators and retained charges before scientific disposition or prospective recovery. Preserve frozen cohort rules.
+Unresolved evidence: development cohort incomplete; validation20, formal10, required matched ablations and hash-bound original-goal completion remain outstanding. Historical failures, unknown telemetry and protected reserves preserved.

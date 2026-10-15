@@ -1,0 +1,5 @@
+N31 remains active on GPU7: controller 203563, worker 735819. Process identities, bound hashes, and ledger prefixes verified; source remains `7428ce8a`.
+
+Five matched Dev triples are complete: C0/Q0/N31 each 0/5. Task-5 C0 is running. No scientific promotion or goal completion.
+
+Operational summary recorded. Next: monitor the existing cohort, then reconcile terminal audits and accounting.

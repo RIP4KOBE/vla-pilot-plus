@@ -1,0 +1,3 @@
+Refreshed the disabled manifests; the unchanged graph validator passed. Recorded source `d322548`, verified driver identities, unchanged ledgers, and no active GPU worker.
+
+Next: finite readiness measurement under the existing authorization. Validation, formal evaluation, and required ablation evidence remain incomplete.

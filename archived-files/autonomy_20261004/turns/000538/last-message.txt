@@ -1,0 +1,3 @@
+Integrated the reviewed N34 controller repair as `68c341e`, preserving the 62 passing test results and all accounting history.
+
+No GPU cohort is active. Recorded the handoff for runtime verification and prospective release preparation. Validation, formal evaluation, and required ablation evidence remain outstanding; completion is not claimed.

@@ -1,0 +1,3 @@
+Verified the existing N36 independent review is live; no duplicate launched. Sources and private ledgers remain unchanged: 506 dispatches, 75.6062 GPU-hours.
+
+Saved the hash-bound turn 1592 operational summary. Next step is to reconcile the review when it finishes. Validation, formal evaluation, and required ablation evidence remain incomplete.

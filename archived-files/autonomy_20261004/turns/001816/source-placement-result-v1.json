@@ -1,0 +1,27 @@
+{
+  "schema": "n36-reviewed-source-placement-result-v1",
+  "at": "2026-10-11T05:55:21.782786+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001816/source-placement-authority-v1.json",
+    "bytes": 2642,
+    "sha256": "cd7c0447c58a1b71a696cd5bad23cba3e600e13dce6d6ee10fe5a3f7d33692d3"
+  },
+  "source_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001816/scoped-root-review-v1.json",
+    "bytes": 2976,
+    "sha256": "da04d1fdb0cff00b88e9bc8a145e25bd94cb5d0bb7ed33420344e936856b54b1"
+  },
+  "destination": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "before": "a5b32cdefc0879e98011f86b1559e4250926ba62",
+  "after": "f661a570403e9ff7224d4c35230a0f2b9321a269",
+  "tracked_clean": true,
+  "merge_output": "Updating a5b32cd..f661a57\nFast-forward\n scripts/qd_ed_n36_engineering_r1.py    |  13 ++\n scripts/qd_ed_n36_readiness_prepare.py |  73 ++++++++++-\n scripts/qd_ed_n36_source.py            | 110 +++++++++++++++-\n tests/test_n36_engineering_r1.py       | 106 +++++++++++++++\n tests/test_n36_preparation_binding.py  | 229 +++++++++++++++++++++++++++++++++\n tests/test_n36_readiness_prepare.py    | 221 +++++++++++++++++++++++++++----\n 6 files changed, 719 insertions(+), 33 deletions(-)\n create mode 100644 tests/test_n36_preparation_binding.py\n",
+  "no_new_source_edits": true,
+  "measurement_authorized": false,
+  "gpu_dispatches": 0,
+  "remaining_gates": [
+    "P3 affected disabled graph and independent/root review",
+    "P4 fresh measured readiness identity and reviewed release",
+    "Scientific promotion and original validation/formal/ablation evidence"
+  ]
+}

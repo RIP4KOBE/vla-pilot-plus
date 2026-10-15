@@ -1,0 +1,3 @@
+Adopted the reviewed N34R3 operational repair as `3dc01fb`; 201 focused CPU tests passed. All historical charges and scientific gates remain intact.
+
+No GPU cohort is active. The existing driver continues with runtime regeneration and prospective release verification. Validation, formal evaluation and ablation evidence remain outstanding; the goal is not complete.

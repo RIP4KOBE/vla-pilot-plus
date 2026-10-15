@@ -1,0 +1,5 @@
+Reconciled the completed CPU graph repair and launched independent B5 review (PID 2247369). Source and ledgers remain unchanged.
+
+GPU release and validation/formal/ablation evidence remain outstanding. The driver continues monitoring.
+
+[Operational summary](../autonomy_20261004/turns/001556/operational-summary-v1.json)

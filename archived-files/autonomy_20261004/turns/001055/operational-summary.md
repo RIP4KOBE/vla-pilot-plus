@@ -1,0 +1,9 @@
+# Turn 001055 operational summary
+
+Current frozen source `52a87af0bf11f95b21ce17aba456dc98944d9774`. N35 controller {'pid': 2632351, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 141061885, 'state': 'R', 'ppid': 12479, 'cpu_ticks': 667781}; current children []. Controller boot/start identity matches checkpoint; driver {'pid': 268073, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 97715947, 'state': 'S', 'ppid': 12479, 'cpu_ticks': 40996}. Prior turn completed normally, with no recovery needed. Bound launch, plan, release, authority, continuation and completion-contract hashes verified. Resource isolation ACTIVE/PASS.
+
+STOP present: False; deadline elapsed: False; authorization ends 2026-10-11T11:13:13Z. Owning ledger prefix retained; current ledger 1482 rows / 7395456 bytes / SHA256 5f7d1523fc809de20883f94d2bea919ab52997877d15c359646ed6f21cd099de. Task4 N35 completed valid with success=false, bringing interim matched Dev counts to {'C0': {'valid': 5, 'success': 0}, 'Q0': {'valid': 5, 'success': 0}, 'N34': {'valid': 5, 'success': 0}, 'N35': {'valid': 5, 'success': 0}}. Current pending/running attempts: []. Controller result exists: False. Controller remains alive between cells; no restart warranted by the static startup status. No duplicate dispatch, replay, signals, source/protocol edits, state/ledger changes or foreign-study writes.
+
+Next bounded step: monitor existing controller's next admission or terminal result, then reconcile native audits and accounting before scientific disposition. Validation, formal and required ablation evidence remain incomplete; original goal not met. Frozen thresholds and all historical costs, unknown telemetry and protected reserves preserved.
+
+Reconciliation: end-reconciliation-v1.json SHA256 1ae91d0f042277c3e3a37bee47baadedf8357a8b0e1ebf0eea282eaa451e6dab.

@@ -1,0 +1,44 @@
+{
+  "schema": "n36-reviewed-source-placement-authority-v1",
+  "at": "2026-10-11T05:55:21.731433+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "bytes": 1942,
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c"
+  },
+  "review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001816/scoped-root-review-v1.json",
+    "bytes": 2976,
+    "sha256": "da04d1fdb0cff00b88e9bc8a145e25bd94cb5d0bb7ed33420344e936856b54b1"
+  },
+  "destination": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "before": "a5b32cdefc0879e98011f86b1559e4250926ba62",
+  "after": "f661a570403e9ff7224d4c35230a0f2b9321a269",
+  "operation": "Fast-forward only, no source edits; isolated owning adapter checkout",
+  "gpu_authorized": false,
+  "measurement_authorized": false,
+  "budget_delta_attempts": 0,
+  "budget_delta_gpu_hours": 0,
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "bytes": 7572377,
+      "sha256": "501510963420bacc7b680044d040ca2ba0883a89c907646db70f947b2575d8af"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "bytes": 130771,
+      "sha256": "2b630cc8835ded3d4e8d10af0afbc3f2cc94468837f50537eea8b273c53ce600"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    },
+    "readiness-preparation-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/readiness-preparation-ledger.jsonl",
+      "bytes": 16004,
+      "sha256": "007eef46ade39c05043cd7333279b0fe8bfe27f9734b7e809727300f148f8c81"
+    }
+  }
+}

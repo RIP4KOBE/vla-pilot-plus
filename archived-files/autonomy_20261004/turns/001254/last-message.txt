@@ -1,0 +1,3 @@
+Verified the existing N36R2 CPU executor remains live. Source and private ledgers are unchanged; no duplicate dispatch occurred.
+
+Release remains blocked by a STOP-path binding mismatch pending terminal delivery and review. Operational summary recorded for driver continuation. Validation, formal, and ablation completion remain unproven.

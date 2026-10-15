@@ -1,0 +1,3 @@
+Recorded a prospective repair for N34R4’s runtime-audit failure: five CPU conversion checks and strict attestation passed.
+
+No GPU worker is active. All 447 attempts and 63.730606 GPU-hours remain charged. The driver continues toward a reviewed N34R5 recovery release; validation, formal, and ablation evidence remain incomplete.

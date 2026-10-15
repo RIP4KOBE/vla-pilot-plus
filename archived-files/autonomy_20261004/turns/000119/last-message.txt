@@ -1,0 +1,3 @@
+Integrated the reviewed N32 repair at `289a7dc`. Verified 549 source files and all 156 pinned RDT files.
+
+Driver remains active; no GPU cohort is running. Prior invalid results and charges remain intact. Recorded the operational handoff for a distinct recovery protocol and release. Validation, formal evaluation, and ablation goals remain unmet.

@@ -1,0 +1,70 @@
+{
+  "schema": "n4-protected-evaluation-preparation-source-refs-v1",
+  "scope": "Source and own-study fixed seed-plan metadata only; no native/outcome/current cohort/journal reads",
+  "W_head": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9",
+  "old_R_head": "ed56611dc45d28dbc59ffa172a810a810360dfc1",
+  "references": {
+    "old_protocol": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/experiments/iteration_002_executed_quality/runner/future-evaluation/protocol-v1.md",
+      "sha256": "75766ff02c4722c25f772e647937fc68cf9a3361129791585430115595f0e8fa"
+    },
+    "old_budget_clarification": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/experiments/iteration_002_executed_quality/runner/future-evaluation/budget-entry-clarification-v1.md",
+      "sha256": "9b1ccf9932f8fe2bf637d0e2a4674fae866740424ef523d83d665bac8c14c77c"
+    },
+    "old_README": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/experiments/iteration_002_executed_quality/runner/future-evaluation/README.md",
+      "sha256": "6cc2a35d44142cd8eb4230a878483cba7b55a8cd39bcf8b673c91a4627dd364f"
+    },
+    "old_evaluation_contract": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/scripts/qd_ed_n2_evaluation.py",
+      "sha256": "cdb8d3b3068ccff8c62b796f05ba6da2559134c892c4cd566450e42331367889"
+    },
+    "old_supervisor": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/scripts/qd_ed_n2_evaluate.py",
+      "sha256": "f6ff7e6d3cacc29f879c8255151b741a2f03675a050af5779666461404f6a45d"
+    },
+    "old_report": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/scripts/qd_ed_n2_evaluation_report.py",
+      "sha256": "bfb02ada30d49e01a3300b7146e57393a83d3581afa63c6bd40a207002465ce5"
+    },
+    "seed_plan_metadata": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/data/frozen-seed-plan.json",
+      "sha256": "9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1"
+    },
+    "user_execution_spec": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+    },
+    "N4_protocol": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_004_terminal_population/protocol.md",
+      "sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2"
+    },
+    "N4_profile": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/qd_ed_final/candidate_n4.json",
+      "sha256": "8d421a3c6ec860dee778453225339d776911647480bc2f0394e098a00ded84b2"
+    },
+    "N4_plan": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n4_plan.py",
+      "sha256": "e5a6fd6e084a0748d786a0baec4472507d5ba61384696023b76a0099c05c59e9"
+    },
+    "N4_report": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n4_report.py",
+      "sha256": "d26769d73e43e6b10b8171f6930604bc510d15b26174ca3a767bcdf84a72c2fb"
+    },
+    "N4_auditor": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/audit_decision_evidence.py",
+      "sha256": "4fdc8793d2a4cc4935e571c5db58e38e4ed48aae388f2ef598928a2b322491df"
+    },
+    "production_policy": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_policy_steer.py",
+      "sha256": "edebea0873ca1d3868741c0602d1d7a2d0b92f5b0d0eef848288a10f4e0956ac"
+    },
+    "production_runner": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py",
+      "sha256": "c3ccced7b0535a824a96724f787dfc5cd3636f1de023149082593d35dc975d5b"
+    }
+  },
+  "actual_phase_release": false,
+  "tests_run": 0
+}

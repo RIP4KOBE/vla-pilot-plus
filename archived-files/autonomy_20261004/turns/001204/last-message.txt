@@ -1,0 +1,3 @@
+Verified the active CPU executor and unchanged ledger: 503 attempts, 75.2678 GPU-hours. No GPU cohort is running.
+
+Recovery preparation remains active; its draft flags an identity-contract blocker requiring repair and review before dispatch. Recorded the operational handoff. Validation, formal evaluation, and required ablations remain incomplete.

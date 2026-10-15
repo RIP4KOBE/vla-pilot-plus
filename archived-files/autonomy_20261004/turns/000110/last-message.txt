@@ -1,0 +1,3 @@
+N32 remains active: controller `1136447`, worker `1192975`, source `c427e7ac`. Process identities, frozen bindings and ledger continuity verified; no duplicate dispatched.
+
+Task0 C0 is progressing. Operational summary saved for turn 110. Next step is monitoring its terminal receipt and native audit. Validation, formal and ablation evidence remain outstanding.

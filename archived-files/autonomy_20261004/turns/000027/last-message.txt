@@ -1,0 +1,3 @@
+N31 continues on GPU7 with verified controller/monitor identities and unchanged source `7428ce8a`. Ledger history is intact; no restart or duplicate dispatch occurred.
+
+C0/Q0/N31 each remain at 0/3; task 3 C0 is running. Operational summary saved for turn 27. Next: monitor completion, audit receipts, and assess the frozen promotion gate. Validation/formal/ablation completion remains unproven.

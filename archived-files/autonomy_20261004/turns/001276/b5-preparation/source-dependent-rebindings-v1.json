@@ -1,0 +1,743 @@
+{
+  "schema": "n36r2-source-dependent-rebindings-v1",
+  "changed_commit": "30c6321715df86c5bab623db607bab2811aed56d",
+  "base_commit": "b1d20fc0481721da6ebaab161c5a2ef7c3d50173",
+  "release_enabled": false,
+  "rebindings_performed": false,
+  "precise_source_changes": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001276/b5-preparation/source-change-manifest-v1.json",
+    "bytes": 4805,
+    "sha256": "e914dd8b5b647a2a521635fe0de925030301715637facd6d91e0d12bafd3380b"
+  },
+  "prior_index": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/evidence-index-v1.json",
+    "bytes": 32586,
+    "sha256": "e75c0d00c717198364c8975db47be07b3019aac18466af0a2c05dde764ba5474"
+  },
+  "items": [
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/all40-joins-v1.json",
+        "sha256": "de3e5558685d8e65a0d0d4da625d31db09320d185a6b9da017431e8dd27eb6a5",
+        "bytes": 78105
+      },
+      "action": "Refresh derived joins/config comparison or sanitized import readiness against new source; old evidence stays accepted only for old source."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t00_c0_001250.disabled.json",
+        "sha256": "11f5e5764d2d506d4f04288c41f631de994dc32effed2000aa5ea88648c3aaae",
+        "bytes": 14721
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t00_n34_001250.disabled.json",
+        "sha256": "2a4ce4ae400bb0806e65cda14d7076abf02730178d17bf28500e814323a887d3",
+        "bytes": 15012
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t00_n36_001250.disabled.json",
+        "sha256": "5b71ddf8a186befa7b511c50b4899479ce35070c213492dd6c18f34db41d0ed4",
+        "bytes": 15173
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t00_q0_001250.disabled.json",
+        "sha256": "71bd4cbbdafb35fe27d69a4e8ac443d99cf9352a83e1cd8f1d0789ee4aebff64",
+        "bytes": 14740
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t01_c0_001250.disabled.json",
+        "sha256": "b33ed7cfd1deabea93ac73c6a2f1ca416e8fd990764b3844c7a129790092a166",
+        "bytes": 14721
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t01_n34_001250.disabled.json",
+        "sha256": "ed242b2b0c8181cf95c189f1ae6c6ecfef219bf3642c56b1fce18133974d2ae1",
+        "bytes": 15012
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t01_n36_001250.disabled.json",
+        "sha256": "22e6e832b8ea43f3e5ae263db15ca4625607914b76cad112a7c730d09f8797b5",
+        "bytes": 15173
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t01_q0_001250.disabled.json",
+        "sha256": "0d4a19cf5d0c1674fc20997f075f90493519f04ced534ed504e04b8ef3d8508a",
+        "bytes": 14740
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t02_c0_001250.disabled.json",
+        "sha256": "9d3f54a76c988e1355975b81dd7fd339592bae632fdd3e00c024a0594cb4289e",
+        "bytes": 14719
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t02_n34_001250.disabled.json",
+        "sha256": "b9e8104105403c0f882f15d9d686c8eba067a83424c811a57c3c6e5141acc185",
+        "bytes": 15010
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t02_n36_001250.disabled.json",
+        "sha256": "01cc13db6bd955ae0bfb0e61e84fe1da273667181e338519f85223e13bf835cc",
+        "bytes": 15171
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t02_q0_001250.disabled.json",
+        "sha256": "67baa732bde4d3c35d77fe604d15e3ac3eac151291f82ef91449acf345c953d2",
+        "bytes": 14738
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t03_c0_001250.disabled.json",
+        "sha256": "91e96e2f5bea83366f992c9ae5164721bfb35966ac3cb241366af7781a0ddb0e",
+        "bytes": 14719
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t03_n34_001250.disabled.json",
+        "sha256": "61cc5bd239a443cfaa9a94b36f63327cb4c3445e8622969a360fbbd82693bb02",
+        "bytes": 15010
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t03_n36_001250.disabled.json",
+        "sha256": "38114f572b059b33237f7ddaecf752dd4b5fd1984b43445eb8492bd8cf70683e",
+        "bytes": 15171
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t03_q0_001250.disabled.json",
+        "sha256": "5f5ea4944c6a17353b2939bc2fadc724d69c3e7b5a7b57801aaa2a8ccb7dffc3",
+        "bytes": 14738
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t04_c0_001250.disabled.json",
+        "sha256": "12546627ee1990bb23e214e02c3d45ea099ee2e5cb99a137d73257bf0bfb5057",
+        "bytes": 14721
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t04_n34_001250.disabled.json",
+        "sha256": "3a2c847418a6ade0757f255638e5a257929e2787129540c2be35ca29a799112f",
+        "bytes": 15012
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t04_n36_001250.disabled.json",
+        "sha256": "35adcb582080a64fa39a45ef71383f06d9c5fa241887602a480f50e8e4565d6f",
+        "bytes": 15173
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t04_q0_001250.disabled.json",
+        "sha256": "7f7f65fef451ce2e8e08bc6cef930161d422ac0561a2e20dfd805aaf73611789",
+        "bytes": 14740
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t05_c0_001250.disabled.json",
+        "sha256": "ac068981675993cbcf905f2ed69bd6f7d57be0b6f25e0dde7f5a78827fc89f73",
+        "bytes": 14719
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t05_n34_001250.disabled.json",
+        "sha256": "86f7b78fd8d249aceb54cf6b74aaa3a6a94e243f4bc0bd524bddce6a9ff0955a",
+        "bytes": 15010
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t05_n36_001250.disabled.json",
+        "sha256": "94578c54c230c95f189f04b2717d9c017d030b286659f5a5fecab5174571286c",
+        "bytes": 15171
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t05_q0_001250.disabled.json",
+        "sha256": "1f7a69b11a92fda1a84190ef0bd43a183a9d166d81ba6b85d43e8b848f3f29e8",
+        "bytes": 14738
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t06_c0_001250.disabled.json",
+        "sha256": "163d05d7bfad2652d1287f0bc14c58fbd528be79dfb414867a3f6b0bbc15e3d5",
+        "bytes": 14719
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t06_n34_001250.disabled.json",
+        "sha256": "ce5c0e6461f86c8b9e0ac5faa30f8f10eba8db978c6879a7db4b50154066e844",
+        "bytes": 15010
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t06_n36_001250.disabled.json",
+        "sha256": "94f195daf02b2d5b28bfb0c1277078549db07c9b507d52641fcb25c4d452a7fc",
+        "bytes": 15171
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t06_q0_001250.disabled.json",
+        "sha256": "2746a0cb0e90b60a8eb784ee94f4dfb56d81c0bb462117dc5c6e1cb43e307687",
+        "bytes": 14738
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t07_c0_001250.disabled.json",
+        "sha256": "4d7310b40e8f46070f96e5a6138a1d1ca6fd9e4df6c99404fa2a7293126d82bc",
+        "bytes": 14721
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t07_n34_001250.disabled.json",
+        "sha256": "d7c22e3f303b007606a329e8ad3808e7f9df55dacbef0a607088c83ca924e54e",
+        "bytes": 15012
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t07_n36_001250.disabled.json",
+        "sha256": "6603c9cd8f2faa29cab2d1f4f6c131b448501f98bcc75900e834059d9e184781",
+        "bytes": 15173
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t07_q0_001250.disabled.json",
+        "sha256": "6f61059330ccc149dbbc9c98f6195bbb5897bd94d02ffaf39c6dad79966bbe88",
+        "bytes": 14740
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t08_c0_001250.disabled.json",
+        "sha256": "00bed0c6069ff9520215977e0a5ed5aea7c14d59a6e538b71bc9d386e14fb2d7",
+        "bytes": 14721
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t08_n34_001250.disabled.json",
+        "sha256": "7989211d8c2f3e37dcf5c9148802c1eaebb0f1e0f25e00e023df8e41dbbff4ea",
+        "bytes": 15012
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t08_n36_001250.disabled.json",
+        "sha256": "ee3f8257546e081d21d82a9cda012a92373405fbffd74ec8b152287eacde159a",
+        "bytes": 15173
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t08_q0_001250.disabled.json",
+        "sha256": "cc142ab808f1a804382827a80750a75847efb273c438afbe0f9df424b667ea95",
+        "bytes": 14740
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t09_c0_001250.disabled.json",
+        "sha256": "24673155c3491801ccb50d0b4302032b25604acffb39a151d12a5ed553368a12",
+        "bytes": 14721
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t09_n34_001250.disabled.json",
+        "sha256": "10643a3f958f3d3d59855fdcc72b0a4c8fa0f28f6646d42615980870aca17e51",
+        "bytes": 15012
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t09_n36_001250.disabled.json",
+        "sha256": "e0c9c4556a4eebad50057cecc6fa3e2f3ee41a138b5f48b239037cf3df97d28f",
+        "bytes": 15173
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/contexts/n36r2_dev_t09_q0_001250.disabled.json",
+        "sha256": "fc52e7e25f08959a04bac4e3699c59e3283a8b2dae8ca282bea32ae9b50cf712",
+        "bytes": 14740
+      },
+      "action": "Regenerate only after refreshed disabled plan/manifests; keep release null until external release."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/controller-semantics.isolated.draft-v1.json",
+        "sha256": "05180c5cebabefefefc387e1bd9545619b1f543897c9e976ad5118c59741729c",
+        "bytes": 3048
+      },
+      "action": "Rebind changed runtime/closure references while preserving actual controller source, gains and native semantics."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/full-scientific-config-comparison-v1.json",
+        "sha256": "7edf6ed841e4bf3c93445fbbd34d08b03c03840aa5af59a4dc27f846d15c8a52",
+        "bytes": 22534
+      },
+      "action": "Refresh derived joins/config comparison or sanitized import readiness against new source; old evidence stays accepted only for old source."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/import-origins-v1.json",
+        "sha256": "af7c1b4b81dac399460390b3b6b511f07db3c7a35222f3325283b8bc403fec5e",
+        "bytes": 11844
+      },
+      "action": "Refresh derived joins/config comparison or sanitized import readiness against new source; old evidence stays accepted only for old source."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/plan.complete-disabled-v1.json",
+        "sha256": "3dd6c343fb6e96240ef69da584aa34dfdacec6235945d9e15bdd2886a2b64fa5",
+        "bytes": 416457
+      },
+      "action": "Rebind complete source/runtime/protocol/accounting/manifests/review/routing; remain disabled here."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t00_c0_001250.json",
+        "sha256": "21e2e50ac6fcaf54b8c5fcecd02cd5dd8b68ca5a1af5a3c7422b8688d2ecaa3b",
+        "bytes": 392840
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t00_n34_001250.json",
+        "sha256": "fda2e10e7dfcec4ad740f997d7ed4f0be86361b32c4469f85e7f5daf4bcda8a7",
+        "bytes": 394607
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t00_n36_001250.json",
+        "sha256": "02198768ec270093179b697beadbbb91978862e9622ae02e92e40f9422168c17",
+        "bytes": 395028
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t00_q0_001250.json",
+        "sha256": "f98c7cc8f592af6d46e1cec46f1eb29b3fa0d65e8209a3e4a858e0488b68bf69",
+        "bytes": 392872
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t01_c0_001250.json",
+        "sha256": "39d8584265e1523c03cd2e46e22370eed7dc307824054384b2873a0e26972b55",
+        "bytes": 392840
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t01_n34_001250.json",
+        "sha256": "90d150b0f7bd1f6a89ed97ef82ea4c86818113f238bfd5c4d5cd166a6594035d",
+        "bytes": 394607
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t01_n36_001250.json",
+        "sha256": "c72f749e612c2ffefd1fb1dc90562d7073c3020634fc7beef1080e078a26db15",
+        "bytes": 395028
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t01_q0_001250.json",
+        "sha256": "88b719c5ac2316cec3f8bf57c9f1fd4e2c0334b883eeed55851efd8193775ef9",
+        "bytes": 392872
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t02_c0_001250.json",
+        "sha256": "1f9cc8cf666cc9a57a6aabdc75e0eaf88d08866d28d7900a4d481137528f9e3b",
+        "bytes": 392836
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t02_n34_001250.json",
+        "sha256": "e3389d2f682a2db0585cfab6212c8e5ddabda272834dc66e188d81d7e6bb50ab",
+        "bytes": 394603
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t02_n36_001250.json",
+        "sha256": "cba2b21956aba1aa999cfd5c308723489f00c62010615b7f7a355708603bdc26",
+        "bytes": 395024
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t02_q0_001250.json",
+        "sha256": "45769e50104eae4d78bad1407ec6ffd11bc4f9453f3c133dbbd4cae2e3c635a0",
+        "bytes": 392868
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t03_c0_001250.json",
+        "sha256": "9b2320833917904b21b06015aa3612d870af540712e2d8542947fb5b1315a088",
+        "bytes": 392836
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t03_n34_001250.json",
+        "sha256": "6dacb41e5681383d5c185210fdb5ba20a3699ae10dd2e276947ae6986cbca327",
+        "bytes": 394603
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t03_n36_001250.json",
+        "sha256": "1bd2282886f37ae2c8df8a46d2f94db2c0669b4998d563996cbddebe62378695",
+        "bytes": 395024
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t03_q0_001250.json",
+        "sha256": "ed9e2482de42390775611574fe6f63392fbe79531b53dbb439dbd3c75dc1533f",
+        "bytes": 392868
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t04_c0_001250.json",
+        "sha256": "c3a6642a7d6b5f0450871508af91e8fa74fb674fb5f5406e696a0a6e93e5316f",
+        "bytes": 392840
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t04_n34_001250.json",
+        "sha256": "983e5a0c40eab21993c57718631611c6b4229d24fd270429d9fa03dc98bb18fa",
+        "bytes": 394607
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t04_n36_001250.json",
+        "sha256": "3be8216200045164c9694e4a34e6baca091d51a2a5fa6453493ce41c2f5b5861",
+        "bytes": 395028
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t04_q0_001250.json",
+        "sha256": "ce4a9c22af067ca6da8c8fd1bf12fef82aae27a127b3b9b0974070fda344b4fa",
+        "bytes": 392872
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t05_c0_001250.json",
+        "sha256": "fd23eed4ea82c0b0d9d2479f64fcda8bf2473dfb06c9fb6df676d5eebc9dabf8",
+        "bytes": 392836
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t05_n34_001250.json",
+        "sha256": "9d76a9b0fdb5039ce05750e5b30f2b3b7d2e1b9ff0e3aade13657affc6f19903",
+        "bytes": 394603
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t05_n36_001250.json",
+        "sha256": "257b4be501f4455e972f5b30e701f298cea8266439a87a115dcd6f5c6e685041",
+        "bytes": 395024
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t05_q0_001250.json",
+        "sha256": "88abc1030198ceea93508de35379a6bcff8785cb0777de732c66a79330ace8c8",
+        "bytes": 392868
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t06_c0_001250.json",
+        "sha256": "6fef6aebe5d7e18541142795debf135e9ce973bc149505a6571381b0e6635ccb",
+        "bytes": 392836
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t06_n34_001250.json",
+        "sha256": "86935a3c06f4655ab64bc1265bceef77e6eb1cec86c8a77e4f4f3e5b1c952f84",
+        "bytes": 394603
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t06_n36_001250.json",
+        "sha256": "92205be3166204ff79688e72c41c9981f65ec3b315efd8220e26ec4ee4adc154",
+        "bytes": 395024
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t06_q0_001250.json",
+        "sha256": "71fb3337fd05158fdec7bdacd10b7d52e90bba24ad48d57d2b52d93264fc1854",
+        "bytes": 392868
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t07_c0_001250.json",
+        "sha256": "5453caa5ccf07540a80adc88956d71aa4341ca26297a428b88ef25c1a17264b7",
+        "bytes": 392840
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t07_n34_001250.json",
+        "sha256": "9d130a4fe5e08dc47434b86568e53c184aa72cf1f8bdc6ef86d82b551a7f3884",
+        "bytes": 394607
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t07_n36_001250.json",
+        "sha256": "91f17c2681cd894f51d4e24355aa85ed7881d4c1a957f6321855280a11951159",
+        "bytes": 395028
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t07_q0_001250.json",
+        "sha256": "04ee9bd8010e09adbf5d1c59449dd37fee22c0e5a5609950fe67178fad6a7cbc",
+        "bytes": 392872
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t08_c0_001250.json",
+        "sha256": "8231895aecde8763edc698611914bef87a28718dc9e5bb3a483786ba9f775a43",
+        "bytes": 392840
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t08_n34_001250.json",
+        "sha256": "db751cc16d294952480f9b64800f3c143a80576b505f5139a02066691afc000c",
+        "bytes": 394607
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t08_n36_001250.json",
+        "sha256": "ef328de980cd5b9d5246085c0a28d08d22dfee66dfc5320eef632cc01ab531ae",
+        "bytes": 395028
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t08_q0_001250.json",
+        "sha256": "17d59079c05045129d46aa37c841505144a6578b8fc06d098a8c8c63db8c16a2",
+        "bytes": 392872
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t09_c0_001250.json",
+        "sha256": "94d6f771931638576dd551bd4cba64a84f2157b40c57c89ca158be8aee63fe51",
+        "bytes": 392840
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t09_n34_001250.json",
+        "sha256": "1b05eee5ac13bfcf0b89e1f534bfa267541f46ebfd90d6a052233f6aad138f3e",
+        "bytes": 394607
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t09_n36_001250.json",
+        "sha256": "c7dfcd1a040e8a3af92179f726f6bd2745da2e158b7a23679334bd124aed465a",
+        "bytes": 395028
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/expected/n36r2_dev_t09_q0_001250.json",
+        "sha256": "c60cce7109ec07c633f38f45671207f2ce7743662626d577c412c365e64070bf",
+        "bytes": 392872
+      },
+      "action": "Regenerate exact all40 manifest with changed source/scientific_source inventory and operational bindings; preserve task/seed/profile/config except authorized source/output substitutions."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/prepared/plan.draft.json",
+        "sha256": "4ce10b6b42acbd9081d14330cdbec094df16fdaf57a59d19faf473981eb7079f",
+        "bytes": 415808
+      },
+      "action": "Rebind complete source/runtime/protocol/accounting/manifests/review/routing; remain disabled here."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/runtime-closure.isolated.draft-v1.json",
+        "sha256": "611280160079689e83627493554c41625d45762f94272692f690349b27ed0ed8",
+        "bytes": 1635477
+      },
+      "action": "Refresh changed imported source entries, new admission module, bootstrap/source-execution search-path contract and sanitized environment; redo only affected runtime bindings and later actual-worker observations."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/runtime.isolated.draft-v1.json",
+        "sha256": "8211dd267b3003caeeebb734a9b72a3d49a28239ecaec2a2634f43068bdaacc1",
+        "bytes": 2085296
+      },
+      "action": "Refresh changed imported source entries, new admission module, bootstrap/source-execution search-path contract and sanitized environment; redo only affected runtime bindings and later actual-worker observations."
+    },
+    {
+      "prior": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001268/source-runtime-preparation/source.complete-v1.json",
+        "sha256": "2c1c4d3907ffe237bea32fb98fdff13f62c6b5b2a4689ffaea44970d85417ff7",
+        "bytes": 177459
+      },
+      "action": "New commit, ten changed/new files, source_files_sha256 and identical scientific_source inventory; accepted old source remains historical only."
+    }
+  ],
+  "new_plan": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001276/b5-preparation/plan.unbound-disabled-v1.json",
+  "new_plan_warning": "Its source/runtime/all40 expected-manifest refs intentionally remain OLD and non-admissible. This package is a complete preparation proposal, not refreshed B2/B4 evidence. No stale review is adopted.",
+  "additional_required": [
+    "New independent review matching changed source, runtime, accounting and routing using n36r2-independent-b5-review-v1 schema; b5_review remains null.",
+    "New source adoption decision and owning-state budget authority/accounting amendment adoption by coordinator, with freshly reconciled ledger prefixes; no caps increase.",
+    "New root production review and detached externally hash-bound release for final plan; all contexts regenerated with it only after release.",
+    "Actual per-process before/after runtime/source/native observations do not exist yet and can only be collected during a separately admitted worker."
+  ],
+  "unchanged_anchors": [
+    "Frozen scientific protocol and original protocol review; original accounting anchor/margin; all40 identities/thresholds/zero automatic recoveries; accepted B1/B3 facts; native build and checkpoint bytes remain bound to prior accepted evidence unless their inputs change."
+  ],
+  "no_broad_repetition": "No B2/passive B4 broad suite or broad hashes repeated. Review affected dependency graph and exact source diff; recompute derived hash fields before any release."
+}

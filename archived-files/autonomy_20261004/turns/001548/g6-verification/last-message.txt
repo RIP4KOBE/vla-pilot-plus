@@ -1,0 +1,3 @@
+Completed bounded CPU verification: all 75 native binaries passed hash/path checks; fresh controller source findings and independent B5 inputs are recorded in [report-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001548/g6-verification/report-v1.json).
+
+Controller root approval, independent B5, and readiness remain unresolved. Dispatch veto preserved. `source_adopted=false`, `release_enabled=false`, `goal_complete=false`.

@@ -1,0 +1,3 @@
+Continued N34 on unchanged source `3acfda1`. Reconciled the interrupted CPU validation and restarted the same check with durable output; PID `2830025` remains active.
+
+No GPU cohort dispatched; ledgers and reserves unchanged. Saved the operational handoff. Next: inspect validation, then admission if it passes. Original validation/formal/ablation evidence remains outstanding.

@@ -1,0 +1,3 @@
+Continued monitoring the existing N36 CPU executor; process identities match and private ledgers remain unchanged. Source remains `d3225489`.
+
+Recorded the hash-bound turn summary. Next: reconcile the executor’s terminal outputs and independently review the refreshed graph. GPU release remains disabled; validation/formal/ablation completion is not established.

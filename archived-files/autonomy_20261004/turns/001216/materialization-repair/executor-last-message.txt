@@ -1,0 +1,5 @@
+Materialized 537 pinned source files; strict source verification and all 40 CPU manifest checks passed. Source and ledgers remain unchanged.
+
+Draft remains disabled, unfrozen, and unapproved. Reports document 160 unresolved non-source runtime paths and root prerequisites; no readiness or scientific success claimed.
+
+[report-v1.json](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001216/materialization-repair/report-v1.json) · [report-v1.md](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001216/materialization-repair/report-v1.md)

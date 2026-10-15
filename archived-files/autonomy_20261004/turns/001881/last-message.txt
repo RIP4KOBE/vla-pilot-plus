@@ -1,0 +1,3 @@
+Continued N36 recovery. All four production preflight checks pass; full CPU admission remains running and its process identity is recorded for monitoring.
+
+Source and ledgers are preserved. No GPU dispatch occurred. Operational summary and checkpoint are saved; validation, formal, and ablation evidence remain incomplete.

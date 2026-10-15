@@ -1,0 +1,3 @@
+Continuation recorded. Source remains `289a7dc2`; CPU executor `1296671` is preparing distinct N32R1 recovery identities. Prior charges and protected reserves remain intact; no GPU cohort was launched.
+
+Next: review the repair and freeze the recovery release. Validation, formal, and ablation evidence remain incomplete.

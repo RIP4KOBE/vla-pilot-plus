@@ -1,0 +1,3 @@
+N32R1 CPU recovery delivery is available; 10 focused tests reportedly passed. Ledger history remains intact, and no GPU work was dispatched.
+
+Operational summary saved. Next: review the delivery and prepare the prospective release. Validation, formal evaluation and required ablation evidence remain incomplete.

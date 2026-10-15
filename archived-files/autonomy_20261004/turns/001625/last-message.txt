@@ -1,0 +1,3 @@
+Continued the authorized study. Verified live identities and unchanged ledgers, then launched an independent CPU review of repair `f256fec`.
+
+Review remains active; no GPU dispatched. Operational handoff saved for the driver. Validation, formal evaluation, and required ablations remain incomplete.

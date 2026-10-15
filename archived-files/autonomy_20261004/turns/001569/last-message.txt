@@ -1,0 +1,3 @@
+Reconciled G7 commit `1b8613a` and its corrected CPU test evidence. Private ledgers remain unchanged.
+
+Independent review is running under verified handles; state, checkpoint, and operational summary are recorded. GPU release remains disabled. Validation, formal evaluation, and required ablation evidence remain incomplete.

@@ -1,0 +1,3 @@
+Reconciled repair commit `5da91e1` and launched independent CPU review. Owning state and turn 001334 summary now record its live handles and next steps.
+
+No GPU dispatched; ledger charges remain unchanged. Validation, formal, and required ablation evidence are still incomplete.

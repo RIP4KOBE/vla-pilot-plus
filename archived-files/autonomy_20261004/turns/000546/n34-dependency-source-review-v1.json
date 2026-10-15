@@ -1,0 +1,23 @@
+{
+  "status": "PINNED_DEPENDENCY_SOURCE_VERIFIED_RUNTIME_CLOSURE_PENDING",
+  "provision": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000546/n34-offline-object-provision-result-v1.json",
+    "sha256": "6320468384cde324b69d53b76dcdb4121bd92391b43ce9c6750b80aabbd5f98b"
+  },
+  "dependency_source": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000546/n34-owning-dependency-source-v1.json",
+    "sha256": "c3c85d4f4ff766601e4655ed1a4c4257164b92094ef367cd55b6ed18df062798"
+  },
+  "verified_dependency_files": 682,
+  "initial_fsck_failure": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000546/provision-first-fsck-v1.json",
+    "sha256": "0bff694f6234953521ac94255dfad4b72acb055de5bf858808925671741a4fd9"
+  },
+  "shallow_boundary_amendment": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000546/shallow-boundary-amendment-v1.json",
+    "sha256": "9188c10555d2eef5cb665fe1e68e6e311417d8d583bd972326a82464cb069b2e"
+  },
+  "gpu_dispatched": false,
+  "target_met": false,
+  "next_step": "Complete actual external loaded-runtime closure for N34 in owning checkout, preserving pinned scientific source and strict origin audits. Then prepare finite prospective accounting and 30 fresh manifests/release; GPU dispatch and scientific promotion remain closed until all release gates pass."
+}

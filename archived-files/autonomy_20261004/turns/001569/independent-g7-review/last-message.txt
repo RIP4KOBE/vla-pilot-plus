@@ -1,0 +1,5 @@
+**FAIL** — the receipt verifier accepts substituted engineering source identities with their compiled records missing. Nine focused tests passed; the independent rejection probe failed and is retained.
+
+[Hash-bound report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001569/independent-g7-review/report-v1.json>) includes file/line evidence and minimal repair, graph, and B5 obligations.
+
+No source changes, GPU release, or scientific success granted.

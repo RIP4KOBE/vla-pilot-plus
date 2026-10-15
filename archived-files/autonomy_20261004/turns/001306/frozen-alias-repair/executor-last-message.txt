@@ -1,0 +1,10 @@
+Committed `0b97d569a50032f62f719b1c8bc61323eaeaecb7`.
+
+- Closed two-pair alias proof added; canonical inventory and audits preserved.
+- Complete CPU round trip passed with 1,299 ordinary rows.
+- 132 tests passed, one deselected; cumulative test time 50.18 seconds.
+- Scientific source/settings unchanged.
+
+Reports: [JSON](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001306/frozen-alias-repair/report-v1.json) · [Markdown](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001306/frozen-alias-repair/report-v1.md)
+
+Independent review and production/release gates remain unresolved. No scientific completion claim.

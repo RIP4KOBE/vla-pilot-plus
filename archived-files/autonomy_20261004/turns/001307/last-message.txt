@@ -1,0 +1,3 @@
+Continuation verified and recorded. Existing CPU repair remains active; its latest run reports 132 passed, one deselected, including full-consumer acceptance.
+
+Next: reconcile the final commit/report and independently review before GPU release. Ledgers remain unchanged; validation, formal and ablation goals remain unproven.

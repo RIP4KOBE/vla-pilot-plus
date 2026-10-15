@@ -1,0 +1,5 @@
+N34R6 runtime provenance and 30 fresh manifests passed CPU checks on source `f43de005`. No GPU cohort is active; all charges remain intact.
+
+Next: freeze and validate the prospective release before GPU7 dispatch. Validation, formal evaluation, and required ablation evidence remain outstanding.
+
+[Operational summary](../autonomy_20261004/turns/000669/operational-summary.md)

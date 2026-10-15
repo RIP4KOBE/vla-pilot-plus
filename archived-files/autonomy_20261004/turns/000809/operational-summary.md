@@ -1,0 +1,10 @@
+Turn809 operational summary
+
+Current source: 4b390b3e0c6b708572736939749a0fab0fb7ef37; frozen launch, plan, release and handoff hashes verified.
+Live controller: {'pid': 1322966, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 137471973, 'state': 'S', 'ppid': 12479}. Direct workers: [{'pid': 1923143, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 138875333, 'state': 'S', 'ppid': 1322966}]. Driver/coordinator identities verified. Terminal result present: False.
+Owning ledger prefixes preserved: {"attempt-ledger.jsonl": {"bytes": 7005460, "sha256": "3d3b7fb146750735b8b85cef9e9128e01c50bd0a8e220a242c8c2de598dba58a", "prior_prefix_verified": true}, "gpu-healthcheck-ledger.jsonl": {"bytes": 66651, "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7", "prior_prefix_verified": true}, "gpu-hour-reservation-ledger.jsonl": {"bytes": 401, "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8", "prior_prefix_verified": true}}. Resource isolation ACTIVE/PASS. STOP: False; deadline 2026-10-11T11:13:13Z; passed: False.
+Prior turn808 completed normally; no recovery needed. State/checkpoint source/controller agree.
+Current episode: n34r11_dev_t04_n34_20261008, event dispatched; development counts {"C0": {"valid": 5, "success": 0}, "Q0": {"valid": 5, "success": 0}, "N34": {"valid": 4, "success": 0}}. Current outcome unknown. Runner log mtime: 2026-10-09T06:17:52.088428+00:00.
+Completed bounded identity, hash, ledger-prefix and progress checks. Only turn-local records written; no dispatch, replay, restart, signals, source/plan/state/budget/ledger changes or coordinator locks.
+Next bounded step: monitor existing N34R11 controller to terminal outcome, then reconcile native receipts, matched denominators and retained charges before prospective scientific decisions.
+Unresolved: validation, formal and required ablation evidence do not satisfy original-goal completion contract. No promotion/completion asserted. Driver continues.

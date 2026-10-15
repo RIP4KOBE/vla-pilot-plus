@@ -1,0 +1,5 @@
+N31 continues on GPU7 under the verified controller. Source `7428ce8` and frozen rules remain unchanged.
+
+C0 task 0 recorded a valid failure; Q0 task 0 is running. No promotion or completion is evidenced yet.
+
+Operational summary saved for driver continuation. Next step: monitor the existing cohort and review native audited outcomes.

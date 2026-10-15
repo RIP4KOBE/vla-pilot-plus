@@ -1,0 +1,5 @@
+**PASS_SCOPED_CPU:** F1–F4 closed within the source/CPU review scope; no remaining blocking source defect found. Deployed graph refresh and measured readiness remain pending.
+
+[Review](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001703/preparation-accounting-review/review-v1.json>) includes exact bindings and the bounded next step. Detached SHA256 verified.
+
+`release_enabled=false`, `gpu_authorized=false`, `target_met=false`.

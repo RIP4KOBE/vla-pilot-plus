@@ -1,0 +1,3 @@
+N32’s existing CPU executor remains live; source checks are recorded for commit `34c6f219`. Final delivery is pending before review and GPU release.
+
+N31 remains closed for numeric futility. Private ledgers are intact. Turn 97’s operational summary is saved; validation, formal, and ablation goals remain unmet.

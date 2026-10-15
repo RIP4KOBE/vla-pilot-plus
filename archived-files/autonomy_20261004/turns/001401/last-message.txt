@@ -1,0 +1,3 @@
+Verified authority, live identities and unchanged ledgers. N36R3 remains waiting: GPU7 is occupied by PID 1128889, so no dispatch occurred.
+
+Recorded turn 001401’s hash-bound operational summary. The driver remains active; next step is the frozen healthcheck after GPU7 becomes idle. Validation, formal and ablation completion remain unproven.

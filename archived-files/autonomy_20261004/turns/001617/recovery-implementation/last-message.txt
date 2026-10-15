@@ -1,0 +1,5 @@
+Committed as `f256fec`. CPU tests passed: 46 focused R1, 205 combined engineering, and 97 shared regressions.
+
+Parent source and owning ledger hashes are unchanged. Release remains disabled; coordinator review, adoption, and binding refresh are pending.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001617/recovery-implementation/report-v1.json>) includes evidence hashes and exact follow-up bindings. No scientific success claimed.

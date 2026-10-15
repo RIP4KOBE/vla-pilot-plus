@@ -1,0 +1,8 @@
+B5 decision: **PASS_PREPARATION_REQUIRES_ROOT_RELEASE**.
+
+- [Review artifact](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001556/independent-b5/independent-b5-review-v1.json)
+- [Report and evidence](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001556/independent-b5/report-v1.json)
+
+No preparation blockers found. Scientific rows, gates, and ledgers remain unchanged. Review was not injected into any plan.
+
+G7’s unconditional dispatch veto remains. Controller/source changes require focused review refresh. Native execution and original goal completion remain unproven; release remains disabled.

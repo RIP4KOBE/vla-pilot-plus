@@ -1,0 +1,3 @@
+N36’s existing CPU executor remains live; 29 tests passed, with final implementation review pending. No GPU controller is active, and private ledgers remain unchanged.
+
+Saved turn 001164’s operational summary. Next: reconcile executor completion and independently review before adoption or dispatch. Validation, formal, and ablation evidence remain outstanding.

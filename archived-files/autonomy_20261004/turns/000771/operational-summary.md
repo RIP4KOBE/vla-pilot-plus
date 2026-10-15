@@ -1,0 +1,8 @@
+Turn 771 operational summary
+
+Current source 4b390b3e0c6b708572736939749a0fab0fb7ef37; scientific source 1065f38122379a515b60a9a424f574330405b66f remains frozen.
+Controller PID 1322966 / boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7 / start_ticks 137471973 verified live; worker PID 1681366 / start_ticks 138293934 verified on assigned GPU7 UUID GPU-48473162-9548-1a19-04aa-ea86c5349187 (17757 MiB). A transient controller child exited during observation; no intervention. Driver PID 268073 and current coordinator PID 1682233 identities match.
+Bound handoff and exact authority hashes verified. State/checkpoint agree; current plan, release and launch hashes match. All three prior private ledger prefixes preserved. Isolation ACTIVE/PASS. Prior turn 770 completed normally. STOP absent and authorization deadline 2026-10-11T11:13:13Z not reached.
+N34R11 has 8 valid completed outcomes and 0 successes; task2 N34 is dispatched and running. Controller terminal result absent. Status timestamp is static since launch; live worker and ledger progression establish continuing activity.
+No new dispatch, replay, restart, process signal, scientific/state/ledger changes, or coordinator lock acquisition. Preserved historical charges and protected reserves. Initial checkpoint read was overbroad/truncated; subsequent reads restricted to current fields.
+Next bounded step: monitor existing task2 N34 worker/controller; at cohort termination reconcile native receipts, denominators, accounting and frozen scientific gates before any iteration or promotion. Original validation/formal/required ablation evidence remains incomplete. No completion record created.

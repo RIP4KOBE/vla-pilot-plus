@@ -1,0 +1,15 @@
+# Node 15.6 — bounded CPU preparation
+
+**Decision: a separate engineering adapter is required.** Existing full-plan plus detached-release artifacts cannot honestly express the requested distinct engineering scope. The release has no single-cell selector; its exact identity, 40-cell allocation, accounting hashes, output routing and 41-invocation health ceiling are fixed. The durable first-C0 pause is useful enforcement to preserve, but does not transform full scientific authority into engineering authority.
+
+The concrete disabled specification is [engineering-adapter-spec-v1.json](engineering-adapter-spec-v1.json); bound inputs, source line evidence, accounting and blockers are in [report-v1.json](report-v1.json). No enabled plan or approval artifact was fabricated.
+
+The proposed identity is `N36_ENGINEERING_C0_TASK0_001479`, with one fresh `n36_engineering_t00_c0_001479` attempt and one fresh health identity. Preserve task0/C0 seeds and init hashes, the entire original scientific matrix/rules, all **40 full audit manifests**, and a separate diagnostic manifest. Keep source/runtime/native/controller/B5/accounting/readiness gates. The specification identifies exact adapter, release-audit extraction, bridge, worker, health and lifecycle changes plus focused verification. No original source was edited.
+
+**Arithmetic:** `(1800+40)+(20+40)+200 = 2100` wall seconds. GPU reservation is `1900/3600 = 19/36` hours; the 200-second root overhead is not GPU budget. Retain **506 attempts / 75.60616276674473 GPU-hours**, every historical invalid charge, all three journal prefixes and the **0.23357169027962 GPU-hour admission margin**. At most 507 attempts after this scope; one baseline slot, zero retries. Conservative GPU admission after reservation is `75.83973445702435 + 19/36` hours. Live prefix/snapshot/suffix verification remains a future adoption gate.
+
+Deadline remains **2026-10-11 11:13:13Z**; latest diagnostic start is **10:38:13Z** that day, with fit recalculated before release. The full 75,600-second cohort missed its latest start and remains blocked.
+
+Next: owner assigns a bounded isolated CPU adapter implementation, obtains focused independent review and exact B5/binding refresh, then prospectively adopts separate engineering authority and accounting before any fresh health/episode release. Standing budget approval is present; no user budget request is needed. All required exact bindings and runtime evidence remain unresolved. The old draft has 40 prospective references, zero expected manifests and stale source bindings.
+
+First-C0 staging is scientifically legitimate only as prospectively separated engineering evidence: no matched improvement, promotion, pooled control, replacement cohort or automatic continuation. Valid C0 must durably stop; invalid/unsettled states fail closed. CPU preparation establishes neither DINO/native runtime success nor original-goal completion. Prior scoped source PASS and 93 tests are retained; no tests were rerun, GPU used, or source/owner/ledger/lock/prior artifact changed.

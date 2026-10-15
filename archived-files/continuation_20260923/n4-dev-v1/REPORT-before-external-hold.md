@@ -1,0 +1,13 @@
+# N4 Dev is running under the GPU3-only supervisor
+
+The overall research target is not yet met. N4 has no completed online score at this checkpoint. The first C0/Q0/N4 task0 triplet is released; the supervisor performs fresh source/provider/idle admission and complete native audit between rows. No validation/formal execution is authorized.
+
+The frozen 12-row exploratory Dev matrix is tasks0,3,6,9 in C0/Q0/N4 order, with original matched seeds/init states. N4 changes only the executed candidate from archive global best to the last true canonical population first native-cost argmin. QD archive parents, quality provider, Stage normalization and archive spread, 176 candidates/11 score batches/10 rounds remain fixed.
+
+Integrated source: f6a9ab04c0f184bbe2f8c837b33492835bc8fec9. Core40, native-auditor67 and runner/regression212 checks passed. Independent review13 checks overlaps author tests; two additional real stub-policy dtype integrations passed. These are correctness evidence, not task-effect evidence. The completed Q0 prerequisite has142/155 guided decisions with native nonmembership and a changed actual-prefix command; this is an activity prerequisite only.
+
+Artifacts: continuation_20260923/n4-dev-v1 under the study artifact root. Plan SHA8f9c058cd0e87da1ba8a108c1d778b6da445bba5a87b5c212351d7145770c5ed; prelaunch review SHAa1a6e270dab5921cf6118a666205f695086602a96101360c87176b3bbdc4ae33; first3 release SHA93c1e139029467a49ace9600ced56431c34120428c4f8e0e8b1efb6e7a41e31a. The state file links current owned supervisor and launch/status records.
+
+At prelaunch the shared ledger was112 dispatched, zero in flight,15.739958095529593 GPUh. Preserve original48h/240 limits, baseline20/development100/recovery20, and protected validation60/14h plus formal40/10h. N4 has12 originals allocated6 baseline+6 development, at most4 exact eligible replacements,16 dispatches/8.5h local cap. Current resource admission is recalculated before each full1800+40s window. Earlier health cost is disclosed without recharging. CPU preflight failures and narrow orchestration fixes are preserved; none launched GPU work or changed scientific conditions.
+
+The first3 checkpoint checks correctness, not success or an effect threshold. After that checkpoint, finish all12 accepted scientific cells. Dev promotion requires N4>=2/4 and>=both same-round controls plus all numerical/action/native/source gates, substantive QD parent use and a verified actual-prefix change from the stored archive reference. That reference is not a counterfactual rollout. Earlier N3 remains rejected at0/10 versus C0 3/10 and Q0 1/10; its reports and all failures are preserved.

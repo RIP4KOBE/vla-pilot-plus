@@ -1,0 +1,268 @@
+{
+  "schema": "n4-shared-resource-conflict-review-v1",
+  "created_utc": "2026-09-24T03:19:53.034162+00:00",
+  "scope": "resource metadata and source only; no external scientific outcomes, native payloads, GPU calls, dispatch, locks acquired, or mutable resource changes",
+  "status": "NOT_CURRENTLY_EXECUTABLE",
+  "W_head": "9e5c63632fbd9169e88b6437b50f365eac819d6b",
+  "R3_head_before_review": "489869b475c694bd0f12cf944de9c5719c1128af",
+  "external_source_head": "4170aeb52c029be17bf31b2933ad6e5a62b02cb3",
+  "sources": {
+    "user_execution_spec": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+    },
+    "W_contract": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/ARBOR_CONTRACT.md",
+      "sha256": "2478b31d2d33df9aa7aa321afa6b172aaadb983a720367c8b1df5fd3b9a9627b"
+    },
+    "W_runner": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py",
+      "sha256": "9d1ab138644510edae3eb0c7d3b13e8d1dbfcdb3fc02bd92e232a67d21f993ea"
+    },
+    "external_runner": {
+      "path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/scripts/qd_ed_final_runner.py",
+      "sha256": "6eabb1ce72a8a8d5e6df3a36d6aa7c9ba5a0fa6035110de1d8307bf5ebefb6a6"
+    },
+    "coordination_document": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/RESOURCE_PRIORITY_GPU2_N1U.md",
+      "sha256": "a056d4db8674a9e0fd0ba9e4a6b0c048ad3f502e0d35a3981e33e48937d42024"
+    },
+    "resource_authorization": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/resource/n1u-budget-approval/authorization.json",
+      "sha256": "ebd43aa5ad751aee9de02c956f9da91ffaa1e76312189ebcf07c3a99b682ea55"
+    },
+    "cohort_manifest": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/resource/n1u-budget-approved-cohort/manifest.json",
+      "sha256": "d23b7108060654f4280b944d737e2cde0ea875466849a807aabed431c5a43b47"
+    },
+    "proposal": {
+      "path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/experiments/iteration_001_execution_intent/n1u-budget-reallocation-proposal.md",
+      "sha256": "a2d8ecd7f4b1bc3fdfc899998e4d67da2ec8bfb18dbd524dc7d85b150eaa0560"
+    },
+    "approved_amendment": {
+      "path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/experiments/iteration_001_execution_intent/n1u-budget-reallocation-approved.md",
+      "sha256": "f13ca0cb9b2dd4c6de3d697680a57c30ed0913756cd66badd22f23761fb21bce"
+    },
+    "external_lease_wrapper": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/n1u_capacity_cohort_queue.py",
+      "sha256": "04d96e0ff54978208d152ca148cc79c70b4021b7ddcdcaae93c664b1eaa028cd"
+    },
+    "N4_protocol": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_004_terminal_population/protocol.md",
+      "sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2"
+    },
+    "N4_prerequisite_protocol": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_004_terminal_population/q0-transfer-check-protocol.md",
+      "sha256": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca"
+    },
+    "prior_review": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n3-runner-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-resource-runner-review/memo-v1.md",
+      "sha256": "a3e8fd13da0dabc631b1b9c57057fe8ab7cd695163ab7dcaa8fc53c0f2fd4b29"
+    }
+  },
+  "approval_provenance": {
+    "schema": "qd-ed-user-approved-budget-transfer-v1",
+    "recorded_utc": "2026-09-24T03:01:42.677689+00:00",
+    "approved": true,
+    "recorded_user_instruction": "批准调拨并启动 GPU2 N1U（建议）",
+    "priority": "GPU2 N1U",
+    "old_caps": {
+      "baseline": 20,
+      "development": 100,
+      "validation": 60,
+      "formal": 40,
+      "recovery": 20
+    },
+    "new_caps": {
+      "baseline": 11,
+      "development": 122,
+      "validation": 60,
+      "formal": 40,
+      "recovery": 7
+    },
+    "snapshot": {
+      "dispatched": 110,
+      "aborted": 10,
+      "valid": 91,
+      "invalid": 9,
+      "completed": 100,
+      "running": 0,
+      "gpu_hours_consumed": 15.441015923040702,
+      "by_bucket": {
+        "baseline": 11,
+        "development": 92,
+        "validation": 0,
+        "formal": 0,
+        "recovery": 7
+      },
+      "reserved_attempts": 110,
+      "gpu_hours_by_bucket": {
+        "baseline": 1.0068434539688518,
+        "development": 13.269691965916856,
+        "validation": 0.0,
+        "formal": 0.0,
+        "recovery": 1.1644805031549907
+      },
+      "gpu_healthcheck_hours": 0.2602564145160282,
+      "gpu_healthcheck_inflight": 0
+    },
+    "global_max_attempts": 240,
+    "global_max_gpu_hours": 48,
+    "gpu_hour_reservations": {
+      "validation": 14.0,
+      "formal": 10.0
+    },
+    "attempt_ledger_sha256_at_approval": "d8e494b550fe6c12d772abd35362704943119ca34a963ac73ec0156484e43a38",
+    "original_conversation_independently_inspected": false
+  },
+  "manifest_metadata": {
+    "schema": "qd-ed-resource-cohort-lock-v1",
+    "created_at": "2026-09-24T03:03:15.334029+00:00",
+    "source_commit": "4170aeb52c029be17bf31b2933ad6e5a62b02cb3",
+    "plan_path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-n1u-budget-approved-plan.json",
+    "plan_sha256": "84dedea9a5adbf38d13333faa0a1f843796013c2a73e46653b1b5f93d3400884",
+    "wrapper_sha256": "04d96e0ff54978208d152ca148cc79c70b4021b7ddcdcaae93c664b1eaa028cd",
+    "max_concurrent_gpu_workers": 1,
+    "physical_gpu": 2,
+    "episode_retries_added": 0,
+    "application_retries_added": 0,
+    "final_replacement_cohort": true
+  },
+  "cohort_original_count": 30,
+  "mutable_metadata_snapshot": {
+    "W": {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/research-state.yaml",
+      "budget": {
+        "max_episode_attempts": 240,
+        "max_gpu_hours": 48.0,
+        "reserved": {
+          "baseline": 20,
+          "development": 100,
+          "validation": 60,
+          "formal": 40,
+          "recovery": 20
+        },
+        "dispatched": 111,
+        "gpu_hours_consumed": 15.441015923040702,
+        "gpu_hour_reservations": {
+          "validation": 14.0,
+          "formal": 10.0
+        }
+      },
+      "by_bucket": {
+        "baseline": 11,
+        "development": 93,
+        "validation": 0,
+        "formal": 0,
+        "recovery": 7
+      },
+      "source_caps": {
+        "baseline": 20,
+        "development": 100,
+        "validation": 60,
+        "formal": 40,
+        "recovery": 20
+      }
+    },
+    "external": {
+      "path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/research-state.yaml",
+      "budget": {
+        "max_episode_attempts": 240,
+        "max_gpu_hours": 48.0,
+        "reserved": {
+          "baseline": 11,
+          "development": 122,
+          "validation": 60,
+          "formal": 40,
+          "recovery": 7
+        },
+        "dispatched": 111,
+        "gpu_hours_consumed": 15.627135189757091,
+        "gpu_hour_reservations": {
+          "validation": 14.0,
+          "formal": 10.0
+        }
+      },
+      "by_bucket": {
+        "baseline": 11,
+        "development": 93,
+        "validation": 0,
+        "formal": 0,
+        "recovery": 7
+      },
+      "source_caps": {
+        "baseline": 11,
+        "development": 122,
+        "validation": 60,
+        "formal": 40,
+        "recovery": 7
+      }
+    }
+  },
+  "live_lease_evidence": {
+    "lock_paths": [
+      {
+        "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-runner.lock",
+        "resolved_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-runner.lock",
+        "device": 2051,
+        "inode": 27280417
+      },
+      {
+        "path": "/home/hynx/VLA-Pilot++/.worktree/exp/rdt-qd-ed-gpu6-20260922T063626Z/data/qd-ed-runner.lock",
+        "resolved_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-runner.lock",
+        "device": 2051,
+        "inode": 27280417
+      }
+    ],
+    "holder": {
+      "pid": 2922757,
+      "state": "S",
+      "ppid": 1,
+      "pgid": 2922757,
+      "session_id": 2922757,
+      "proc_start_ticks": 8189893,
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7"
+    },
+    "proc_locks_matching_lines": [
+      "60: FLOCK  ADVISORY  WRITE 2922757 08:03:27280417 0 EOF"
+    ]
+  },
+  "conditional_full_cohort_scenario": {
+    "assumption": "all 30 original N1U cells dispatch from approved starting snapshot; not an outcome prediction",
+    "dispatched": 140,
+    "by_bucket": {
+      "baseline": 11,
+      "development": 122,
+      "recovery": 7,
+      "validation": 0,
+      "formal": 0
+    },
+    "remaining_total_attempts": 100,
+    "remaining_protected_attempts": 100,
+    "remaining_unprotected_attempts": 0
+  },
+  "conclusions": [
+    "Old-cap one-Q0-to-baseline feasibility is conditional and cannot authorize current N4 dispatch.",
+    "W source/state retain old caps; external source/state implement the hash-bound approved transfer. Do not silently synchronize, reinterpret or exploit this conflict.",
+    "Baseline and recovery have zero unused slots under the approved external allocation. N4 original 4+8 or proposed 5+7 mapping cannot fit.",
+    "The true shared lease is occupied by the approved whole-cohort queue; GPU3 idleness does not release shared capacity.",
+    "If external cohort ends early, refresh settled resource metadata; no automatic reversal of approved transfer or new priority follows.",
+    "Any changed cross-session allocation/priority requires an explicit coordinated resource decision before new prospective freeze/admission; preserve all old journal entries and protected reserves."
+  ],
+  "not_read": [
+    "external episode result/log/video/bundle/scientific report",
+    "protected 2026-08-10 design",
+    "Poe or Codex credentials"
+  ],
+  "no_mutation_targets": [
+    "W",
+    "X",
+    "state",
+    "journal",
+    "budget caps",
+    "resource allocation",
+    "external process",
+    "prior review"
+  ],
+  "checks": "stdlib AST/hash/git source and resource/proc metadata verification only; no scientific tests or simulations"
+}

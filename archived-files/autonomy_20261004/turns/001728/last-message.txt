@@ -1,0 +1,3 @@
+Verified live review identities, unchanged ledgers, and clean source `1c10f9d`. The existing CPU review continues; its preliminary finding blocks the proposed binding repair pending final evidence.
+
+Recorded turn 1728’s hash-bound operational summary. Next: reconcile the completed review and address confirmed blockers. Validation, formal evaluation, and required ablations remain incomplete.

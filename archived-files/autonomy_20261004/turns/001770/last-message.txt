@@ -1,0 +1,3 @@
+Repair `a5b32cd` passed scoped review and all 85 CPU tests. State, checkpoint and operational summary are recorded; private ledgers remain unchanged.
+
+Driver identity is valid; no study GPU worker is live. Next: prepare fresh prospective bindings and review them before measurement. Validation, formal evaluation and ablation evidence remain incomplete.

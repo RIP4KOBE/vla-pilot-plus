@@ -1,0 +1,316 @@
+diff --git a/scripts/qd_ed_n36_source.py b/scripts/qd_ed_n36_source.py
+index 3e8f1b4191a4bc43cecfac8c4fff985154fb89a4..27bd01a52d59832c5d4b4cf58e83bd24a826e66b 100644
+--- a/scripts/qd_ed_n36_source.py
++++ b/scripts/qd_ed_n36_source.py
+@@ -141,6 +141,85 @@ def verify_alias(receipt, runtime, runtime_receipt, binding):
+     return {'os.path'}
+ 
+ 
++# Closed CPython pairs. These names are never added to frozen_modules.
++IMPORTLIB_FROZEN_PAIRS = (
++    ('importlib._bootstrap', '_frozen_importlib'),
++    ('importlib._bootstrap_external', '_frozen_importlib_external'),
++)
++
++
++def importlib_alias_claim(runtime, binding, alias, canonical):
++    require((alias, canonical) in IMPORTLIB_FROZEN_PAIRS,
++            'N36 importlib alias pair differs')
++    require(all(name in runtime['modules'] for name in (alias, canonical)),
++            'N36 importlib alias inventory incomplete')
++    # The standard-library location is bound to this interpreter, not discovered
++    # from a potentially substituted module or a matching source hash.
++    path = str(Path(sys.base_prefix).resolve() / 'lib' /
++               ('python%d.%d' % sys.version_info[:2]) / 'importlib' /
++               (alias.rsplit('.', 1)[1] + '.py'))
++    records = {name: copy.deepcopy(runtime['modules'][name]) for name in (alias, canonical)}
++    require(path == str(Path(path).resolve())
++            and records[alias] == records[canonical]
++            and records[alias] == {'path': path, 'sha256': sha(path)},
++            'N36 importlib alias inventory differs')
++    return {'rule': 'n36-frozen-importlib-alias-v1',
++            'binding': copy.deepcopy(binding), 'interpreter': copy.deepcopy(runtime['interpreter']),
++            'alias': alias, 'canonical': canonical, 'module_name': alias, 'package': 'importlib',
++            'file': path, 'spec_name': canonical, 'origin': 'frozen',
++            'loader': '_frozen_importlib.FrozenImporter', 'is_frozen': True,
++            'same_module_object': True, 'importlib_attribute_is_module': True,
++            'records': records}
++
++
++def live_importlib_aliases(runtime, binding):
++    # Reuse the existing live process/interpreter check as well as os.path's
++    # independent identity proof; retained hashes never stand in for identity.
++    require(isinstance(binding, dict), 'N36 importlib alias binding required')
++    live_alias(runtime, binding)
++    claims = {}
++    for alias, canonical in IMPORTLIB_FROZEN_PAIRS:
++        module = sys.modules.get(canonical)
++        spec = getattr(module, '__spec__', None)
++        require(module is not None and sys.modules.get(alias) is module
++                and getattr(importlib, alias.rsplit('.', 1)[1], None) is module
++                and getattr(module, '__name__', None) == alias
++                and getattr(module, '__package__', None) == 'importlib'
++                and getattr(spec, 'name', None) == canonical
++                and getattr(spec, 'origin', None) == 'frozen'
++                and getattr(spec, 'loader', None) is importlib.machinery.FrozenImporter
++                and getattr(module, '__loader__', None) is importlib.machinery.FrozenImporter
++                and _imp.is_frozen(canonical), 'N36 importlib alias live identity differs: ' + alias)
++        claim = importlib_alias_claim(runtime, binding, alias, canonical)
++        require(getattr(module, '__file__', None) == claim['file'],
++                'N36 importlib alias lexical file differs: ' + alias)
++        claims[alias] = claim
++    return claims
++
++
++def verify_importlib_aliases(receipt, runtime, runtime_receipt, binding):
++    # This also enforces the exact external context/runtime/process/phase shape,
++    # receipt binding and current interpreter identity before any exemption.
++    aliases = verify_alias(receipt, runtime, runtime_receipt, binding)
++    claims = receipt.get('frozen_importlib_aliases')
++    require(isinstance(claims, dict)
++            and set(claims) == {a for a, _ in IMPORTLIB_FROZEN_PAIRS},
++            'N36 importlib alias proof coverage differs')
++    for alias, canonical in IMPORTLIB_FROZEN_PAIRS:
++        claim = claims[alias]
++        require(claim == importlib_alias_claim(runtime, binding, alias, canonical)
++                and claim['same_module_object'] is True
++                and claim['importlib_attribute_is_module'] is True
++                and claim['is_frozen'] is True
++                and canonical in receipt['frozen_modules'] and _imp.is_frozen(canonical),
++                'N36 importlib alias proof differs: ' + alias)
++        for name in (alias, canonical):
++            require(runtime_receipt['modules'].get(name) == runtime['modules'][name],
++                    'N36 importlib alias canonical inventory evidence missing/differs: ' + name)
++        aliases.add(alias)
++    return aliases
++
++
+ def attest(root, source, runtime, *, binding=None):
+     state = active()
+     root = Path(root).resolve()
+@@ -203,7 +282,8 @@ def attest(root, source, runtime, *, binding=None):
+         canonical = getattr(spec, 'name', name)
+         require((canonical, path) in known, 'N36 unrecorded Python execution: ' + name)
+     return {'schema': 'n36-source-execution-v2', 'binding': copy.deepcopy(binding),
+-        'interpreter': copy.deepcopy(runtime['interpreter']), 'frozen_aliases': aliases, 'bootstrap': {'path': bootstrap, 'sha256': state.bootstrap_digest},
++        'interpreter': copy.deepcopy(runtime['interpreter']), 'frozen_aliases': aliases,
++        'frozen_importlib_aliases': live_importlib_aliases(runtime, binding), 'bootstrap': {'path': bootstrap, 'sha256': state.bootstrap_digest},
+         'search_path': list(sys.path), 'search_prefix': str(Path(sys.prefix).resolve()),
+         'compiled': records, 'startup_source_only': startup, 'frozen_modules': sorted(set(frozen)),
+         'exceptions': ['interpreter-bound built-in/frozen modules', 'separately inventoried native extensions',
+@@ -245,7 +325,7 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
+         from scripts import qd_ed_n34_source as closure
+         require(binding is not None, 'N36 external runtime binding required')
+         closure.verify_runtime_receipt(runtime, runtime_receipt, binding=binding, after=False)
+-        aliases = verify_alias(receipt, runtime, runtime_receipt, binding)
++        aliases = verify_importlib_aliases(receipt, runtime, runtime_receipt, binding)
+         observed += [row for name, row in runtime_receipt['modules'].items() if name not in frozen and name not in aliases]
+         observed += [e['record'] for e in runtime_receipt['generated_modules'].values()]
+     for row in observed:
+diff --git a/scripts/test_n36_generated_import.py b/scripts/test_n36_generated_import.py
+index 7b089f0eab191f888bf0bde4eae3d3809532966d..2319f554bb5b4502a008388b59ac71017d5c6b6a 100644
+--- a/scripts/test_n36_generated_import.py
++++ b/scripts/test_n36_generated_import.py
+@@ -112,23 +112,12 @@ def child(output):
+     source = {'files': [{'path': str(Path(p).relative_to(ROOT)), 'sha256': h} for p, h in files.items()]}
+     observed = runtime.attest_runtime_receipt(closure, closure['runtime'], binding=binding, after=True)
+     receipt = execution.attest(ROOT, source, closure, binding=binding)
+-    # Preserve the full producer evidence. The focused consumer fixture includes
+-    # only generated provenance and the existing mandatory os.path alias proof;
+-    # it makes no claim about unrelated full-runtime alias compatibility.
+-    full_observed = copy.deepcopy(observed)
+-    full_error = None
+-    try:
+-        execution.verify_receipt(receipt, ROOT, source, closure, runtime_receipt=observed, binding=binding)
+-    except ValueError as exc:
+-        full_error = str(exc)
+-    observed['modules'] = {name: observed['modules'][name] for name in
+-                           (runtime.GENERATOR_NAME, runtime.TEMPLATE_NAME, 'os.path', 'posixpath')}
++    # Unsuppressed full CPU producer-consumer gate; retain every ordinary row.
+     execution.verify_receipt(receipt, ROOT, source, closure, runtime_receipt=observed, binding=binding)
+     output.write_text(json.dumps({'closure': closure, 'source': source, 'runtime': observed,
+-                                 'full_runtime': full_observed, 'full_consumer_error': full_error,
+                                  'execution': receipt, 'binding': binding, 'rejected': rejected}))
+     print(json.dumps({'generated_path': str(path), 'sha256': execution.sha(path), 'rejected': rejected,
+-                      'full_consumer_error': full_error}))
++                      'full_consumer_passed': True, 'ordinary_modules': len(observed['modules'])}))
+ 
+ 
+ def test_real_bootstrap_and_retained_receipt(tmp_path, monkeypatch):
+@@ -160,6 +149,39 @@ def test_real_bootstrap_and_retained_receipt(tmp_path, monkeypatch):
+             next(r for r in bad['compiled'] if r['module'] == runtime.GENERATED_NAME)['path'] += '.wrong'
+         with pytest.raises(ValueError):
+             execution.verify_receipt(bad, ROOT, source, closure, runtime_receipt=bad_observed, binding=binding)
++    # Exercise each new proof through the complete consumer, preserving all
++    # ordinary rows (including unrelated Python execution coverage).
++    assert set(observed['modules']) >= {n for pair in execution.IMPORTLIB_FROZEN_PAIRS for n in pair}
++    for alias, canonical in execution.IMPORTLIB_FROZEN_PAIRS:
++        for fault in ('object', 'loader', 'spec', 'name', 'path', 'hash', 'interpreter',
++                      'context', 'runtime_closure', 'process', 'phase',
++                      'canonical_frozen', 'canonical_evidence', 'missing_proof', 'ordinary_execution'):
++            bad, bad_observed = copy.deepcopy(receipt), copy.deepcopy(observed)
++            claim = bad['frozen_importlib_aliases'][alias]
++            if fault == 'object': claim['same_module_object'] = False
++            elif fault == 'loader': claim['loader'] = 'wrong'
++            elif fault == 'spec': claim['spec_name'] = alias
++            elif fault == 'name': claim['module_name'] = canonical
++            elif fault in ('path', 'hash'):
++                claim['records'][alias]['path' if fault == 'path' else 'sha256'] = 'wrong'
++            elif fault == 'interpreter': claim['interpreter']['sha256'] = '0'*64
++            elif fault in ('context', 'runtime_closure'): claim['binding'][fault]['sha256'] = '0'*64
++            elif fault == 'process': claim['binding']['process']['pid'] += 1
++            elif fault == 'phase': claim['binding']['phase'] = 'runtime_after'
++            elif fault == 'canonical_frozen': bad['frozen_modules'].remove(canonical)
++            elif fault == 'canonical_evidence': del bad_observed['modules'][canonical]
++            elif fault == 'missing_proof': del bad['frozen_importlib_aliases'][alias]
++            else:
++                # Same-path aliases do not become a broad exemption.
++                bad['compiled'] = [r for r in bad['compiled'] if r['module'] != runtime.TEMPLATE_NAME]
++            with pytest.raises(ValueError):
++                execution.verify_receipt(bad, ROOT, source, closure, runtime_receipt=bad_observed, binding=binding)
++        bad_closure, bad_observed = copy.deepcopy(closure), copy.deepcopy(observed)
++        bad_closure['modules']['arbitrary_alias'] = copy.deepcopy(closure['modules'][alias])
++        bad_observed['modules']['arbitrary_alias'] = copy.deepcopy(observed['modules'][alias])
++        with pytest.raises(ValueError, match='N36 module missing executable receipt:'):
++            execution.verify_receipt(receipt, ROOT, source, bad_closure,
++                                     runtime_receipt=bad_observed, binding=binding)
+     assert len(value['rejected']) == 11
+ 
+ 
+diff --git a/tests/test_n36_frozen_alias.py b/tests/test_n36_frozen_alias.py
+index fbf030a8cd675965eb26ef780771d75bc78bf9f3..0b9d79cc69d5f0197f74d9eb7affbb2d86ccd577 100644
+--- a/tests/test_n36_frozen_alias.py
++++ b/tests/test_n36_frozen_alias.py
+@@ -90,6 +90,17 @@ def test_parent_rejects_mismatched_receipts(proof, fault):
+ 
+ def complete_fixture(root, proof):
+     runtime,binding,receipt,observed = proof
++    for alias, canonical in execution.IMPORTLIB_FROZEN_PAIRS:
++        record = {'path': str(Path(sys.modules[canonical].__file__).resolve()),
++                  'sha256': execution.sha(sys.modules[canonical].__file__)}
++        for name in (alias, canonical):
++            runtime['modules'][name] = record.copy()
++            observed['modules'][name] = record.copy()
++        receipt['frozen_modules'].append(canonical)
++    receipt['frozen_modules'].sort()
++    receipt['frozen_importlib_aliases'] = execution.live_importlib_aliases(runtime, binding)
++    receipt['search_prefix'] = str(Path(sys.executable).resolve().parent.parent)
++    receipt['search_path'] = [str(root)]
+     names = ['scripts.qd_ed_n36_worker','scripts.qd_ed_n36_native','scripts.qd_ed_n36_arithmetic',
+              'scripts.audit_decision_evidence','scripts.qd_ed_n36_source', 'ordinary']
+     files = [{'path':n.replace('.','/')+'.py', 'sha256':'c'*64} for n in names]
+@@ -108,7 +119,7 @@ def complete_fixture(root, proof):
+ 
+ 
+ @pytest.mark.parametrize('fault', [None,'ordinary_missing','arbitrary_same_path','equal_hash_substitution'])
+-def test_full_parent_exemption_is_only_os_path(proof,tmp_path,fault):
++def test_full_parent_exemption_is_only_closed_aliases(proof,tmp_path,fault):
+     runtime,binding,receipt,observed=proof
+     source=complete_fixture(tmp_path,proof)
+     if fault=='ordinary_missing': receipt['compiled']=[r for r in receipt['compiled'] if r['module']!='ordinary']
+diff --git a/tests/test_n36_importlib_alias.py b/tests/test_n36_importlib_alias.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..ae0cf203a376129726abd8485769df71dacf6117
+--- /dev/null
++++ b/tests/test_n36_importlib_alias.py
+@@ -0,0 +1,100 @@
++"""Closed importlib alias identity: synthetic CPU evidence grants no release."""
++import copy
++import importlib
++import os
++from pathlib import Path
++import sys
++from types import SimpleNamespace
++
++import pytest
++from scripts import qd_ed_n36_source as execution
++
++
++@pytest.fixture
++def proof():
++    names = ['os.path', 'posixpath'] + [n for pair in execution.IMPORTLIB_FROZEN_PAIRS for n in pair]
++    runtime = {'interpreter': execution.interpreter_identity(), 'modules': {
++        name: {'path': str(Path(sys.modules[name].__file__).resolve()),
++               'sha256': execution.sha(sys.modules[name].__file__)} for name in names}}
++    binding = {'context': {'path': '/synthetic/context', 'sha256': 'a'*64},
++               'runtime_closure': {'path': '/synthetic/runtime', 'sha256': 'b'*64},
++               'process': {'pid': os.getpid(),
++                           'proc_start_ticks': Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19],
++                           'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip()},
++               'phase': 'runtime_before'}
++    receipt = {'schema': 'n36-source-execution-v2', 'binding': copy.deepcopy(binding),
++               'interpreter': copy.deepcopy(runtime['interpreter']),
++               'frozen_modules': sorted(['posixpath'] + [c for _, c in execution.IMPORTLIB_FROZEN_PAIRS]),
++               'frozen_aliases': {'os.path': execution.live_alias(runtime, binding)},
++               'frozen_importlib_aliases': execution.live_importlib_aliases(runtime, binding)}
++    observed = {'binding': copy.deepcopy(binding), 'modules': copy.deepcopy(runtime['modules'])}
++    return runtime, binding, receipt, observed
++
++
++def test_closed_pairs(proof):
++    runtime, binding, receipt, observed = proof
++    assert execution.verify_importlib_aliases(receipt, runtime, observed, binding) == {
++        'os.path', 'importlib._bootstrap', 'importlib._bootstrap_external'}
++    assert all(alias not in receipt['frozen_modules'] for alias, _ in execution.IMPORTLIB_FROZEN_PAIRS)
++
++
++@pytest.mark.parametrize('alias,canonical', execution.IMPORTLIB_FROZEN_PAIRS)
++@pytest.mark.parametrize('fault', ['alias_object', 'canonical_object', 'canonical_missing', 'attribute',
++    'spec', 'spec_name', 'origin', 'loader', 'module_loader', 'name', 'package', 'path', 'lexical_path',
++    'hash', 'canonical_inventory', 'not_frozen', 'interpreter', 'process'])
++def test_live_rejects_substitution(proof, monkeypatch, alias, canonical, fault):
++    runtime, binding, _, _ = proof
++    module = sys.modules[canonical]
++    if fault in ('alias_object', 'canonical_object'):
++        monkeypatch.setitem(sys.modules, alias if fault == 'alias_object' else canonical,
++                            SimpleNamespace(**vars(module)))
++    elif fault == 'canonical_missing': monkeypatch.delitem(sys.modules, canonical)
++    elif fault == 'attribute': monkeypatch.setattr(importlib, alias.rsplit('.', 1)[1], object())
++    elif fault == 'spec': monkeypatch.setattr(module, '__spec__', None)
++    elif fault in ('spec_name', 'origin', 'loader'):
++        spec = copy.copy(module.__spec__)
++        setattr(spec, 'name' if fault == 'spec_name' else fault, 'wrong')
++        monkeypatch.setattr(module, '__spec__', spec)
++    elif fault in ('module_loader', 'name', 'package', 'path', 'lexical_path'):
++        field = {'module_loader': '__loader__', 'name': '__name__', 'package': '__package__',
++                 'path': '__file__', 'lexical_path': '__file__'}[fault]
++        value = str(Path(module.__file__).parent) + '/./' + Path(module.__file__).name if fault == 'lexical_path' else 'wrong'
++        monkeypatch.setattr(module, field, value)
++    elif fault == 'hash': runtime['modules'][alias]['sha256'] = '0'*64
++    elif fault == 'canonical_inventory': del runtime['modules'][canonical]
++    elif fault == 'not_frozen': monkeypatch.setattr(execution._imp, 'is_frozen', lambda n: n != canonical)
++    elif fault == 'interpreter': runtime['interpreter']['sha256'] = '0'*64
++    else: binding['process']['pid'] += 1
++    with pytest.raises(ValueError, match='N36'):
++        execution.live_importlib_aliases(runtime, binding)
++
++
++@pytest.mark.parametrize('alias,canonical', execution.IMPORTLIB_FROZEN_PAIRS)
++@pytest.mark.parametrize('fault', ['same_module_object', 'importlib_attribute_is_module', 'is_frozen',
++    'alias', 'canonical', 'module_name', 'package', 'file', 'spec_name', 'origin', 'loader',
++    'hash', 'path', 'interpreter', 'claim_binding', 'context', 'runtime_closure', 'process', 'phase',
++    'canonical_frozen_missing', 'canonical_runtime_missing', 'canonical_observed_missing',
++    'alias_observed_missing', 'missing_proof', 'extra_proof', 'coordinated_path', 'coordinated_hash'])
++def test_retained_rejects_substitution(proof, alias, canonical, fault):
++    runtime, binding, receipt, observed = proof
++    claim = receipt['frozen_importlib_aliases'][alias]
++    if fault in ('same_module_object', 'importlib_attribute_is_module', 'is_frozen'): claim[fault] = 1
++    elif fault in ('alias', 'canonical', 'module_name', 'package', 'file', 'spec_name', 'origin', 'loader'): claim[fault] = 'wrong'
++    elif fault in ('hash', 'path'): claim['records'][alias]['sha256' if fault == 'hash' else 'path'] = 'wrong'
++    elif fault == 'interpreter': claim['interpreter']['sha256'] = '0'*64
++    elif fault == 'claim_binding': claim['binding']['process']['pid'] += 1
++    elif fault in ('context', 'runtime_closure'): binding[fault]['sha256'] = '0'*64
++    elif fault == 'process': binding['process']['pid'] += 1
++    elif fault == 'phase': binding['phase'] = 'runtime_after'
++    elif fault == 'canonical_frozen_missing': receipt['frozen_modules'].remove(canonical)
++    elif fault == 'canonical_runtime_missing': del runtime['modules'][canonical]
++    elif fault == 'canonical_observed_missing': del observed['modules'][canonical]
++    elif fault == 'alias_observed_missing': del observed['modules'][alias]
++    elif fault == 'missing_proof': del receipt['frozen_importlib_aliases'][alias]
++    elif fault == 'extra_proof': receipt['frozen_importlib_aliases']['other'] = copy.deepcopy(claim)
++    else:
++        field = 'path' if fault == 'coordinated_path' else 'sha256'
++        for records in (runtime['modules'], observed['modules'], claim['records']):
++            for name in (alias, canonical): records[name][field] = 'wrong'
++    with pytest.raises(ValueError, match='N36'):
++        execution.verify_importlib_aliases(receipt, runtime, observed, binding)

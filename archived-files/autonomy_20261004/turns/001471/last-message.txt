@@ -1,0 +1,3 @@
+Continued the owning study. Verified authority, process identities, and unchanged ledgers; launched a bounded CPU-only N36R4 repair.
+
+Operational summary and live handles are recorded. Next: reconcile repair results, independently review, and recheck deadline fit before GPU release. Validation, formal, and ablation evidence remain incomplete.

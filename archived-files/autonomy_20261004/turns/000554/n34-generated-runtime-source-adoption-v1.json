@@ -1,0 +1,43 @@
+{
+  "schema": "n34-generated-runtime-source-adoption-v1",
+  "at": "2026-10-08T17:08:13.645120+00:00",
+  "source_before": "6fdea5f57d5b4cf281786124c46863855f9035c9",
+  "source_after": "9b63eff8b848d1a5d03bf1611503215eb7526261",
+  "implementation_commit": "1eeaddf1416e5a2d6b3ed3ab143f15cf5f85da81",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000553/n34-generated-runtime-terminal-review-v1.json",
+    "sha256": "57d358220628cb248c0d0f57f58e0586b5aff2c6cbbdc042d5ca977c9e08edab"
+  },
+  "identical_integrated_files": [
+    {
+      "path": "scripts/qd_ed_n34_source.py",
+      "sha256": "f0a6f95c93ca693b0293ad7187e1f0ec6f7ddecb527dba944d6d033cdd9dd460"
+    },
+    {
+      "path": "tests/test_n34_generated_runtime.py",
+      "sha256": "c59a44b3bb71518c5183550f29a0dab0e7829f1d39b4c67d5fc2a74a4aa07e90"
+    },
+    {
+      "path": "docs/n34-generated-runtime-binding-v1.md",
+      "sha256": "8902bbb07ada25304e688d3d86443074d33b692ae8dd902e0f48f289ee55c4f1"
+    }
+  ],
+  "validation": "Final executor event confirms exit0 and 60 passed,55 deselected in12.73s. Earlier launcher and teardown failures retained. No unnecessary broad rerun.",
+  "gpu_dispatched": false,
+  "scientific_promotion": false,
+  "next_step": "Complete N34 deployed runtime/lazy-import closure on adopted source, then finite accounting and 30 fresh prospective manifests with detached release. No GPU dispatch until release gates pass; validation/formal require scientific promotion.",
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6659252,
+      "lines": 1326,
+      "sha256": "229878bc3a9d99fd596f363835f4ef1ae3c2757b7f34aa43e0aef985de1aa0f2",
+      "prior_prefix_matches": true
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "lines": 66,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7",
+      "prior_prefix_matches": true
+    }
+  }
+}

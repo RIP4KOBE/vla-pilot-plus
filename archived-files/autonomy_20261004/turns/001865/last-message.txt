@@ -1,0 +1,3 @@
+N36’s CPU admission audit passed all 41 manifests and exited cleanly. Recorded the result in owning state/checkpoint and a hash-bound operational summary; ledgers and frozen source remain unchanged.
+
+Next: readiness release and independent review. No GPU dispatch occurred. Validation, formal, and required ablation evidence remain incomplete.

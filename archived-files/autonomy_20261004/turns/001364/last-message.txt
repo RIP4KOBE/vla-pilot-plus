@@ -1,0 +1,3 @@
+Verified authorization, live driver identity and unchanged ledgers. N36R3 awaits GPU7 availability; a foreign process still occupies it. No dispatch or new charges occurred.
+
+Hash-bound operational summary saved. Next: fresh healthcheck once GPU7 is idle. Validation, formal and required ablation evidence remain incomplete.

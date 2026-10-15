@@ -1,0 +1,8 @@
+Committed `fac4719a3acd5e6ba0ef8d2d0033d7ccfff39c45`.
+
+- Added patch Python sources to operational closure; fail-closed semantics unchanged.
+- Changed only the bridge and focused regression test file.
+- **45 tests passed**; worktree clean.
+- Wrote `report-v1.md` and `implementation-result-v1.json` to the requested directory.
+
+CPU-only validation; no scientific score or release claim. Ready for root review/adoption.

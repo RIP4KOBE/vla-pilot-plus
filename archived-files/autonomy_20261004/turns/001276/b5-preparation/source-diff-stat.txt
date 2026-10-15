@@ -1,0 +1,11 @@
+ scripts/qd_ed_n36_accounting.py  |  13 ++-
+ scripts/qd_ed_n36_bootstrap.py   |  16 +++-
+ scripts/qd_ed_n36_contract.py    |  13 ++-
+ scripts/qd_ed_n36_healthcheck.py |   7 +-
+ scripts/qd_ed_n36_release.py     |  30 ++++++-
+ scripts/qd_ed_n36_runner.py      |  20 ++---
+ scripts/qd_ed_n36_source.py      |  14 ++++
+ scripts/qd_ed_n36_worker.py      |  23 ++++++
+ scripts/qd_ed_n36r2_admission.py | 171 +++++++++++++++++++++++++++++++++++++++
+ tests/test_n36r2_admission.py    | 159 ++++++++++++++++++++++++++++++++++++
+ 10 files changed, 443 insertions(+), 23 deletions(-)

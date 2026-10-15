@@ -1,0 +1,3 @@
+N34R4 stopped as invalid: its post-run audit found unfrozen `OpenGL.arrays.ctypespointers`. Recorded the hash-bound closure and retained all costs: 447 attempts, 63.730606 GPU-hours.
+
+No GPU worker remains. Source and scientific gates are unchanged. The driver continues; next is CPU runtime-inventory diagnosis before a reviewed recovery release. Original-goal evidence remains incomplete.

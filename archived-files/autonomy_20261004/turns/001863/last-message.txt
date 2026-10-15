@@ -1,0 +1,3 @@
+Continued N36 recovery: controller binding review and production validator passed. Saved the hash-bound summary and updated the owning checkpoint; charges remain unchanged.
+
+No experiment controller is live. Next: dependent graph and manifest admission. Validation, formal, and ablation completion remain unproven.

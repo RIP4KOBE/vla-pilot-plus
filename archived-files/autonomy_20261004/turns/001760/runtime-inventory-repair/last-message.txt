@@ -1,0 +1,5 @@
+Completed: artifact input omission, not empty-file filtering. Seven focused CPU checks passed; strict rejection remains intact. Source unchanged and clean; no commit needed.
+
+[report-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001760/runtime-inventory-repair/report-v1.json) records the prospective OpenGL input repair and fresh recovery/release requirements.
+
+Retained charges: **234.03980207443237 seconds, 1 provider call, incomplete telemetry**. No measurement replay or promotion claim.

@@ -1,0 +1,31 @@
+{
+  "schema": "bounded-source-observation-v1",
+  "at": "2026-10-10T11:13:06.459459+00:00",
+  "turn": 1417,
+  "source_before": "4347951a24b63cdb7f0c8a585591d89f1be778ae",
+  "source_observed": "4e632c3bf1afe682d9287a518e531e6f2a6eba42",
+  "status": "PRELIMINARY_DIFF_REVIEW_TERMINAL_REPORT_PENDING",
+  "review": "Inspected committed diff: finite ordered observation/completion timestamps bounded by start, coordinator/weekly ends and current time; non-time evidence equality and identity checks retained. Fixture canonical_worktree and mock signature repaired; adversarial timestamp and non-time mutation coverage added.",
+  "test_evidence": "Executor events report 57 passing cases followed by 3 passing corrected nonfinite exception cases; no independent rerun or final report yet.",
+  "events": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001416/readiness-timestamp-repair/executor-events.jsonl",
+    "bytes": 840109,
+    "sha256": "dde2ea4a48bc3f277006e4048ffe9743c3c6abae713336c561506b0c61fbbbbe"
+  },
+  "adopted": false,
+  "gpu_dispatch_authorized": false,
+  "live_handles": [
+    {
+      "pid": 1430287,
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "start_ticks": 149335877,
+      "state": "S"
+    },
+    {
+      "pid": 1430290,
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "start_ticks": 149335879,
+      "state": "S"
+    }
+  ]
+}

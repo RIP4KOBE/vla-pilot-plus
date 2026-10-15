@@ -1,0 +1,5 @@
+Prepared `n36_readiness_preparation_recovery_001723` drafts, report/hash, manifest, checks, and exact amendment diff.
+
+Graph remains **blocked** by the source-pinned specification and audit freeze requirement. Failed identity and `0.045194898711310494 GPUh` retained; never replayed. STOP/deadline checked. No source edits, GPU activity, adoption, release, or independent-review claim.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001723/readiness-recovery-graph/report-v1.json>) · [Final manifest](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001723/readiness-recovery-graph/outputs-manifest-final-v1.json>)

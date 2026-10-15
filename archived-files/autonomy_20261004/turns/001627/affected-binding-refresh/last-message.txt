@@ -1,0 +1,5 @@
+Saved [report-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001627/affected-binding-refresh/report-v1.json).
+
+**BLOCKED:** immutable runtime bytes pin four outdated source hashes. Independent B5 and root/controller review remain pending.
+
+Prepared 11 disabled bindings, 40 audit manifests, and the R1 manifest/plan. Exact source fast-forward recorded; ledgers and prior artifacts preserved. No GPU dispatch or enabled release.

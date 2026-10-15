@@ -1,0 +1,3 @@
+N34R8 stopped because its runtime audit rejected an unfrozen `dinov2` module. I recorded the hash-bound terminal closure, preserved all charges and ledger history, and verified no cohort remains running.
+
+Next: bounded CPU diagnosis and a reviewed recovery release. The driver remains active; validation, formal evaluation, and ablation completion remain unproven.

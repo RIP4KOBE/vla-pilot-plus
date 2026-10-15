@@ -1,0 +1,5 @@
+Recorded the bounded development-trace review and updated owning state/checkpoint.
+
+Six selected proposals showed 1.7–8.2 cm arrival prediction errors; clipping alone does not explain them. Source, gates and ledger remain unchanged; no GPU dispatch occurred.
+
+Next: constraints-first successor design. Validation, formal and ablation goals remain unmet; the local driver continues.

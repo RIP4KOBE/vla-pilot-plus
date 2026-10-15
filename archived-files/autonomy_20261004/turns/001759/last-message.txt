@@ -1,0 +1,3 @@
+Reconciled the readiness failure: `OpenGL.GL.VERSION` was missing from the frozen runtime inventory. All measurement processes exited; charges and unknown telemetry remain preserved.
+
+Recorded the diagnosis and continuation summary. Next is a bounded inventory repair with fresh recovery provenance. Validation, formal evaluation, and ablation evidence remain incomplete.

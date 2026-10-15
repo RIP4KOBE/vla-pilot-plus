@@ -1,0 +1,7 @@
+# Turn 001074 operational summary
+
+Current source: `52a87af0bf11f95b21ce17aba456dc98944d9774`. N35 frozen launch/plan/release bindings verified; state and checkpoint agree. Controller PID 2632351, boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7, start ticks 141061885 remains live; CPU ticks increased from 825933 to 839627. Controller children: []. Driver PID 268073 and current official gpt-6-astra coordinator identity verified. STOP present: False; deadline 2026-10-11T11:13:13Z, elapsed: False.
+
+Completed: verified bound handoff and exact authority, resource isolation and validation hash, prior normal turn completion, current controller identity, frozen bindings, and owning ledger prefix. Ledger remains 1488 rows / 7425059 bytes. Interim Dev: {"C0": {"valid": 6, "success": 1}, "Q0": {"valid": 6, "success": 0}, "N34": {"valid": 5, "success": 0}, "N35": {"valid": 5, "success": 0}}. In flight: []; terminal result present: False. Controller status is a launch-level marker; CPU activity alone is not scientific progress. No new dispatch, restart, process signal, source edit, state mutation, or protected-result access.
+
+Next bounded step: monitor existing controller; when terminal, reconcile native evidence and accounting before any subsequent decision. Preserve cohort and charges. Validation, formal and required ablation evidence remains unresolved. No completion record or success claim; driver continues authorized coordination.

@@ -1,0 +1,3 @@
+Reconciled completed repair `808e27f`: 217 focused CPU tests reported passing; existing parity failure preserved. Owning state/checkpoint and hash-bound operational summary updated. Ledgers unchanged; no GPU dispatched.
+
+Next: source adoption and full graph verification. Validation, formal evaluation, and required ablation evidence remain incomplete.

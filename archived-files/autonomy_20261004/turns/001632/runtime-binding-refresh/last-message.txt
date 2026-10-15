@@ -1,0 +1,8 @@
+Created [report-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/report-v1.json): **PARTIAL_CLOSURE_BLOCKED**.
+
+- Bound reviewed source; refreshed 40 audit drafts and R1 manifest/plan references.
+- Source, runtime files, native bytes and all 41 scientific configuration recompositions pass.
+- Existing helpers reject the new runtime because reviewed source still pins the old runtime.
+- Controller/root review, independent B5 and fresh readiness remain pending.
+
+Source, placement and ledgers are unchanged. Readiness remains false; no GPU, health or release operations occurred.

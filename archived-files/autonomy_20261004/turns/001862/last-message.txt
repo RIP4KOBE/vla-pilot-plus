@@ -1,0 +1,3 @@
+Reconciled all four preparation runs: eight recorded processes are absent, and all charges, failures, and unknown telemetry remain preserved. Saved hash-bound review and checkpoint records.
+
+Source remains `808e27f`; no GPU dispatch occurred. Next: controller binding review and production graph admission. Validation, formal, and ablation completion remain unproven.

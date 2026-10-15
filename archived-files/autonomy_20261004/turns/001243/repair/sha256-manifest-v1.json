@@ -1,0 +1,47 @@
+{
+  "schema": "node-15.6-repair-sha256-manifest-v1",
+  "commit": "e95745853ec2fbb95e55915e99644a4dc0443261",
+  "source_base": "ca4e6a96d049c7ebb1f302d755883388ddbfdbd8",
+  "files": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n36_cyutility_alias_repair_001243/implementation/scripts/qd_ed_n34_source.py",
+      "sha256": "b2f0532b826868fe035f3dffaf5d136987c9fdfb2a7a5c801975a5b2f502b2f2"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n36_cyutility_alias_repair_001243/implementation/scripts/qd_ed_n36_worker.py",
+      "sha256": "f2b523a3b482a754b17fd5678ccc313bcceadc59dc28be87a5cdee420f8bb7ae"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/variants/n36_cyutility_alias_repair_001243/implementation/tests/test_n36_cyutility_alias.py",
+      "sha256": "116031ce54010afd16e7aa66ff75bfe6e2776e7536ffb890cb640d5766a44f8d"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001243/repair/report-v1.json",
+      "sha256": "da55613b7f35127f877dad4157ee3d80c0056c5a8e9f6fd7bff864042f957249"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001243/repair/report-v1.md",
+      "sha256": "97688aae1c0e758eec725740c993cb520a084424fd88b45d2a1038ed89d59f8a"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001243/repair/cpu-checks-v1.json",
+      "sha256": "7c90d0cd7c8bd469a9575a202da80233f8bd5aa49bf72de65ce6edd71b30b00f"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001243/repair/cpu-checks-v1.log",
+      "sha256": "938dea8722a993b536a0bb166e24ec50b7c6d40a250f2d7f63eaf4dc065c1cb6"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001243/repair/cpu-checks-final-v1.json",
+      "sha256": "f8f595e2e740488b2957cb1fe7661826f80f7dd5b172785e9bc6fe35e4b39da9"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001243/repair/cpu-checks-final-v1.log",
+      "sha256": "3652ff094140788cd97a5ff0442adf765ea54bb4b610c2b43a49883e76325b15"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001243/repair/layout-check-v1.json",
+      "sha256": "5864df965bc537a320cb86960e796fdb6aaecb2dccec4011f0b99aa03c64c205"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "kind": "deployed_source_review",
+  "at": "2026-10-08T16:11:51.549008+00:00",
+  "runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/root-recovery-release-v2/runtime.owning-v1.json",
+    "sha256": "f5e07434eed3af61a71ce9944e2682995656d6069f659f2057860733ebe53513"
+  },
+  "fixture_only": false,
+  "source_commit": "68c341ef6357887c4ae33ddafad00fab17582302",
+  "sources": [
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/osc.py",
+      "sha256": "cfa62a0e719bc53ef0c701efa66f7b3e2272d4fca2150ec73c05bb145eba85cb"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/control_utils.py",
+      "sha256": "1d0f1a063894b1e8289339e223665e14e8aec492c31e9e00f42edea8dc735f43"
+    }
+  ],
+  "findings": [
+    "Fixed impedance parses all six pose channels as delta; use_delta scales before constructing goals.",
+    "Position goal is current world position plus scaled translation; orientation delta is axis-angle converted to a matrix and left-multiplied by current orientation.",
+    "Zero rotation with no explicit set_ori preserves the previous orientation goal; it does not establish physical orientation lock."
+  ],
+  "native_execution_observed": false
+}

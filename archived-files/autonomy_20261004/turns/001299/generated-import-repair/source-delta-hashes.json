@@ -1,0 +1,46 @@
+{
+  "base": "30c6321715df86c5bab623db607bab2811aed56d",
+  "commit": "e4914cb4baf91bbb66f91e25584652eb273b8904",
+  "patch": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001299/generated-import-repair/source-delta.patch",
+    "bytes": 21578,
+    "sha256": "0db6142f309261ed60e6936f9de53cb2bd00aca67d1a843c761976a94f0f72c5"
+  },
+  "files": [
+    {
+      "path": "scripts/qd_ed_n34_source.py",
+      "before_sha256": "b2f0532b826868fe035f3dffaf5d136987c9fdfb2a7a5c801975a5b2f502b2f2",
+      "after_sha256": "be71a7cc706915c7466b641a68d6ece2689857668baf74fa2a58aa8181ca70b4",
+      "after_bytes": 30267,
+      "diff_sha256": "b6ce691c38ab2424fca03b037c031721fbae6c4f26ad464f28bdb7a560c420da"
+    },
+    {
+      "path": "scripts/qd_ed_n36_bootstrap.py",
+      "before_sha256": "fe7d92193675d587c98977ced4a4e4602e1d2c3f4bf068afe22500acba5f52e6",
+      "after_sha256": "b58430c8d7381e13791ad62cc00ce8cb11d7c344192df9729f0d4bdbc306fb64",
+      "after_bytes": 5831,
+      "diff_sha256": "46a82ac1e28c59d015352cffb9cf9b483905a9da052f6a31c6790aa9b190f4a4"
+    },
+    {
+      "path": "scripts/qd_ed_n36_generated.py",
+      "before_sha256": null,
+      "after_sha256": "e1f43e04e4afabba62b81468d8bf68da6cd66d99f3bc074a703ef7bc83d5e523",
+      "after_bytes": 2146,
+      "diff_sha256": "1547d2345156eac08d64727f1eb3f9f772f8a0739a164d238f619e73fb0a817a"
+    },
+    {
+      "path": "scripts/qd_ed_n36_source.py",
+      "before_sha256": "15092a028d5c317eab34c4dc01942d1b135b8e7ff0d44a26300260899f0460a9",
+      "after_sha256": "939ff8ab3b41cb8cbe1b116ff94cc9ba0ac6ada02dccc755b700127ce0a97492",
+      "after_bytes": 14942,
+      "diff_sha256": "2efa02215212a2b16557b069ce61957d269676b2e84ecd6fd5d0d13b9a1921f2"
+    },
+    {
+      "path": "scripts/test_n36_generated_import.py",
+      "before_sha256": null,
+      "after_sha256": "80a0ea69887d0e7c997416c2fb700a1745e0d7f9a1a95b9a45979c818cde85c7",
+      "after_bytes": 9145,
+      "diff_sha256": "b04d4964a53d3ad95c388a50f476710c860dde001fa7cf26f5b5f56ede0b8513"
+    }
+  ]
+}

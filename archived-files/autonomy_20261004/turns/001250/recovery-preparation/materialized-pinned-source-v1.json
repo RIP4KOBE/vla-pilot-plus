@@ -1,0 +1,14 @@
+[
+  {
+    "submodule": "third_party/rdt",
+    "pin": "b896f4dcac8ed1c3fae4a056200db267607f131f",
+    "read_only_database": "/home/hynx/lizhuo/VLA-Pilot++/.git/modules/third_party/rdt",
+    "files": 132
+  },
+  {
+    "submodule": "third_party/lerobot",
+    "pin": "715debf6c1723a28f1a57d4274a8c4ec35b6a417",
+    "read_only_database": "/home/hynx/lizhuo/VLA-Pilot++/.git/modules/third_party/lerobot",
+    "files": 405
+  }
+]

@@ -1,0 +1,8 @@
+**BLOCKED.** Two targeted CPU reproductions confirmed:
+
+- Normal terminated successes fail the N35 audit with `reset mismatch`.
+- Missing terminal-reset evidence is incorrectly accepted.
+
+Authority and source hashes verified. No source/state changes or GPU work occurred.
+
+Reports: [Markdown](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000904/n35-implementation-review/report-v1.md) · [JSON](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000904/n35-implementation-review/report-v1.json).

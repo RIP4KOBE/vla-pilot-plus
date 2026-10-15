@@ -1,0 +1,5 @@
+G1 review **PASS** for `dcd890474b733743414d2a7711069bb0d2b0337e`; 37 focused CPU tests passed. G2–G7 remain unresolved.
+
+[Report written](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001530/owner-route-review/report-v1.json).
+
+No GPU, no adoption, no goal completion.

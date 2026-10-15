@@ -1,0 +1,3 @@
+N36R1 repair exited successfully; artifact hashes verified. No GPU worker is active, and charges remain unchanged.
+
+Recorded the operational handoff. Next: independent repair review, source/accounting adoption, and release validation. Original validation, formal evaluation and ablations remain incomplete.

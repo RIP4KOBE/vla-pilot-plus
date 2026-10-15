@@ -1,0 +1,5 @@
+Continued N36R3 from source `bee9f6a`. Verified authority, driver identity, and unchanged ledgers.
+
+A CPU-only executor is repairing the owner-path admission check; PID `1099021` is verified live. Next: review its repair and tests before GPU release. Validation, formal, and ablation evidence remain incomplete.
+
+Operational handoff recorded for turn `001352`.

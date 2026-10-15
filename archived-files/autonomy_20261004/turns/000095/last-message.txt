@@ -1,0 +1,3 @@
+N32’s CPU executor remains live and identity-verified; its latest test run reports 140 passed. N31 is closed for numeric futility. Source and private ledgers are unchanged.
+
+Turn 95’s operational summary is recorded. Next: review the committed adapter delivery before GPU release. Validation, formal evaluation, and required ablation evidence remain outstanding.

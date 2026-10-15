@@ -1,0 +1,3 @@
+Reviewed source `cd6c969` and accepted the scoped recovery repair for disabled binding preparation. Driver identity verified; no live GPU cohort; all four ledgers unchanged.
+
+Recorded the operational summary. Next: refresh bindings and verify release gates. Validation, formal evaluation, and required ablation evidence remain incomplete.

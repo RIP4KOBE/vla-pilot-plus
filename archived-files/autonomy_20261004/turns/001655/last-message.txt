@@ -1,0 +1,3 @@
+Existing N36 CPU executor remains valid and active, testing repair commit `bacb032`. No duplicate dispatch; private ledgers remain unchanged.
+
+Turn 001655’s hash-bound operational summary is saved. Next: reconcile the executor’s terminal results, then independently review the repair. Validation/formal/ablation completion remains unproven.

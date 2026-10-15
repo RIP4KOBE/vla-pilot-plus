@@ -1,0 +1,5 @@
+**FAIL, bounded source scope:** two confirmed gaps—loaded-code attestation accepts stale bytecode, and archive-origin validation accepts corrupted raw provenance.
+
+Reports: [Markdown](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001167/source-review/report-v1.md) · [JSON](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001167/source-review/report-v1.json)
+
+Source unchanged. No GPU execution. `score=null`, `promotion=false`, `target_met=false`.

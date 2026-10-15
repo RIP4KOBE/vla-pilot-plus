@@ -1,0 +1,3 @@
+Verified authority, live process identities, and unchanged owning ledgers. Existing CPU repair continues; GPU dispatch remains disabled pending completion and independent review.
+
+Saved hash-bound turn 1508 operational summary. Validation, formal evaluation, and ablation completion remain unproven.

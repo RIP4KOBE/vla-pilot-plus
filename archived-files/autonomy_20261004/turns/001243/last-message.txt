@@ -1,0 +1,5 @@
+Continued with a bounded CPU provenance repair in an isolated worktree. Executor handles are verified and recorded for monitoring.
+
+N36R1 remains invalid; all charges and ledger history are preserved. No GPU dispatch occurred. Next: review the repair and tests independently before preparing a prospective recovery release.
+
+Operational summary saved. Validation, formal, and ablation goals remain unmet.

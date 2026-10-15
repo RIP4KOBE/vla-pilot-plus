@@ -1,0 +1,7 @@
+Source: `52a87af0bf11f95b21ce17aba456dc98944d9774`. N35 controller PID 2632351 / start_ticks 141061885 / boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7 is live. Driver PID 268073 / start_ticks 97715947 and coordinator PID 3007093 / start_ticks 141990615 are live. STOP absent; authorization deadline 2026-10-11T11:13:13Z remains open.
+
+Verified handoff and exact authorization hashes, active controller launch/plan/release hashes, state/checkpoint agreement, ACTIVE/PASS isolation, and prior ledger prefix preservation. Prior turn completed normally, requiring no recovery. Task 2 C0 newly completed valid with success=false; nine valid cells are retained across the current N35 cohort, all unsuccessful. At the observation, the controller was between cells: no child process or GPU7 compute process was present, and no controller terminal result existed. This is not evidence of failure and does not authorize duplicate dispatch.
+
+This turn wrote only local monitoring records; frozen source, plan, thresholds, budgets, ledgers and controller were unchanged. Next bounded step: monitor the existing N35 controller for its next admission or terminal record; at termination reconcile native audits, complete/partial denominators, costs and frozen scientific gates. Validation/formal/required ablation evidence remains outstanding; target not met.
+
+Reconciliation: end-reconciliation-v1.json SHA-256 0b774d6a6e649681c13ad9a80dd6c501f3c83e0f26b10345d6cea5b243e799d7.

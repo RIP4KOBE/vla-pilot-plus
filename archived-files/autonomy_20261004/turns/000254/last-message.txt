@@ -1,0 +1,3 @@
+N32R2 controller 1818171 remains live on frozen source `1065f381`. Process identity, frozen bindings, and ledger continuity verified; eight valid development cells have zero successes.
+
+Turn 254 operational summary saved. Next: monitor task 2’s candidate and controller outcome. Validation, formal, and required ablation evidence remain incomplete.

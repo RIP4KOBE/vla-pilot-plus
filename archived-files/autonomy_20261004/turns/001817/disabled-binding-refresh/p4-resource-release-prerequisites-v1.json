@@ -1,0 +1,227 @@
+{
+  "adopted": false,
+  "approved": false,
+  "blocking_result": {
+    "actual_policy_resource_id": null,
+    "function": "scripts.qd_ed_n36_engineering_r1._recovery_specification",
+    "historical_contract_successor": "n36_readiness_preparation_recovery_001771",
+    "historical_reference_only": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001775/recovery-prefix-contract.root-reviewed-disabled-v2.json",
+      "sha256": "0d6b5f6c6e0db4daec713a36b886de18a7c99f531328d0cec4b23f5f2ee8b936"
+    },
+    "reason": "bound recovery policy successor"
+  },
+  "candidate_graph": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/graph.candidate-disabled-v1.json",
+    "sha256": "feee4334aeff7b3739603a09c8aec3bebad5da46e64b6a01d8956ad6d2159d89"
+  },
+  "commands_not_executed": [
+    {
+      "argv": [
+        "/home/hynx/miniconda3/envs/vla-pilot/bin/python3.12",
+        "-B",
+        "-c",
+        "import json,sys; from scripts import qd_ed_n36_engineering_r1 as e, qd_ed_n36_readiness_prepare as p; spec=e.specification(); p.policy(spec); release_ref={'path':sys.argv[1],'sha256':sys.argv[2]}; release=e.read(release_ref); source_ref=release['source_record']; source=e.read(source_ref); p.verify_graph(release,source,e.read(spec['canonical_runtime'])); p.validate_release(release_ref,spec,source,source_ref); print('PASS_GRAPH_AND_PREPARATION_RELEASE_VALIDATION_ONLY')",
+        "<ROOT_REVIEWED_RELEASE_PATH>",
+        "<ROOT_REVIEWED_RELEASE_SHA256>"
+      ],
+      "cwd": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+      "environment": {
+        "GIT_NO_LAZY_FETCH": "1",
+        "GIT_OPTIONAL_LOCKS": "0",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "QD_ED_N36_R1_SPECIFICATION": "<JSON {path,sha256} OF ROOT_FINAL_DISABLED_SPECIFICATION>"
+      },
+      "purpose": "After root supplies all prerequisite values: exact production recovery, graph and release validation; reads complete journals, no dispatch"
+    },
+    {
+      "argv": [
+        "/home/hynx/miniconda3/envs/vla-pilot/bin/python3.12",
+        "-B",
+        "-m",
+        "scripts.qd_ed_n36_readiness_prepare",
+        "--release",
+        "<ROOT_REVIEWED_RELEASE_PATH>",
+        "--release-sha256",
+        "<ROOT_REVIEWED_RELEASE_SHA256>"
+      ],
+      "cwd": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+      "environment": {
+        "GIT_NO_LAZY_FETCH": "1",
+        "GIT_OPTIONAL_LOCKS": "0",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "QD_ED_N36_R1_SPECIFICATION": "<JSON {path,sha256} OF ROOT_FINAL_DISABLED_SPECIFICATION>"
+      },
+      "purpose": "Only after separate root authorization, accounting adoption and successful review; this command performs measurement and is NOT authorized by this packet"
+    }
+  ],
+  "current_candidate_paths": {
+    "acceptance_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/pending-acceptance.json",
+    "accounting_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/pending-accounting.json",
+    "disabled_runtime_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/disabled-runtime.json",
+    "gpu_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/pending-gpu.json",
+    "proof_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/pending-proof.json",
+    "provider_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/pending-provider.json",
+    "release_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/pending-release.json"
+  },
+  "gpu_authorized": false,
+  "identity_rules": {
+    "automatic_retry": false,
+    "kind": "readiness_preparation",
+    "must_differ_from": [
+      "n36_healthcheck_engineering_r1_t00_c0_001616",
+      "n36_engineering_r1_t00_c0_001616",
+      "n36_readiness_preparation_recovery_001771",
+      "n36_readiness_preparation_001651",
+      "n36_readiness_preparation_recovery_001723"
+    ],
+    "must_match": [
+      "policy.resource_id",
+      "readiness_recovery.resource_id",
+      "recovery_prefix_contract.successor.resource_id",
+      "accounting_authority.resource_id",
+      "release.resource_id"
+    ],
+    "occurrences_in_complete_ledgers": {
+      "attempt-ledger.jsonl": 0,
+      "gpu-healthcheck-ledger.jsonl": 0,
+      "gpu-hour-reservation-ledger.jsonl": 0,
+      "readiness-preparation-ledger.jsonl": 0
+    },
+    "unconsumed_at_draft": true
+  },
+  "lineage_value_already_repaired": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001730/recovery-prefix-contract/engineering-r1-spec.canonical-prospective-disabled-v2.json",
+    "sha256": "6eab17b8f8701ccea6cb5e9eb21f787873ec1d79d6612d775446ceb570e8dce1"
+  },
+  "path_requirement": "Root must freeze distinct canonical absolute paths in final policy; pending paths are candidate values only. No release/proof/accounting/measurement files created here.",
+  "provider_measurement_authorized": false,
+  "recovery_requirements": {
+    "current_complete_partition_not_verified": true,
+    "full_ledgers_required_for_budget_snapshots": true,
+    "guard_functions": [
+      "_recovery_contract",
+      "_recovery_capture",
+      "_recovery_partition",
+      "preparation_budget"
+    ],
+    "historical_predecessor_values_only": [
+      {
+        "provider_calls_retained": 1,
+        "resource_id": "n36_readiness_preparation_001651",
+        "retained_charge_gpu_hours": 0.045194898711310494,
+        "retained_charge_gpu_seconds": 162.70163536071777,
+        "telemetry_complete": false
+      },
+      {
+        "provider_calls_retained": 1,
+        "resource_id": "n36_readiness_preparation_recovery_001723",
+        "retained_charge_gpu_hours": 0.06501105613178677,
+        "retained_charge_gpu_seconds": 234.03980207443237,
+        "telemetry_complete": false
+      }
+    ],
+    "historical_subtotal_gpu_hours": 0.11020595484309727,
+    "no_ledger_read_or_adoption_by_this_executor": true,
+    "original_snapshot_reference": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/retained-snapshot-v1.json",
+      "sha256": "67eff7abfa6e08e089ed671874ae1b1d52ef7584b7df33d04235068bb20250d9"
+    },
+    "preserve_original_offsets": {
+      "attempt-ledger.jsonl": {
+        "bytes": 7572377,
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+        "sha256": "501510963420bacc7b680044d040ca2ba0883a89c907646db70f947b2575d8af"
+      },
+      "gpu-healthcheck-ledger.jsonl": {
+        "bytes": 114767,
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+        "sha256": "9dd949d47ffbc3549eaf0ee6638833ec7a6123f7ad71d895a73e45e1f753e793"
+      },
+      "gpu-hour-reservation-ledger.jsonl": {
+        "bytes": 401,
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+        "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+      }
+    },
+    "requirement": "Root must account for every consumed/failed preparation including any later consumption of the old successor; retain raw byte segments and unknown telemetry charges. The two historical predecessor values are not asserted to be the complete current partition.",
+    "root_observed_prefixes_at_authority": {
+      "attempt-ledger.jsonl": {
+        "bytes": 7572377,
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+        "prior_prefix_preserved": true,
+        "sha256": "501510963420bacc7b680044d040ca2ba0883a89c907646db70f947b2575d8af"
+      },
+      "gpu-healthcheck-ledger.jsonl": {
+        "bytes": 130771,
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+        "prior_prefix_preserved": true,
+        "sha256": "2b630cc8835ded3d4e8d10af0afbc3f2cc94468837f50537eea8b273c53ce600"
+      },
+      "gpu-hour-reservation-ledger.jsonl": {
+        "bytes": 401,
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+        "prior_prefix_preserved": true,
+        "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+      },
+      "readiness-preparation-ledger.jsonl": {
+        "bytes": 16004,
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/readiness-preparation-ledger.jsonl",
+        "prior_prefix_preserved": true,
+        "sha256": "007eef46ade39c05043cd7333279b0fe8bfe27f9734b7e809727300f148f8c81"
+      }
+    },
+    "schema": "n36-failed-readiness-recovery-prefix-contract-v2"
+  },
+  "release_enabled": false,
+  "release_fixed_values": {
+    "absolute_gpu_hours": "224",
+    "accounting_authority_schema": "n36-preparation-accounting-authority-v1",
+    "accounting_review_schema": "n36-preparation-accounting-root-review-v1",
+    "adoption_slot": "n36_preparation_accounting_adoption",
+    "automatic_recoveries": 0,
+    "baseline": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001631/runtime.r1.disabled-v1.json",
+      "sha256": "c8af3302446fff0b03d1942ba52c2e892bcf27c7b9a1676e747028aabbb7732f"
+    },
+    "bounds": "max(policy.not_before, measurement.not_before) < issued_at <= now < expires_at <= deadline; 40 < gpu_seconds <= expires_at-issued_at; obey accounting/standing window and available headroom",
+    "cleanup_seconds": 40,
+    "deadline": "2026-10-11T11:13:13+00:00",
+    "episode_authorized": false,
+    "health_authorized": false,
+    "interpreter": {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/bin/python3.12",
+      "sha256": "6004c39d3577b31a592ef0af49b4d928d493a9aee4fdec439e19413586937f97",
+      "version": "3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]"
+    },
+    "max_episode_attempts": 0,
+    "max_health_invocations": 0,
+    "measurement_not_before": "2026-10-10T22:45:08+00:00",
+    "policy_not_before": "2026-10-10T21:55:26.671161+00:00",
+    "provider_calls": 1,
+    "purpose": "readiness_preparation_only",
+    "retained_margin_gpu_hours": "0.23357169027962",
+    "root_review_schema": "n36-preparation-root-measurement-review-v1",
+    "runtime": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/disabled-runtime.json",
+      "sha256": "c7be0cd69ba50a4afa3b9e583f2cea8b4647ec47b11a7bca1d88a0bfd9bd99c4"
+    },
+    "schema": "n36-preparation-measurement-release-v1",
+    "source_cwd": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+    "source_record": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/source-record.json",
+      "sha256": "9bb058ecd5050355bd26f4b2803bbe980be06dceb8cbc3773265877d16fb3fc0"
+    },
+    "stop_authority_from": "scripts.qd_ed_n36_stop.binding() under owning authority; must still be clear"
+  },
+  "resource_created": false,
+  "root_owned_missing_values": [
+    "Fresh nonempty resource_id proven absent from complete attempt, health, reservation and preparation journals",
+    "Fresh readiness_recovery identity reference and v2 recovery_prefix_contract with valid root reconciliation/review and exact accounting partition",
+    "Final disabled specification, plan/audit/manifests and graph review hashes",
+    "Finite issued_at, expires_at and gpu_seconds backed by current complete budget snapshot",
+    "Detached accounting review, preparation accounting authority, owner adoption, detached measurement review and separate finite release"
+  ],
+  "schema": "n36-disabled-preparation-resource-release-prerequisites-v1",
+  "status": "UNASSIGNED_NOT_RELEASED"
+}

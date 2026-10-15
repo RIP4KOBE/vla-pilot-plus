@@ -1,0 +1,3 @@
+Reconciled N36R3’s completed CPU binding refresh and verified 70 artifact hashes. Owning state, checkpoint, and tree now record its terminal status; all charges remain preserved.
+
+Next: controller review and independent B5 before GPU release. Validation, formal evaluation, and required ablations remain incomplete. Operational summary recorded for driver continuation.

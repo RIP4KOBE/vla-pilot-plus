@@ -1,0 +1,3 @@
+Continued the authorized study. N34R11 CPU recovery preparation is running with verified process identities. Source `1151333e` remains unchanged; all ledger charges and protected reserves are preserved.
+
+Next: review the executor’s changes and tests before preparing a GPU release. Validation, formal evaluation and ablation evidence remain outstanding. Operational summary recorded for driver continuation.

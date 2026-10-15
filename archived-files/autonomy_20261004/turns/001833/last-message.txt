@@ -1,0 +1,3 @@
+Continued the owning study and recorded a precise blocker: one frozen runtime hash conflicts with the reviewed source. Composition stopped at the validator; no GPU dispatch occurred, and all charges remain intact.
+
+The checkpoint now directs a prospective runtime correction. Validation, formal evaluation, and required ablations remain incomplete.

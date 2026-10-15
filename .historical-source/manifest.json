@@ -1,0 +1,151 @@
+{
+  "schema": "historical_supplemental_source_v1",
+  "date": "2026-10-15",
+  "source_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+  "files": [],
+  "scope": "Source/configuration/documentation only. Raw videos/model weights/logs/captures and private files remain external. Source symlinks are materialized here and mapped to their observed targets.",
+  "entries_key": "files",
+  "entry_count": 26652,
+  "entry_shards": [
+    {
+      "path": ".historical-source/manifests/part-0000.json",
+      "entries": 1000,
+      "sha256": "3d4cabe8570cb5deaf10382f0a28ac336a2f4e3e9b01e43b1936ed65ea83aaa0"
+    },
+    {
+      "path": ".historical-source/manifests/part-0001.json",
+      "entries": 1000,
+      "sha256": "6be857e91bc568786047cdc3f568c3e8023e8b9e2e8b945a879532259b9affbd"
+    },
+    {
+      "path": ".historical-source/manifests/part-0002.json",
+      "entries": 1000,
+      "sha256": "b61c0a51ba8b1031e90f0dd187d7d5f4c78e6d1b98cad7c9f2d71e5e0245ad2f"
+    },
+    {
+      "path": ".historical-source/manifests/part-0003.json",
+      "entries": 1000,
+      "sha256": "9bd57667162465d081f5ebccc4e86a7ce5174659bdca000953ca105180487fc1"
+    },
+    {
+      "path": ".historical-source/manifests/part-0004.json",
+      "entries": 1000,
+      "sha256": "62266971f3a95cd243b2fd3f9c9d91453df32bf35fd942eb505d04d377012741"
+    },
+    {
+      "path": ".historical-source/manifests/part-0005.json",
+      "entries": 1000,
+      "sha256": "5b7dd91726d5b07c62c0c9b06b3c344e98f76800dd9b8ac1c690f4c7e063fd7b"
+    },
+    {
+      "path": ".historical-source/manifests/part-0006.json",
+      "entries": 1000,
+      "sha256": "1b9133884ae694f2a6970721ef4f6c1bba3e9f1311fce207f73b629e3b825195"
+    },
+    {
+      "path": ".historical-source/manifests/part-0007.json",
+      "entries": 1000,
+      "sha256": "7ca8ff212502b98fa102d0c922f52002f8a47b61f357ca88e13ab5e4292b63db"
+    },
+    {
+      "path": ".historical-source/manifests/part-0008.json",
+      "entries": 1000,
+      "sha256": "2c50133b0066002b144eaef87d08276c931ab41468ab6960c4663ff2a500d5d7"
+    },
+    {
+      "path": ".historical-source/manifests/part-0009.json",
+      "entries": 1000,
+      "sha256": "ed2b207f1db3270b92068c79263095f17a39b79fa4ad55837543fefa1b1cc1e8"
+    },
+    {
+      "path": ".historical-source/manifests/part-0010.json",
+      "entries": 1000,
+      "sha256": "f152138c9478bf582b8fa4954d555fbd77077ca0375079926766f64dd5337962"
+    },
+    {
+      "path": ".historical-source/manifests/part-0011.json",
+      "entries": 1000,
+      "sha256": "e1b4e88cb2e2365c8f377de79b560448bc4115d18cd08b656ee8ca6d404b2261"
+    },
+    {
+      "path": ".historical-source/manifests/part-0012.json",
+      "entries": 1000,
+      "sha256": "95891149f80f3b1d5dd873792d7f567a5fac2c6209ec1ad2a2316ed8738770a3"
+    },
+    {
+      "path": ".historical-source/manifests/part-0013.json",
+      "entries": 1000,
+      "sha256": "6e36d35d74c6648dab7442957a5d240f3e4f8350364519e83b69b9e0b4b571b4"
+    },
+    {
+      "path": ".historical-source/manifests/part-0014.json",
+      "entries": 1000,
+      "sha256": "1daa2a1e4073f3bbc738646fe396c4a1975c76f6d4bd77c8115989a6cc5c3b8a"
+    },
+    {
+      "path": ".historical-source/manifests/part-0015.json",
+      "entries": 1000,
+      "sha256": "4ad2a64bc13626ba40fbc62ca977466d5f69ad1c204e9d52abfae2bdb5152ee1"
+    },
+    {
+      "path": ".historical-source/manifests/part-0016.json",
+      "entries": 1000,
+      "sha256": "29975da02d981373e4736387a4b8a847d83c2f0e92735675d36269ba9d8c3bf4"
+    },
+    {
+      "path": ".historical-source/manifests/part-0017.json",
+      "entries": 1000,
+      "sha256": "98dd4c13966bfa6f87b763bd408e554d12513448b1dfcb51aeb777502eb5ec7f"
+    },
+    {
+      "path": ".historical-source/manifests/part-0018.json",
+      "entries": 1000,
+      "sha256": "31cf0fa44d86106190bfbf38d8d8dfebbbff52281c931e62d31fe6e0716f6d5d"
+    },
+    {
+      "path": ".historical-source/manifests/part-0019.json",
+      "entries": 1000,
+      "sha256": "d80aeb9477cb78eaf86d484a79ae210563bd5216546513c52baffd43e688632b"
+    },
+    {
+      "path": ".historical-source/manifests/part-0020.json",
+      "entries": 1000,
+      "sha256": "79a81f72a02d68ec55481a230cfc74af72829621b1356538dc2a4d92cb8df238"
+    },
+    {
+      "path": ".historical-source/manifests/part-0021.json",
+      "entries": 1000,
+      "sha256": "788133f90293c00cf02990fdfe8c427ae15618cf69c6c38efc8b41dd7eb167cc"
+    },
+    {
+      "path": ".historical-source/manifests/part-0022.json",
+      "entries": 1000,
+      "sha256": "e071017b8f976a62f01ea8e0ea3d9148e4de4d0e38d6f500acb13fe768bc9246"
+    },
+    {
+      "path": ".historical-source/manifests/part-0023.json",
+      "entries": 1000,
+      "sha256": "ba600c3e3f5690066ba6b83805bdebccc2e30657b1c7b2436f50f1a0b4566244"
+    },
+    {
+      "path": ".historical-source/manifests/part-0024.json",
+      "entries": 1000,
+      "sha256": "e7f5e9bbae5b020259df7e5429716230723d237a4a8c692b8802035419f2a5ba"
+    },
+    {
+      "path": ".historical-source/manifests/part-0025.json",
+      "entries": 1000,
+      "sha256": "85028b7f1da7d002721b7651a75ba858a6bda6069d2dadac2907d9f12a54d616"
+    },
+    {
+      "path": ".historical-source/manifests/part-0026.json",
+      "entries": 652,
+      "sha256": "5f16f9f798aed5307d66cb93fec25e3cc91a89ced3539dd34ecec92764df47e1"
+    }
+  ],
+  "publication_redaction": {
+    "policy": "Credential-like values and AWS signed URL queries removed in a separate exported history. Original private archive remains byte-exact. Published commit identities may differ; see main source index for original-to-published mapping.",
+    "published_parent_commit": "6803b58103359b96c56521163c07fedbe9f43e9c",
+    "overlay_redacted_paths": 3
+  }
+}

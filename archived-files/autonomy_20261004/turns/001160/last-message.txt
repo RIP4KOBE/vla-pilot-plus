@@ -1,0 +1,3 @@
+N36 CPU implementation remains active; the executor is correcting two integration-test failures. No GPU controller is running, and all private ledger prefixes remain unchanged.
+
+Operational summary recorded for turn 1160. Next: monitor completion, reconcile final tests and artifacts, then independently review before adoption. Validation, formal, and ablation evidence remain outstanding.

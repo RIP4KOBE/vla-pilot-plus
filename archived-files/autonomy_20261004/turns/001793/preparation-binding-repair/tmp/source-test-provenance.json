@@ -1,0 +1,66 @@
+{
+  "base": "a5b32cdefc0879e98011f86b1559e4250926ba62",
+  "committed_after": "f5fc546e08d41049949bbcbaecb79515c822e0e9",
+  "committed_files": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_r1_001617/implementation_worktree/scripts/qd_ed_n36_readiness_prepare.py",
+      "sha256": "37f29bc5818d2e92e3c926e67e378a9421ca91f911f6d66847f0190cea8d5059",
+      "bytes": 63060
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_r1_001617/implementation_worktree/scripts/qd_ed_n36_source.py",
+      "sha256": "3e7e600c0c98a94fa1d03786ae836d34bf301b81d102ebc8cf155602638779f1",
+      "bytes": 26644
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_r1_001617/implementation_worktree/tests/test_n36_preparation_binding.py",
+      "sha256": "4f3c6a7a020c65de5c64708ce06290f866ff57b6fd78515525f26b572de696d4",
+      "bytes": 13675
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_r1_001617/implementation_worktree/tests/test_n36_readiness_prepare.py",
+      "sha256": "0361b28c3191e3c46c65a7212136527f6100f2695662a86327b800e0b1145f9f",
+      "bytes": 74282
+    }
+  ],
+  "focused_run_files": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001793/preparation-binding-repair/tmp/focused-run-source/scripts/qd_ed_n36_readiness_prepare.py",
+      "sha256": "37f29bc5818d2e92e3c926e67e378a9421ca91f911f6d66847f0190cea8d5059",
+      "bytes": 63060
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001793/preparation-binding-repair/tmp/focused-run-source/scripts/qd_ed_n36_source.py",
+      "sha256": "1f4b3adca8dbc3462b5212d70efd6df22d788c3df0bc09760fb93128f4146a69",
+      "bytes": 26357
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001793/preparation-binding-repair/tmp/focused-run-source/tests/test_n36_preparation_binding.py",
+      "sha256": "648a05431e75675f68b95ee667a60f94ef4b8b81991e17cc0eb191cdeafd6391",
+      "bytes": 13033
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001793/preparation-binding-repair/tmp/focused-run-source/tests/test_n36_readiness_prepare.py",
+      "sha256": "0361b28c3191e3c46c65a7212136527f6100f2695662a86327b800e0b1145f9f",
+      "bytes": 74282
+    }
+  ],
+  "unchanged_regression_tests": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_r1_001617/implementation_worktree/tests/test_n36_importlib_alias.py",
+      "sha256": "e454d8bc6200ea453829a40298ccbcc66c11b75d14cf38c60c81d0ce03942679",
+      "bytes": 6447
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_r1_001617/implementation_worktree/tests/test_n36_frozen_alias.py",
+      "sha256": "63da27398e1f987f409b18f3d3f459232de11e3dee68da284ae5bc521ca7340e",
+      "bytes": 14859
+    }
+  ],
+  "interpreter": {
+    "path": "/home/hynx/miniconda3/envs/vla-pilot/bin/python3.12",
+    "sha256": "6004c39d3577b31a592ef0af49b4d928d493a9aee4fdec439e19413586937f97",
+    "bytes": 31448728
+  },
+  "working_tree_clean": true
+}

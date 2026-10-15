@@ -1,0 +1,1084 @@
+{
+  "manifests": [
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/00.json",
+        "sha256": "d34ffc1a8b6ff7156e84f1e98a1cbd42f2f87ad83d2a8f9fdf8341d41ba99e7e"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/00.json",
+        "sha256": "4ae056a73a09245b114372989bb16a64b75fa9dfeb1186c49cb1a443035e8a7e"
+      },
+      "row": {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "budget_bucket": "baseline",
+        "env_seed": 1969522881,
+        "episode_key": "n36r4_dev_t00_c0_001467",
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1969522881,
+        "profile": "C0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 0,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/01.json",
+        "sha256": "74aece23803ee151dde69c98d4acfd569ef574c64f3d2eb618f9ac9cfd4ea829"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/01.json",
+        "sha256": "b943b64a6d71a3640d0bd6d0e672036fdd5e510d8356238456da75b94fa3335b"
+      },
+      "row": {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "budget_bucket": "development",
+        "env_seed": 1969522881,
+        "episode_key": "n36r4_dev_t00_q0_001467",
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1969522881,
+        "profile": "Q0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 0,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/02.json",
+        "sha256": "cfebe11737774ef2922dc28a87c514e6b70921ce8a2bc816a4da41b0f6f04528"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/02.json",
+        "sha256": "928025c0caa8a32a79d8619d0022854717ca2c0aec84304314f12412833f8fc9"
+      },
+      "row": {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "budget_bucket": "development",
+        "env_seed": 1969522881,
+        "episode_key": "n36r4_dev_t00_n34_001467",
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1969522881,
+        "profile": "N34",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 0,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/03.json",
+        "sha256": "5e223c3a1b6f5db27fa62d2745b623445a181b3140dbe44ff56526cd0c1abca0"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/03.json",
+        "sha256": "54ebb15cfdd52d5a14e1566b477d9bb7471eaa467abb95973e521d77a0af06c4"
+      },
+      "row": {
+        "bddl_sha256": "a5f887cc4ccf489cd152b36cc25894519c98609b833dd26c24498de6e07dfd52",
+        "budget_bucket": "development",
+        "env_seed": 1969522881,
+        "episode_key": "n36r4_dev_t00_n36_001467",
+        "init_file_sha256": "f69f911bcf00ff138a07a104e537cd06714bebd1b5b3f2879c7f8aae5fa5310c",
+        "init_index": 0,
+        "init_row_sha256": "48b759458f7f8b6c4ee24238038db71ab908360b36e58729d053daf269d544ae",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1969522881,
+        "profile": "N36",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 0,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/04.json",
+        "sha256": "41b86044f07968eca3969ef581c817e105adc0d86cd335d396a14614f700d6a7"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/04.json",
+        "sha256": "796d1e8059e4ae14d3f7a772a0d8dd6a55c13209626169640b0464525546069c"
+      },
+      "row": {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "budget_bucket": "baseline",
+        "env_seed": 1661846292,
+        "episode_key": "n36r4_dev_t01_c0_001467",
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1661846292,
+        "profile": "C0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 1,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/05.json",
+        "sha256": "4cfe055f771fd77b66947c4dca6bdb9820e1c06619d4342a293fe08b128899b0"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/05.json",
+        "sha256": "71de7eda509906ccea57bb5160736034bba31f6246ccf86ab080d157319fe46f"
+      },
+      "row": {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "budget_bucket": "development",
+        "env_seed": 1661846292,
+        "episode_key": "n36r4_dev_t01_q0_001467",
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1661846292,
+        "profile": "Q0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 1,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/06.json",
+        "sha256": "cb6b1188d2726bb186719e4ffcaabb1d30bf1461476b63803f31ea9994cd3244"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/06.json",
+        "sha256": "9a85c3bd8a9db554f5256001398ca34cf91e7059c755fcfefd4c55282b4581bc"
+      },
+      "row": {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "budget_bucket": "development",
+        "env_seed": 1661846292,
+        "episode_key": "n36r4_dev_t01_n34_001467",
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1661846292,
+        "profile": "N34",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 1,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/07.json",
+        "sha256": "badac6794a494d7d13d820b91e53bd53a05c482166305e568763763c4076cbc7"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/07.json",
+        "sha256": "b2e667c452983b38c91e7d96cf4bdad5566622ccac34792fcb6c1f3dcfd6ff7b"
+      },
+      "row": {
+        "bddl_sha256": "358a2ad6d3a3367c013260a7c90b84311392de768459c3e956e226534abce575",
+        "budget_bucket": "development",
+        "env_seed": 1661846292,
+        "episode_key": "n36r4_dev_t01_n36_001467",
+        "init_file_sha256": "b5b96980f857e2ab18ce8e2da832f2474700f2f8c439ab5363bf6cd566c8a303",
+        "init_index": 0,
+        "init_row_sha256": "2c0b399c52b759187483bbc0473bad47b366f3e5a3816f8ce98a5d37640a1725",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1661846292,
+        "profile": "N36",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 1,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/08.json",
+        "sha256": "9aaec5f1371fc95c47ce7493cde97ddb1e1e4d41849e3eaa284cd9d3b2e0f95a"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/08.json",
+        "sha256": "3d1b3cbec575523384a2d267f344d19ea152692f49bf3bdf8391b4a0ddfdb139"
+      },
+      "row": {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "budget_bucket": "baseline",
+        "env_seed": 496956836,
+        "episode_key": "n36r4_dev_t02_c0_001467",
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 496956836,
+        "profile": "C0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 2,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/09.json",
+        "sha256": "609d6227eb6c324b4829470085e423bf9f37fe6de2bb0bc40e2826de3fa7aa4f"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/09.json",
+        "sha256": "23298f891527a56bbf01b464289fed2007b17c6fc9e88c861f13b143aa2dcea7"
+      },
+      "row": {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "budget_bucket": "development",
+        "env_seed": 496956836,
+        "episode_key": "n36r4_dev_t02_q0_001467",
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 496956836,
+        "profile": "Q0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 2,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/10.json",
+        "sha256": "608ef0f37787a994b7941d808100444ea98931acdf74b44d47c33aaf99d85588"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/10.json",
+        "sha256": "eb22a4de4145b15fdee1bb46a997ff06d1304833095ae7424e544ba7dfaa4bd8"
+      },
+      "row": {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "budget_bucket": "development",
+        "env_seed": 496956836,
+        "episode_key": "n36r4_dev_t02_n34_001467",
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 496956836,
+        "profile": "N34",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 2,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/11.json",
+        "sha256": "c1d083cd2da1495ba71b97cc319195fcac641253bbd6202dad0900394d8f209f"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/11.json",
+        "sha256": "8de153446327099d82e1514f822400e79f7ada195c276e977ae2f528f01ddf29"
+      },
+      "row": {
+        "bddl_sha256": "62c9ef35beda8c2bcc79a20ed02303f0a86e991f9ce13c0932031f897cacef86",
+        "budget_bucket": "development",
+        "env_seed": 496956836,
+        "episode_key": "n36r4_dev_t02_n36_001467",
+        "init_file_sha256": "3f7dcd34f32391f4def6064b5aad135cd13ddfecffa46f0949373ebac5ed7c45",
+        "init_index": 0,
+        "init_row_sha256": "f77a5f5866952552461f703b40f853add2c13d75cbd54cd8fbbaae641db165c1",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 496956836,
+        "profile": "N36",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 2,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/12.json",
+        "sha256": "5148786ea9f5dfcdfb27576d452edfeb3ef3ef78471bc51b6d4f478c0e6dc8c6"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/12.json",
+        "sha256": "fa1806c79bf80e8c2ef449ceeadba9f72fcfd9450e6cd9c4cc3419d571d6c7ba"
+      },
+      "row": {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "budget_bucket": "baseline",
+        "env_seed": 851784825,
+        "episode_key": "n36r4_dev_t03_c0_001467",
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 851784825,
+        "profile": "C0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 3,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/13.json",
+        "sha256": "529734ddfc5b8ae05a167b521ff63ffb244d10a4717dfe5986ba9ff99e38831b"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/13.json",
+        "sha256": "cca21f10281a512bf278f924940b6b93e951f6fcadb001d8d55f3efc1ba9c61e"
+      },
+      "row": {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "budget_bucket": "development",
+        "env_seed": 851784825,
+        "episode_key": "n36r4_dev_t03_q0_001467",
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 851784825,
+        "profile": "Q0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 3,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/14.json",
+        "sha256": "a55001945f9cda9aa3583334f768ce14450d36b7df635a831467106e441d6ebd"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/14.json",
+        "sha256": "9df88b616bea1ea875470e5105935632803853614cae0e65df6b185519328dc0"
+      },
+      "row": {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "budget_bucket": "development",
+        "env_seed": 851784825,
+        "episode_key": "n36r4_dev_t03_n34_001467",
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 851784825,
+        "profile": "N34",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 3,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/15.json",
+        "sha256": "afb3e27938c53e4d1d4bd254e1e7223b80d3c8bbd22fc756fcf60a6e96fe1a44"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/15.json",
+        "sha256": "f631d0fd50102f8659f7f6644a74011c6b64e8a0e1b2bfe10b4f447b443ee272"
+      },
+      "row": {
+        "bddl_sha256": "86b689f3e6e16b6472574e6e3f7a401d4d591b398a1f025353da318355e68e16",
+        "budget_bucket": "development",
+        "env_seed": 851784825,
+        "episode_key": "n36r4_dev_t03_n36_001467",
+        "init_file_sha256": "0c35b6c7ed64b36f9ecd4e30c9daa3e0e08e9088e7f839f9afda644a2abebd6f",
+        "init_index": 0,
+        "init_row_sha256": "faa3e635dd29229f763f8748098f92543b7f680fb4212e7036ec49ba55d57c93",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 851784825,
+        "profile": "N36",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 3,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/16.json",
+        "sha256": "ede796221542dcd95677b63c851c804a0cb503ebc3004512424035a85a8e69b0"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/16.json",
+        "sha256": "d7af2bba578f85ce727bfa61faee3a429c0bc2b097b835bbf36b74108d03d35b"
+      },
+      "row": {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "budget_bucket": "baseline",
+        "env_seed": 1144935104,
+        "episode_key": "n36r4_dev_t04_c0_001467",
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1144935104,
+        "profile": "C0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 4,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/17.json",
+        "sha256": "2839d078861c237bd3e40bc1169bd555f7a14f4917cba628d1a244f79a143a8b"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/17.json",
+        "sha256": "e95fd263681d7f295c53fe01c981f686b28b87e104682a4446b9a14436abec74"
+      },
+      "row": {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "budget_bucket": "development",
+        "env_seed": 1144935104,
+        "episode_key": "n36r4_dev_t04_q0_001467",
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1144935104,
+        "profile": "Q0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 4,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/18.json",
+        "sha256": "56152b855007b6f8329d2360dd68dd4979b2a4fae06a0bf7cb30df38183a6a61"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/18.json",
+        "sha256": "2094dc89f0a326d46c90074fd05b75efd4e7e9078db186005a45cd6c9a17f6b1"
+      },
+      "row": {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "budget_bucket": "development",
+        "env_seed": 1144935104,
+        "episode_key": "n36r4_dev_t04_n34_001467",
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1144935104,
+        "profile": "N34",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 4,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/19.json",
+        "sha256": "2508f3340631563954ecd0873feb9fe085095284bea969c65f229baaeb261a2c"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/19.json",
+        "sha256": "103d11186e5ebe657074f635c15b0ff5d61b4fff1a9c2c03509d9c54f40e36cf"
+      },
+      "row": {
+        "bddl_sha256": "69646943311b00a299154293046b528b60af713f64731a6d70f154f525f2c917",
+        "budget_bucket": "development",
+        "env_seed": 1144935104,
+        "episode_key": "n36r4_dev_t04_n36_001467",
+        "init_file_sha256": "6c504050fe26a1591f31e4216296bc4d1a9c9c1a33a491ffb7484fe15b7ca47e",
+        "init_index": 0,
+        "init_row_sha256": "e773740b1d2927cb47331e1ff21a056e7118e6aef76681b8001521ff462c10a9",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1144935104,
+        "profile": "N36",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 4,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/20.json",
+        "sha256": "89eb3301d68d062531e0297ddadd7d91a64128c225328a12362e6b97a2967463"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/20.json",
+        "sha256": "99c1bd3fcaf232b5458dc5152da8e12656cdaa6f583ad842e25b981eb764240f"
+      },
+      "row": {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "budget_bucket": "baseline",
+        "env_seed": 970869399,
+        "episode_key": "n36r4_dev_t05_c0_001467",
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 970869399,
+        "profile": "C0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 5,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/21.json",
+        "sha256": "c48444a8a35fc32ba358193e0b8403078dec3d67fe290ce20ad886fae78d7efc"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/21.json",
+        "sha256": "aef40dc69ebd7bf511830d510448fa3825321bb4051c790458d2abbb700b0ae2"
+      },
+      "row": {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "budget_bucket": "development",
+        "env_seed": 970869399,
+        "episode_key": "n36r4_dev_t05_q0_001467",
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 970869399,
+        "profile": "Q0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 5,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/22.json",
+        "sha256": "3e74b97b8b2f0283457e04e073134d314ea3512cead650d7560593f85ae7898c"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/22.json",
+        "sha256": "85b4fb5ca0ce718287b3a43248fe8c0b181439a0ef9d47d9606cb1a9386fc7dd"
+      },
+      "row": {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "budget_bucket": "development",
+        "env_seed": 970869399,
+        "episode_key": "n36r4_dev_t05_n34_001467",
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 970869399,
+        "profile": "N34",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 5,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/23.json",
+        "sha256": "1a6f557d4f2ebc8c758335bdf0db14e5dd967db03ea4db3c13a64c5abe22ccd2"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/23.json",
+        "sha256": "7b82773ab7fafcd160bff0ac8d0daa29c594be787dac98cf453223747be2c0af"
+      },
+      "row": {
+        "bddl_sha256": "964dcb3a554611cc0c85478c878529d0da5bd2a85045b9c0ec54fa05f7320255",
+        "budget_bucket": "development",
+        "env_seed": 970869399,
+        "episode_key": "n36r4_dev_t05_n36_001467",
+        "init_file_sha256": "22667f44abeda256bfa19af289c557a4591631ec81f345a5de7b8f2fca8c9c2d",
+        "init_index": 0,
+        "init_row_sha256": "b9ce167f1250d75a658ff60926d83963155810d20a06d45bdc84a30faf0f47a4",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 970869399,
+        "profile": "N36",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 5,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/24.json",
+        "sha256": "7c3f613b128c9a02df555934976022146bff90debf37594750313a6e6eb8029a"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/24.json",
+        "sha256": "e84b99adef11d2a50a4832085bdb424f8a36aae3bbda981dcf1ef0d177e3d512"
+      },
+      "row": {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "budget_bucket": "baseline",
+        "env_seed": 324717095,
+        "episode_key": "n36r4_dev_t06_c0_001467",
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 324717095,
+        "profile": "C0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 6,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/25.json",
+        "sha256": "149b9f839d025e8c99b18cf5aab0d094d69474f2e9eb63ffb274eaaeaff1d2c1"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/25.json",
+        "sha256": "2064606d1504694724cb0502b32d120c0826159739bbbf243c4c99247723dbbc"
+      },
+      "row": {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "budget_bucket": "development",
+        "env_seed": 324717095,
+        "episode_key": "n36r4_dev_t06_q0_001467",
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 324717095,
+        "profile": "Q0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 6,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/26.json",
+        "sha256": "ae038cf0252ee49f7eacfa793e43f4ec19cb93114a9d07652690f299e7420e56"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/26.json",
+        "sha256": "2cdfd42ed6d4e1540d8eea7002b69f1bce5b8bdaec35a3a28dd5b95af7c3af84"
+      },
+      "row": {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "budget_bucket": "development",
+        "env_seed": 324717095,
+        "episode_key": "n36r4_dev_t06_n34_001467",
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 324717095,
+        "profile": "N34",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 6,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/27.json",
+        "sha256": "45b35b7b2e2a75b6ca59f21a1e4341d0531fb907aa936ef86a00d66bd977126d"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/27.json",
+        "sha256": "d316558e486310b9e2415acc1b33aa4c0d1b12673b52e46849af720c77bd7b40"
+      },
+      "row": {
+        "bddl_sha256": "4f0e06e848a7dfac5cb5ff3190e1997095122cb9dfcb603447822aaa6129536d",
+        "budget_bucket": "development",
+        "env_seed": 324717095,
+        "episode_key": "n36r4_dev_t06_n36_001467",
+        "init_file_sha256": "bde72400da8c8546fd0f28514af49f48d6b6a2f7089691bcf48eb95ab65a62f8",
+        "init_index": 0,
+        "init_row_sha256": "aa4fe30bc10b84fcc2ee6b6d38448fbbf6bae9872c2092b0dd19f9b92aa98e11",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 324717095,
+        "profile": "N36",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 6,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/28.json",
+        "sha256": "dded9ada08f13108bab5f117627dec70e9bd1115c3784806d4a6a237104de8f0"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/28.json",
+        "sha256": "f45a58b98d539dd568cac486c34c3df6366ee7c8647c66618c9988eef891fb36"
+      },
+      "row": {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "budget_bucket": "baseline",
+        "env_seed": 1541693852,
+        "episode_key": "n36r4_dev_t07_c0_001467",
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1541693852,
+        "profile": "C0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 7,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/29.json",
+        "sha256": "68d5eb35d031d85afffb94e1d31a47368f276dd07c8b3890440c6f8885af873e"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/29.json",
+        "sha256": "92a321e7b7a4515bb54c14994703e9da791d17aa0693e3f6535a3db7b59773bd"
+      },
+      "row": {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "budget_bucket": "development",
+        "env_seed": 1541693852,
+        "episode_key": "n36r4_dev_t07_q0_001467",
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1541693852,
+        "profile": "Q0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 7,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/30.json",
+        "sha256": "3657b7b700e3d77940761586598b905deb1b7cedf99dfad1184b7149d06e95f4"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/30.json",
+        "sha256": "65c7c44a39baa2593676470a08863521fd177314257e43bea91c9adf57147657"
+      },
+      "row": {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "budget_bucket": "development",
+        "env_seed": 1541693852,
+        "episode_key": "n36r4_dev_t07_n34_001467",
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1541693852,
+        "profile": "N34",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 7,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/31.json",
+        "sha256": "4823ebe41562868127d70ee0e32434da6ae10ca06f5aed538a8f313aa4b55df0"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/31.json",
+        "sha256": "9ed49326b0aa07e8caec2500765b00caab72a3a46e8f4744e58febc53222390c"
+      },
+      "row": {
+        "bddl_sha256": "c4b5fabbc535cffbf9506743ed90c9957c1c33893c34e9a727dfed6a65b942d0",
+        "budget_bucket": "development",
+        "env_seed": 1541693852,
+        "episode_key": "n36r4_dev_t07_n36_001467",
+        "init_file_sha256": "bf1fde82c0f553c33dfe5f078beffe993ce7e589f4b3df905c2419db6e48786a",
+        "init_index": 0,
+        "init_row_sha256": "e7dfc87fb7c0a1315e209abb64da13fea1e37ea489253efeedeee7ea14548914",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1541693852,
+        "profile": "N36",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 7,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/32.json",
+        "sha256": "a8d68d36942b73e48514f46adc50aa21eaad47b27d9d6133a4654a1e0065d2d2"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/32.json",
+        "sha256": "3fb51681b5c91493e6cbdd5bc65ce89f6db7f683b124e042b15f744db2e9622b"
+      },
+      "row": {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "budget_bucket": "baseline",
+        "env_seed": 1709579522,
+        "episode_key": "n36r4_dev_t08_c0_001467",
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1709579522,
+        "profile": "C0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 8,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/33.json",
+        "sha256": "d9627f6bc8fa0ec7fca24f5fcf0fc090ce9c77fa1ab6c5d266240beafedd8be3"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/33.json",
+        "sha256": "895116eac6704dbd0a1e840cceb74d7624b5d7fe49e49df0a184841b9bc49ad8"
+      },
+      "row": {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "budget_bucket": "development",
+        "env_seed": 1709579522,
+        "episode_key": "n36r4_dev_t08_q0_001467",
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1709579522,
+        "profile": "Q0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 8,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/34.json",
+        "sha256": "ae07cf419f1b413379b48d1b6bc536ba913545b57eed4212aeee584828337d47"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/34.json",
+        "sha256": "75efdcc0dd2635d1677381a2c1dba4e3a58f1019f3e5942a36da17bf57e76c0b"
+      },
+      "row": {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "budget_bucket": "development",
+        "env_seed": 1709579522,
+        "episode_key": "n36r4_dev_t08_n34_001467",
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1709579522,
+        "profile": "N34",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 8,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/35.json",
+        "sha256": "1d31bdabea83ef63053c1e5532d6dbca4de03aba367c198dca9246c7ff78962d"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/35.json",
+        "sha256": "250354c4078ec718f62020eb07d0506d1bd9917275fffb2c3200a43820c1530c"
+      },
+      "row": {
+        "bddl_sha256": "d0624eb125885ae203412fb1390a6703e9affbcee7cb03c30bc029188b6a98fa",
+        "budget_bucket": "development",
+        "env_seed": 1709579522,
+        "episode_key": "n36r4_dev_t08_n36_001467",
+        "init_file_sha256": "282786a2251a7a198951a30b8ed4b502cb2e735aeb4beb0ada1302f828a53bdb",
+        "init_index": 0,
+        "init_row_sha256": "718f2fb31f45c25f9c3f1bcf7637ba8ec113b0773b6ce829c7f4b3d02c154555",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1709579522,
+        "profile": "N36",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 8,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/36.json",
+        "sha256": "040f0ec69693a04e6a64699f958201421aa8b453c4a61875a40abba9f0f62a3e"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/36.json",
+        "sha256": "6a6d675aebf2f470f2b57a37aee336ef06fa6f99b731626fba8bd593c4da6b28"
+      },
+      "row": {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "budget_bucket": "baseline",
+        "env_seed": 1045350852,
+        "episode_key": "n36r4_dev_t09_c0_001467",
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1045350852,
+        "profile": "C0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 9,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/37.json",
+        "sha256": "13d17626db0c7f311c88313b1dc8e9c06df2f6bf8019a98ce9681f1f8032ebb9"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/37.json",
+        "sha256": "bd254f1696e656c6d8c1ae1327ac0ce6d20001dcafa9be0254ebc849e1ba851f"
+      },
+      "row": {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "budget_bucket": "development",
+        "env_seed": 1045350852,
+        "episode_key": "n36r4_dev_t09_q0_001467",
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1045350852,
+        "profile": "Q0",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 9,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/38.json",
+        "sha256": "33b86919678de23f2076fca58e38532327ff363b5e5907554ca236915b208a65"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/38.json",
+        "sha256": "1660cfa1c3d3f715414f93e4471839324ed2c8582508b8607f85eca5c423f584"
+      },
+      "row": {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "budget_bucket": "development",
+        "env_seed": 1045350852,
+        "episode_key": "n36r4_dev_t09_n34_001467",
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1045350852,
+        "profile": "N34",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 9,
+        "timeout_seconds": 1800
+      }
+    },
+    {
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001864/audit-manifests/39.json",
+        "sha256": "fadafcf24f6f9f6279a455a7f6eadfabed0bb442af5dc1078904130ad654297a"
+      },
+      "original": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/audit-manifests/39.json",
+        "sha256": "63db0b24697207c073cfcdedae06d05b24fcc4cc89ab69019e3089ea0a57f737"
+      },
+      "row": {
+        "bddl_sha256": "e67ed018a37c853cf09c8ec793291570f8515572a6cdabc677485ea57c75f6ac",
+        "budget_bucket": "development",
+        "env_seed": 1045350852,
+        "episode_key": "n36r4_dev_t09_n36_001467",
+        "init_file_sha256": "925eee2f7e4ad2d82d3056b780bc5ed864dac1113d6737d46c3f50835c17b099",
+        "init_index": 0,
+        "init_row_sha256": "d8309b31899377d1051f6d7da47edc747b294842a6fec748aff6c9b822d8797e",
+        "iteration": "N36R4_NONPROGRESS_TANGENT_DEV_001467",
+        "policy_seed": 1045350852,
+        "profile": "N36",
+        "replacement": null,
+        "seed_block": "dev",
+        "split": "dev",
+        "task_id": 9,
+        "timeout_seconds": 1800
+      }
+    }
+  ]
+}

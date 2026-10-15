@@ -1,0 +1,870 @@
+{
+  "schema": "n36-json-config-recomposition-v1",
+  "expression": "w.canonical_sha(config)==stored hash and json.loads(json.dumps(resolved))==stored resolved config (same serialization as production _verify_manifest_bound)",
+  "results": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t00_c0_001467.disabled.json",
+      "row": "n36r4_dev_t00_c0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t00_n34_001467.disabled.json",
+      "row": "n36r4_dev_t00_n34_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t00_n36_001467.disabled.json",
+      "row": "n36r4_dev_t00_n36_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t00_q0_001467.disabled.json",
+      "row": "n36r4_dev_t00_q0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t01_c0_001467.disabled.json",
+      "row": "n36r4_dev_t01_c0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t01_n34_001467.disabled.json",
+      "row": "n36r4_dev_t01_n34_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t01_n36_001467.disabled.json",
+      "row": "n36r4_dev_t01_n36_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t01_q0_001467.disabled.json",
+      "row": "n36r4_dev_t01_q0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t02_c0_001467.disabled.json",
+      "row": "n36r4_dev_t02_c0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t02_n34_001467.disabled.json",
+      "row": "n36r4_dev_t02_n34_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t02_n36_001467.disabled.json",
+      "row": "n36r4_dev_t02_n36_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t02_q0_001467.disabled.json",
+      "row": "n36r4_dev_t02_q0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t03_c0_001467.disabled.json",
+      "row": "n36r4_dev_t03_c0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t03_n34_001467.disabled.json",
+      "row": "n36r4_dev_t03_n34_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t03_n36_001467.disabled.json",
+      "row": "n36r4_dev_t03_n36_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t03_q0_001467.disabled.json",
+      "row": "n36r4_dev_t03_q0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t04_c0_001467.disabled.json",
+      "row": "n36r4_dev_t04_c0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t04_n34_001467.disabled.json",
+      "row": "n36r4_dev_t04_n34_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t04_n36_001467.disabled.json",
+      "row": "n36r4_dev_t04_n36_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t04_q0_001467.disabled.json",
+      "row": "n36r4_dev_t04_q0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t05_c0_001467.disabled.json",
+      "row": "n36r4_dev_t05_c0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t05_n34_001467.disabled.json",
+      "row": "n36r4_dev_t05_n34_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t05_n36_001467.disabled.json",
+      "row": "n36r4_dev_t05_n36_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t05_q0_001467.disabled.json",
+      "row": "n36r4_dev_t05_q0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t06_c0_001467.disabled.json",
+      "row": "n36r4_dev_t06_c0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t06_n34_001467.disabled.json",
+      "row": "n36r4_dev_t06_n34_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t06_n36_001467.disabled.json",
+      "row": "n36r4_dev_t06_n36_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t06_q0_001467.disabled.json",
+      "row": "n36r4_dev_t06_q0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t07_c0_001467.disabled.json",
+      "row": "n36r4_dev_t07_c0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t07_n34_001467.disabled.json",
+      "row": "n36r4_dev_t07_n34_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t07_n36_001467.disabled.json",
+      "row": "n36r4_dev_t07_n36_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t07_q0_001467.disabled.json",
+      "row": "n36r4_dev_t07_q0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t08_c0_001467.disabled.json",
+      "row": "n36r4_dev_t08_c0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t08_n34_001467.disabled.json",
+      "row": "n36r4_dev_t08_n34_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t08_n36_001467.disabled.json",
+      "row": "n36r4_dev_t08_n36_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t08_q0_001467.disabled.json",
+      "row": "n36r4_dev_t08_q0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t09_c0_001467.disabled.json",
+      "row": "n36r4_dev_t09_c0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t09_n34_001467.disabled.json",
+      "row": "n36r4_dev_t09_n34_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t09_n36_001467.disabled.json",
+      "row": "n36r4_dev_t09_n36_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/audit-manifests/n36r4_dev_t09_q0_001467.disabled.json",
+      "row": "n36r4_dev_t09_q0_001467",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001632/runtime-binding-refresh/engineering-manifest.disabled-v1.json",
+      "row": "n36_engineering_r1_t00_c0_001616",
+      "composed_hash_matches": true,
+      "json_roundtripped_resolved_matches": true,
+      "raw_python_resolved_matches": false,
+      "raw_type_difference_fields": [
+        {
+          "field": "qd_grid_shape",
+          "python_type": "tuple",
+          "json_type": "list"
+        },
+        {
+          "field": "qd_bounds_quantiles",
+          "python_type": "tuple",
+          "json_type": "list"
+        }
+      ],
+      "remaining_difference_fields": [],
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS",
+  "elapsed_seconds": 9.25827721413225,
+  "does_not_supersede_full_manifest_helper_failures": true
+}

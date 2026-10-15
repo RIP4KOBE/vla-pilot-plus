@@ -1,0 +1,3 @@
+N34R3 runtime preparation passed on source `3dc01fb`: 30 fresh manifests and strict CPU attestations recorded. Charges and scientific gates remain unchanged; no GPU cohort is active.
+
+Operational handoff saved. The driver continues with release verification before dispatch. Validation, formal evaluation, and required ablations remain outstanding; the goal is not complete.

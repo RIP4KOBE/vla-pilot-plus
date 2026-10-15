@@ -1,0 +1,3 @@
+GPU7 healthcheck passed on frozen source `b8d6b981`; both process handles exited. Recorded its 10.115 GPU-seconds and preserved prior ledger history.
+
+Operational summary saved. Next: verify and release the engineering-only C0 episode. Validation, formal evaluation, and required ablations remain incomplete.

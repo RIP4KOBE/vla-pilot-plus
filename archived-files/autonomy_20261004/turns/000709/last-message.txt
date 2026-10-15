@@ -1,0 +1,3 @@
+N34R10 release validation passed. Controller `1236007` and worker `1238684` are live; the first attempt is dispatched.
+
+Source and scientific gates remain frozen. Prior charges and protected reserves are preserved. Operational summary recorded; the driver continues monitoring. Validation, formal evaluation, and ablation evidence remain outstanding.

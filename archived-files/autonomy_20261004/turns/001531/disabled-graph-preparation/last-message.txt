@@ -1,0 +1,5 @@
+Stopped at G2: **537 pinned dependency files are missing**—132 RDT and 405 LeRobot files. BASE ancestry and exact ten-path `OPERATIONAL_FILES` equality pass.
+
+G3–G5 remain unattempted. Candidate source is unchanged; no imports, adoption, or dispatch occurred.
+
+[report-v1.json](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001531/disabled-graph-preparation/report-v1.json) contains hashes, partial inventory, exact blockers, the Poe-helper read-boundary disclosure, and the next bounded step.

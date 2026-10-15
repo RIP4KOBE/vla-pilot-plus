@@ -1,0 +1,151 @@
+{
+  "schema": "task0-recorded-video-source-mapping-v1",
+  "source_commit": "525506ca3198f54d86dadf84bbb76eb64926d87a",
+  "status": "SOURCE_AND_CONTAINER_MAPPING; PIXEL_VERIFICATION_PENDING_AUTHORIZATION",
+  "inventory_sha256": "b9f96f865cc18f270c3fa0bb7e9631c0edf8f09f692c96e4c14cf75f38ae49dc",
+  "sources": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/main.py",
+      "sha256": "258d66b3040be8750beb9e0eab47a7b607db7cbe00d167726664526554fdec57"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/utils/vis_utils.py",
+      "sha256": "6e256ca29aabcb8ffeb852e56c732ec56885394bb8e4e8ca2fd0957e989289b8"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/env_adapters/libero_adapter.py",
+      "sha256": "029657074f6fc783beebc3b4a1431faceee51f970e4d79f0ead3796b6dd2f508"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/env_adapters/base_adapter.py",
+      "sha256": "a5bb4f9e06f458fc38e6cc7486e6c6d268fc67bfaf6fd9f84f90514236144de8"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/backend/libero.yaml",
+      "sha256": "e1d1f41f178c7e5968e04b8337c13e8f37b691a7b3e93f9f8e9f7bb5796deb14"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py",
+      "sha256": "7e360ebd243864a510500f5c9af4a6919c71a355e30c1bfd241439c4de26188d"
+    }
+  ],
+  "capture_sequence": [
+    {
+      "source": "main.py:1454",
+      "fact": "recorder.clear precedes episode adapter.reset; no prior episode frames retained"
+    },
+    {
+      "source": "core/env_adapters/libero_adapter.py:791",
+      "fact": "reset applies initial state then num_steps_wait no-op simulator steps; resolved count=5 for all3; outside main video loop"
+    },
+    {
+      "source": "main.py:1659",
+      "fact": "fresh-chunk Stage update and provider selection precede policy selection, image capture and dispatch"
+    },
+    {
+      "source": "main.py:1999",
+      "fact": "resolved debug_draw_trajectory=true; visualization image comes from draw_action_trajectory_on_vlm_image before action"
+    },
+    {
+      "source": "utils/vis_utils.py:327",
+      "fact": "LIBERO raw agentview image obtained at current sim state; predicted action trajectories may overlay; flipud at normal return line437"
+    },
+    {
+      "source": "main.py:2036",
+      "fact": "status overlay Step/Stage/Guide uses upcoming action loop state; Grip is planned command, not observed finger qpos"
+    },
+    {
+      "source": "main.py:2044",
+      "fact": "Norm_R display, when guidance on, is current post-policy getter rounded2decimals; it is not independently logged exact prior Stage query argument"
+    },
+    {
+      "source": "main.py:2060",
+      "fact": "exactly one recorder.add_frame in main loop before evidence.dispatch and adapter.step line2068"
+    },
+    {
+      "source": "main.py:2085",
+      "fact": "chunk index may reset after execution; global_steps increments at2094 after new observation"
+    },
+    {
+      "source": "main.py:2115",
+      "fact": "on terminal/truncation save current frames and break; no final post-action frame appended"
+    },
+    {
+      "source": "utils/vis_utils.py:656",
+      "fact": "add_frame preserves append order and copies uint8 image"
+    },
+    {
+      "source": "utils/vis_utils.py:684",
+      "fact": "save pads to largestframe bottom/right if necessary, appends SUCCESS/FAIL outcome text to every frame, encodes ordered list H264 default10fps"
+    },
+    {
+      "source": "core/env_adapters/libero_adapter.py:807",
+      "fact": "terminated step can reset immediately, but main breaks before next recording; accepted three numeric outputs have no terminated/reset and final truncation"
+    }
+  ],
+  "mapping": {
+    "decoded_presentation_frame_index": "f (0-based)",
+    "upcoming_action_global_step": "f",
+    "completed_actions_before_frame": "f, excluding5reset warmups",
+    "prior_actual_outcome": "action f-1 for f>=1 under same reset/no intervening action; frame0 has no admitted policy action predecessor",
+    "last_video_frame": 719,
+    "last_actual_action": 719,
+    "last_actual_action_response_in_video": false,
+    "frame_after_action_s": "s+1 only for s<719 and no reset; final response absent",
+    "camera": "agentview",
+    "video_shape": [
+      640,
+      640,
+      3
+    ],
+    "policy_camera_input_shape": [
+      128,
+      128
+    ],
+    "fps": 10,
+    "video_presentation_seconds": "f/10; not wall time or proof of simulator/control time",
+    "source_proof_limit": "one-frame-per-action source path plus reported container720 equals recorded actions720; selected decoded overlay/ordinal consistency not yet checked",
+    "orientation": "normal LIBERO drawing path flips raw render vertically before text; exception/early-return paths can skip flip, so actual orientation remains visually unverified"
+  },
+  "proposed_selection": {
+    "rule": "same fixed initial-dense/coarse-full-episode grid for all3; independent of unseen pixels; not all Stage boundaries",
+    "indices": [
+      0,
+      8,
+      16,
+      24,
+      32,
+      64,
+      96,
+      128,
+      160,
+      240,
+      320,
+      400,
+      480,
+      560,
+      640,
+      719
+    ],
+    "frames_per_arm": 16,
+    "total_frames": 48,
+    "contact_sheet_pages": 4,
+    "rows": [
+      "C0",
+      "Q0 recovery1",
+      "N2"
+    ],
+    "columns_per_page": 4,
+    "frame_conversion": "software decode by presentation ordinal; select exact n, not coarse timestamp/keyframe seek"
+  },
+  "limits": [
+    "Lossy H264 and drawn status/trajectory overlays can occlude scene; no hidden-state or subpixelcontact claim",
+    "FAIL is retrospective episode label on all frames, not failure onset",
+    "Colored trajectory overlays are predictions, not observed object/EEF traces",
+    "Rounded Norm_R overlay cannot replace missing exact normalized Stage input",
+    "One camera cannot establish grasp/contact/occluded object state; absence of visibility is Unknown",
+    "Sparse fixed grid cannot prove absence of brief behavior between sampled frames",
+    "No target map; keypoint0 is not assumed target",
+    "No visual inspection, extraction, GPU/model/provider/projector/simulator call has occurred in this preparation"
+  ]
+}

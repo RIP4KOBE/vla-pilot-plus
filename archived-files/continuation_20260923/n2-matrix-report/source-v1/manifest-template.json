@@ -1,0 +1,16 @@
+{
+  "schema": "qd-ed-n2-report-input-v1",
+  "script_sha256": "8299647ed0ec904e230058a96a8d0b2d2714e2a3879341ea6917416093c3dfe2",
+  "protocol_sha256": "5ff1478eec7a9d8e1e7fb0914d762bacd86195125ff863a7c918f533c225417c",
+  "authorization": {
+    "path": "ROOT_WRITES_AFTER_REVIEW",
+    "sha256": null
+  },
+  "base_plan": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/plan.frozen.json",
+    "sha256": "ec037ec84555bd46d3b776f29979545d21b21c1f3671c3bd32b07e933d5cdc45"
+  },
+  "plan_revisions": [],
+  "input_scope_complete": false,
+  "attempts": []
+}

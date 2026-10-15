@@ -1,0 +1,46 @@
+{
+  "inspected_copies": [
+    {
+      "original": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001429/binding-refresh/refresh-bindings-v1.py",
+        "bytes": 12965,
+        "sha256": "02884bed16dbb5214b6009fe813b1d958f4b32d163971d5b25179204e6bf87ec"
+      },
+      "new_copy": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001448/binding-refresh/refresh-bindings-v1.py",
+        "bytes": 13598,
+        "sha256": "a77d6eb666141041ea5dc0550b9bb5639f664de994d998767c06e1a79ef99cd7"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001429/binding-refresh/complete-bindings-v1.py",
+        "bytes": 8894,
+        "sha256": "ddae36f794a4baf188f9cfaa712b739787b9db6113c6bd519aef441839dc3656"
+      },
+      "new_copy": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001448/binding-refresh/complete-bindings-v1.py",
+        "bytes": 9752,
+        "sha256": "a4d53bb1de88843c539eb7a48639a2ab89ff9a99fa5964ce72b37cebe80c25c3"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001429/binding-refresh/finalize-report-v1.py",
+        "bytes": 15584,
+        "sha256": "f88e6c03de4b5989fc8f6d9384c4e7902af1174c25c901ce3858150e9740db30"
+      },
+      "new_copy": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001448/binding-refresh/finalize-report-v1.py",
+        "bytes": 15680,
+        "sha256": "51c1a87cae9a0fabc8e470768e432e23c41615920e3d919d103f3cd3003f78f3"
+      }
+    }
+  ],
+  "manifest_tool_inspected": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001432/manifest-refresh/refresh-v1.py",
+    "bytes": 3833,
+    "sha256": "008ec6cf47071a9bdcae9c2589d1c42e3af7cc5bacc1e58f87cb0e08987a25cb"
+  },
+  "adaptation": "Actual acceptance status/source/report; changed_files from bound repair report using relative_path and after; exact accepted total and prospective identity. No acceptance edits."
+}

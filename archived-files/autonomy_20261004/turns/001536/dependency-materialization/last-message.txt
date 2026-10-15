@@ -1,0 +1,5 @@
+Completed: 685 regular files and the exact 12 authorized symlinks materialized from local pinned Git objects.
+
+Full G2 passed for all 1,110 source files, including operational delta and scientific equivalence. HEAD and owning ledgers remained unchanged. Dispatch veto remains; G3/G4 were not run.
+
+[Report and inventory references](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001536/dependency-materialization/report-v1.json)

@@ -1,0 +1,3 @@
+Continued the owning study. The prospective CPU inventory repair passed serialization, strict attestation, and controller checks. Source and ledgers remain unchanged; no GPU cohort is running.
+
+Recorded the [operational summary](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000645/operational-summary.md). Next: fresh N34R4 recovery identity and reviewed release. Validation, formal evaluation, and required ablations remain outstanding; the driver continues.

@@ -1,0 +1,3 @@
+Reviewed and adopted N34R5’s operational repair as `f351be88`; 328 focused tests passed. All charges and ledger hashes remain unchanged. No GPU cohort is running.
+
+Recorded the handoff in [operational-summary.md](../autonomy_20261004/turns/000657/operational-summary.md). Next: regenerate and validate the runtime before GPU admission. Validation, formal evaluation and ablation evidence remain outstanding.

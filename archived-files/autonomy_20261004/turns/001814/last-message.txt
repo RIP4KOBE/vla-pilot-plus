@@ -1,0 +1,3 @@
+Continued monitoring the verified live repair executor. Focused checks currently fail, so source adoption and GPU dispatch remain blocked pending repair and review. All ledger prefixes are unchanged.
+
+Wrote the hash-bound turn 1814 operational summary. Validation, formal and ablation completion remain unevidenced; the driver continues.

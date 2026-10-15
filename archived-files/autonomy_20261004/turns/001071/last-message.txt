@@ -1,0 +1,3 @@
+N35’s existing controller remains live; frozen source and ledger history are intact. Task 5 Q0 finished with a valid failure. No restart or duplicate dispatch occurred.
+
+Monitoring checkpoint saved in `autonomy_20261004/turns/001071/operational-summary.md`. Next: monitor controller progression and reconcile terminal evidence. Validation/formal/ablation goals remain unmet; the driver retains coordination.

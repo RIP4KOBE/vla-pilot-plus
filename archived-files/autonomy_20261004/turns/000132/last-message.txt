@@ -1,0 +1,3 @@
+N32R1 remains active with verified controller/worker identities and intact frozen hashes and ledger history. First C0 reports 0/1; native audit and accounting remain pending.
+
+Operational summary saved for turn 132. Next: monitor terminal evidence without restarting the cohort. The original goal remains unmet.

@@ -1,0 +1,23 @@
+{
+  "actual_source_commit": "cd6c969cbfdf006fd017553448bed2e61fc0380e",
+  "actual_source_worktree": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_r1_001617/implementation_worktree",
+  "changed_files": [
+    {
+      "after_sha256": "63e68c934eea9d3de2df96dfe30adf2f1b341e21f2fe4b881abed191f57bf577",
+      "before_sha256": "eeaac1f0b49cf818886f3d180920e9decc34ed608e6719d41a1493eece0334ed",
+      "path": "scripts/qd_ed_n36_engineering_r1.py"
+    },
+    {
+      "after_sha256": "0795f0827c10c81cbd5866385608e45d7b09fd6bd9c7bc348e89fe11347783c5",
+      "before_sha256": "40bbabea125b5c8b92e6d7260f083b4e9b36f51379bcab5901532f5a91a9a4d0",
+      "path": "tests/test_n36_engineering_r1.py"
+    }
+  ],
+  "observed_deployed_commit": "f661a570403e9ff7224d4c35230a0f2b9321a269",
+  "placement_performed": false,
+  "production_required_worktree": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "reason": "Production SOURCE and verify_graph require the adapter checkout. Candidate source evidence is from recovery checkout. Owner must separately place accepted commit then refresh source/runtime closure routes and review before release.",
+  "required_commit": "cd6c969cbfdf006fd017553448bed2e61fc0380e",
+  "source_adopted": false,
+  "status": "OWNER_PLACEMENT_REQUIRED"
+}

@@ -1,0 +1,8 @@
+Turn781 operational summary
+
+Current source 4b390b3e0c6b708572736939749a0fab0fb7ef37; scientific source 1065f38122379a515b60a9a424f574330405b66f remains frozen.
+Live handles {'controller': {'pid': 1322966, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 137471973, 'state': 'R'}, 'driver': {'pid': 268073, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 97715947, 'state': 'S'}, 'coordinator': {'pid': 1750287, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 138456482, 'state': 'S'}}; controller children []. Boot/start identities verified; controller result present: False.
+Bound handoff/authority and current launch/plan/release/continuation/completion-contract hashes verified. State/checkpoint agree; resource isolation ACTIVE/PASS. Three prior owning ledger prefixes preserved. Prior turn780 completed normally; no recovery required.
+N34R11 counts {'C0': {'valid': 4, 'success': 0}, 'Q0': {'valid': 3, 'success': 0}, 'N34': {'valid': 3, 'success': 0}}; latest attempt n34r11_dev_t03_c0_20261008 event valid. Task3 C0 valid failure added since prior turn. Existing controller preserved between cells; no duplicate dispatch, replay, signals, scientific/source/state/ledger edits or coordinator lock acquisition.
+Driver STOP False; cohort STOP False; authorization deadline 2026-10-11T11:13:13Z; passed False.
+Next bounded step: monitor existing controller for next cell or termination, then reconcile native receipts, matched denominators and all charges before recovery/promotion. Validation/formal/required-ablation evidence remains incomplete; no completion record created.

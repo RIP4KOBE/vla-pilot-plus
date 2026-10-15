@@ -1,0 +1,316 @@
+{
+  "artifact_field_boundaries": [
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/disabled-runtime.json",
+        "sha256": "c7be0cd69ba50a4afa3b9e583f2cea8b4647ec47b11a7bca1d88a0bfd9bd99c4"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/disabled-runtime.json",
+        "sha256": "7089022c26651b82fcacaac800e812405f9582d49e5304bfa72da59840d70198"
+      },
+      "boundary": "runtime",
+      "changed_json_pointers": [
+        "/preparation/source",
+        "/preparation/source_record/path",
+        "/preparation/source_record/sha256"
+      ],
+      "unchanged_top_level_fields": [
+        "artifact_root",
+        "controls_label_suffix",
+        "cuda_egl_probe",
+        "cuda_egl_verified",
+        "dependencies",
+        "egl_device_metadata_path",
+        "environment",
+        "files",
+        "frozen_stage_provider",
+        "gpu_mapping",
+        "main_overrides",
+        "metadata_mapping_verified",
+        "prior_provider_manifest",
+        "provider_evidence",
+        "provider_frozen_at",
+        "provider_note",
+        "provider_ready",
+        "schema",
+        "stage_condition",
+        "stage_engineering_condition",
+        "stage_recovered_error_condition",
+        "tasks",
+        "worktree"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/runtime-closure.prospective-disabled-v1.json",
+        "sha256": "a72449d594dc562ec62ed381468abe8d7ca98e0cf810a1127727d1c67b471b02"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/runtime-closure.prospective-disabled-v1.json",
+        "sha256": "f12b068574b84f902b24d190125f752c752bb1745bb92337be56f4cefa2b4d12"
+      },
+      "boundary": "runtime_closure",
+      "changed_json_pointers": [
+        "/runtime/path",
+        "/runtime/sha256"
+      ],
+      "unchanged_top_level_fields": [
+        "distribution_versions",
+        "generated_modules",
+        "interpreter",
+        "module_aliases",
+        "modules",
+        "required_after",
+        "schema",
+        "versions"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/amendment.prospective-disabled-v1.json",
+        "sha256": "a0a4240d0f30509806d15a3eb74354e4ec91d4e253a01a65411ee93286a3ecc7"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/amendment.prospective-disabled-v1.json",
+        "sha256": "9bec8ec00135c2c57b5f63ac6d23bcb002d49be3c13c6e5a4cb70d207aba7bb8"
+      },
+      "boundary": "amendment",
+      "changed_json_pointers": [
+        "/source/path",
+        "/source/sha256"
+      ],
+      "unchanged_top_level_fields": [
+        "approved_prospective_scope",
+        "code_change_scope",
+        "deployment_authorized",
+        "exact_source_change_allowlist",
+        "gpu_authorized",
+        "implementation_review",
+        "limitation",
+        "new_allowed_entrypoints",
+        "new_repair_authority",
+        "node_id",
+        "previous_runtime_amendment",
+        "provider_measurement_authorized",
+        "release_enabled",
+        "schema",
+        "scientific_changes_authorized",
+        "scientific_source_anchor",
+        "source_adopted",
+        "source_base",
+        "status"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/preparation-policy.unassigned-disabled-v1.json",
+        "sha256": "5b99182c63c21257cb8eaace31f6bfd49ce3097ce02488fc6472d145aa5c7814"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/preparation-policy.unassigned-disabled-v1.json",
+        "sha256": "60f960b9d6d125faa496132af2af1544a6d1aec8d5f8db67912c4b3daad89e88"
+      },
+      "boundary": "policy",
+      "changed_json_pointers": [
+        "/acceptance_path",
+        "/accounting_path",
+        "/disabled_runtime_path",
+        "/gpu_path",
+        "/previous_specification/path",
+        "/previous_specification/sha256",
+        "/proof_path",
+        "/provider_path",
+        "/release_path"
+      ],
+      "unchanged_top_level_fields": [
+        "baseline",
+        "deadline",
+        "not_before",
+        "resource_id",
+        "schema"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/specification.prospective-disabled-v1.json",
+        "sha256": "ad95b360654a01a4669c8138df2852f3f31e02480eaa1eddf7f64a804cc6998a"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/specification.prospective-disabled-v1.json",
+        "sha256": "d983afb6285c19f7b720b0313316cfb6fc686c5c53dcfe94bac852c09f6d2e6a"
+      },
+      "boundary": "specification",
+      "changed_json_pointers": [
+        "/runtime_binding/amendment/path",
+        "/runtime_binding/amendment/sha256",
+        "/runtime_binding/preparation/path",
+        "/runtime_binding/preparation/sha256",
+        "/runtime_binding/runtime_path",
+        "/runtime_binding/source_record_path"
+      ],
+      "unchanged_top_level_fields": [
+        "accounting_proposal",
+        "binding_requirements",
+        "canonical_runtime",
+        "decision",
+        "deployment_source_cwd",
+        "downstream_slots",
+        "full_audit_view",
+        "gpu_authorized",
+        "node_id",
+        "not_a_released_plan",
+        "parent_specification",
+        "prospective_amendment",
+        "readiness_recovery",
+        "recovery_prefix_contract",
+        "release_enabled",
+        "retained_ledger_prefixes",
+        "retained_snapshot",
+        "retained_snapshot_reference",
+        "root_adopted",
+        "schema",
+        "scope",
+        "source_adoption_required",
+        "source_base_commit",
+        "status",
+        "unchanged_files_and_rules"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/controller-semantics.pending-disabled-v1.json",
+        "sha256": "cb6f5bb6db7de37bd7666c51f7a33559fac705e88c3d7fa99f7be4b45415d649"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/controller-semantics.pending-disabled-v1.json",
+        "sha256": "fc68b5168f0ef4c394578a4c46b929e351b84b22df7d5a2d1ee471488d760a33"
+      },
+      "boundary": "controller_semantics",
+      "changed_json_pointers": [
+        "/runtime/path",
+        "/runtime/sha256",
+        "/runtime_closure/path",
+        "/runtime_closure/sha256",
+        "/source_commit"
+      ],
+      "unchanged_top_level_fields": [
+        "b5_review",
+        "class",
+        "gpu_authorized",
+        "historical_review_only",
+        "independent_review_claimed",
+        "instance",
+        "instance_scope",
+        "module",
+        "native_execution_observed",
+        "physical_gain_certified",
+        "production_eligible",
+        "readiness_eligible",
+        "release_enabled",
+        "review_evidence",
+        "root_acceptance",
+        "schema",
+        "scientific_promotion",
+        "semantics",
+        "source",
+        "status"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/graph.candidate-disabled-v1.json",
+        "sha256": "feee4334aeff7b3739603a09c8aec3bebad5da46e64b6a01d8956ad6d2159d89"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/graph.partial-disabled-v1.json",
+        "sha256": "84deee2a42e86d78ccff729abc05748871da5b36bf31e1e4b822104cdd01a6b2"
+      },
+      "boundary": "graph",
+      "changed_json_pointers": [
+        "/amendment/path",
+        "/amendment/sha256",
+        "/controller_semantics/path",
+        "/controller_semantics/sha256",
+        "/final_source_review",
+        "/policy/path",
+        "/policy/sha256",
+        "/prior_partial_graph",
+        "/runtime/path",
+        "/runtime/sha256",
+        "/runtime_closure/path",
+        "/runtime_closure/sha256",
+        "/source_placement",
+        "/source_record/path",
+        "/source_record/sha256",
+        "/specification/path",
+        "/specification/sha256",
+        "/status"
+      ],
+      "unchanged_top_level_fields": [
+        "audit",
+        "authority",
+        "b5_review",
+        "frozen",
+        "full40_manifests",
+        "gpu_authorized",
+        "graph_complete",
+        "graph_verified",
+        "historical_accounting_only",
+        "historical_graph_only",
+        "independent_review_claimed",
+        "native_build",
+        "plan",
+        "provider_measurement_authorized",
+        "provider_ready",
+        "recovery_identity_status",
+        "recovery_prefix_contract",
+        "release_enabled",
+        "relocation_map",
+        "resource_id",
+        "review_status",
+        "root_acceptance",
+        "root_controller_acceptance",
+        "runtime_ready",
+        "schema",
+        "scientific_equivalence",
+        "scientific_source_anchor",
+        "separate_engineering_manifest",
+        "source_adopted"
+      ]
+    }
+  ],
+  "historical_only": [
+    "amendment implementation_review is a production-pinned historical scope provenance field, never final-source acceptance",
+    "specification readiness_recovery and recovery_prefix_contract remain historical placeholders; production rejects null policy successor",
+    "prior controller review and B5 are not accepted for new graph"
+  ],
+  "module_changes": [],
+  "not_claimed": [
+    "full production graph validation",
+    "independent/root graph review",
+    "loaded controller behavior",
+    "fresh native execution",
+    "scientific result"
+  ],
+  "prior_boundary": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/boundary-manifest-v1.json",
+    "sha256": "ae9f8dfd03807f41d7885bcbd87b5d7d28148bf06d3550918a38aa63c8757786"
+  },
+  "schema": "n36-disabled-binding-boundaries-v1",
+  "source_inventory_delta": [
+    "scripts/qd_ed_n36_engineering_r1.py",
+    "scripts/qd_ed_n36_readiness_prepare.py",
+    "tests/test_n36_engineering_r1.py",
+    "tests/test_n36_readiness_prepare.py"
+  ],
+  "unchanged": [
+    "scientific source anchor 1065f38122379a515b60a9a424f574330405b66f",
+    "all specification fields outside runtime_binding; thresholds, seeds, accounting and scope",
+    "runtime outside preparation.source and preparation.source_record",
+    "closure outside runtime reference and changed module hashes",
+    "native inventory and all unrelated external modules",
+    "controller instance, semantics and source identity",
+    "historical documents, failed checks, source checkout, state, checkpoints, ledgers and locks"
+  ]
+}

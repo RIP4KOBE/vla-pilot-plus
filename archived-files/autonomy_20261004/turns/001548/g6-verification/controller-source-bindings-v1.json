@@ -1,0 +1,86 @@
+{
+  "proof": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001543/g5-disabled-preparation/attempt-2/controller-semantics.disabled-v1.json",
+    "sha256": "127e6c507e04d8c93c21c259f40242832e339b9e9525297a548a789ec77469a3"
+  },
+  "sources": [
+    {
+      "evidence": "scale_action",
+      "record": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/base_controller.py",
+        "sha256": "61f99a2daeb4eb6e39bfb996d94c5a5689ef3bc771d030d070193ea56d6a8332"
+      },
+      "closure_modules": [
+        "robosuite.controllers.base_controller"
+      ]
+    },
+    {
+      "evidence": "scale_action",
+      "record": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/config/osc_pose.json",
+        "sha256": "07f3a8b41d3eecc8a36700a85bd8207ee3fbc36eb73f6a2248340c96770d1e45"
+      },
+      "closure_modules": []
+    },
+    {
+      "evidence": "set_goal",
+      "record": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/osc.py",
+        "sha256": "cfa62a0e719bc53ef0c701efa66f7b3e2272d4fca2150ec73c05bb145eba85cb"
+      },
+      "closure_modules": [
+        "robosuite.controllers.osc"
+      ]
+    },
+    {
+      "evidence": "set_goal",
+      "record": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/control_utils.py",
+        "sha256": "1d0f1a063894b1e8289339e223665e14e8aec492c31e9e00f42edea8dc735f43"
+      },
+      "closure_modules": [
+        "robosuite.utils.control_utils"
+      ]
+    },
+    {
+      "evidence": "wrapper_and_gripper",
+      "record": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/core/env_adapters/libero_adapter.py",
+        "sha256": "17fb74b3d475c91bc015222d4b61989c82a57f83935581b54935bab8080be26d"
+      },
+      "closure_modules": [],
+      "candidate_source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/core/env_adapters/libero_adapter.py",
+        "sha256": "17fb74b3d475c91bc015222d4b61989c82a57f83935581b54935bab8080be26d"
+      },
+      "candidate_hash_equal": true,
+      "same_resolved_file": false
+    },
+    {
+      "evidence": "wrapper_and_gripper",
+      "record": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/libero_pro/libero/libero/envs/env_wrapper.py",
+        "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0"
+      },
+      "closure_modules": [],
+      "candidate_source": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/libero_pro/libero/libero/envs/env_wrapper.py",
+        "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0"
+      },
+      "candidate_hash_equal": true,
+      "same_resolved_file": false
+    },
+    {
+      "evidence": "wrapper_and_gripper",
+      "record": {
+        "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/grippers/panda_gripper.py",
+        "sha256": "a3760a8fc4599fa6f79914304b82466f3c1bda1a945943ca693bb57f00dc59eb"
+      },
+      "closure_modules": [
+        "robosuite.models.grippers.panda_gripper"
+      ]
+    }
+  ],
+  "approval_status": "DISABLED_PENDING_ROOT_REVIEW",
+  "independent_b5": false
+}

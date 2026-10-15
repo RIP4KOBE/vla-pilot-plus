@@ -1,0 +1,3 @@
+N36R3 controller 1680100 remains live on frozen source `711602ac`; verification advanced without duplicate dispatch. Ledger prefixes and frozen bindings passed checks.
+
+Turn 1458’s hash-bound summary is saved. Next: reconcile first-C0 native evidence at termination. Validation, formal evaluation, and required ablations remain unproven.

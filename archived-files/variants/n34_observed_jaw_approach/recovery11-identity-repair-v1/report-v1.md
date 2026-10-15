@@ -1,0 +1,15 @@
+# Arbor node15.4 CPU identity implementation
+
+Committed `79ed3cd928bd9d1cc8277aeccf905e5a541678b8` on existing `codex/n34-production-integration`, from clean base `cf11e91d2d9a4a0def0111c1ab24d0111c75988b`. Worktree is clean after commit. Status: ready for root review/adoption; no GPU release.
+
+Changes are limited to `scripts/qd_ed_n34_contract.py`, `scripts/qd_ed_n34_release.py`, and `tests/test_qd_ed_n34_recovery11.py`. The contract now issues all 30 fresh lowercase-profile N34R11 keys for `N34R11_OBSERVED_JAW_APPROACH_DEV_20261008`. Task0 C0 explicitly replaces `n34r10_dev_t00_c0_20261008`, bound to the exact turn715 terminal path and SHA256 in authority. Its bytes were verified against that digest. Mapping remains 1 recovery / 9 baseline / 20 development, with zero automatic retries. Release admission uses the N34R11 preparation resource kind; historical resources still enter global accounting.
+
+All eleven N34 through N34R10 invalid executions remain required, charged in original buckets, and excluded from matched outcomes. No historical records were changed. N34R10 computed task0 C0 but remains INVALID because its imageio.plugins.pillow output-path dependency was unbound. It is not a valid control.
+
+Scientific behavior, tasks, seeds, thresholds, audit requirements, deadline, caps, and protected reserves were not changed. Requested scientific implementation `1065f38122379a515b60a9a424f574330405b66f` received no behavioral edits. Existing scientific-source configuration was left untouched. AST comparison confirmed unchanged contract constants and function behavior except identity/provenance strings and the history-count docstring.
+
+Validation: 12 focused CPU tests passed; `git diff --check` passed. Tests cover all30 fresh identities, exact terminal binding, stale rows/plans/terminal rejection, bucket/replacement enforcement, all eleven retained charges and unknown-duration rejection, no carried controls, invalid-stop/no-retry behavior, preparation accounting selection, complete-valid-triple futility, and all30/five-success/both-control promotion requirements. The first test run had one incorrect exception expectation; the final run passes with the existing GateError behavior. See `focused-tests-v1.log` and `invariants-check-v1.json`. Test command and details are in `implementation-result-v1.json`.
+
+No runtime preparation, runtime inventory edits, provider/GPU calls, subagents, APPROVED artifact generation, or owning state/ledger writes occurred. No protected guidance document or protected results were opened. The turn707 protected-read incident remains preserved without opening the prohibited document. Authority-provided accounting snapshots and ledger prefixes were recorded as supplied, not independently recomputed.
+
+Turn716 composed runtime closure is preparation only and retains OLD identities. Root must separately review/adopt this commit and regenerate the runtime composition and release artifacts before any prospective dispatch. No scientific score or efficacy conclusion is produced by this CPU engineering task.

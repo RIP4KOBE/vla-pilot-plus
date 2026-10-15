@@ -1,0 +1,3 @@
+Continued the owning study. Adopted the reviewed readiness-only release and launched one bounded measurement; controller PID 4136963 is verified live.
+
+Source and scientific gates remain unchanged. Recorded the operational handoff for monitoring and accounting reconciliation. Validation, formal evaluation, and required ablation evidence remain incomplete.

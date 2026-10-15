@@ -1,0 +1,3 @@
+Reconciled the completed review: G7 failed a source-identity audit. Launched one bounded CPU repair and recorded the operational handoff.
+
+Private ledgers remain unchanged. GPU release stays blocked pending repair and independent review; validation, formal evaluation, and required ablations remain incomplete.

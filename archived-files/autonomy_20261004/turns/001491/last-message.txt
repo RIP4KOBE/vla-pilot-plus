@@ -1,0 +1,3 @@
+Verified live executor identities and unchanged private ledgers. The existing CPU executor reports 190 passing tests; its partial adapter keeps GPU dispatch disabled.
+
+Operational summary saved for turn 1491. Next: reconcile its terminal report and review remaining integration gaps. Validation/formal/ablation completion remains unproven.

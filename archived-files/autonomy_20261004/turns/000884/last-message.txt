@@ -1,0 +1,3 @@
+Reconciled the completed N35 review and recorded corrected accounting, including the weekly cap and retained healthcheck costs. Source and ledgers remain unchanged; no GPU dispatch occurred.
+
+Saved the operational handoff. Next is independent review of the corrections before implementation. Validation, formal evaluation and required ablation evidence remain incomplete.

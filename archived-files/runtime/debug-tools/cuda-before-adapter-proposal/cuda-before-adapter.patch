@@ -1,0 +1,16 @@
+--- a/main.py
++++ b/main.py
+@@ -595,6 +595,13 @@
+         # Pass task instruction from cfg.main (set by task config) so adapter can surface it
+         if self.config.get('instruction', ''):
+             env_config['instruction'] = self.config.get('instruction')
++
++        # Establish CUDA before an RDT CUDA run creates the environment renderer.
++        if (
++            cfg.get('policy', {}).get('type', 'diffusion') == 'rdt'
++            and torch.device(cfg.get('device', 'cuda')).type == 'cuda'
++        ):
++            torch.cuda.init()
+ 
+         # Create adapter
+         self.adapter = create_adapter(self.backend, env_config)

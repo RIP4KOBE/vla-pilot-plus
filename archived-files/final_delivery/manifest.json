@@ -1,0 +1,1058 @@
+{
+  "schema": "qd-ed-negative-result-delivery-v1",
+  "created_at": "2026-09-22T12:22:58.134671+00:00",
+  "study_id": "20260921T093925Z",
+  "study_status": "CONCLUDED_TARGET_NOT_MET",
+  "decision": "TARGET_NOT_MET / NO_ADOPTION",
+  "target_achieved": false,
+  "best_effective_candidate": null,
+  "candidate_algorithm_effect": "UNKNOWN_UNEVALUATED",
+  "worktree": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z",
+  "artifacts": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z",
+  "branch": "exp/rdt-qd-ed-final-20260921T093925Z",
+  "final_documentation_commit": "1a0e1b52c3cab9acac1ee6092d58d5925b41163f",
+  "latest_executed_source_commit": "2435f86f601fa97070f6697670b29063078e91ac",
+  "per_attempt_source_identity": "Use final-attempts.csv and each frozen runtime/command record, not the final documentation commit.",
+  "authorized_physical_gpus_at_closure": [
+    3
+  ],
+  "active_owned_gpu_workers": [],
+  "automatic_dispatch_authorized": false,
+  "budget": {
+    "max_gpu_hours": 48.0,
+    "gpu_hours_consumed": 1.0262591123256264,
+    "max_episode_attempts": 240,
+    "reserved": {
+      "baseline": 20,
+      "development": 100,
+      "validation": 60,
+      "formal": 40,
+      "recovery": 20
+    },
+    "dispatched": 11,
+    "aborted": 8,
+    "valid": 0,
+    "running": 0,
+    "invalid": 3,
+    "completed": 3,
+    "gpu_hour_reservations": {
+      "validation": 14.0,
+      "formal": 10.0
+    }
+  },
+  "validation_executed": false,
+  "formal_executed": false,
+  "coverage": "Final documents, ledgers, frozen identities, method implementation, linked attempt commands/results, GPU3 diagnostic sources/contracts/results and final raw parity arrays. Model weight identities are in the frozen runtime inventory; videos and other raw logs remain in per-attempt output directories.",
+  "files": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/.arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/checkpoint.json",
+      "sha256": "28f0f58ba56e5b86940aa906b206be7fdb50e8c3f563ad1bc78aa6113e4b4592",
+      "size_bytes": 30688,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/.arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.json",
+      "sha256": "4c115d8f5b1203ca7bc22d7006e15d1a481b36ef704b9c980e5a6e33d355dcc8",
+      "size_bytes": 10866,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/.arbor/sessions/rdt-qd-ed-final-20260921T093925Z/REPORT.md",
+      "sha256": "4e264496b85032eba1f8d14662bbdaa17164a61ffa58b44e838e00cfe9315d61",
+      "size_bytes": 1747,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/.arbor/sessions/rdt-qd-ed-final-20260921T093925Z/run_stats.json",
+      "sha256": "2e789195e8cb2a96656d6ed8054cf04c43d34d27b1d21445f04a8258565eaae5",
+      "size_bytes": 29167,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/exposure-registry.jsonl",
+      "sha256": "ae0e1ceb219aec2821bc199fb28c07602e966b8103f629c171055cf044506c9d",
+      "size_bytes": 367096,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/gpu-healthcheck-ledger.jsonl",
+      "sha256": "5696188c8acd0ae2f0e1d05cf16541ed0db1bfff1303388b31b6d2e7b25dd95a",
+      "size_bytes": 58011,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/final-attempts.csv",
+      "sha256": "fd579db0235255dc25a0927f01f80835cd0a79211f20ba71c57b49a91c42cb10",
+      "size_bytes": 8393,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/final-cost-telemetry.md",
+      "sha256": "c7a92e542e4679b49a5716fdd9640fbfe6795f7c87222a3bd2d0eee715b2b88e",
+      "size_bytes": 3544,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/final-gpu-diagnostics.csv",
+      "sha256": "aa9e4355966af85b1e6ce9de49396491ca08e7c2413e2695db940642990ee855",
+      "size_bytes": 6007,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/final-n1-method.md",
+      "sha256": "cae2a2cccca379c1ce60c625ab6936cc5e7cd57d453b9aba8179109ddaefa401",
+      "size_bytes": 8103,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/final-planned-cells.csv",
+      "sha256": "2726e4b5298f9a22d838ca345e895f9f1df84137402620895bd236a16ce07d26",
+      "size_bytes": 4135,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/final-report.md",
+      "sha256": "cc09b32caad332b0997c863dafb2aa26c6b18476b3b6c67a285fb7e697475eea",
+      "size_bytes": 13108,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/iteration-ledger.md",
+      "sha256": "2153330b3acb74480ba692432a58d3db5ae4d5c1839259bde2fc16c7133e0326",
+      "size_bytes": 62525,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/resume.md",
+      "sha256": "4e264496b85032eba1f8d14662bbdaa17164a61ffa58b44e838e00cfe9315d61",
+      "size_bytes": 1747,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_001_execution_intent/analysis.md",
+      "sha256": "474c60273d6ad24fcb99874374d047394b060045f05805c2f3ebd0366bfeacc5",
+      "size_bytes": 12544,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/research-state.yaml",
+      "sha256": "9fef714344b1193ff151079335296087c69baa88fde9ed2f787e55b58ac6af4f",
+      "size_bytes": 45607,
+      "roles": [
+        "final_commit"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/attempt-ledger.jsonl",
+      "sha256": "7a503ba5f120d791598f3146d5e93bffaa523cd34656262a26854c73b84aad7a",
+      "size_bytes": 54463,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/gpu-hour-reservation-ledger.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/frozen-seed-plan.json",
+      "sha256": "9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1",
+      "size_bytes": 58246,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/historical-exposure-inventory.jsonl",
+      "sha256": "304c99c7f6df75a68c3278df0640c6a5bb744d04b2457d5991881e9ac4b2b573",
+      "size_bytes": 361322,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/runtime-inventory.json",
+      "sha256": "44d456203ca168eec9eddfb6834d54347153b2c859eb1b4fc0dea02c15138b83",
+      "size_bytes": 82751,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/configs/qd_ed_final/candidate_n1.json",
+      "sha256": "5e74d72f108df53897e790677154c5ca3691b1aeb318297168d3bffcb84bfe3c",
+      "size_bytes": 3546,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/qd_ed.py",
+      "sha256": "4415ea7f16029e2fa2e7528c1f7065ba673b7a5a512723bfa9611f992298daa4",
+      "size_bytes": 39448,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_policy_steer.py",
+      "sha256": "82c8515542780acc5389d3043d7f25e14e9d23f6149fb067a6dfa99fb9aa584e",
+      "size_bytes": 341700,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/eds_eval_metrics.py",
+      "sha256": "0e07c57167dd92c07a31395f6ebba0b56d0f65bc62f4fb1e4d5fb30549fd6ae0",
+      "size_bytes": 34419,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/utils/eds_eval_vis.py",
+      "sha256": "d155d2b2e6e72bd877899c1fdc6f0e57d847ea63d68b55a74a0606c90ab86676",
+      "size_bytes": 17043,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py",
+      "sha256": "c4f1d00d4ed0942d188804efda8e75f4432cc6ce26a289ea847dd2e15122209c",
+      "size_bytes": 66468,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_execution_intent_replay.py",
+      "sha256": "b602818b3753c6110d2baf9c4d2e9fed5a23f9456829c71912e425bb90280bf1",
+      "size_bytes": 9588,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/tests/test_qd_ed_archive.py",
+      "sha256": "d8f392c2c554889cd3ba0af18d3079bab0948d5b1deaaba5375de22a7f0c00b3",
+      "size_bytes": 27208,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/tests/test_rdt_steer.py",
+      "sha256": "0fa5a80ac5aeeaec91ac56f16b7040c6d193117a131efca352254f5cfbb27689",
+      "size_bytes": 331563,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/tests/test_eds_eval_vis.py",
+      "sha256": "34cd0e13b11bdafdb956ca40b5c042d1fcf39d9a68ba1bc352bd34fd8f45ebed",
+      "size_bytes": 7595,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_001_execution_intent/protocol.md",
+      "sha256": "e3d3c2ed50db4a845e4d0713671db225c96f124ca8719d171e5d7006f0a5e0b0",
+      "size_bytes": 5537,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_001_execution_intent/startup-repair-amendment.md",
+      "sha256": "7edc8d05830c75156e05f3ba687b84b2dbcf00fe3b976a3c605c457710d9ceaa",
+      "size_bytes": 3536,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef",
+      "size_bytes": 21913,
+      "roles": [
+        "reproducibility"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/final_delivery/accounting.json",
+      "sha256": "d0607f94052dc8e8f190779cbd6bcfe3ccc68e825b875c3442f025bbf2f0ca07",
+      "size_bytes": 24122,
+      "roles": [
+        "delivery_accounting"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/final_delivery/preclosure-audit.json",
+      "sha256": "5aac922022fe5352f45622b3711e4a4d20d974bf0d1eacc0406e5e866ed06515",
+      "size_bytes": 1905,
+      "roles": [
+        "delivery_accounting"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/final_delivery/exposure-registry-before-current-study-append.jsonl",
+      "sha256": "d9daafde403f368ece68fbb49ab1b88a0d7574c88759891e1e6cac17547200f8",
+      "size_bytes": 364724,
+      "roles": [
+        "delivery_accounting"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/final-cost-telemetry.json",
+      "sha256": "ece914bb97c60f9b83ddb62dc816d175f3f43c96d4278107ab169f4f5cbc1da6",
+      "size_bytes": 65892,
+      "roles": [
+        "executor_evidence"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/final-cost-telemetry.md",
+      "sha256": "c7a92e542e4679b49a5716fdd9640fbfe6795f7c87222a3bd2d0eee715b2b88e",
+      "size_bytes": 3544,
+      "roles": [
+        "executor_evidence"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/final-n1-method-section.md",
+      "sha256": "06d2618a8dba4606cbdafad68e7104f9e693bb51c1c280da561038c857ab13e2",
+      "size_bytes": 8109,
+      "roles": [
+        "executor_evidence"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/runtime-manifest.json",
+      "sha256": "2118d25a2e91c170c2842aec7ef11159df6c15a314d1a28153779722f22aea8e",
+      "size_bytes": 1732631,
+      "roles": [
+        "gpu3_runtime_identity"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-static-scene.py",
+      "sha256": "0e7ff69ab304464cfa17365a0bc147c6af545761ff38a0a670a8e59ec889c167",
+      "size_bytes": 9405,
+      "roles": [
+        "gpu3_static_scene_diagnostic:supervisor"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-static-scene-diagnostic/frozen-contract.json",
+      "sha256": "a080ed9625989cef5b0de19321fc367e14bfbaf0ed934ffb0a62b6b84ff98695",
+      "size_bytes": 1806,
+      "roles": [
+        "gpu3_static_scene_diagnostic:contract_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-static-scene-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_static_scene__b8f0b3b6214f/healthcheck-result.json",
+      "sha256": "9884379d49f8e642cd25e374136a64b8da58182acddad6e2f6b4fe5c172b8682",
+      "size_bytes": 1245,
+      "roles": [
+        "gpu3_static_scene_diagnostic:result_path",
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-model.py",
+      "sha256": "82981d32eaf709ac3c7e4232749b92baeb86994fa98bdd49c81347819d715e70",
+      "size_bytes": 16594,
+      "roles": [
+        "gpu3_scene_model_diagnostic:script"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-scene-model.py",
+      "sha256": "01549695362503f2960f1eff80e280d0e70a60e3ab3c0e96816664975f6358d1",
+      "size_bytes": 13111,
+      "roles": [
+        "gpu3_scene_model_diagnostic:supervisor"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/frozen-contract.json",
+      "sha256": "30b237ff4171bf0e49fd0f80e5234868ee73f62dc414e9507386dc34563f11bb",
+      "size_bytes": 13974,
+      "roles": [
+        "gpu3_scene_model_diagnostic:contract_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_scene_model__c83cfb349cba/healthcheck-result.json",
+      "sha256": "7b59d822ba9f6f29f4b48131c783e20e47da03ad8880da72bc9b9027ae580597",
+      "size_bytes": 1229,
+      "roles": [
+        "gpu3_scene_model_diagnostic:result_path",
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/diagnostic-analysis.json",
+      "sha256": "0af8f745681a3444dd48250e9ce5e60ab32d05dcfcb69bcdd2366188f643de3d",
+      "size_bytes": 1438,
+      "roles": [
+        "gpu3_scene_model_diagnostic:analysis_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-model-load-phases.py",
+      "sha256": "741c087a21228b5dc5f49801c3734b93ed690760a3731eb5c8b6b3138a0775a4",
+      "size_bytes": 17800,
+      "roles": [
+        "gpu3_load_phase_diagnostic:script"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-model-load-phases.py",
+      "sha256": "ab2796fe17200ab1178d9c1befb2fc5cfd49c8a9d4230a9a3181f1c9c1d4c735",
+      "size_bytes": 12933,
+      "roles": [
+        "gpu3_load_phase_diagnostic:supervisor"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/frozen-contract.json",
+      "sha256": "f87139677662de6cf65a47383c7d521b0b9c91b606ef88bac5f3fd8917337f3e",
+      "size_bytes": 14658,
+      "roles": [
+        "gpu3_load_phase_diagnostic:contract_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_model_load_phases__52ec6c4eb068/healthcheck-result.json",
+      "sha256": "f58cb98e84d406edf896f92fc5c21da2b6ddda01c6374f86f544cfa8b51fcc62",
+      "size_bytes": 970,
+      "roles": [
+        "gpu3_load_phase_diagnostic:result_path",
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/diagnostic-analysis.json",
+      "sha256": "89c723f8b4a3bf2964aadb02a227713f08e57cdf0d3750481856f767d0030b24",
+      "size_bytes": 749,
+      "roles": [
+        "gpu3_load_phase_diagnostic:analysis_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-cuda-first.py",
+      "sha256": "b0c4dd043cc2bb9b96ca72bf25ca40099a5da8b64a9651ab1e2fa24773725f9c",
+      "size_bytes": 20752,
+      "roles": [
+        "gpu3_cuda_first_diagnostic:script"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-cuda-first.py",
+      "sha256": "c9fdd50852c16e53ce2a1ccca2835cbcd5f4bf22e080244bdac1b9fc85b1a35e",
+      "size_bytes": 13881,
+      "roles": [
+        "gpu3_cuda_first_diagnostic:supervisor"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/frozen-contract.json",
+      "sha256": "5dc28f10b3bc99a12e9d917c0efcfb12f550d953ccd206a342e31681b8d4c502",
+      "size_bytes": 14616,
+      "roles": [
+        "gpu3_cuda_first_diagnostic:contract_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_first__c40589cf6c65/healthcheck-result.json",
+      "sha256": "3e1700d1d69a7528e6a2e2a4f8d092de4c6053044d0b5ca0142b66b04e17ca70",
+      "size_bytes": 934,
+      "roles": [
+        "gpu3_cuda_first_diagnostic:result_path",
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/diagnostic-analysis.json",
+      "sha256": "15b2140acbdcebe9d9609220a5d704613e0d82cef2df83d8f032f2ca49d73cf4",
+      "size_bytes": 2179,
+      "roles": [
+        "gpu3_cuda_first_diagnostic:analysis_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-thread.py",
+      "sha256": "ce9457f5e184e6cad285a1444f97fefbaa1b8c353346e310b7c738cf76855ed0",
+      "size_bytes": 23989,
+      "roles": [
+        "gpu3_render_thread_diagnostic:script"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-render-thread.py",
+      "sha256": "51e604cecf10f8eca134ba4edc6eba5354453ac94149892667fb680cd528792f",
+      "size_bytes": 16623,
+      "roles": [
+        "gpu3_render_thread_diagnostic:supervisor"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/frozen-contract.json",
+      "sha256": "1eba79779c181c19774ddab2980cc5e0b2518ab651c6b014b6b7c7fc06343a83",
+      "size_bytes": 14633,
+      "roles": [
+        "gpu3_render_thread_diagnostic:contract_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_thread__be460ba14398/healthcheck-result.json",
+      "sha256": "eb1e3e990a02458a645fb35f4ff02d35de995c4abcbdce70129ef1da5fb09d7f",
+      "size_bytes": 1238,
+      "roles": [
+        "gpu3_render_thread_diagnostic:result_path",
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/diagnostic-analysis.json",
+      "sha256": "08847e3f5d578a38eabd69312eced5c601950be3aa27a5c8b9a1e16357754dda",
+      "size_bytes": 3346,
+      "roles": [
+        "gpu3_render_thread_diagnostic:analysis_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-process.py",
+      "sha256": "9eff1e42185316c5070b1d581e6238169657d1bdff9f4e20ebb76ac583e1a390",
+      "size_bytes": 28105,
+      "roles": [
+        "gpu3_render_process_diagnostic:script"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-render-process.py",
+      "sha256": "588e568057e54006a5b8e4b1b7002328647129c6006dacc29ad2509c6c05fc24",
+      "size_bytes": 31611,
+      "roles": [
+        "gpu3_render_process_diagnostic:supervisor"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/frozen-contract.json",
+      "sha256": "f7bbb68c2515413a89ce7869dd06a698c1d9224e247a36fb5ebfba9f9dfd5d6c",
+      "size_bytes": 14740,
+      "roles": [
+        "gpu3_render_process_diagnostic:contract_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_process__7a179aced1de/healthcheck-result.json",
+      "sha256": "337b4632eb8ab465a937f9c28f345201a53d6c9ae7967791f540926881676de9",
+      "size_bytes": 2762,
+      "roles": [
+        "gpu3_render_process_diagnostic:result_path",
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/diagnostic-analysis.json",
+      "sha256": "7da3cf251d854d0cfdcbbeed4126a089eb61b94a03437b9965c8ef3d5e767091",
+      "size_bytes": 3965,
+      "roles": [
+        "gpu3_render_process_diagnostic:analysis_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-idle.py",
+      "sha256": "ec415acee0e57f29603bdf7dc6771ca6d55bdad31e22c28e9ab1463a6767ad05",
+      "size_bytes": 10606,
+      "roles": [
+        "gpu3_render_idle_diagnostic:script"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-render-idle.py",
+      "sha256": "bde008e92f2bbb96ef1cac1d7887d58a2fd3fd95b8ee2b9813c0da47106a6ae1",
+      "size_bytes": 14785,
+      "roles": [
+        "gpu3_render_idle_diagnostic:supervisor"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/frozen-contract.json",
+      "sha256": "a0688ad3ebc0d732606b546614d052ca685f438fcd82d627113548cffdcc460b",
+      "size_bytes": 13995,
+      "roles": [
+        "gpu3_render_idle_diagnostic:contract_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_idle__8d9503386162/healthcheck-result.json",
+      "sha256": "2a2fd0ef56e62da23499b7d4c9be8480929800c8042d59bd1d86bea4ca33e696",
+      "size_bytes": 2832,
+      "roles": [
+        "gpu3_render_idle_diagnostic:result_path",
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-model-first.py",
+      "sha256": "63d0acaed3b5c1a3088dab79f49c2f224374406a0d9078c4c3aeeb2364eb2519",
+      "size_bytes": 20429,
+      "roles": [
+        "gpu3_model_first_diagnostic:script"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-model-first.py",
+      "sha256": "e834d28838e0e9c324af42b7fcb8aa67f789f61963e36952b0cc41f5816edfde",
+      "size_bytes": 15623,
+      "roles": [
+        "gpu3_model_first_diagnostic:supervisor"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/frozen-contract.json",
+      "sha256": "cf240423e1bc27969425d963cb9c208bf0a02011fc02abd2591ee66de0e0e1e1",
+      "size_bytes": 13973,
+      "roles": [
+        "gpu3_model_first_diagnostic:contract_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_model_first__256bd92ec777/healthcheck-result.json",
+      "sha256": "959c22fe5788bfee2006f55125563042302635ff6207b57490f9f2f6adba987f",
+      "size_bytes": 1232,
+      "roles": [
+        "gpu3_model_first_diagnostic:result_path",
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/diagnostic-analysis.json",
+      "sha256": "aef27ed572fa2157bb012e71764367f676af0664fcb7cca74c8fc921b6cb1213",
+      "size_bytes": 2835,
+      "roles": [
+        "gpu3_model_first_diagnostic:analysis_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-context-lifetime.py",
+      "sha256": "76c600819d57cc7179b3ba75c3f88ba5901053e68f38523ebbbe021c9785784f",
+      "size_bytes": 29669,
+      "roles": [
+        "gpu3_context_lifetime_diagnostic:script"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-context-lifetime.py",
+      "sha256": "995dcaae05ada01d445aadbee8ed9eae16b30f2216fd71e88a79dd63e78e6e69",
+      "size_bytes": 16883,
+      "roles": [
+        "gpu3_context_lifetime_diagnostic:supervisor"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/frozen-contract.json",
+      "sha256": "cd742189842d2de2217b2c03602dc5829ed29b0a66fde99589decfebacc0ebe0",
+      "size_bytes": 14003,
+      "roles": [
+        "gpu3_context_lifetime_diagnostic:contract_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_context_lifetime__a426c0351816/healthcheck-result.json",
+      "sha256": "fd3a4e546aae9afc53325b36d4db7860a57260017cb81459a14f56ef97da531c",
+      "size_bytes": 974,
+      "roles": [
+        "gpu3_context_lifetime_diagnostic:result_path",
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/diagnostic-analysis.json",
+      "sha256": "4da4b7e080abb4161ce9aa42d5ef9479971f3143117421acb8d5b18fa4560a19",
+      "size_bytes": 4209,
+      "roles": [
+        "gpu3_context_lifetime_diagnostic:analysis_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-native-render-lifetime.py",
+      "sha256": "cf48e493e74f2e44283eff537e1339c6ccb8e1a0ef643cbe4a65b11681c307c5",
+      "size_bytes": 23937,
+      "roles": [
+        "gpu3_native_render_lifetime_diagnostic:script"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/native-render-lifetime-proposal/native_render_lifetime.py",
+      "sha256": "ebbff19af379a2e0db523ef32df66cb2edbef6e62d74090db45957e4767b55c0",
+      "size_bytes": 12874,
+      "roles": [
+        "gpu3_native_render_lifetime_diagnostic:helper"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-native-render-lifetime.py",
+      "sha256": "a156aa0e7d752b57e1c4a554991036963c8a420edcb8186479f4a4546f064fd1",
+      "size_bytes": 18783,
+      "roles": [
+        "gpu3_native_render_lifetime_diagnostic:supervisor"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/frozen-contract.json",
+      "sha256": "535ebb5115237529d775fde8e1b334552d811d94fd90a95e549ed71eaebcca78",
+      "size_bytes": 15004,
+      "roles": [
+        "gpu3_native_render_lifetime_diagnostic:contract_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/healthcheck-result.json",
+      "sha256": "8a89bee43d3cd2812f5c31991ce14c410106a776640a8ae39f66c6324dc32cba",
+      "size_bytes": 993,
+      "roles": [
+        "gpu3_native_render_lifetime_diagnostic:result_path",
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/diagnostic-analysis.json",
+      "sha256": "e3ab8bb3b28bc96059058a44e87264158538d02b4c6781d82d0401917cc6be31",
+      "size_bytes": 6065,
+      "roles": [
+        "gpu3_native_render_lifetime_diagnostic:analysis_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__baseline_dev_t00_q0__49b1a88877f7/command.json",
+      "sha256": "8d426a1683a8267c17283d87ffe9649bff6cb06b83764d7e37a8319f6922a87d",
+      "size_bytes": 13653,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__baseline_dev_t00_q0__49b1a88877f7/attempt-result.json",
+      "sha256": "66f0467b771f54951884c238cc8150ef38cfa129d4194c0eb3ca9dd46700c2dc",
+      "size_bytes": 1809,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0__2b5e035fd6bb/command.json",
+      "sha256": "5614a46c2527bc7c3428ca8534d35acc0f8ab4a946c84601887f08507deed416",
+      "size_bytes": 13623,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0__2b5e035fd6bb/attempt-result.json",
+      "sha256": "81a10aa70b0635302609fffd63b0de8d284ec4f1fd92447c0f6ffeb8d79ca1d7",
+      "size_bytes": 1828,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r1__1eb8b4580e78/command.json",
+      "sha256": "7d7790498e3281e5e81968b3da33fc12fe2e886a10ebc3543525e5083dda0e76",
+      "size_bytes": 13638,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r1__1eb8b4580e78/attempt-result.json",
+      "sha256": "77c1619272713f2d60e45ac06b4bb29ebf65d0ec8aa731a15fc9cf3b4784d904",
+      "size_bytes": 1892,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r2__5621b7ebde96/command.json",
+      "sha256": "e911c4284ba4e1de74223e2b339287f9167697e11edd83bbba5e6f3416d0b5d4",
+      "size_bytes": 13638,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r2__5621b7ebde96/attempt-result.json",
+      "sha256": "13bb9271ef2b954a1639a2976d648116fbd303e6299c48e2515e1e07bf8540a4",
+      "size_bytes": 1858,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r3__6df33a24c65f/command.json",
+      "sha256": "7d955d872e41b798e2ff6321f2c8e1b2a4573b47f77156db15fe036c84c50103",
+      "size_bytes": 13638,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r3__6df33a24c65f/attempt-result.json",
+      "sha256": "6ee2aa9ce054d5f2530247fed67a410beccdc6226f5d144425be29e6c50173c6",
+      "size_bytes": 1858,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00__6e57273c45b3/command.json",
+      "sha256": "11685f9aa54610da6ad410431cdbf11cc432ba79e228f4f68f3caf168332641b",
+      "size_bytes": 13613,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00__6e57273c45b3/attempt-result.json",
+      "sha256": "4ff792fc819ae8a2889a379080dea3f29c719fd81a6bcda4beedb6c3d65238a6",
+      "size_bytes": 1853,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df/command.json",
+      "sha256": "fd958c880598db8af75470a40cf818b33e46084cc75b061aaf6292f654501fae",
+      "size_bytes": 13628,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df/attempt-result.json",
+      "sha256": "8818fd65dcffb5016ff3efc04e23636c97731bdfd5a5322cda71915ebe292466",
+      "size_bytes": 1925,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu3_native_c0_t00_r2__79342697c4d2/command.json",
+      "sha256": "147507ab33b5c8f2981fa3c915dea17468b59236ae83101e00648cb09177bbba",
+      "size_bytes": 13644,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu3_native_c0_t00_r2__79342697c4d2/attempt-result.json",
+      "sha256": "192a601ccd1aaae407030c1c86d4d99a4f9c0430c015883d27b8b5e865d9aacc",
+      "size_bytes": 1893,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu5_egl_serial_c0_t00__00baf2a27328/command.json",
+      "sha256": "8cdccdb9ed5d9fedbddd3928c07cc7295ff40e2acde6646431dafeb6c161ead6",
+      "size_bytes": 13670,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu5_egl_serial_c0_t00__00baf2a27328/attempt-result.json",
+      "sha256": "bf66c588a054fc7ecdcdb76bd251147dddb3ee086e4c44199a3d0a794bd7487e",
+      "size_bytes": 1871,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu5_render_lifetime_c0_t00__6c3f2c767df3/command.json",
+      "sha256": "b98639c1920f2ad6229d27dc153bc75a06271ea560b4dd1c74425e76922c2888",
+      "size_bytes": 13729,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu5_render_lifetime_c0_t00__6c3f2c767df3/attempt-result.json",
+      "sha256": "ac2d684d02a36ff523882f40b9540c553fea0c1a3a1ef93c9ee91fa67a2148c0",
+      "size_bytes": 1892,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74/command.json",
+      "sha256": "a12484428b1c84fbd9cae29c72e2054c7bb779b07c41934822e260b0a72710bc",
+      "size_bytes": 14090,
+      "roles": [
+        "scientific_attempt:command_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/attempts/rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74/attempt-result.json",
+      "sha256": "97180c7bad39033b8d12086bf12bdfa077c23613497ac20b7c6b32837e74d01d",
+      "size_bytes": 9675,
+      "roles": [
+        "scientific_attempt:result_path"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu7_cuda_egl__fe302aecdabc/healthcheck-result.json",
+      "sha256": "fd5e122fa7f954a609a736a021d3bab3e36be212f5d3efa6aa3769db3311ed6c",
+      "size_bytes": 726,
+      "roles": [
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu7_cuda_egl__37018e4719cd/healthcheck-result.json",
+      "sha256": "8e2fbdccd239b2626290074b1e311ecf486782fbabedc9d780916341b2dbea23",
+      "size_bytes": 1806,
+      "roles": [
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu7_cuda_egl__4fafff3673e5/healthcheck-result.json",
+      "sha256": "08a094f9e4848b1912d8e651bf96cba06902a320613eb14caea6d85be312dc78",
+      "size_bytes": 1930,
+      "roles": [
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_egl__a5ad637fabe8/healthcheck-result.json",
+      "sha256": "ab80cd9393cf6a9ef038df2b285bd8d3637a2765a9a3d3fe94b3926a647f5735",
+      "size_bytes": 1931,
+      "roles": [
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu6_cuda_egl__f77b064574fb/healthcheck-result.json",
+      "sha256": "6f5f95e8c4bb9d79027af8580cbc89ed22873a90aeb4dccbc47b5ece210a99d8",
+      "size_bytes": 1931,
+      "roles": [
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu6_cuda_egl__74d84549721c/healthcheck-result.json",
+      "sha256": "a095f1f4e69ea27c6c8c19c18dcdb17bcdf042666c0f470a44692f78fe280a7a",
+      "size_bytes": 1930,
+      "roles": [
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/native_probes/rdt-qd-ed-final-20260921T093925Z__gpu6_native_b1__b689d3b01c36/healthcheck-result.json",
+      "sha256": "ac145a756d0efa165ad362d749beb9d6dc8a60462836ae3a744371416dd8b6d7",
+      "size_bytes": 1939,
+      "roles": [
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_egl__e30fffebe9e4/healthcheck-result.json",
+      "sha256": "d54466f6d19583d57c3adc1ee66aac78f0e1bf5487be8de5846b159ebbcca0ce",
+      "size_bytes": 1930,
+      "roles": [
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_egl__060fecd66f77/healthcheck-result.json",
+      "sha256": "e8385096b29a8629d579514b0e6e7249b2bef14fcf353e41ccc150454964a913",
+      "size_bytes": 1931,
+      "roles": [
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/runtime/probes/rdt-qd-ed-final-20260921T093925Z__gpu2_cuda_egl__e2ff56fa9d05/healthcheck-result.json",
+      "sha256": "ca5a77b13fd754b89b2caea4b9fe5434b0a1c5f6e60a5991d242ca47cfb0d8ab",
+      "size_bytes": 1931,
+      "roles": [
+        "gpu_resource_result"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/frames/before_model_load/agentview_128x128_depth.npy",
+      "sha256": "5ac90f76852c2a6e2cccdc1e3f3f5960f6427273f996e673772aa2a86840e2c7",
+      "size_bytes": 65664,
+      "roles": [
+        "final_native_diagnostic_raw_array"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/frames/before_model_load/agentview_128x128_rgb.npy",
+      "sha256": "a2e63534b8e6266560a9b6e1c7f631f5c66f9832bd6cb9169167a2fd3d56e3da",
+      "size_bytes": 49280,
+      "roles": [
+        "final_native_diagnostic_raw_array"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/frames/before_model_load/robot0_eye_in_hand_128x128_depth.npy",
+      "sha256": "624e5e59abaa8cd3db8745dc12d05542e5a12a2e6fea65de17d9cd088654459e",
+      "size_bytes": 65664,
+      "roles": [
+        "final_native_diagnostic_raw_array"
+      ]
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/frames/before_model_load/robot0_eye_in_hand_128x128_rgb.npy",
+      "sha256": "d701bf509324ac84f2a897d55543faecd73c1295aedc43b5e1f3310340723c3c",
+      "size_bytes": 49280,
+      "roles": [
+        "final_native_diagnostic_raw_array"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+Committed `5da91e13a32211ac51ff0bb81d76aaefa0cc583f`: N36R3 authority validation, owner/source routing, and separate metered health readiness. First-C0 durable pause remains intact.
+
+Validation: **176 passed**, then **28 passed** after the final guard. Eight broader regression failures remain documented. A legacy test’s accidental STOP-file creation was corrected and recorded; owner state/journals were untouched.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001327/admission-implementation/report-v1.md>) · [JSON](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001327/admission-implementation/report-v1.json>)
+
+GPU and release remain disabled. Root review/adoption and actual readiness/G3 execution remain pending.

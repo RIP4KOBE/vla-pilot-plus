@@ -1,0 +1,226 @@
+diff --git a/scripts/test_n36_parent_anchor_child.py b/scripts/test_n36_parent_anchor_child.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..923414839c19cc6c763a6947e99a729f13db53bd
+--- /dev/null
++++ b/scripts/test_n36_parent_anchor_child.py
+@@ -0,0 +1,43 @@
++"""Isolated CPU alias fixture; no production closure or worker lifecycle claim."""
++import json, os, sys
++from pathlib import Path
++from scripts import qd_ed_n36_source as execution
++
++def main():
++    execution.active()
++    runtime_path, context_path = map(Path, sys.argv[1:3])
++    phase = sys.argv[3]
++    assert phase in ('runtime_before', 'runtime_after')
++    runtime=json.loads(runtime_path.read_text())
++    binding={'context':{'path':str(context_path),'sha256':execution.sha(context_path)},
++     'runtime_closure':{'path':str(runtime_path),'sha256':execution.sha(runtime_path)},
++     'process':{'pid':os.getpid(),'proc_start_ticks':Path('/proc/self/stat').read_text().rsplit(')',1)[1].split()[19],
++     'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip()},'phase':phase}
++    # Partial, observed CPU inventory for testing the actual producer. This is
++    # explicitly not the complete committed production source freeze.
++    root=Path(execution.__file__).resolve().parents[1]
++    state=execution.active()
++    source_files={str(root/'scripts/qd_ed_n36_bootstrap.py'):state.bootstrap_digest}
++    for (name,path),digest in state.compiled.items():
++        path=str(Path(path).resolve())
++        if Path(path).is_relative_to(root): source_files[path]=digest
++        elif name not in runtime['modules']: runtime['modules'][name]={'path':path,'sha256':digest}
++    for name,module in list(sys.modules.items()):
++        path=getattr(module,'__file__',None)
++        if path and Path(path).is_file() and not Path(path).resolve().is_relative_to(root) and name not in runtime['modules']:
++            runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':execution.sha(path)}
++    source={'files':[{'path':str(Path(path).relative_to(root)),'sha256':digest} for path,digest in source_files.items()]}
++    # Freeze this expanded test-only inventory before the parent's handoff.
++    frozen_path=runtime_path.with_name('observed-runtime.json')
++    frozen_path.write_text(json.dumps(runtime))
++    binding['runtime_closure']={'path':str(frozen_path),'sha256':execution.sha(frozen_path)}
++    print('READY',flush=True)
++    assert sys.stdin.read(1)=='G'
++    receipt=execution.attest(root,source,runtime,binding=binding)
++    observed = {'schema':'n34-runtime-receipt-v2', 'binding':binding,
++                'modules':runtime['modules'], 'generated_modules':{}}
++    print(json.dumps({'execution':receipt, 'runtime':observed}),flush=True)
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tests/test_n36_frozen_alias.py b/tests/test_n36_frozen_alias.py
+index 0b9d79cc69d5f0197f74d9eb7affbb2d86ccd577..ccb57fbd7f4f9af9d46154994ff83a7189ff8870 100644
+--- a/tests/test_n36_frozen_alias.py
++++ b/tests/test_n36_frozen_alias.py
+@@ -132,68 +132,111 @@ def test_full_parent_exemption_is_only_closed_aliases(proof,tmp_path,fault):
+     else: execution.verify_receipt(receipt,tmp_path,source,runtime,runtime_receipt=observed,binding=binding)
+ 
+ 
+-def test_fresh_source_bootstrap_process_receipt(tmp_path):
+-    """Real isolated interpreter proof; only alias inventory, never an episode."""
++@pytest.fixture(scope='module', params=['runtime_before', 'runtime_after'])
++def parent_anchored_receipts(tmp_path_factory, request):
++    """Capture expectations from files and /proc while the child awaits G."""
++    tmp_path = tmp_path_factory.mktemp('parent-anchor-' + request.param)
+     root = Path(__file__).resolve().parents[1]
+     record = {'path':str(Path(os.path.__file__).resolve()), 'sha256':execution.sha(os.path.__file__)}
++    # This required_after set is CPU alias coverage only, never production coverage.
+     runtime = {'interpreter':execution.interpreter_identity(),
+-               'modules':{'os.path':record,'posixpath':record}, 'required_after':['episode.only']}
+-    runtime_path = tmp_path/'runtime.json'; runtime_path.write_text(json.dumps(runtime))
+-    runtime_ref = {'path':str(runtime_path),'sha256':execution.sha(runtime_path)}
+-    context = tmp_path/'context.json'; context.write_text(json.dumps({'release_enabled':False,'cpu_only':True}))
+-    context_ref = {'path':str(context),'sha256':execution.sha(context)}
+-    program = tmp_path/'alias_child.py'
+-    program.write_text('''import json, os, sys
+-from pathlib import Path
+-from scripts import qd_ed_n36_source as execution
+-execution.active()
+-runtime_path, context_path = map(Path,sys.argv[1:])
+-runtime=json.loads(runtime_path.read_text())
+-binding={'context':{'path':str(context_path),'sha256':execution.sha(context_path)},
+- 'runtime_closure':{'path':str(runtime_path),'sha256':execution.sha(runtime_path)},
+- 'process':{'pid':os.getpid(),'proc_start_ticks':Path('/proc/self/stat').read_text().rsplit(')',1)[1].split()[19],
+- 'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip()},'phase':'runtime_before'}
+-# Partial, observed CPU inventory for testing the actual producer. This is
+-# explicitly not the complete committed production source freeze.
+-root=Path(execution.__file__).resolve().parents[1]
+-state=execution.active()
+-source_files={str(root/'scripts/qd_ed_n36_bootstrap.py'):state.bootstrap_digest}
+-for (name,path),digest in state.compiled.items():
+-    path=str(Path(path).resolve())
+-    if Path(path).is_relative_to(root): source_files[path]=digest
+-    elif name not in runtime['modules']: runtime['modules'][name]={'path':path,'sha256':digest}
+-for name,module in list(sys.modules.items()):
+-    path=getattr(module,'__file__',None)
+-    if path and Path(path).is_file() and not Path(path).resolve().is_relative_to(root) and name not in runtime['modules']:
+-        runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':execution.sha(path)}
+-source={'files':[{'path':str(Path(path).relative_to(root)),'sha256':digest} for path,digest in source_files.items()]}
+-# Freeze this expanded test-only inventory before the parent's handoff.
+-frozen_path=runtime_path.with_name('observed-runtime.json')
+-frozen_path.write_text(json.dumps(runtime))
+-binding['runtime_closure']={'path':str(frozen_path),'sha256':execution.sha(frozen_path)}
+-print('READY',flush=True)
+-assert sys.stdin.read(1)=='G'
+-receipt=execution.attest(root,source,runtime,binding=binding)
+-print(json.dumps(receipt),flush=True)
+-''')
+-    command = execution.command(sys.executable, root, 'alias_child', str(runtime_path), str(context))
+-    child = subprocess.Popen(command, env={**os.environ,'PYTHONPATH':str(tmp_path),'CUDA_VISIBLE_DEVICES':''},
++               'modules':{'os.path':record,'posixpath':record},
++               'required_after':['os.path', 'posixpath', '_frozen_importlib',
++                                 '_frozen_importlib_external']}
++    runtime_path = tmp_path/'runtime.json'
++    runtime_path.write_text(json.dumps(runtime))
++    context = tmp_path/'context.json'
++    context.write_text(json.dumps({'release_enabled':False, 'cpu_only':True}))
++    context_ref = {'path':str(context), 'sha256':execution.sha(context)}
++    command = execution.command(sys.executable, root, 'scripts.test_n36_parent_anchor_child',
++                                str(runtime_path), str(context), request.param)
++    child = subprocess.Popen(command, env={**os.environ, 'CUDA_VISIBLE_DEVICES':''},
+                              stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+-    assert child.stdout.readline().strip() == 'READY'
+-    frozen_path=runtime_path.with_name('observed-runtime.json')
+-    runtime=json.loads(frozen_path.read_text())
+-    assert runtime['modules']['os.path']==runtime['modules']['posixpath']==record
+-    assert all(execution.sha(row['path'])==row['sha256'] for row in runtime['modules'].values())
+-    runtime_ref={'path':str(frozen_path),'sha256':execution.sha(frozen_path)}
+-    identity = {'pid':child.pid, 'proc_start_ticks':Path(f'/proc/{child.pid}/stat').read_text().rsplit(')',1)[1].split()[19],
+-                'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
+-    stdout,stderr=child.communicate('G',timeout=20)
+-    assert child.returncode == 0, stderr
+-    receipt=json.loads(stdout)
+-    binding={'context':context_ref,'runtime_closure':runtime_ref,'process':identity,'phase':'runtime_before'}
+-    observed={'schema':'n34-runtime-receipt-v2','binding':binding,'modules':runtime['modules'],'generated_modules':{}}
+-    assert execution.verify_alias(receipt,runtime,observed,binding)=={'os.path'}
+-    closure.verify_runtime_receipt(runtime,observed,binding=binding,after=False)
+-    with pytest.raises(ValueError,match='incomplete'): closure.verify_runtime_receipt(runtime,observed,binding=binding,after=True)
+-    (tmp_path/'live-receipt.json').write_text(json.dumps({'command':command,'expected_binding':binding,
+-        'execution':receipt,'runtime':observed,'full_after_coverage':False},indent=2)+'\n')
++    try:
++        # Bound readiness independently of communicate; surface stderr on early exit.
++        import selectors
++        with selectors.DefaultSelector() as selector:
++            selector.register(child.stdout, selectors.EVENT_READ)
++            assert selector.select(timeout=20), 'isolated child readiness timeout'
++        ready = child.stdout.readline().strip()
++        if ready != 'READY':
++            stdout, stderr = child.communicate(timeout=5)
++            pytest.fail(f'isolated child readiness: {ready!r}; stdout={stdout}; stderr={stderr}')
++        frozen_path = runtime_path.with_name('observed-runtime.json')
++        runtime = json.loads(frozen_path.read_text())
++        assert runtime['interpreter'] == execution.interpreter_identity()
++        assert runtime['modules']['os.path'] == runtime['modules']['posixpath'] == record
++        assert all(execution.sha(row['path']) == row['sha256'] for row in runtime['modules'].values())
++        runtime_ref = {'path':str(frozen_path), 'sha256':execution.sha(frozen_path)}
++        identity = {'pid':child.pid,
++                    'proc_start_ticks':Path(f'/proc/{child.pid}/stat').read_text().rsplit(')',1)[1].split()[19],
++                    'boot_id':Path('/proc/sys/kernel/random/boot_id').read_text().strip()}
++        binding = {'context':context_ref, 'runtime_closure':runtime_ref,
++                   'process':identity, 'phase':request.param}
++        # Persist the independently captured expectation BEFORE releasing receipt production.
++        anchor = tmp_path/'parent-before-handoff.json'
++        anchor.write_text(json.dumps({'command':command, 'expected_binding':binding,
++                                      'child_poll':child.poll(), 'ready':ready}, indent=2)+'\n')
++        assert child.poll() is None
++        stdout, stderr = child.communicate('G', timeout=20)
++        (tmp_path/'child.stdout.log').write_text(stdout)
++        (tmp_path/'child.stderr.log').write_text(stderr)
++        assert child.returncode == 0, stderr
++    finally:
++        if child.poll() is None:
++            child.kill()
++            child.communicate(timeout=5)
++    receipts = json.loads(stdout)
++    assert execution.sha(context) == context_ref['sha256']
++    assert execution.sha(frozen_path) == runtime_ref['sha256']
++    assert json.loads(anchor.read_text())['expected_binding'] == binding
++    (tmp_path/'live-receipt.json').write_text(json.dumps({
++        'command':command, 'expected_binding':binding, **receipts,
++        'full_after_coverage':False}, indent=2)+'\n')
++    return runtime, binding, receipts['execution'], receipts['runtime']
++
++
++def test_fresh_source_bootstrap_process_receipt(parent_anchored_receipts):
++    """Both phases join actual file hashes to an independently captured process."""
++    runtime, binding, receipt, observed = parent_anchored_receipts
++    assert execution.verify_importlib_aliases(receipt, runtime, observed, binding) == {
++        'os.path', 'importlib._bootstrap', 'importlib._bootstrap_external'}
++    closure.verify_runtime_receipt(runtime, observed, binding=binding,
++                                   after=binding['phase'] == 'runtime_after')
++    incomplete = copy.deepcopy(runtime)
++    incomplete['required_after'].append('episode.only')
++    with pytest.raises(ValueError, match='incomplete'):
++        closure.verify_runtime_receipt(incomplete, observed, binding=binding, after=True)
++
++
++@pytest.mark.parametrize('target', ['parent', 'execution', 'runtime', 'all_receipts'])
++@pytest.mark.parametrize('field', ['context.path', 'context.sha256', 'runtime_closure.path',
++    'runtime_closure.sha256', 'process.pid', 'process.boot_id', 'process.proc_start_ticks', 'phase'])
++def test_fresh_parent_anchor_rejects_substitution(parent_anchored_receipts, target, field):
++    runtime, binding, receipt, observed = copy.deepcopy(parent_anchored_receipts)
++    changed = copy.deepcopy(binding)
++    if field == 'phase':
++        changed['phase'] = 'runtime_after' if binding['phase'] == 'runtime_before' else 'runtime_before'
++    else:
++        section, key = field.split('.')
++        value = changed[section][key]
++        if key == 'pid': value += 1
++        elif key == 'proc_start_ticks': value = str(int(value) + 1)
++        elif key == 'sha256': value = ('0' if value[0] != '0' else '1') + value[1:]
++        else: value += '.substituted'
++        changed[section][key] = value
++    if target == 'parent': binding = changed
++    elif target == 'execution': receipt['binding'] = changed
++    elif target == 'runtime': observed['binding'] = changed
++    else:
++        # Internally consistent forgery must still fail against the independent parent.
++        receipt['binding'] = copy.deepcopy(changed)
++        observed['binding'] = copy.deepcopy(changed)
++        for claim in list(receipt['frozen_aliases'].values()) + list(receipt['frozen_importlib_aliases'].values()):
++            claim['binding'] = copy.deepcopy(changed)
++    with pytest.raises(ValueError, match='context/process/phase differs'):
++        execution.verify_importlib_aliases(receipt, runtime, observed, binding)
++    if target != 'execution':
++        with pytest.raises(ValueError, match='schema/binding differs'):
++            closure.verify_runtime_receipt(runtime, observed, binding=binding,
++                                           after=binding['phase'] == 'runtime_after')

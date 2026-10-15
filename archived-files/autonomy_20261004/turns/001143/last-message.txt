@@ -1,0 +1,3 @@
+N36’s CPU review remains live and progressing. Verified process identities, authorization, unchanged source, and ledger; no duplicate dispatch occurred.
+
+Operational summary saved for turn 001143. Next: reconcile the reviewer’s report before implementation. Validation, formal evaluation, and required ablation evidence remain outstanding.

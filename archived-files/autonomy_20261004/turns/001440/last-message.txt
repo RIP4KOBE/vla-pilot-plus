@@ -1,0 +1,5 @@
+Continued N36R3 on source `d01bc1e2`. Verified unchanged ledgers and no active GPU worker.
+
+CPU repair executor PID `1553380` is addressing the CLI reference mismatch. Its handles and next review step are recorded in the operational summary.
+
+First-C0/G3, validation, formal evaluation, and ablation evidence remain pending.

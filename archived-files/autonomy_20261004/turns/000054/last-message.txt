@@ -1,0 +1,5 @@
+N31 remains active on frozen source `7428ce8`. Controller 203563 and monitor 203562 identities verified; ledger history preserved.
+
+Task5 Q0 completed as an audited valid failure. Five matched triples remain 0/5 per arm; task5 N31 is next.
+
+Turn54 operational summary saved. Continue monitoring toward cohort disposition; validation, formal and ablation evidence remain outstanding.

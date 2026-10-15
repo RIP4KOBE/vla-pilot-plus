@@ -1,0 +1,5 @@
+N34R4 runtime preparation passed: 30 fresh manifests generated, strict CPU attestations passed, and all prior charges preserved.
+
+No GPU cohort is active. The driver remains live. Next: freeze and validate the prospective release before GPU admission.
+
+Operational summary recorded. Validation, formal evaluation, and required ablation evidence remain outstanding; the goal is incomplete.

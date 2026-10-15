@@ -1,0 +1,5 @@
+N31 remains active under controller 203563, with task3 C0 dispatched. Frozen source `7428ce8` and ledger history are preserved.
+
+Three matched triples are complete: C0/Q0/N31 each 0/3. No scientific promotion or goal completion is evidenced.
+
+Turn 26 operational summary saved. Next: monitor the existing controller, then audit terminal results and accounting.

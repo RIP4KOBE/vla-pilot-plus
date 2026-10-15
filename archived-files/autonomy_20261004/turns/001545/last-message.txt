@@ -1,0 +1,3 @@
+Verified authority, live process identities and unchanged private ledgers. Existing G5 CPU preparation remains active; no duplicate dispatch or source change.
+
+Recorded turn 1545’s hash-bound operational summary. Next: reconcile G5 outputs, then remaining release checks. Validation, formal and required ablation evidence remain incomplete; the driver continues.

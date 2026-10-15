@@ -1,0 +1,115 @@
+{
+  "schema": "n4-external-resource-interruption-v1",
+  "utc": "2026-09-24T04:58:59.532793+00:00",
+  "source_commit": "f6a9ab04c0f184bbe2f8c837b33492835bc8fec9",
+  "supervisor_launch": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/first3-launch.json",
+    "sha256": "62de93b6599f330759b5690d325b070720020cc05c843eb21ecd72bb1250d557"
+  },
+  "supervisor_terminal": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/first3-launch-result.json",
+    "sha256": "e474e6218fca9f7701a64890ab90de14bdb5cd35cfd4ce2e7bf44ae0674e3dfe"
+  },
+  "queue_status": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/first3-status.json",
+    "sha256": "92ab6290122ace727875a5bbef475f55c8944d2dbe1f7a8a2d19649e09320cbb"
+  },
+  "stderr": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/first3-supervisor.stderr.log",
+    "sha256": "18d76d3047b95d8afdbf03b19c60a8058a814e89fa7f43ac7790d2b65342a2a7"
+  },
+  "external_hold": {
+    "active": true,
+    "priority": "GPU2 current research continuation",
+    "authorization": "Existing explicit user GPU2 priority and pause-after-current-episode instruction",
+    "paused_queue_pid": 3021562,
+    "paused_after_completed_keys": [
+      "n4_dev_t00_c0_20260924",
+      "n4_dev_t00_q0_20260924"
+    ],
+    "remaining_selected_keys": [
+      "n4_dev_t00_n4_20260924"
+    ],
+    "active_episode_aborted": false,
+    "do_not_auto_resume": true,
+    "note_path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/RESOURCE_PRIORITY_GPU2_N1U.md"
+  },
+  "current_state_budget": {
+    "max_gpu_hours": 48.0,
+    "gpu_hours_consumed": 16.081373450989588,
+    "max_episode_attempts": 240,
+    "reserved": {
+      "baseline": 11,
+      "development": 122,
+      "validation": 60,
+      "formal": 40,
+      "recovery": 7
+    },
+    "dispatched": 114,
+    "aborted": 10,
+    "valid": 94,
+    "running": 0,
+    "invalid": 10,
+    "completed": 104,
+    "gpu_hour_reservations": {
+      "validation": 14.0,
+      "formal": 10.0
+    },
+    "attempt_reallocation": {
+      "authorization_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z/resource/n1u-budget-approval/authorization.json",
+      "authorization_sha256": "ebd43aa5ad751aee9de02c956f9da91ffaa1e76312189ebcf07c3a99b682ea55",
+      "synchronized_utc": "2026-09-24T04:53:24.633548+00:00",
+      "shared_authority": "Same user-approved transfer applies to both worktrees; source caps may be stricter, never create extra authority."
+    }
+  },
+  "actual_shared_costs": {
+    "dispatched": 114,
+    "aborted": 10,
+    "valid": 94,
+    "invalid": 10,
+    "completed": 104,
+    "running": 0,
+    "gpu_hours_consumed": 16.081373450989588,
+    "by_bucket": {
+      "baseline": 13,
+      "development": 94,
+      "validation": 0,
+      "formal": 0,
+      "recovery": 7
+    },
+    "reserved_attempts": 114,
+    "gpu_hours_by_bucket": {
+      "baseline": 1.3482588094288481,
+      "development": 13.568634138405747,
+      "validation": 0.0,
+      "formal": 0.0,
+      "recovery": 1.1644805031549907
+    },
+    "gpu_healthcheck_hours": 0.2602564145160282,
+    "gpu_healthcheck_inflight": 0
+  },
+  "frozen_N4_caps": {
+    "baseline": 20,
+    "development": 100,
+    "validation": 60,
+    "formal": 40,
+    "recovery": 20
+  },
+  "unchanged_active_resource_pointer": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-shared-resource-active.json",
+    "sha256": "0fc8c4f4e086bfa8bc5573264d2f21680709f7764beeab380d72efdd8df76af5"
+  },
+  "unchanged_N4_resource_contract": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-resource-resumption-v1/shared-resource-contract-v1.json",
+    "sha256": "26972958be5372d8dffd304abcba844259e882588ca86a20c3b703e9446768b5"
+  },
+  "partial_report": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/interrupted-first2-report-v1/report.json",
+    "sha256": "f30d681e639d0b409b7817d07708d69b5d40c7e29be4976e8fc75727482a8580"
+  },
+  "queue_interruption_signal": "SIGTERM handled as KeyboardInterrupt; no active episode aborted",
+  "N4_candidate_dispatched": false,
+  "user_priority_clarification_pending": true,
+  "no_resume_authorized_by_this_record": true,
+  "external_scientific_evidence_policy": "A coordination notice was opened to investigate priority and contained external scientific text; none is imported into the frozen hypothesis, task selection, comparisons, report, resource decision or continuation. Further external inspection is restricted to structured resource metadata."
+}

@@ -1,0 +1,3 @@
+N32’s existing CPU executor remains live and identity-verified. N31 is closed for numeric futility; source and private ledgers remain unchanged.
+
+Turn 94’s operational summary is recorded. Next: review the completed adapter delivery before GPU release. Validation, formal evaluation, and required ablation evidence remain outstanding.

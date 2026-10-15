@@ -1,0 +1,7 @@
+Committed N34R2 identity repair as `82fe104752fa89d56501bbc78bae856e6bd6ad8a`.
+
+508 focused CPU tests passed; worktree clean. Both invalid histories remain charged, with science and strict audits unchanged.
+
+Written to the requested output directory: `implementation-result-v1.json` and `report-v1.md`.
+
+Root review/adoption and fresh runtime composition remain pending. No GPU/provider launches or owning-state writes.

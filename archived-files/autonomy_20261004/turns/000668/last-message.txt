@@ -1,0 +1,5 @@
+Adopted N34R6’s operational identity repair as `f43de005`; reviewed 377 passing focused tests. Scientific code and all ledger charges remain unchanged.
+
+No GPU cohort is active. Next: regenerate runtime provenance and validate a fresh release before GPU7 dispatch. Validation, formal evaluation, and required ablation evidence remain outstanding.
+
+[Operational summary](../autonomy_20261004/turns/000668/operational-summary.md)

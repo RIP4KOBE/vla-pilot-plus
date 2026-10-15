@@ -1,0 +1,5 @@
+Recorded hash-bound source acceptance for repair `e957458`. Owning source remains unchanged; no GPU worker is active.
+
+All 504 dispatches and 75.49265 GPU-hours remain charged. N36R1 remains INVALID.
+
+Next: prepare the fresh recovery identity and frozen runtime closure, then complete production checks and independent release review. Validation, formal evaluation, and required ablation evidence remain unmet. Operational summary saved for driver continuation.

@@ -1,0 +1,34 @@
+{
+  "schema": "n36r1-root-production-repair-review-v1",
+  "at": "2026-10-10T01:10:53.142169+00:00",
+  "status": "PASS_BOUNDED_SOURCE_REPAIR_ONLY",
+  "report": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001225/production-repair/report-v1.json",
+    "sha256": "215514b05b86c1f0764464a474604c51a2aa53e6687a2727e6610f4c23364833"
+  },
+  "exit": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001225/production-repair/executor-exit-v1.json",
+    "sha256": "20e58e56e54c10c117ab4553ba0c8d04a83fe349e691c87f62d7f8e24821c68e"
+  },
+  "old_source": "066f2bf57e05111fea329ff7c393ac3e002d7c0f",
+  "new_source": "ca4e6a96d049c7ebb1f302d755883388ddbfdbd8",
+  "changed_files": [
+    "scripts/qd_ed_n36_runner.py",
+    "scripts/qd_ed_n36_worker.py",
+    "tests/test_n36_production_repair.py"
+  ],
+  "checks": [
+    "All six artifact hashes verified",
+    "Exact parent and three-file patch reviewed",
+    "Independent CPU regression run: six tests PASS",
+    "PR-01 exact source launcher envelope now shared by runner and terminal verifier; downstream native checks remain mandatory",
+    "PR-04 full1840 second checks at both final handoffs; rejected handoff remains unsettled; owned timeout cleanup unchanged"
+  ],
+  "gpu_dispatch_authorized": false,
+  "remaining": [
+    "PR-02 owning source adoption",
+    "PR-03 exact accounting reference adoption",
+    "Fresh owning runtime/source/controller/all40 binding and independent final production review",
+    "Same-worker native and original scientific evidence"
+  ]
+}

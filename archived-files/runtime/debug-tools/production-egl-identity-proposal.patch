@@ -1,0 +1,505 @@
+diff --git a/core/production_egl_identity_observer.py b/core/production_egl_identity_observer.py
+new file mode 100644
+--- /dev/null
++++ b/core/production_egl_identity_observer.py
+@@ -0,0 +1,234 @@
++"""Unapplied proposal: inspect an already-current production EGL context once.
++
++Import and construction are CPU-only. Native queries run only when an explicit
++after_successful_render callback is invoked. This module never creates a display
++or context, makes one current, renders, steps a simulator, or reads credentials.
++"""
++from __future__ import annotations
++
++import ctypes
++import functools
++import json
++import os
++from pathlib import Path
++import re
++import sys
++import threading
++import time
++
++
++UNKNOWN = 'Unknown'
++EXPECTED_FIELDS = (
++    'physical_gpu', 'uuid', 'pci_bus_id', 'egl_device_index',
++    'cuda_visible_devices', 'cuda_device_order', 'process_cuda_ordinal',
++)
++OBSERVED_FIELDS = (
++    'egl_current_display', 'egl_current_context', 'egl_display_device',
++    'egl_device_index', 'egl_device_cuda_ordinal', 'gl_vendor', 'gl_renderer',
++    'gl_version', 'drm_device_file', 'drm_pci_bus_id', 'physical_gpu', 'gpu_uuid',
++)
++
++
++class ReadOnlyEGLQueries:
++    """Use raw entrypoints from already-loaded PyOpenGL DLL handles only.
++
++    Access cached platform attributes through __dict__ so lazy library loaders
++    cannot run. Fresh ctypes call views omit wrappers/errcheck without changing
++    the production function objects. Missing exports or extension proof remain
++    unavailable; there is no eglGetProcAddress fallback.
++    """
++
++    def __init__(self):
++        module = sys.modules.get('OpenGL.platform')
++        platform = vars(module).get('PLATFORM') if module is not None else None
++        cached = vars(platform) if platform is not None else {}
++        self._egl, self._gl = cached.get('EGL'), cached.get('GL')
++        if self._egl is None:
++            raise LookupError('production EGL library is not already loaded')
++        self._display_extensions = None
++        self._device_extensions = {}
++        self._display = None
++
++    @staticmethod
++    def raw(library, name, result, arguments):
++        if library is None:
++            raise LookupError('production library is not already loaded')
++        original = getattr(library, name, None)
++        if original is None:
++            raise LookupError('raw query is not exported by loaded library')
++        address = ctypes.cast(original, ctypes.c_void_p).value
++        if not address:
++            raise LookupError('raw query address is unavailable')
++        return ctypes.CFUNCTYPE(result, *arguments)(address)
++
++    def current_display(self):
++        self._display = self.raw(self._egl, 'eglGetCurrentDisplay', ctypes.c_void_p, [])()
++        return self._display
++
++    def current_context(self):
++        return self.raw(self._egl, 'eglGetCurrentContext', ctypes.c_void_p, [])()
++
++    def gl_string(self, enum):
++        value = self.raw(self._gl, 'glGetString', ctypes.c_char_p, [ctypes.c_uint])(enum)
++        return value.decode('utf-8', errors='replace') if value else None
++
++    def supports_display(self, *extensions):
++        if self._display_extensions is None:
++            function = self.raw(self._egl, 'eglQueryString', ctypes.c_char_p, [ctypes.c_void_p, ctypes.c_int])
++            value = function(self._display, 0x3055)
++            self._display_extensions = set(value.decode('ascii', errors='replace').split()) if value else set()
++        if not any(extension in self._display_extensions for extension in extensions):
++            raise LookupError('required extension support not proven on current display')
++
++    def display_device(self, display):
++        self.supports_display('EGL_EXT_device_query', 'EGL_EXT_device_base')
++        function = self.raw(self._egl, 'eglQueryDisplayAttribEXT', ctypes.c_uint,
++                            [ctypes.c_void_p, ctypes.c_int, ctypes.POINTER(ctypes.c_ssize_t)])
++        value = ctypes.c_ssize_t()
++        return value.value if function(display, 0x322C, ctypes.byref(value)) else None
++
++    def device_cuda_ordinal(self, device):
++        self.supports_display('EGL_EXT_device_query', 'EGL_EXT_device_base')
++        if device not in self._device_extensions:
++            function = self.raw(self._egl, 'eglQueryDeviceStringEXT', ctypes.c_char_p, [ctypes.c_void_p, ctypes.c_int])
++            value = function(device, 0x3055)
++            self._device_extensions[device] = set(value.decode('ascii', errors='replace').split()) if value else set()
++        if 'EGL_NV_device_cuda' not in self._device_extensions[device]:
++            raise LookupError('CUDA device attribute support not proven on observed device')
++        function = self.raw(self._egl, 'eglQueryDeviceAttribEXT', ctypes.c_uint,
++                            [ctypes.c_void_p, ctypes.c_int, ctypes.POINTER(ctypes.c_ssize_t)])
++        value = ctypes.c_ssize_t()
++        return value.value if function(device, 0x323A, ctypes.byref(value)) else None
++
++    def device_indices(self, device):
++        self.supports_display('EGL_EXT_device_enumeration', 'EGL_EXT_device_base')
++        function = self.raw(self._egl, 'eglQueryDevicesEXT', ctypes.c_uint,
++            [ctypes.c_int, ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.c_int)])
++        count = ctypes.c_int()
++        devices = (ctypes.c_void_p * 128)()
++        if not function(128, devices, ctypes.byref(count)) or not 0 < count.value <= 128:
++            return []
++        return [index for index in range(count.value) if devices[index] == device]
++
++
++def query_current_context(queries_factory=ReadOnlyEGLQueries):
++    """Observe only the calling thread's current context; absent data stays Unknown."""
++    observed = {field: UNKNOWN for field in OBSERVED_FIELDS}
++    unavailable = []
++    def attempt(field, function):
++        try:
++            value = function()
++        except Exception as exc:
++            unavailable.append({'field': field, 'reason': type(exc).__name__})
++            return None
++        if value is None or value == '' or value == []:
++            unavailable.append({'field': field, 'reason': 'query_unavailable'})
++            return None
++        return value
++    queries = attempt('egl_library', queries_factory)
++    if queries is None:
++        return {'observed': observed, 'unavailable': unavailable}
++    display = attempt('egl_current_display', queries.current_display)
++    context = attempt('egl_current_context', queries.current_context)
++    if display:
++        observed['egl_current_display'] = hex(display)
++    if context:
++        observed['egl_current_context'] = hex(context)
++    if not display or not context:
++        unavailable.append({'field': 'current_context', 'reason': 'no_current_display_or_context'})
++        return {'observed': observed, 'unavailable': unavailable}
++    for field, enum in (('gl_vendor', 0x1F00), ('gl_renderer', 0x1F01), ('gl_version', 0x1F02)):
++        value = attempt(field, lambda enum=enum: queries.gl_string(enum))
++        if value is not None:
++            observed[field] = value
++    device = attempt('egl_display_device', lambda: queries.display_device(display))
++    if device:
++        observed['egl_display_device'] = hex(device)
++        ordinal = attempt('egl_device_cuda_ordinal', lambda: queries.device_cuda_ordinal(device))
++        if ordinal is not None:
++            observed['egl_device_cuda_ordinal'] = ordinal
++        indices = attempt('egl_device_index', lambda: queries.device_indices(device))
++        if indices is not None and len(indices) == 1:
++            observed['egl_device_index'] = indices[0]
++        elif indices is not None:
++            unavailable.append({'field': 'egl_device_index', 'reason': 'ambiguous_device_enumeration'})
++    # Current EGL metadata does not independently provide a NVIDIA index/UUID.
++    # In particular, do not substitute CUDA_VISIBLE_DEVICES or expected values.
++    return {'observed': observed, 'unavailable': unavailable}
++
++
++def comparisons(expected, observed):
++    def equal(observed_field, expected_field, normalize=lambda value: value):
++        left, right = observed.get(observed_field, UNKNOWN), expected.get(expected_field, UNKNOWN)
++        if left == UNKNOWN or right == UNKNOWN:
++            return UNKNOWN
++        try:
++            return normalize(left) == normalize(right)
++        except Exception:
++            return UNKNOWN
++    def pci(value):
++        match = re.fullmatch(r'([0-9a-fA-F]+):([0-9a-fA-F]{2}):([0-9a-fA-F]{2})\.([0-7])', value)
++        if match is None:
++            raise ValueError('invalid PCI identifier')
++        return tuple(int(group, 16) for group in match.groups())
++    return {'egl_device_index_matches': equal('egl_device_index', 'egl_device_index'),
++            'process_cuda_ordinal_matches': equal('egl_device_cuda_ordinal', 'process_cuda_ordinal'),
++            'drm_pci_bus_id_matches': equal('drm_pci_bus_id', 'pci_bus_id', pci),
++            'physical_gpu_index_matches': UNKNOWN, 'gpu_uuid_matches': UNKNOWN}
++
++
++class CurrentContextIdentityObserver:
++    """Best-effort callback; at most one query attempt after successful rendering."""
++
++    def __init__(self, output_path, expected, *, query_fn=query_current_context):
++        self.output_path = Path(output_path)
++        self.expected = {field: expected.get(field, UNKNOWN) for field in EXPECTED_FIELDS}
++        self.query_fn = query_fn
++        self._attempted = False
++        self._lock = threading.Lock()
++        self.last_record = None
++
++    def after_successful_render(self):
++        # The diagnostic's own lock does not replace or acquire the renderer lock.
++        with self._lock:
++            if self._attempted:
++                return
++            self._attempted = True
++        record = {'schema': 'production-egl-current-context-observation-v1',
++                  'time_unix': time.time(), 'thread_id': threading.get_ident(),
++                  'trigger': 'original_production_render_returned_successfully',
++                  'expected': self.expected,
++                  'observation_policy': 'current calling-thread context only; environment is not device evidence',
++                  'extra_render_calls': 0, 'extra_simulation_steps': 0,
++                  'context_create_calls': 0, 'make_current_calls': 0}
++        try:
++            record.update(self.query_fn())
++        except Exception as exc:
++            record.update(observed={field: UNKNOWN for field in OBSERVED_FIELDS},
++                          unavailable=[{'field': 'identity_query', 'reason': type(exc).__name__}])
++        try:
++            record['comparison'] = comparisons(self.expected, record['observed'])
++            self.last_record = record
++            self.output_path.parent.mkdir(parents=True, exist_ok=True)
++            # Create-only: never overwrite a prior run's context observation.
++            with self.output_path.open('x') as stream:
++                stream.write(json.dumps(record, sort_keys=True, allow_nan=False) + '\n')
++                stream.flush()
++                os.fsync(stream.fileno())
++        except Exception:
++            # A missing/unwritable path, malformed diagnostic value, or duplicate
++            # artifact cannot change the original renderer's result or exception.
++            return
++
++
++def wrap_render_once(original, observer):
++    """Optional instance wrapper: exactly one original call with untouched args."""
++    @functools.wraps(original)
++    def wrapped(*args, **kwargs):
++        result = original(*args, **kwargs)
++        try:
++            observer.after_successful_render()
++        except Exception:
++            pass
++        return result
++    return wrapped
+diff --git a/tests/test_production_egl_identity_observer.py b/tests/test_production_egl_identity_observer.py
+new file mode 100644
+--- /dev/null
++++ b/tests/test_production_egl_identity_observer.py
+@@ -0,0 +1,261 @@
++"""CPU mocks only: no ctypes library is loaded and no native context is queried."""
++import importlib.util
++import json
++from pathlib import Path
++import threading
++import ctypes
++from types import SimpleNamespace
++
++import pytest
++
++
++HERE = Path(__file__).resolve().parents[1] / 'core'
++spec = importlib.util.spec_from_file_location('production_egl_identity_observer', HERE / 'production_egl_identity_observer.py')
++observer_module = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(observer_module)
++
++
++EXPECTED = {'physical_gpu': 7, 'uuid': 'GPU-frozen', 'pci_bus_id': '00000000:E1:00.0',
++            'egl_device_index': 4, 'cuda_visible_devices': '7', 'cuda_device_order': 'PCI_BUS_ID',
++            'process_cuda_ordinal': 0}
++
++
++class MockQueries:
++    def __init__(self, *, context=0x44, display=0x22, missing=None):
++        self.context, self.display, self.missing = context, display, missing
++        self.calls = []
++    def current_display(self):
++        self.calls.append('current_display')
++        return self.display
++    def current_context(self):
++        self.calls.append('current_context')
++        return self.context
++    def gl_string(self, enum):
++        self.calls.append(('gl_string', enum))
++        if self.missing == 'gl_renderer' and enum == 0x1F01:
++            raise RuntimeError('query failure')
++        return {0x1F00: 'NVIDIA Corporation', 0x1F01: 'Mock NVIDIA GPU', 0x1F02: 'Mock GL 4.6'}[enum]
++    def display_device(self, display):
++        assert display == 0x22
++        self.calls.append('display_device')
++        if self.missing == 'display_device':
++            raise LookupError('extension unavailable')
++        return 0x66
++    def device_cuda_ordinal(self, device):
++        assert device == 0x66
++        self.calls.append('cuda_ordinal')
++        return 0
++    def device_indices(self, device):
++        assert device == 0x66
++        self.calls.append('device_indices')
++        return [4]
++
++
++def test_mock_query_records_actual_metadata_without_inventing_physical_uuid():
++    queries = MockQueries()
++    result = observer_module.query_current_context(lambda: queries)
++    actual = result['observed']
++    assert actual['egl_current_context'] == '0x44'
++    assert actual['egl_current_display'] == '0x22'
++    assert actual['egl_display_device'] == '0x66'
++    assert actual['egl_device_index'] == 4 and actual['egl_device_cuda_ordinal'] == 0
++    assert actual['gl_vendor'] == 'NVIDIA Corporation'
++    assert actual['gl_renderer'] == 'Mock NVIDIA GPU'
++    assert actual['drm_pci_bus_id'] == 'Unknown'
++    assert actual['physical_gpu'] == actual['gpu_uuid'] == observer_module.UNKNOWN
++    assert observer_module.comparisons(EXPECTED, actual) == {
++        'egl_device_index_matches': True, 'process_cuda_ordinal_matches': True,
++        'drm_pci_bus_id_matches': 'Unknown', 'physical_gpu_index_matches': 'Unknown', 'gpu_uuid_matches': 'Unknown'}
++    assert queries.calls == ['current_display', 'current_context', ('gl_string', 0x1F00),
++        ('gl_string', 0x1F01), ('gl_string', 0x1F02), 'display_device', 'cuda_ordinal',
++        'device_indices']
++
++
++@pytest.mark.parametrize('display,context', [(0, 0x44), (0x22, 0), (0, 0)])
++def test_missing_current_context_does_not_query_gl_or_any_device(display, context):
++    queries = MockQueries(context=context, display=display)
++    result = observer_module.query_current_context(lambda: queries)
++    assert queries.calls == ['current_display', 'current_context']
++    assert result['observed']['gl_renderer'] == 'Unknown'
++    assert result['observed']['egl_device_index'] == 'Unknown'
++
++
++@pytest.mark.parametrize('missing', ['display_device', 'gl_renderer'])
++def test_optional_query_failure_records_unknown_but_retains_other_observations(missing):
++    result = observer_module.query_current_context(lambda: MockQueries(missing=missing))
++    assert result['observed']['gl_vendor'] == 'NVIDIA Corporation'
++    if missing == 'display_device':
++        assert result['observed']['egl_display_device'] == result['observed']['egl_device_index'] == 'Unknown'
++    else:
++        assert result['observed']['gl_renderer'] == 'Unknown'
++        assert result['observed']['egl_device_index'] == 4
++    assert result['unavailable']
++
++
++def test_no_observation_or_native_load_during_import_or_construction(tmp_path, monkeypatch):
++    monkeypatch.setattr(observer_module.ctypes, 'CDLL', lambda *args: pytest.fail('must not load EGL'))
++    observer = observer_module.CurrentContextIdentityObserver(tmp_path / 'identity.json', EXPECTED)
++    assert observer.last_record is None
++    assert not (tmp_path / 'identity.json').exists()
++
++
++def test_native_facade_reuses_loaded_raw_entries_without_wrappers_or_extension_fallback(monkeypatch):
++    calls = []
++    # All addresses below are CPU ctypes callbacks, not driver/library functions.
++    display = ctypes.CFUNCTYPE(ctypes.c_void_p)(lambda: 0x22)
++    context = ctypes.CFUNCTYPE(ctypes.c_void_p)(lambda: 0x44)
++    display.errcheck = lambda *args: pytest.fail('must not call original errcheck')
++    strings = {enum: ctypes.create_string_buffer(value) for enum, value in (
++        (0x1F00, b'loaded vendor'), (0x1F01, b'loaded renderer'), (0x1F02, b'loaded version'))}
++    empty_extensions = ctypes.create_string_buffer(b'')
++    def get_string(enum):
++        calls.append(enum)
++        return ctypes.addressof(strings[enum])
++    gl_string = ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.c_uint)(get_string)
++    query_string = ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int)(
++        lambda display, enum: ctypes.addressof(empty_extensions))
++    egl = SimpleNamespace(eglGetCurrentDisplay=display, eglGetCurrentContext=context,
++        eglQueryString=query_string,
++        eglGetError=lambda: pytest.fail('must not consume errors'),
++        eglGetProcAddress=lambda *args: pytest.fail('must not resolve extension entries'),
++        eglQueryDisplayAttribEXT=lambda *args: pytest.fail('must not query unsupported attributes'))
++    gl = SimpleNamespace(glGetString=gl_string, glGetError=lambda: pytest.fail('must not consume errors'))
++    platform = SimpleNamespace(EGL=egl, GL=gl)
++    monkeypatch.setitem(observer_module.sys.modules, 'OpenGL.platform', SimpleNamespace(PLATFORM=platform))
++    monkeypatch.setattr(observer_module.ctypes, 'CDLL', lambda *args: pytest.fail('must not load libraries'))
++    result = observer_module.query_current_context()
++    assert result['observed']['egl_current_display'] == '0x22'
++    assert result['observed']['egl_current_context'] == '0x44'
++    assert result['observed']['gl_renderer'] == 'loaded renderer'
++    assert result['observed']['egl_display_device'] == 'Unknown'
++    assert calls == [0x1F00, 0x1F01, 0x1F02]
++
++
++def test_missing_cached_library_never_triggers_platform_lazy_loader(monkeypatch):
++    class Platform:
++        @property
++        def EGL(self):
++            pytest.fail('must not trigger EGL lazy loader')
++    monkeypatch.setitem(observer_module.sys.modules, 'OpenGL.platform', SimpleNamespace(PLATFORM=Platform()))
++    result = observer_module.query_current_context()
++    assert set(result['observed'].values()) == {'Unknown'}
++
++
++def test_cuda_attribute_is_not_queried_without_observed_device_extension(monkeypatch):
++    queries = object.__new__(observer_module.ReadOnlyEGLQueries)
++    queries._display_extensions = {'EGL_EXT_device_query'}
++    queries._device_extensions = {0x66: {'EGL_EXT_device_drm'}}
++    monkeypatch.setattr(queries, 'raw', lambda *args: pytest.fail('unsupported CUDA attribute must not be queried'))
++    with pytest.raises(LookupError, match='support not proven'):
++        queries.device_cuda_ordinal(0x66)
++
++
++def test_wrapping_preserves_render_pixel_calls_locks_arguments_and_object_identity(tmp_path):
++    calls, expected_result = [], object()
++    render_lock = threading.Lock()
++    def query():
++        # Wrapped at the existing read_pixels success boundary, still inside
++        # MjSim.render's original lock. The observer does not acquire this lock.
++        assert render_lock.locked()
++        calls.append('query')
++        return observer_module.query_current_context(lambda: MockQueries())
++    observer = observer_module.CurrentContextIdentityObserver(tmp_path / 'identity.json', EXPECTED, query_fn=query)
++    def read_pixels(*args, **kwargs):
++        assert render_lock.locked()
++        calls.append(('read_pixels', args, kwargs))
++        return expected_result
++    wrapped_read_pixels = observer_module.wrap_render_once(read_pixels, observer)
++    def original_render(*args, **kwargs):
++        calls.append(('render', args, kwargs))
++        with render_lock:
++            calls.append('existing_context_render')
++            return wrapped_read_pixels(*args, **kwargs)
++    for _ in range(2):
++        assert original_render(640, 640, depth=True) is expected_result
++    assert calls.count('query') == 1
++    assert calls.count('existing_context_render') == 2
++    assert [entry for entry in calls if isinstance(entry, tuple)] == [
++        ('render', (640, 640), {'depth': True}), ('read_pixels', (640, 640), {'depth': True}),
++        ('render', (640, 640), {'depth': True}), ('read_pixels', (640, 640), {'depth': True})]
++    assert not render_lock.locked()
++    record = json.loads((tmp_path / 'identity.json').read_text())
++    assert record['extra_render_calls'] == record['extra_simulation_steps'] == 0
++    assert record['context_create_calls'] == record['make_current_calls'] == 0
++
++
++def test_original_exception_propagates_unchanged_without_identity_query(tmp_path):
++    exception = ValueError('original render failed')
++    observer = observer_module.CurrentContextIdentityObserver(tmp_path / 'identity.json', EXPECTED,
++        query_fn=lambda: pytest.fail('no successful original render'))
++    calls = []
++    def original(*args, **kwargs):
++        calls.append((args, kwargs))
++        raise exception
++    wrapped = observer_module.wrap_render_once(original, observer)
++    with pytest.raises(ValueError) as raised:
++        wrapped(1, depth=False)
++    assert raised.value is exception
++    assert calls == [((1,), {'depth': False})]
++    assert observer.last_record is None and observer._attempted is False
++
++
++def test_identity_failure_and_unwritable_artifact_cannot_change_original_result(tmp_path):
++    expected_result = object()
++    queries = []
++    def failed_query():
++        queries.append(1)
++        raise OSError('identity unavailable')
++    # A directory cannot be opened as the create-only artifact; failure ignored.
++    observer = observer_module.CurrentContextIdentityObserver(tmp_path, EXPECTED, query_fn=failed_query)
++    calls = []
++    def original(value):
++        calls.append(value)
++        return expected_result
++    wrapped = observer_module.wrap_render_once(original, observer)
++    assert wrapped(1) is expected_result and wrapped(2) is expected_result
++    assert calls == [1, 2] and queries == [1]
++    assert observer.last_record['observed']['egl_current_context'] == 'Unknown'
++
++
++def test_failed_identity_query_is_written_as_unknown_and_not_retried(tmp_path):
++    calls = []
++    def query():
++        calls.append(1)
++        raise RuntimeError('failure')
++    observer = observer_module.CurrentContextIdentityObserver(tmp_path / 'identity.json', EXPECTED, query_fn=query)
++    observer.after_successful_render()
++    observer.after_successful_render()
++    record = json.loads((tmp_path / 'identity.json').read_text())
++    assert calls == [1]
++    assert set(record['observed'].values()) == {'Unknown'}
++    assert set(record['comparison'].values()) == {'Unknown'}
++
++
++def test_expected_environment_never_becomes_observed_identity_and_secrets_are_not_copied(tmp_path):
++    expected = {**EXPECTED, 'api_key': 'REDACTED'}
++    observer = observer_module.CurrentContextIdentityObserver(tmp_path / 'identity.json', expected,
++        query_fn=lambda: observer_module.query_current_context(lambda: MockQueries(context=0)))
++    observer.after_successful_render()
++    text = (tmp_path / 'identity.json').read_text()
++    record = json.loads(text)
++    assert 'api_key' not in text and 'must-never-be-recorded' not in text
++    assert record['expected']['physical_gpu'] == 7
++    assert record['observed']['physical_gpu'] == record['observed']['gpu_uuid'] == 'Unknown'
++
++
++def test_prior_identity_artifact_is_never_overwritten(tmp_path):
++    output = tmp_path / 'identity.json'
++    output.write_text('prior-record')
++    observer = observer_module.CurrentContextIdentityObserver(output, EXPECTED,
++        query_fn=lambda: observer_module.query_current_context(lambda: MockQueries()))
++    observer.after_successful_render()
++    assert output.read_text() == 'prior-record'
++
++
++def test_comparison_distinguishes_mismatch_and_unknown():
++    observed = {'egl_device_index': 2, 'egl_device_cuda_ordinal': 0, 'drm_pci_bus_id': '0001:e1:00.0'}
++    result = observer_module.comparisons(EXPECTED, observed)
++    assert result['egl_device_index_matches'] is False
++    assert result['drm_pci_bus_id_matches'] is False
++    assert result['process_cuda_ordinal_matches'] is True
++    assert result['gpu_uuid_matches'] == 'Unknown'

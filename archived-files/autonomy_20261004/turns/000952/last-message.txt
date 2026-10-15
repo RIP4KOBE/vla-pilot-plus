@@ -1,0 +1,3 @@
+N35 remains active on GPU7: controller 2632351, worker 2846753, source `52a87af0`. Six episodes are valid but unsuccessful; task1 N34 is pending.
+
+Verified process identities, frozen hashes and ledger continuity. Saved turn 952 reconciliation and operational summary. Next: monitor the existing cohort. Validation, formal and required-ablation completion evidence remains outstanding.

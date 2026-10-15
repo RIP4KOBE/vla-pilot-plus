@@ -1,0 +1,3 @@
+N32R1 controller 1348389 remains live in release revalidation on frozen source `531477e9`. Authorization, process identity, frozen hashes, and ledger preservation verified; operational summary recorded.
+
+Next: monitor the existing controller and reconcile terminal audits/accounting. Validation, formal, and required ablation evidence remain incomplete.

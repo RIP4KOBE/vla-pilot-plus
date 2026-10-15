@@ -1,0 +1,3 @@
+Continued on source `808e27f7`; verified driver identity and unchanged ledgers. Built a fresh disabled graph, but production validation blocked on controller-review status.
+
+Recorded the blocker and next scoped review in turn `001840`, state and checkpoint. No GPU dispatch occurred. Validation, formal and ablation completion remain unevidenced; the driver remains active.

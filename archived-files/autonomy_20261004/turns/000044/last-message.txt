@@ -1,0 +1,3 @@
+N31 remains active on GPU7; controller and worker identities verified. Source and frozen rules are unchanged, and private ledger prefixes are intact.
+
+Recorded turn 44’s operational summary. Next: monitor task 4 and audit the cohort at termination. Validation, formal evaluation, and required ablation evidence remain outstanding.

@@ -1,0 +1,3 @@
+N32R2’s controller remains live; source and ledger integrity checks passed. The candidate worker exited after reporting failure, with terminal audit acceptance still pending. No restart or duplicate dispatch occurred.
+
+Turn 180’s operational summary is saved. Next: reconcile terminal receipts. Validation, formal evaluation and required ablation completion remain unproven.

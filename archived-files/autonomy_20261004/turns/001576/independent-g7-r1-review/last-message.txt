@@ -1,0 +1,5 @@
+PASS for exact commit `b8d6b98164f24a599a9aa1fa6ce862b12cb2fcf6`. G7-R1 is closed; all four focused CPU tests passed, including the `__main__` positive case. Historical failures remain preserved.
+
+[Hash-bound report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001576/independent-g7-r1-review/report-v1.json>)
+
+Affected proof/graph refresh and fresh B5 review remain required. No GPU release or scientific success is granted.

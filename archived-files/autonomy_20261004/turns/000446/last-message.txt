@@ -1,0 +1,3 @@
+Continued the authorized study. Verified source and ledger integrity, refreshed accounting, and launched bounded CPU preparation for N32R3.
+
+No duplicate GPU job was dispatched. State, checkpoint, and operational handoff are saved. Next: review recovery provenance and release candidates. Validation/formal/ablation goals remain unmet.

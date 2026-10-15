@@ -1,0 +1,5 @@
+Source review: **PASS**. Runtime closure and recovery release acceptance: **BLOCKED**.
+
+34 focused tests passed; four additional negative probes rejected correctly. Composition layout remains unverified. N36R1 remains INVALID, all charges retained; no replay or promotion.
+
+Wrote hash-bound [report-v1.md](../autonomy_20261004/turns/001247/review/report-v1.md), report-v1.json and SHA256SUMS in the requested directory. Source remained unchanged.

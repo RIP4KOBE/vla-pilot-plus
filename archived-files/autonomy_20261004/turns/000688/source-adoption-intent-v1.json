@@ -1,0 +1,36 @@
+{
+  "schema": "n34r8-source-adoption-v1",
+  "at": "2026-10-09T00:05:34.533661+00:00",
+  "source_before": "5dcbd06dc48564f5c62d883f289b14332593026f",
+  "candidate": "7cc32546ef70f6a9e28170ac184f9d9d30fb9a33",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000688/engineering-review-v1.json",
+    "sha256": "52ef5dfe6bbedd31dd2b9cc2cfd211409c1ac7473d83788f0928b0a91d55b773"
+  },
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6760579,
+      "sha256": "18bed4fd7be1ecdbee47eae4f5978324d28926e313e1780935bec6203b1b0e10"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    }
+  },
+  "gpu_dispatch": false,
+  "scientific_promotion": false,
+  "next_step": "Regenerate composed N34R8 runtime closure and30 fresh manifests on adopted source using turn685 corrected import inventory. Freeze fresh prospective accounting/protocol/root review/release; pass full public validation before idle GPU7 admission. Preserve eight invalid charges, unknown telemetry, scientific thresholds and protected gates.",
+  "scientific_source_resolution": {
+    "current_n34_implementation": "71ffff1a0f70d9874b309db9ef1843c02bf17ebf",
+    "historical_state_field": "1065f38122379a515b60a9a424f574330405b66f",
+    "basis": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000524/n34-cpu-source-adoption-v1.json",
+      "sha256": "7c7b06e50013fccea43a6a61e3c29f5da7e79396525751a817218ef91c1f4f88"
+    },
+    "historical_field_preserved": true
+  }
+}

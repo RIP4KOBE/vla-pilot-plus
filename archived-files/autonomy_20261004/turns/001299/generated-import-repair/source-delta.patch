@@ -1,0 +1,389 @@
+diff --git a/scripts/qd_ed_n34_source.py b/scripts/qd_ed_n34_source.py
+index b54b16f23810d0b131c56c5b03aaba5e2c50dd7b..a2a44504cd8f68aaa5e16d13f2a8e4b00ce1a898 100644
+--- a/scripts/qd_ed_n34_source.py
++++ b/scripts/qd_ed_n34_source.py
+@@ -152,7 +152,7 @@ def _live_source(name, path):
+     return module
+ 
+ 
+-def _generated_runtime(closure):
++def _generated_runtime(closure, *, scan_loaded=True):
+     """Validate a prospective rule and any live instance; never learn trust from it."""
+     rules = closure.get('generated_modules', {})
+     if closure.get('schema') != 'n34-runtime-source-closure-v2':
+@@ -215,7 +215,10 @@ def _generated_runtime(closure):
+         _runtime_file(record)
+         _live_source(GENERATED_NAME, path)
+         inventory[GENERATED_NAME] = record
+-    for name, module in list(sys.modules.items()):
++    # The source bootstrap checks each discovery before execution. Its import
++    # gate needs the same fixed rule/owner checks without a quadratic full
++    # inventory scan; every runtime attestation retains that scan by default.
++    for name, module in list(sys.modules.items()) if scan_loaded else ():
+         file = getattr(module, '__file__', None)
+         in_directory = file is not None and directory is not None and Path(file).resolve().is_relative_to(directory)
+         w.require(name == GENERATED_NAME or not (name.startswith('_remote_module_') or in_directory),
+diff --git a/scripts/qd_ed_n36_bootstrap.py b/scripts/qd_ed_n36_bootstrap.py
+index 494bfbbc0ab7845f010c675ecda71de780ed2bf7..838a9eae3a411c2340d4c018295e3481445f3171 100644
+--- a/scripts/qd_ed_n36_bootstrap.py
++++ b/scripts/qd_ed_n36_bootstrap.py
+@@ -30,8 +30,10 @@ def source_code(self, fullname):
+         validate_search()
+     path = self.get_filename(fullname)
+     data = self.get_data(path)
+-    code = self.source_to_code(data, path)
+     digest = _hashlib.openssl_sha256(data).hexdigest()
++    if 'validate_origin' in globals():
++        validate_origin(fullname, path, digest)
++    code = self.source_to_code(data, path)
+     key = (fullname, path)
+     if key in compiled and compiled[key] != digest:
+         raise RuntimeError('N36 source changed during import: ' + fullname)
+@@ -83,15 +85,51 @@ for directory in site.getsitepackages():
+     if directory not in sys.path:
+         sys.path.append(directory)
+ 
++# Load the validator before enabling search checks: it uses only engineering
++# code/stdlib and must not recursively import while validating Torch's path.
++from scripts.qd_ed_n36_generated import admit as admit_generated, CONTENT_SHA
++
+ def validate_search():
+     for entry in sys.path:
+         path = os.path.realpath(entry)
+         if not entry or not any(path == base or path.startswith(base + os.sep)
+                                 for base in (root, os.path.realpath(sys.prefix))):
+-            raise ImportError('N36 foreign import search path: ' + path)
++            try:
++                if entry != path:
++                    raise ValueError('noncanonical generated directory')
++                admit_generated(path, compiled)
++            except (ValueError, OSError, KeyError, TypeError) as exc:
++                raise ImportError('N36 foreign import search path: ' + path) from exc
++
++
++def validate_origin(fullname, filename, digest=None):
++    path = os.path.realpath(filename)
++    if any(path == base or path.startswith(base + os.sep)
++           for base in (root, os.path.realpath(sys.prefix))):
++        return
++    if (fullname != '_remote_module_non_scriptable' or filename != path
++            or os.path.basename(path) != fullname + '.py'
++            or (digest is not None and digest != CONTENT_SHA)):
++        raise ImportError('N36 foreign generated import origin: ' + filename)
++    admit_generated(os.path.dirname(path), compiled)
++
++
++class GeneratedSearchGuard:
++    """Check native/namespace discoveries too, before PathFinder can load them."""
++    @staticmethod
++    def find_spec(fullname, path=None, target=None):
++        validate_search()
++        spec = external.PathFinder.find_spec(fullname, path, target)
++        if spec is not None:
++            if spec.origin is not None:
++                validate_origin(fullname, spec.origin)
++            for directory in spec.submodule_search_locations or ():
++                validate_origin(fullname, directory)
++        return spec
+ 
+ 
+ validate_search()
++sys.meta_path.insert(sys.meta_path.index(external.PathFinder), GeneratedSearchGuard)
+ 
+ if len(sys.argv) < 2:
+     raise SystemExit('usage: qd_ed_n36_bootstrap.py MODULE [ARGS...]')
+diff --git a/scripts/qd_ed_n36_generated.py b/scripts/qd_ed_n36_generated.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..90dccd2b8472783541b0247565c6f80f03966944
+--- /dev/null
++++ b/scripts/qd_ed_n36_generated.py
+@@ -0,0 +1,39 @@
++"""Pre-execution admission for the existing, fixed Torch generated-source rule.
++
++This is not a runtime closure: production attestation still requires the frozen
++closure and its process-bound generated receipt. No observed hash grants trust.
++"""
++from pathlib import Path
++import sys
++from scripts import qd_ed_n34_source as runtime
++
++CONTENT_SHA = '8205b16956fb264841ecd8644784a0d157f87df79b17c16825dc1163433ce5d8'
++
++
++def admit(directory, compiled):
++    site = Path(sys.prefix) / ('lib/python%d.%d/site-packages' % sys.version_info[:2])
++    records = {
++        runtime.GENERATOR_NAME: {'path': str(site / 'torch/distributed/nn/jit/instantiator.py'),
++                                 'sha256': runtime.GENERATOR_SHA},
++        runtime.TEMPLATE_NAME: {'path': str(site / 'torch/distributed/nn/jit/templates/remote_module_template.py'),
++                                'sha256': runtime.TEMPLATE_SHA},
++    }
++    rule = {'rule': runtime.GENERATED_RULE, 'generator': records[runtime.GENERATOR_NAME],
++            'template': records[runtime.TEMPLATE_NAME], 'sha256': CONTENT_SHA}
++    closure = {'schema': 'n34-runtime-source-closure-v2', 'modules': records,
++               'generated_modules': {runtime.GENERATED_NAME: rule},
++               'required_after': [runtime.GENERATED_NAME]}
++    for name, record in records.items():
++        runtime.w.require(compiled.get((name, record['path'])) == record['sha256'],
++                          'N36 generated owner/template execution differs')
++    # Reuse canonical live origin, TemporaryDirectory/finalizer, pinned template
++    # derivation and source-byte checks, including during module initialization.
++    inventory = runtime._generated_runtime(closure, scan_loaded=False)
++    generator = sys.modules[runtime.GENERATOR_NAME]
++    path = Path(directory)
++    expected = path / (runtime.GENERATED_NAME + '.py')
++    runtime.w.require(str(path) == generator.INSTANTIATED_TEMPLATE_DIR_PATH
++                      and set(path.iterdir()) == {expected},
++                      'N36 generated directory contains foreign source')
++    runtime._runtime_file({'path': str(expected), 'sha256': CONTENT_SHA})
++    return inventory
+diff --git a/scripts/qd_ed_n36_source.py b/scripts/qd_ed_n36_source.py
+index c2686fb957656bce74861b2883037a60eda34c43..3e8f1b4191a4bc43cecfac8c4fff985154fb89a4 100644
+--- a/scripts/qd_ed_n36_source.py
++++ b/scripts/qd_ed_n36_source.py
+@@ -38,16 +38,21 @@ def active():
+         and zipimport.zipimporter.get_code is state.reject_bytecode
+         and zipimport.zipimporter.exec_module is state.reject_bytecode
+         and zipimport.zipimporter.load_module is state.reject_bytecode, 'N36 executable loader replaced')
+-    validate_search_path(state.root, sys.path, sys.prefix)
++    require(state.GeneratedSearchGuard in sys.meta_path
++            and sys.meta_path.index(state.GeneratedSearchGuard)
++                < sys.meta_path.index(importlib.machinery.PathFinder),
++            'N36 generated search guard replaced')
++    state.validate_search()
+     return state
+ 
+ 
+-def validate_search_path(root, paths, prefix):
++def validate_search_path(root, paths, prefix, *, generated_directories=()):
+     root, prefix = Path(root).resolve(), Path(prefix).resolve()
+     for entry in paths:
+         require(isinstance(entry, str) and bool(entry), 'N36 empty import search path')
+         path = Path(entry).resolve()
+-        require(path == root or root in path.parents or prefix in path.parents,
++        require(path == root or root in path.parents or prefix in path.parents
++                or (entry == str(path) and entry in generated_directories),
+                 'N36 foreign import search path: ' + str(path))
+ 
+ 
+@@ -142,11 +147,18 @@ def attest(root, source, runtime, *, binding=None):
+     index = {str(root / row['path']): row['sha256'] for row in source['files']}
+     index.update({row['path']: row['sha256'] for row in runtime['modules'].values()})
+     generated = {name: rule['sha256'] for name, rule in runtime.get('generated_modules', {}).items()}
++    generated_inventory = {}
++    if generated:
++        from scripts import qd_ed_n34_source as closure
++        generated_inventory = closure._generated_runtime(runtime)
+     records = []
+     for (name, filename), digest in sorted(state.compiled.items()):
+         path = str(Path(filename).resolve())
+         require(index.get(path, generated.get(name)) == digest and sha(Path(path)) == digest,
+                 'N36 compiled source not frozen: ' + name)
++        if name in generated:
++            require(generated_inventory.get(name) == {'path': path, 'sha256': digest},
++                    'N36 generated execution origin differs')
+         records.append({'module': name, 'path': path, 'sha256': digest})
+     bootstrap = str(root / 'scripts/qd_ed_n36_bootstrap.py')
+     require(str(Path(state.__file__).resolve()) == bootstrap
+@@ -203,7 +215,15 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
+     require(receipt['schema'] == 'n36-source-execution-v2', 'N36 execution receipt schema')
+     interpreter = Path(runtime['interpreter']['path']).resolve()
+     require(receipt['search_prefix'] == str(interpreter.parent.parent), 'N36 interpreter search prefix')
+-    validate_search_path(root, receipt['search_path'], receipt['search_prefix'])
++    generated_directories = set()
++    if runtime_receipt is not None:
++        from scripts import qd_ed_n34_source as closure
++        require(binding is not None, 'N36 external runtime binding required')
++        closure.verify_runtime_receipt(runtime, runtime_receipt, binding=binding, after=False)
++        generated_directories = {str(Path(e['record']['path']).parent)
++                                 for e in runtime_receipt['generated_modules'].values()}
++    validate_search_path(root, receipt['search_path'], receipt['search_prefix'],
++                         generated_directories=generated_directories)
+     index = {str(Path(root).resolve() / row['path']): row['sha256'] for row in source['files']}
+     index.update({row['path']: row['sha256'] for row in runtime['modules'].values()})
+     generated = {name: rule['sha256'] for name, rule in runtime.get('generated_modules', {}).items()}
+@@ -211,6 +231,10 @@ def verify_receipt(receipt, root, source, runtime, *, loaded=None, runtime_recei
+         'sha256': index.get(str(Path(root).resolve() / 'scripts/qd_ed_n36_bootstrap.py'))}, 'N36 bootstrap receipt')
+     for row in receipt['compiled'] + receipt['startup_source_only']:
+         require(index.get(row['path'], generated.get(row['module'])) == row['sha256'], 'N36 executable receipt bytes')
++        if row['module'] in generated:
++            evidence = (runtime_receipt or {}).get('generated_modules', {}).get(row['module'], {})
++            require(evidence.get('record') == {'path': row['path'], 'sha256': row['sha256']},
++                    'N36 generated execution receipt origin differs')
+     require({r['module'] for r in receipt['startup_source_only']} == {'encodings', 'encodings.aliases', 'encodings.utf_8'},
+             'N36 startup receipt coverage')
+     frozen = receipt['frozen_modules']
+diff --git a/scripts/test_n36_generated_import.py b/scripts/test_n36_generated_import.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..7b089f0eab191f888bf0bde4eae3d3809532966d
+--- /dev/null
++++ b/scripts/test_n36_generated_import.py
+@@ -0,0 +1,168 @@
++"""Real source-only CPU import and retained provenance, never a release fixture."""
++import copy
++import json
++import os
++from pathlib import Path
++import subprocess
++import sys
++
++from scripts import qd_ed_n34_source as runtime, qd_ed_n36_source as execution
++from scripts import qd_ed_n36_generated as admission
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def child(output):
++    import importlib
++    import tempfile
++    import torch.distributed.nn.api.remote_module
++    import torch
++    from scripts import qd_ed_n36_worker, qd_ed_n36_native, qd_ed_n36_arithmetic
++    from scripts import audit_decision_evidence
++
++    assert not torch.cuda.is_initialized()
++    torch.set_num_threads(2)
++    state = execution.active()
++    generated = sys.modules[runtime.GENERATED_NAME]
++    path = Path(generated.__file__)
++    original = path.read_bytes()
++    assert execution.sha(path) == admission.CONTENT_SHA
++    rejected = []
++
++    def reject(label, action):
++        try:
++            action()
++        except (ImportError, ValueError):
++            rejected.append(label)
++        else:
++            raise AssertionError('accepted ' + label)
++
++    with tempfile.TemporaryDirectory() as foreign:
++        sys.path.append(foreign)
++        reject('foreign-search', execution.active)
++        sys.path.pop()
++        wrong = Path(foreign) / path.name
++        wrong.write_bytes(original)
++        reject('copied-generated', lambda: state.validate_origin(runtime.GENERATED_NAME, str(wrong)))
++        link = Path(foreign) / 'link'
++        link.symlink_to(path.parent, target_is_directory=True)
++        sys.path.append(str(link))
++        reject('symlink-search', execution.active)
++        sys.path.pop()
++    path.write_bytes(original + b'\n# tampered\n')
++    reject('tampered-source', execution.active)
++    path.write_bytes(original)
++    reject('compile-byte-mismatch', lambda: state.validate_origin(runtime.GENERATED_NAME, str(path), '0'*64))
++    old = generated.__spec__.origin
++    generated.__spec__.origin = old + '.wrong'
++    reject('tampered-spec', execution.active)
++    generated.__spec__.origin = old
++    owner = sys.modules[runtime.GENERATOR_NAME]
++    old = owner.INSTANTIATED_TEMPLATE_DIR_PATH
++    owner.INSTANTIATED_TEMPLATE_DIR_PATH = old + '.wrong'
++    reject('tampered-owner', execution.active)
++    owner.INSTANTIATED_TEMPLATE_DIR_PATH = old
++    key = (runtime.GENERATOR_NAME, owner.__file__)
++    old = state.compiled[key]
++    state.compiled[key] = '0'*64
++    reject('unbound-generator-execution', execution.active)
++    state.compiled[key] = old
++    for filename, module in [('foreign_generated_probe.py', 'foreign_generated_probe'),
++                             ('foreign_native_probe.so', 'foreign_native_probe')]:
++        extra = path.parent / filename
++        extra.write_bytes(b'raise AssertionError("must never execute")\n')
++        importlib.invalidate_caches()
++        reject(filename, lambda: importlib.import_module(module))
++        extra.unlink()
++    reject('wrong-module-name', lambda: state.validate_origin('foreign', str(path)))
++    execution.active()
++
++    # Test-only ordinary inventory. Generated trust is the fixed prospective
++    # commitment, not a learned source hash; no production graph is refreshed.
++    modules = {}
++    for name, module in list(sys.modules.items()):
++        file = getattr(module, '__file__', None)
++        if file and name not in (runtime.GENERATED_NAME, 'torch.ops', 'torch.classes'):
++            p = Path(file).resolve()
++            if not p.is_relative_to(ROOT):
++                modules[name] = {'path': str(p), 'sha256': execution.sha(p)}
++    # Torch can replace a Python module with a native-backed namespace (e.g.
++    # _VF). Preserve its executed source in this test inventory as well.
++    for (name, filename), digest in state.compiled.items():
++        p = Path(filename).resolve()
++        if not p.is_relative_to(ROOT) and name != runtime.GENERATED_NAME:
++            modules[name + '.cpu_test_source'] = {'path': str(p), 'sha256': digest}
++    rule = {'rule': runtime.GENERATED_RULE, 'generator': modules[runtime.GENERATOR_NAME],
++            'template': modules[runtime.TEMPLATE_NAME], 'sha256': admission.CONTENT_SHA}
++    closure = {'schema': 'n34-runtime-source-closure-v2', 'modules': modules,
++               'runtime': {'cpu_test_only': True}, 'generated_modules': {runtime.GENERATED_NAME: rule},
++               'required_after': [runtime.GENERATED_NAME], 'interpreter': execution.interpreter_identity(),
++               'versions': {name: 'cpu-test-only' for name in ('python', 'torch', 'libero', 'robosuite', 'mujoco')},
++               'distribution_versions': {name: runtime.importlib.metadata.version(name)
++                   for name in ('torch', 'numpy', 'robosuite', 'mujoco', 'transformers')}}
++    binding = {'context': {'path': str(output), 'sha256': 'c'*64},
++               'runtime_closure': {'path': str(output), 'sha256': 'd'*64},
++               'process': {'pid': os.getpid(), 'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
++                           'proc_start_ticks': Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19]},
++               'phase': 'runtime_before'}
++    files = {str(ROOT / 'scripts/qd_ed_n36_bootstrap.py'): state.bootstrap_digest}
++    for (name, filename), digest in state.compiled.items():
++        if Path(filename).resolve().is_relative_to(ROOT):
++            files[str(Path(filename).resolve())] = digest
++    source = {'files': [{'path': str(Path(p).relative_to(ROOT)), 'sha256': h} for p, h in files.items()]}
++    observed = runtime.attest_runtime_receipt(closure, closure['runtime'], binding=binding, after=True)
++    receipt = execution.attest(ROOT, source, closure, binding=binding)
++    # Preserve the full producer evidence. The focused consumer fixture includes
++    # only generated provenance and the existing mandatory os.path alias proof;
++    # it makes no claim about unrelated full-runtime alias compatibility.
++    full_observed = copy.deepcopy(observed)
++    full_error = None
++    try:
++        execution.verify_receipt(receipt, ROOT, source, closure, runtime_receipt=observed, binding=binding)
++    except ValueError as exc:
++        full_error = str(exc)
++    observed['modules'] = {name: observed['modules'][name] for name in
++                           (runtime.GENERATOR_NAME, runtime.TEMPLATE_NAME, 'os.path', 'posixpath')}
++    execution.verify_receipt(receipt, ROOT, source, closure, runtime_receipt=observed, binding=binding)
++    output.write_text(json.dumps({'closure': closure, 'source': source, 'runtime': observed,
++                                 'full_runtime': full_observed, 'full_consumer_error': full_error,
++                                 'execution': receipt, 'binding': binding, 'rejected': rejected}))
++    print(json.dumps({'generated_path': str(path), 'sha256': execution.sha(path), 'rejected': rejected,
++                      'full_consumer_error': full_error}))
++
++
++def test_real_bootstrap_and_retained_receipt(tmp_path, monkeypatch):
++    import pytest
++    output = tmp_path / 'cpu-receipts.json'
++    command = execution.command(sys.executable, ROOT, 'scripts.test_n36_generated_import', '--child', str(output))
++    result = subprocess.run(command, cwd=ROOT, env={**os.environ, 'CUDA_VISIBLE_DEVICES': '',
++        'OMP_NUM_THREADS': '2', 'MKL_NUM_THREADS': '2', 'OPENBLAS_NUM_THREADS': '2',
++        'NUMEXPR_NUM_THREADS': '2'}, capture_output=True, text=True, timeout=70)
++    assert result.returncode == 0, result.stdout + result.stderr
++    print(result.stdout)
++    value = json.loads(output.read_text())
++    receipt, observed = value['execution'], value['runtime']
++    closure, source, binding = value['closure'], value['source'], value['binding']
++    generated_path = Path(observed['generated_modules'][runtime.GENERATED_NAME]['record']['path'])
++    assert not generated_path.exists()  # verifier must consume retained evidence
++    # The production receipt consumer uses the same source-only cache prefix.
++    monkeypatch.setattr(sys, 'pycache_prefix', '/dev/null')
++    execution.verify_receipt(receipt, ROOT, source, closure, runtime_receipt=observed, binding=binding)
++    for fault in ('missing-receipt', 'foreign-search', 'content', 'owner', 'binding', 'compiled-origin'):
++        bad, bad_observed = copy.deepcopy(receipt), copy.deepcopy(observed)
++        evidence = bad_observed['generated_modules'][runtime.GENERATED_NAME]
++        if fault == 'missing-receipt': bad_observed = None
++        elif fault == 'foreign-search': bad['search_path'].append(str(tmp_path / 'foreign'))
++        elif fault == 'content': evidence['source_utf8'] += '\n# tampered'
++        elif fault == 'owner': evidence['owner']['name'] += '.wrong'
++        elif fault == 'binding': bad_observed['binding']['process']['pid'] += 1
++        else:
++            next(r for r in bad['compiled'] if r['module'] == runtime.GENERATED_NAME)['path'] += '.wrong'
++        with pytest.raises(ValueError):
++            execution.verify_receipt(bad, ROOT, source, closure, runtime_receipt=bad_observed, binding=binding)
++    assert len(value['rejected']) == 11
++
++
++if __name__ == '__main__':
++    assert sys.argv[1] == '--child'
++    child(Path(sys.argv[2]))

@@ -1,0 +1,3 @@
+Continuation verified. N36’s existing repair executor remains active at commit `f5fc546`; ledgers are unchanged and no duplicate work was launched.
+
+Hash-bound operational summary saved for turn 001796. Next: reconcile the terminal repair report and independently review it. Validation, formal evaluation, and required ablation evidence remain incomplete.

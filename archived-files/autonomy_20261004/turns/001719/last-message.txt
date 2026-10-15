@@ -1,0 +1,3 @@
+Continued the owning study. Verified authority, process identities and ledger integrity; reconciled usage to 75.687842 GPU-hours.
+
+A bounded CPU repair is running for the readiness import failure. No GPU cohort was relaunched. The operational summary records its handles and next review step; validation, formal and ablation completion remain unproven.

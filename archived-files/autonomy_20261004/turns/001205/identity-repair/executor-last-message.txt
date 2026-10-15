@@ -1,0 +1,5 @@
+Committed `066f2bf57e05111fea329ff7c393ac3e002d7c0f`.
+
+Strict N36R1 identity/protocol/accounting support implemented; 118 focused CPU tests pass. No GPU use, budget adoption, or release approval. Independent root review remains required.
+
+Reports with hashes, unsigned templates, and exact preparation steps: [Markdown](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001205/identity-repair/report-v1.md) · [JSON](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001205/identity-repair/report-v1.json)

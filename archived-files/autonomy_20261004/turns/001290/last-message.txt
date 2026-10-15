@@ -1,0 +1,5 @@
+Continued N36R2 on source `30c63217`. CPU binding preparation is running under verified PIDs 721701/721702.
+
+Ledger unchanged: 504 attempts, 75.49265 GPU-hours. Next: review the prepared package and complete release gates. No GPU dispatch; validation/formal/ablation completion remains unproven.
+
+Operational summary saved for driver continuation.

@@ -1,0 +1,5 @@
+Recorded scoped controller acceptance for source `89506fe` and reconciled state/checkpoint. Ledger history is unchanged; no GPU work was dispatched.
+
+Next: complete the disabled release graph and required readiness checks. Validation, formal evaluation, and ablation completion remain unproven.
+
+[Operational summary](../autonomy_20261004/turns/001747/operational-summary-v1.json)

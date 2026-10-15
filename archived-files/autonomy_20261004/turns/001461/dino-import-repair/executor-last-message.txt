@@ -1,0 +1,7 @@
+Committed scoped repair: `80a9d945e688da17485239b3d5bb11c558c214d6`.
+
+CPU DINO import/audit tests passed. An unrelated legacy harness failure reproduced at the starting commit.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001461/dino-import-repair/report-v1.md>) includes evidence and limitations; accompanying JSON contains the exact diff and hashes.
+
+No replay or release. `score: null`, `goal_complete: false`.

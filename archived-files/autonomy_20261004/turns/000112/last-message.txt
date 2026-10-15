@@ -1,0 +1,3 @@
+N32 stopped safely: source attestation rejected an unfrozen imported module. Controller and worker exited; the invalid attempt and 706.4-second GPU charge remain recorded.
+
+Saved turn 112’s operational summary and terminal review. Source remains `c427e7ac`. Next: isolated source-manifest repair and prospective release review. Validation, formal, and ablation evidence remain outstanding.

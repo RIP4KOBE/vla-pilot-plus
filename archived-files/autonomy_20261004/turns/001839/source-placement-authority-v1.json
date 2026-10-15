@@ -1,0 +1,42 @@
+{
+  "schema": "n36-reviewed-source-placement-authority-v1",
+  "at": "2026-10-11T07:20:37.836999+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c"
+  },
+  "review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001839/root-scoped-review-v1.json",
+    "sha256": "d5fbb2eb5af1383d52ccf65ce5f2b1e18f56d54745e1365b80098fc57c9ed286"
+  },
+  "destination": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "before": "cd6c969cbfdf006fd017553448bed2e61fc0380e",
+  "after": "808e27f702564fe51db45016e139b68ecb476f8c",
+  "operation": "Fast-forward reviewed isolated engineering commit only; no source editing or scientific adoption",
+  "budget_delta_attempts": 0,
+  "budget_delta_gpu_hours": 0,
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 7572377,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "sha256": "501510963420bacc7b680044d040ca2ba0883a89c907646db70f947b2575d8af"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 130771,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "sha256": "2b630cc8835ded3d4e8d10af0afbc3f2cc94468837f50537eea8b273c53ce600"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "bytes": 401,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    },
+    "readiness-preparation-ledger.jsonl": {
+      "bytes": 16004,
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/readiness-preparation-ledger.jsonl",
+      "sha256": "007eef46ade39c05043cd7333279b0fe8bfe27f9734b7e809727300f148f8c81"
+    }
+  },
+  "gpu_authorized": false,
+  "measurement_authorized": false
+}

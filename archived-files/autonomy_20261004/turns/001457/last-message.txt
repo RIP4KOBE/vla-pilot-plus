@@ -1,0 +1,3 @@
+N36R3 source `711602ac` remains frozen. Controller PID `1680100` is live and advancing through verification; ledger prefixes are unchanged.
+
+Saved the hash-bound turn summary. Next: monitor first-C0 completion and perform G3 review. Validation, formal evaluation and required ablations remain unproven.

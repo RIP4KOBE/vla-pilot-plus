@@ -1,0 +1,3 @@
+Verified authority and live process identities. The existing N36 CPU executor remains active at `fd75477b`; all private ledgers are unchanged.
+
+Saved the hash-bound turn summary. Next: reconcile its terminal report and tests, then independent review. Validation, formal evaluation and required ablations remain incomplete.

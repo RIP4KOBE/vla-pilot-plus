@@ -1,0 +1,3 @@
+N34 CPU implementation is running in an isolated worktree with verified process identities. State, checkpoint, and operational summary are recorded for driver continuation.
+
+N32R3 failed its frozen futility gate. No GPU evaluation was launched; budgets and scientific gates remain intact. Next: review N34’s native encoding and audit evidence. The original research goal remains unmet.

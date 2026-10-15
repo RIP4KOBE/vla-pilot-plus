@@ -1,0 +1,3 @@
+Independent B5 review is running for N36R3 source `d01bc1e2`; reviewer identities are verified and the operational handoff is recorded.
+
+All 505 attempts and 75.5303 GPU-hours remain preserved. Next is review reconciliation before release. Validation, formal evaluation and required ablation evidence remain outstanding; driver continuation is preserved.

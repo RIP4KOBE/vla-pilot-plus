@@ -1,0 +1,3 @@
+N32R2’s existing controller remains live with verified identity, frozen artifacts, and preserved ledger prefixes. Six completed outcomes are valid but unsuccessful; task2 C0 has no recorded outcome yet.
+
+Operational summary saved for turn 233. Monitoring continues through the driver; validation, formal, and required ablation evidence remain outstanding.

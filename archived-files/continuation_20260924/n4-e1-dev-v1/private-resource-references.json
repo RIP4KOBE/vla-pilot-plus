@@ -1,0 +1,14 @@
+{
+  "authorization": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/authorization.json",
+    "sha256": "4026c141ff9bd06f31734c0a43122327b359c35bd847670f641961df9ce81f47"
+  },
+  "migration": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/migration.json",
+    "sha256": "c716e03ae3111f103b9ebb4dc15c6d5696cf7c719cd67c04df7e566c033697e4"
+  },
+  "validation": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/migration-validation.json",
+    "sha256": "f1899d7fa7aa9af765279a58a2232774363d9e75ff5384570688f6a675772d9a"
+  }
+}

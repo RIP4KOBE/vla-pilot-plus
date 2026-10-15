@@ -1,0 +1,41 @@
+{
+  "schema": "n34r3-source-adoption-v1",
+  "at": "2026-10-08T21:32:50.408965+00:00",
+  "source_before": "9d0122c9fea8d6967cea3a7abba60489baae2302",
+  "candidate": "38a723c303e1a69993b6ec1c97bdc26195e44a56",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000638/engineering-review-v1.json",
+    "sha256": "5d327e0ca7a047e2f9371303a77d70e8f0e5d00fbcc773dedb682a19b859d3a6"
+  },
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6687502,
+      "sha256": "19cce287641e1e608618b2d78c60fb4d5d4458d83ae6c9d1df98ef9a7725469f"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7"
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "bytes": 401,
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8"
+    }
+  },
+  "gpu_dispatch": false,
+  "scientific_promotion": false,
+  "next_step": "Regenerate composed N34R3 runtime closure and30 fresh manifests on adopted source using turn635 corrected import inventory. Freeze fresh prospective accounting/protocol/root review/release; pass full public validation before idle GPU7 admission. Preserve three invalid charges, unknown telemetry, scientific thresholds and protected gates.",
+  "source_after": "3dc01fbca919dbddacfd5acd0e08a66d8eb98b3a",
+  "tree": "67508af43a5f4e41a5766261f3a899625cc1a1b7",
+  "identical_integrated_files": [
+    "scripts/qd_ed_n34_contract.py",
+    "scripts/qd_ed_n34_release.py",
+    "tests/test_n34_lifecycle.py",
+    "tests/test_n34_recovery_identity.py",
+    "tests/test_n34_release_boundary.py"
+  ],
+  "test_evidence": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/recovery3-identity-repair-v1/focused-tests-v1.log",
+    "sha256": "0828d8c60dc51cb7aec39cdf922a51abeff2679cc8404787d555cdd2b70ef4de"
+  },
+  "tests_repeated": false
+}

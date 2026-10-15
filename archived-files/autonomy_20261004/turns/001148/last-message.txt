@@ -1,0 +1,3 @@
+Verified continuity and recorded the operational summary. N36 protocol drafting remains active with matching process identities. Source and ledger are unchanged: 502 attempts, 75.243793 GPU-hours.
+
+Next is independent protocol/accounting review. Validation, formal, and required ablation evidence remain outstanding; the research goal is not yet met.

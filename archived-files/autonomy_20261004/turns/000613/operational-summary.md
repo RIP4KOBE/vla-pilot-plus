@@ -1,0 +1,7 @@
+Turn613: verified bound handoff, exact authority and continuation/completion-contract hashes. Prior turn612 exited normally. Source remains 3acfda1adea7b4d9880c81dab7e3882f1587d4d0. Resource isolation ACTIVE/PASS. No STOP; authorization ends 2026-10-11T11:13:13Z.
+
+Driver268073/start97715947, coordinator487226/start135282952, CPU wrapper476535/start135257220 and executor476536/start135257223 match boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. Closed GPU controller3365423, worker4113229 and child399134 are absent. All three private ledger prefixes equal turn610 closure:443 charged dispatches,0 running,63.31147663952318GPUh. Invalid timeout and unknown telemetry remain retained.
+
+Existing official CPU executor continues verification-efficiency-repair-v1 in production_worktree. Focused test log now reports85 passed in42.43s; these remain preliminary, independently unreviewed results. No terminal executor exit yet, no source adoption or additional launch, no GPU dispatch and no state/ledger mutation.
+
+Next bounded step: monitor this executor to terminal report/exit; independently review transaction-scoped audit equivalence, batched pinned-object verification, adversarial tests and timing evidence before adoption. Then prepare a distinct prospective recovery source/protocol/release and exact accounting; never replay the invalid N34 release. Validation, formal and required ablation evidence remain unresolved; no completion record.

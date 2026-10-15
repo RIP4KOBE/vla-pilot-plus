@@ -1,0 +1,3 @@
+Continued monitoring the existing N36 repair; process identities match and focused CPU tests passed. Repair remains active, with no new GPU dispatch or ledger charges.
+
+Saved turn 001574’s hash-bound operational summary. Next: reconcile terminal evidence and obtain independent review. Validation, formal and ablation evidence remain incomplete.

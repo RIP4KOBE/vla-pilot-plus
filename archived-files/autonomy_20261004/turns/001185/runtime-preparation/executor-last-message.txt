@@ -1,0 +1,7 @@
+Prepared the disabled all40 draft and [reports](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001185/runtime-preparation/report-v1.md>).
+
+Actual source-only CPU imports and attestations passed. Measured preparation CPU: 185.72 seconds. Failures and timings are preserved.
+
+GPU/whole-episode checks and root runtime/accounting review remain unresolved. No source or owning-state edits; no dispatch.
+
+`score=null`, `promotion=false`, `target_met=false`, `release_enabled=false`. Stopped.

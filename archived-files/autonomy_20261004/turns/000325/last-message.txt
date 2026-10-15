@@ -1,0 +1,3 @@
+N32R2 remains active on GPU7: controller 1818171, worker 383113. Source `1065f381` and frozen bindings verified; ledger history preserved.
+
+Task4 C0 is running. Validation/formal/ablation completion remains unmet. Operational summary saved for turn 325; the driver will continue monitoring.

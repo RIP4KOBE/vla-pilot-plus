@@ -1,0 +1,3 @@
+Existing G7 CPU executor remains live with verified process identity; integration tests are running. Private ledgers are unchanged, with no duplicate dispatch.
+
+Turn 1565’s hash-bound operational summary is recorded. Next: reconcile terminal output and review the repair. Validation, formal evaluation, and required ablation evidence remain incomplete.

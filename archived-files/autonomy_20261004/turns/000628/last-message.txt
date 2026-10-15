@@ -1,0 +1,3 @@
+Adopted the reviewed N34R2 repair as `9d0122c9`; integrated files match the patch covered by 508 passing CPU tests. Historical charges remain unchanged; no GPU worker is running.
+
+Recorded the operational handoff. Next: runtime and release verification before dispatch. Validation, formal evaluation and required ablations remain outstanding. The driver continues automatically.

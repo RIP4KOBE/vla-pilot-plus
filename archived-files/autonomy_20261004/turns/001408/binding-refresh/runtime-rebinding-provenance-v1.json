@@ -1,0 +1,70 @@
+{
+  "parent_plan": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001358/manifest-refresh/plan.draft.json",
+    "sha256": "91bde0b1d6155a64679ec686bfb08a9608929d1836590534d71770fbc3187f39"
+  },
+  "prior_runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001355/binding-refresh/runtime.isolated.disabled-v1.json",
+    "sha256": "13e015c9a6c2a88453702b09e67ad54a8eee738aa0214cacab10a081bf38c219"
+  },
+  "prior_closure": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001355/binding-refresh/runtime-closure.isolated.disabled-v1.json",
+    "sha256": "7576c3de5c51f7e525a582ed3349dd45fdd0c1251618c813803a6b131b78cc0f"
+  },
+  "changes": [
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "sha256": "e212c027de5e7b53fe52a089e31bb2abc281f9d1334feed1a64f60c67eb9a660",
+        "size_bytes": 7575
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "sha256": "576f421b38a7f31a53760fbf5d4e8c5b6e9fd4f8c54d2fdcb86f3ce33fbf4af7",
+        "size_bytes": 7850
+      }
+    },
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "sha256": "f6b80e99bb6829edc431288a4151df7779eea333ee86b1fdf1842e9c8e1e3909",
+        "size_bytes": 12769
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "sha256": "5fedd29347df6125bac04cbb8e8512ada8f65e04c6deeca3500ca5c78835978c",
+        "size_bytes": 13029
+      }
+    }
+  ],
+  "module_changes": [
+    {
+      "module": "scripts.qd_ed_n36_healthcheck",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "sha256": "e212c027de5e7b53fe52a089e31bb2abc281f9d1334feed1a64f60c67eb9a660"
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "sha256": "576f421b38a7f31a53760fbf5d4e8c5b6e9fd4f8c54d2fdcb86f3ce33fbf4af7"
+      }
+    },
+    {
+      "module": "scripts.qd_ed_n36_runner",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "sha256": "f6b80e99bb6829edc431288a4151df7779eea333ee86b1fdf1842e9c8e1e3909"
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "sha256": "5fedd29347df6125bac04cbb8e8512ada8f65e04c6deeca3500ca5c78835978c"
+      }
+    }
+  ],
+  "inventory_entries_removed": false,
+  "historical_readiness_not_current": true
+}

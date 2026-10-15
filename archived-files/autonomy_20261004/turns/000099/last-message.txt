@@ -1,0 +1,3 @@
+N32 release review found an incorrect STOP path after source adoption. A bounded CPU repair executor is running; no GPU cohort was dispatched.
+
+Prepared the prospective protocol and saved turn 99’s operational summary. Owning source and ledger charges remain unchanged. Next: review the repair, then finish release validation. Original validation, formal, and ablation evidence remains outstanding.

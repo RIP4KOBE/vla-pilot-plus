@@ -1,0 +1,3 @@
+Reconciled the completed B5 review and adopted isolated source/runtime `21fc93e`. Recorded the hash-bound handoff and updated owning state/checkpoint.
+
+Costs remain unchanged: 505 attempts, 75.5273 GPU-hours. Next: locked accounting, fresh charged readiness, then first C0 with mandatory G3 pause. Original validation/formal/ablation goals remain unmet.

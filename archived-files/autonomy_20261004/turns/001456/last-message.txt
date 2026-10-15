@@ -1,0 +1,3 @@
+Continued N36R3 on frozen source `711602ac`. Health passed and charges were reconciled. One first-C0 controller is live (PID 1680100), with mandatory G3 review before further cells.
+
+Operational summary saved. Next: monitor this controller and audit its outcome. Validation, formal evaluation, and required ablations remain unproven.

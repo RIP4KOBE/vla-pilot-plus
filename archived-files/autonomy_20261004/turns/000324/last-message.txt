@@ -1,0 +1,3 @@
+N32R2 remains active: controller `1818171`, task4 C0 worker `383113`, source `1065f381`. Process identities, frozen bindings and ledger continuity verified.
+
+Tasks0–3 remain 0/4 per arm; promotion and completion evidence are unmet. Turn324 operational summary saved. Next: monitor the existing cohort and reconcile terminal evidence.

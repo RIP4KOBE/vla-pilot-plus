@@ -1,0 +1,3 @@
+Reviewed and integrated N34’s CPU implementation as `71ffff1`; all 10 integrated files match the reviewed source. Recorded hash-bound review, adoption, and operational summary.
+
+No GPU dispatch or ledger changes. Next: production runtime/audit integration and a frozen fresh Dev protocol. Validation, formal evaluation, and required ablations remain unmet; the local driver continues.

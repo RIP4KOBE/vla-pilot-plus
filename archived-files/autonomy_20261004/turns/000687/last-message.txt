@@ -1,0 +1,3 @@
+N34R8 CPU repair completed: commit `7cc32546`, 471 tests passed. No GPU cohort is active; all charges remain intact.
+
+Recorded the operational handoff. Next: independently review the repair and reported provenance discrepancy before adoption and release. Validation, formal evaluation, and ablation goals remain unmet.

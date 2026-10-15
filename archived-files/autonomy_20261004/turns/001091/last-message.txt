@@ -1,0 +1,5 @@
+N35 remains active on GPU7; controller and worker identities, frozen bindings, and ledger continuity verified. Task 6 C0 is still running. No restart or duplicate dispatch occurred.
+
+Interim successes: C0 1/6, Q0 0/6, N34 1/6, N35 1/6. Completion remains unproven.
+
+Operational summary saved for turn 001091; next step is continued monitoring under the existing driver.

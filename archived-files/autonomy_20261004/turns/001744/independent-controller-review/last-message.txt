@@ -1,0 +1,5 @@
+PASS_SCOPED_STATIC_BINDINGS — 87 checks passed.
+
+Written: [review-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001744/independent-controller-review/review-v1.json) and [hash-bound manifest](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001744/independent-controller-review/file-manifest-v1.json).
+
+Eligible for owning-root scoped static acceptance. No root acceptance, instance attestation, fresh readiness, B5, graph completeness, or release granted.

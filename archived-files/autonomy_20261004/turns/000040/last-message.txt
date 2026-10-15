@@ -1,0 +1,3 @@
+N31’s controller remains live; frozen source `7428ce8` is unchanged. Task-4 Q0 finished validly without success: C0 0/5, Q0 0/5, N31 0/4.
+
+Recorded turn 40’s operational summary. No duplicate dispatch or recovery was needed. Next: monitor the existing controller’s N31 cell. Validation, formal evaluation, and required ablation evidence remain outstanding.

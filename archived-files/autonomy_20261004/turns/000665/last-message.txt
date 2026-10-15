@@ -1,0 +1,5 @@
+Recorded the CPU runtime repair: 11 conversion checks and strict audits passed. N34R5 remains invalid and charged; no GPU cohort is running.
+
+Next: fresh N34R6 recovery identity and reviewed release. Validation, formal evaluation, and ablation evidence remain outstanding.
+
+[Operational summary](../autonomy_20261004/turns/000665/operational-summary.md)

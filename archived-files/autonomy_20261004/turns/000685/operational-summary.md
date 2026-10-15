@@ -1,0 +1,9 @@
+Turn685: CPU runtime diagnosis complete.
+
+Current source remains 5dcbd06dc48564f5c62d883f289b14332593026f. Handoff, exact authorization, continuation context and completion contract hashes verified. Driver268073/start97715947 and current coordinator1022642/start136635437 verified on boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. Former controller978678 and worker981573 absent. No active GPU controller. Prior turn684 completed normally; all three owning ledger prefixes exactly match terminal closure. STOP absent; deadline2026-10-11T11:13:13Z.
+
+Prospective CPU probe exercised installed Transformers import_protobuf and synthetic ModelProto serialization. Exactly one new external module, sentencepiece.sentencepiece_model_pb2, independently inventoried. Strict runtime attestation/controller proof PASS; CUDA uninitialized. Existing six JIT, eleven OpenGL conversion and two serialization checks retained. No model, environment, provider or protected evaluation executed. Candidate closure is not a GPU release or proof of native completeness. Review, probe and receipt hash-bound; state/checkpoint/tree updated under normal owning state lock. No driver locks acquired. Accounting unchanged:450 attempts/64.17769137431843GPUh, eight invalid N34 executions retained. Native charges and unknown telemetry preserved.
+
+Next bounded step: Prepare isolated N34R8 recovery-identity repair through executor, preserving eight invalid N34 charges and strict audits. Regenerate prospective runtime using turn685 synthetic CPU protobuf and JIT probe on adopted source, freeze new accounting/protocol/manifests and independently reviewed release before idle GPU7 admission. No replay or protected evaluation.
+
+Unresolved evidence: full native runtime coverage, valid matched Dev cohort, scientific promotion, validation20/formal10/required ablations, and hash-bound original-goal completion. No success claim. Driver continues.

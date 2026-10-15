@@ -1,0 +1,5 @@
+N31 remains active on GPU7; controller, monitor, worker identities and ledger prefixes verified. Frozen source `7428ce8a` is unchanged.
+
+Five matched triples completed with no successes; task 5’s candidate remains running. Next step: monitor completion, then review native evidence and the frozen gate. Original goal remains unmet.
+
+Operational summary saved to `turns/000057/operational-summary.json`.

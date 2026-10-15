@@ -1,0 +1,5 @@
+N32R2 remains active on source `1065f381`. Controller PID `1818171` has dispatched candidate worker `2728485`; identities and ledger continuity verified.
+
+Task 0 C0/Q0 are valid failures. Candidate evidence is pending. Frozen rules remain unchanged; no duplicate launch occurred.
+
+Turn 173 operational summary saved. Next: monitor the candidate and audit the completed matched triple. Original-goal completion remains unproven.

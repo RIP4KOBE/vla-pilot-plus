@@ -1,0 +1,5 @@
+N32R2 controller 1818171 remains live with verified identity; source `1065f381` and ledger history are intact. No restart or duplicate dispatch occurred.
+
+Matched Dev results remain 0/3 for each arm; task 3 C0 also failed validly. Next: monitor the existing controller. Validation, formal, and ablation evidence remain outstanding.
+
+Turn 289 operational summary recorded.

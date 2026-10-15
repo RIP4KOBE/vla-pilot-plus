@@ -1,0 +1,3 @@
+Reconciled the completed CPU repair and verified all six corrected fingerprints. Updated the owning state, checkpoint and operational summary; ledgers remain unchanged.
+
+Next: coordinator attestation and fresh independent B5 review. No GPU cohort is running; validation/formal/ablation completion remains unproven.

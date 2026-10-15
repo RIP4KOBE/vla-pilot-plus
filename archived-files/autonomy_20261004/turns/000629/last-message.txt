@@ -1,0 +1,3 @@
+N34R2 runtime preparation passed on source `9d0122c9`: 30 fresh manifests and strict CPU attestations recorded. No GPU worker is running; charges remain unchanged.
+
+Next: freeze and verify the recovery release before dispatch. Validation, formal evaluation, and required ablations remain outstanding. Operational handoff saved; the driver continues automatically.

@@ -1,0 +1,3 @@
+Reconciled the completed preparation and launched the bounded N36R1 identity repair in its isolated worktree. No GPU experiment was dispatched; ledger charges and scientific gates remain unchanged.
+
+Operational summary saved. Next: monitor repair completion and independently review it. Validation, formal evaluation and required ablations remain unresolved.

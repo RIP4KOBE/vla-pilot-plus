@@ -1,0 +1,111 @@
+[
+  {
+    "source": {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/osc.py",
+      "bytes": 20265,
+      "sha256": "cfa62a0e719bc53ef0c701efa66f7b3e2272d4fca2150ec73c05bb145eba85cb"
+    },
+    "slices": [
+      {
+        "first_line": 110,
+        "last_line": 200,
+        "text": "        sim,\n        eef_name,\n        joint_indexes,\n        actuator_range,\n        input_max=1,\n        input_min=-1,\n        output_max=(0.05, 0.05, 0.05, 0.5, 0.5, 0.5),\n        output_min=(-0.05, -0.05, -0.05, -0.5, -0.5, -0.5),\n        kp=150,\n        damping_ratio=1,\n        impedance_mode=\"fixed\",\n        kp_limits=(0, 300),\n        damping_ratio_limits=(0, 100),\n        policy_freq=20,\n        position_limits=None,\n        orientation_limits=None,\n        interpolator_pos=None,\n        interpolator_ori=None,\n        control_ori=True,\n        control_delta=True,\n        uncouple_pos_ori=True,\n        **kwargs,  # does nothing; used so no error raised when dict is passed with extra terms used previously\n    ):\n\n        super().__init__(\n            sim,\n            eef_name,\n            joint_indexes,\n            actuator_range,\n        )\n        # Determine whether this is pos ori or just pos\n        self.use_ori = control_ori\n\n        # Determine whether we want to use delta or absolute values as inputs\n        self.use_delta = control_delta\n\n        # Control dimension\n        self.control_dim = 6 if self.use_ori else 3\n        self.name_suffix = \"POSE\" if self.use_ori else \"POSITION\"\n\n        # input and output max and min (allow for either explicit lists or single numbers)\n        self.input_max = self.nums2array(input_max, self.control_dim)\n        self.input_min = self.nums2array(input_min, self.control_dim)\n        self.output_max = self.nums2array(output_max, self.control_dim)\n        self.output_min = self.nums2array(output_min, self.control_dim)\n\n        # kp kd\n        self.kp = self.nums2array(kp, 6)\n        self.kd = 2 * np.sqrt(self.kp) * damping_ratio\n\n        # kp and kd limits\n        self.kp_min = self.nums2array(kp_limits[0], 6)\n        self.kp_max = self.nums2array(kp_limits[1], 6)\n        self.damping_ratio_min = self.nums2array(damping_ratio_limits[0], 6)\n        self.damping_ratio_max = self.nums2array(damping_ratio_limits[1], 6)\n\n        # Verify the proposed impedance mode is supported\n        assert impedance_mode in IMPEDANCE_MODES, (\n            \"Error: Tried to instantiate OSC controller for unsupported \"\n            \"impedance mode! Inputted impedance mode: {}, Supported modes: {}\".format(impedance_mode, IMPEDANCE_MODES)\n        )\n\n        # Impedance mode\n        self.impedance_mode = impedance_mode\n\n        # Add to control dim based on impedance_mode\n        if self.impedance_mode == \"variable\":\n            self.control_dim += 12\n        elif self.impedance_mode == \"variable_kp\":\n            self.control_dim += 6\n\n        # limits\n        self.position_limits = np.array(position_limits) if position_limits is not None else position_limits\n        self.orientation_limits = np.array(orientation_limits) if orientation_limits is not None else orientation_limits\n\n        # control frequency\n        self.control_freq = policy_freq\n\n        # interpolator\n        self.interpolator_pos = interpolator_pos\n        self.interpolator_ori = interpolator_ori\n\n        # whether or not pos and ori want to be uncoupled\n        self.uncoupling = uncouple_pos_ori\n\n        # initialize goals based on initial pos / ori\n        self.goal_ori = np.array(self.initial_ee_ori_mat)\n        self.goal_pos = np.array(self.initial_ee_pos)\n\n        self.relative_ori = np.zeros(3)\n        self.ori_ref = None"
+      },
+      {
+        "first_line": 202,
+        "last_line": 277,
+        "text": "    def set_goal(self, action, set_pos=None, set_ori=None):\n        \"\"\"\n        Sets goal based on input @action. If self.impedance_mode is not \"fixed\", then the input will be parsed into the\n        delta values to update the goal position / pose and the kp and/or damping_ratio values to be immediately updated\n        internally before executing the proceeding control loop.\n\n        Note that @action expected to be in the following format, based on impedance mode!\n\n            :Mode `'fixed'`: [joint pos command]\n            :Mode `'variable'`: [damping_ratio values, kp values, joint pos command]\n            :Mode `'variable_kp'`: [kp values, joint pos command]\n\n        Args:\n            action (Iterable): Desired relative joint position goal state\n            set_pos (Iterable): If set, overrides @action and sets the desired absolute eef position goal state\n            set_ori (Iterable): IF set, overrides @action and sets the desired absolute eef orientation goal state\n        \"\"\"\n        # Update state\n        self.update()\n\n        # Parse action based on the impedance mode, and update kp / kd as necessary\n        if self.impedance_mode == \"variable\":\n            damping_ratio, kp, delta = action[:6], action[6:12], action[12:]\n            self.kp = np.clip(kp, self.kp_min, self.kp_max)\n            self.kd = 2 * np.sqrt(self.kp) * np.clip(damping_ratio, self.damping_ratio_min, self.damping_ratio_max)\n        elif self.impedance_mode == \"variable_kp\":\n            kp, delta = action[:6], action[6:]\n            self.kp = np.clip(kp, self.kp_min, self.kp_max)\n            self.kd = 2 * np.sqrt(self.kp)  # critically damped\n        else:  # This is case \"fixed\"\n            delta = action\n\n        # If we're using deltas, interpret actions as such\n        if self.use_delta:\n            if delta is not None:\n                scaled_delta = self.scale_action(delta)\n                if not self.use_ori and set_ori is None:\n                    # Set default control for ori since user isn't actively controlling ori\n                    set_ori = np.array([[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, -1.0]])\n            else:\n                scaled_delta = []\n        # Else, interpret actions as absolute values\n        else:\n            if set_pos is None:\n                set_pos = delta[:3]\n            # Set default control for ori if we're only using position control\n            if set_ori is None:\n                set_ori = (\n                    T.quat2mat(T.axisangle2quat(delta[3:6]))\n                    if self.use_ori\n                    else np.array([[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, -1.0]])\n                )\n            # No scaling of values since these are absolute values\n            scaled_delta = delta\n\n        # We only want to update goal orientation if there is a valid delta ori value OR if we're using absolute ori\n        # use math.isclose instead of numpy because numpy is slow\n        bools = [0.0 if math.isclose(elem, 0.0) else 1.0 for elem in scaled_delta[3:]]\n        if sum(bools) > 0.0 or set_ori is not None:\n            self.goal_ori = set_goal_orientation(\n                scaled_delta[3:], self.ee_ori_mat, orientation_limit=self.orientation_limits, set_ori=set_ori\n            )\n        self.goal_pos = set_goal_position(\n            scaled_delta[:3], self.ee_pos, position_limit=self.position_limits, set_pos=set_pos\n        )\n\n        if self.interpolator_pos is not None:\n            self.interpolator_pos.set_goal(self.goal_pos)\n\n        if self.interpolator_ori is not None:\n            self.ori_ref = np.array(self.ee_ori_mat)  # reference is the current orientation at start\n            self.interpolator_ori.set_goal(\n                orientation_error(self.goal_ori, self.ori_ref)\n            )  # goal is the total orientation error\n            self.relative_ori = np.zeros(3)  # relative orientation always starts at 0\n"
+      }
+    ]
+  },
+  {
+    "source": {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/controllers/base_controller.py",
+      "bytes": 10496,
+      "sha256": "61f99a2daeb4eb6e39bfb996d94c5a5689ef3bc771d030d070193ea56d6a8332"
+    },
+    "slices": [
+      {
+        "first_line": 104,
+        "last_line": 125,
+        "text": "    def scale_action(self, action):\n        \"\"\"\n        Clips @action to be within self.input_min and self.input_max, and then re-scale the values to be within\n        the range self.output_min and self.output_max\n\n        Args:\n            action (Iterable): Actions to scale\n\n        Returns:\n            np.array: Re-scaled action\n        \"\"\"\n\n        if self.action_scale is None:\n            self.action_scale = abs(self.output_max - self.output_min) / abs(self.input_max - self.input_min)\n            self.action_output_transform = (self.output_max + self.output_min) / 2.0\n            self.action_input_transform = (self.input_max + self.input_min) / 2.0\n        action = np.clip(action, self.input_min, self.input_max)\n        transformed_action = (action - self.action_input_transform) * self.action_scale + self.action_output_transform\n\n        return transformed_action\n\n    def update(self, force=False):"
+      }
+    ]
+  },
+  {
+    "source": {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/utils/control_utils.py",
+      "bytes": 10243,
+      "sha256": "1d0f1a063894b1e8289339e223665e14e8aec492c31e9e00f42edea8dc735f43"
+    },
+    "slices": [
+      {
+        "first_line": 114,
+        "last_line": 191,
+        "text": "def set_goal_position(delta, current_position, position_limit=None, set_pos=None):\n    \"\"\"\n    Calculates and returns the desired goal position, clipping the result accordingly to @position_limits.\n    @delta and @current_position must be specified if a relative goal is requested, else @set_pos must be\n    specified to define a global goal position\n\n    Args:\n        delta (np.array): Desired relative change in position\n        current_position (np.array): Current position\n        position_limit (None or np.array): 2d array defining the (min, max) limits of permissible position goal commands\n        set_pos (None or np.array): If set, will ignore @delta and set the goal position to this value\n\n    Returns:\n        np.array: calculated goal position in absolute coordinates\n\n    Raises:\n        ValueError: [Invalid position_limit shape]\n    \"\"\"\n    n = len(current_position)\n    if set_pos is not None:\n        goal_position = set_pos\n    else:\n        goal_position = current_position + delta\n\n    if position_limit is not None:\n        if position_limit.shape != (2, n):\n            raise ValueError(\n                \"Position limit should be shaped (2,{}) \" \"but is instead: {}\".format(n, position_limit.shape)\n            )\n\n        # Clip goal position\n        goal_position = np.clip(goal_position, position_limit[0], position_limit[1])\n\n    return goal_position\n\n\ndef set_goal_orientation(delta, current_orientation, orientation_limit=None, set_ori=None):\n    \"\"\"\n    Calculates and returns the desired goal orientation, clipping the result accordingly to @orientation_limits.\n    @delta and @current_orientation must be specified if a relative goal is requested, else @set_ori must be\n    an orientation matrix specified to define a global orientation\n\n    Args:\n        delta (np.array): Desired relative change in orientation, in axis-angle form [ax, ay, az]\n        current_orientation (np.array): Current orientation, in rotation matrix form\n        orientation_limit (None or np.array): 2d array defining the (min, max) limits of permissible orientation goal commands\n        set_ori (None or np.array): If set, will ignore @delta and set the goal orientation to this value\n\n    Returns:\n        np.array: calculated goal orientation in absolute coordinates\n\n    Raises:\n        ValueError: [Invalid orientation_limit shape]\n    \"\"\"\n    # directly set orientation\n    if set_ori is not None:\n        goal_orientation = set_ori\n\n    # otherwise use delta to set goal orientation\n    else:\n        # convert axis-angle value to rotation matrix\n        quat_error = trans.axisangle2quat(delta)\n        rotation_mat_error = trans.quat2mat(quat_error)\n        goal_orientation = np.dot(rotation_mat_error, current_orientation)\n\n    # check for orientation limits\n    if np.array(orientation_limit).any():\n        if orientation_limit.shape != (2, 3):\n            raise ValueError(\n                \"Orientation limit should be shaped (2,3) \" \"but is instead: {}\".format(orientation_limit.shape)\n            )\n\n        # Convert to euler angles for clipping\n        euler = trans.mat2euler(goal_orientation)\n\n        # Clip euler angles according to specified limits\n        limited = False\n        for idx in range(3):"
+      }
+    ]
+  },
+  {
+    "source": {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/grippers/panda_gripper.py",
+      "bytes": 1817,
+      "sha256": "a3760a8fc4599fa6f79914304b82466f3c1bda1a945943ca693bb57f00dc59eb"
+    },
+    "slices": [
+      {
+        "first_line": 38,
+        "last_line": 66,
+        "text": "class PandaGripper(PandaGripperBase):\n    \"\"\"\n    Modifies PandaGripperBase to only take one action.\n    \"\"\"\n\n    def format_action(self, action):\n        \"\"\"\n        Maps continuous action into binary output\n        -1 => open, 1 => closed\n\n        Args:\n            action (np.array): gripper-specific action\n\n        Raises:\n            AssertionError: [Invalid action dimension size]\n        \"\"\"\n        assert len(action) == self.dof\n        self.current_action = np.clip(\n            self.current_action + np.array([-1.0, 1.0]) * self.speed * np.sign(action), -1.0, 1.0\n        )\n        return self.current_action\n\n    @property\n    def speed(self):\n        return 0.01\n\n    @property\n    def dof(self):\n        return 1"
+      }
+    ]
+  },
+  {
+    "source": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/core/env_adapters/libero_adapter.py",
+      "bytes": 72647,
+      "sha256": "17fb74b3d475c91bc015222d4b61989c82a57f83935581b54935bab8080be26d"
+    },
+    "slices": [
+      {
+        "first_line": 43,
+        "last_line": 79,
+        "text": "if LEROBOT_PATH.exists() and str(LEROBOT_PATH) not in sys.path:\n    sys.path.insert(0, str(LEROBOT_PATH))\n\n\n# import lerobot\ntry:\n    from lerobot.processor.pipeline import PolicyProcessorPipeline, ProcessorStep\n    from lerobot.processor.env_processor import LiberoProcessorStep\n    from lerobot.utils.constants import OBS_ENV_STATE, OBS_IMAGE, OBS_IMAGES, OBS_STATE, OBS_STR\nexcept ModuleNotFoundError as exc:\n    missing = exc.name or \"\"\n    logging.getLogger(__name__).warning(\n        \"LeRobot processor dependencies unavailable (%s); using local LIBERO processor fallback\",\n        missing or \"unknown module\",\n    )\n\n    OBS_STR = \"observation\"\n    OBS_ENV_STATE = OBS_STR + \".environment_state\"\n    OBS_STATE = OBS_STR + \".state\"\n    OBS_IMAGE = OBS_STR + \".image\"\n    OBS_IMAGES = OBS_IMAGE + \"s\"\n\n    class ProcessorStep:\n        pass\n\n    class PolicyProcessorPipeline:\n        def __init__(self, steps):\n            self.steps = steps\n\n        def __call__(self, transition):\n            for step in self.steps:\n                transition = step(transition)\n            return transition\n\n    class LiberoProcessorStep(ProcessorStep):\n        def __call__(self, observation):\n            return self.observation(observation)"
+      },
+      {
+        "first_line": 809,
+        "last_line": 819,
+        "text": "    def step(self, action: np.ndarray) -> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:\n        if action.ndim != 1:\n            raise ValueError(\n                f\"Expected action to be 1-D (shape (action_dim,)), \"\n                f\"but got shape {action.shape} with ndim={action.ndim}\"\n            )\n        raw_obs, reward, done, info = self._env.step(action)\n\n        is_success = self._env.check_success()\n        terminated = done or is_success\n        info.update("
+      },
+      {
+        "first_line": 1008,
+        "last_line": 1015,
+        "text": "        self._last_obs = None\n        self._robot_state = None\n\n        env_preprocessor_steps: list[ProcessorStep] = []\n        env_postprocessor_steps: list[ProcessorStep] = []\n        env_preprocessor_steps.append(LiberoProcessorStep())\n        self.env_preprocessor = PolicyProcessorPipeline(steps=env_preprocessor_steps)\n        self.env_postprocessor = PolicyProcessorPipeline(steps=env_postprocessor_steps)"
+      },
+      {
+        "first_line": 1710,
+        "last_line": 1731,
+        "text": "    def step(self, action: torch.Tensor) -> Tuple[Dict, float, bool, bool, Dict]:\n        \"\"\"Step the LIBERO-PRO environment.\"\"\"\n\n        action_transition = {\"action\": action}\n        action_transition = self.env_postprocessor(action_transition)\n        action = action_transition[\"action\"]\n        # Convert gripper action to binary (-1 or 1) before exporting to NumPy.\n        action = action.clone()\n        action[-1] = 1 if action[-1] > 0 else -1\n        # Convert to CPU / numpy. Cast to float32 first \u2014 pi05 outputs bfloat16\n        # but LIBERO environments expect float32.\n        action_numpy: np.ndarray = action.float().to(\"cpu\").numpy()\n\n        current_env = self._env[self.current_task_idx]\n        evidence = getattr(self, \"_decision_evidence\", None)\n        if evidence is not None:\n            current_env._decision_evidence = evidence\n            evidence.record(\"executed_action\", action_numpy=action_numpy)\n            evidence.flush()\n        observation, reward, terminated, truncated, info = current_env.step(action_numpy)\n        self.episode_step += 1\n"
+      }
+    ]
+  },
+  {
+    "source": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/third_party/libero_pro/libero/libero/envs/env_wrapper.py",
+      "bytes": 8781,
+      "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0"
+    },
+    "slices": [
+      {
+        "first_line": 12,
+        "last_line": 70,
+        "text": "class ControlEnv:\n    def __init__(\n        self,\n        bddl_file_name,\n        robots=[\"Panda\"],\n        controller=\"OSC_POSE\",\n        gripper_types=\"default\",\n        initialization_noise=None,\n        use_camera_obs=True,\n        has_renderer=False,\n        has_offscreen_renderer=True,\n        render_camera=\"frontview\",\n        render_collision_mesh=False,\n        render_visual_mesh=True,\n        render_gpu_device_id=-1,\n        control_freq=20,\n        horizon=1000,\n        ignore_done=False,\n        hard_reset=True,\n        camera_names=[\n            \"agentview\",\n            \"robot0_eye_in_hand\",\n        ],\n        camera_heights=128,\n        camera_widths=128,\n        camera_depths=False,\n        camera_segmentations=None,\n        renderer=\"mujoco\",\n        renderer_config=None,\n        **kwargs,\n    ):\n        assert os.path.exists(\n            bddl_file_name\n        ), f\"[error] {bddl_file_name} does not exist!\"\n\n        controller_configs = suite.load_controller_config(default_controller=controller)\n\n        problem_info = BDDLUtils.get_problem_info(bddl_file_name)\n        # Check if we're using a multi-armed environment and use env_configuration argument if so\n\n        # Create environment\n        self.problem_name = problem_info[\"problem_name\"]\n        self.domain_name = problem_info[\"domain_name\"]\n        self.language_instruction = problem_info[\"language_instruction\"]\n        self.env = TASK_MAPPING[self.problem_name](\n            bddl_file_name,\n            robots=robots,\n            controller_configs=controller_configs,\n            gripper_types=gripper_types,\n            initialization_noise=initialization_noise,\n            use_camera_obs=use_camera_obs,\n            has_renderer=has_renderer,\n            has_offscreen_renderer=has_offscreen_renderer,\n            render_camera=render_camera,\n            render_collision_mesh=render_collision_mesh,\n            render_visual_mesh=render_visual_mesh,\n            render_gpu_device_id=render_gpu_device_id,\n            control_freq=control_freq,\n            horizon=horizon,"
+      },
+      {
+        "first_line": 87,
+        "last_line": 88,
+        "text": "    def step(self, action):\n        return self.env.step(action)"
+      }
+    ]
+  }
+]

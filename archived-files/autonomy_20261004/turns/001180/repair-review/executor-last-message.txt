@@ -1,0 +1,3 @@
+PASS for the bounded repair review: SR-01 and SR-02 are repaired; no new concrete source blocker found. Runtime/native-build startup and full-episode audit obligations remain open. No source adoption or promotion.
+
+Reports: [Markdown](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001180/repair-review/report-v1.md) · [JSON](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001180/repair-review/report-v1.json)

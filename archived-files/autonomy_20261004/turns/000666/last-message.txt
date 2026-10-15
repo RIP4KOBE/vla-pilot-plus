@@ -1,0 +1,3 @@
+N34R6’s CPU-only repair executor is running; no GPU cohort was launched. All 448 charged attempts, costs, and protected reserves remain preserved.
+
+State, checkpoint, and operational summary are recorded. Next: review the repair and tests before preparing a prospective GPU release. Validation, formal evaluation, and required ablation evidence remain outstanding.

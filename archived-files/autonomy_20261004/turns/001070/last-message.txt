@@ -1,0 +1,3 @@
+Verified controller identity, frozen source, release hashes, and ledger continuity. N35’s task5 Q0 worker exited; its controller remains live, with terminal accounting pending. No restart or duplicate dispatch.
+
+Operational summary saved for turn 001070. Validation, formal, and ablation completion remains unproven; the driver retains coordination.

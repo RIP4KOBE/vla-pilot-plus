@@ -1,0 +1,3 @@
+Verified live executor identities and unchanged private ledgers. N36R3’s test-only repair is committed; targeted cases passed across bounded runs. The executor is finishing its report.
+
+Recorded the operational handoff. Next: review terminal evidence before source adoption. No GPU dispatch or goal-completion claim.

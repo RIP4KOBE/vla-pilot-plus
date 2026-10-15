@@ -1,0 +1,7 @@
+Turn 575 — 2026-10-08T18:27:59.956185+00:00
+
+Current source 3acfda1adea7b4d9880c81dab7e3882f1587d4d0; N34 frozen plan/release hashes verified unchanged. Bound handoff and exact authorization verified. Prior turn574 exited normally with monitor-only effects. Resource isolation ACTIVE/PASS. Driver STOP absent: True; deadline 2026-10-11T11:13:13Z.
+
+Live controller PID3008475/start134644051 on boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7; current identity matches, CPU ticks 16233 (prior turn12532). Driver PID268073/start97715947 and coordinator PID3115062/start134683420 identities match. Controller status RUNNING_RELEASE_REVALIDATION_AND_LOCKED_ADMISSION; terminal result present: False. Owning ledger {'bytes': 6659252, 'lines': 1326, 'sha256': '229878bc3a9d99fd596f363835f4ef1ae3c2757b7f34aa43e0aef985de1aa0f2'}. Ledger unchanged; no N34 dispatch recorded. Retained accounting442 attempts/62.81145837588456GPUh. No source/state/ledger edits, dispatch/restart or process signals.
+
+Next bounded step: monitor the same N34 controller through release revalidation and locked admission; prior full validation measured approximately10minutes. If terminal, reconcile actual output and private charges before bounded diagnosis. Preserve frozen science, gates and reserves. Native N34 validity/efficacy, fresh validation20/formal10 and matched required ablations remain unresolved. No completion record; local driver continues.

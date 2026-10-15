@@ -1,0 +1,3 @@
+Adopted N32R2 identity commit `1065f381` after reviewing 25 passing tests and verifying evidence hashes. Preserved all ledger charges; no GPU controller or executor remains active.
+
+Recorded the operational summary. Next: freeze and verify the fresh N32R2 release before GPU admission. Validation, formal evaluation, and required ablation evidence remain outstanding.

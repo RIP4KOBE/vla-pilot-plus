@@ -1,0 +1,3 @@
+N34 controller PID 3008475 remains live and progressing through release revalidation on source `3acfda1`. Identity, frozen artifact hashes, and ledger continuity verified; no duplicate dispatch or restart.
+
+Turn 575 operational summary recorded. Next: monitor admission and reconcile terminal evidence. Validation, formal evaluation, and required ablations remain incomplete; the local driver continues.

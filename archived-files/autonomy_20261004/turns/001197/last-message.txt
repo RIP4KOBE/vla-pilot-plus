@@ -1,0 +1,3 @@
+N36’s finite allocation is adopted: 40 Dev attempts, 21 GPU-hours, zero automatic recovery. All prior charges and protected reserves remain intact.
+
+No GPU cohort is active. Next: verify provider/device readiness, freeze and validate the release, then dispatch. Operational summary saved; validation/formal/ablation completion remains unproven.

@@ -1,0 +1,9 @@
+Turn632 — 2026-10-08T21:13:21.286122+00:00
+
+Current source 9d0122c9fea8d6967cea3a7abba60489baae2302; scientific source 71ffff1a0f70d9874b309db9ef1843c02bf17ebf remains frozen. Handoff/authorization and current launch/plan/release hashes verified; owning state/checkpoint agree on active N34R2 controller. Prior turn631 completed normally with no recovery needed. Driver268073/start97715947, current coordinator605742/start135673747, controller592818/start135643655 and worker595896/start135652737 retain boot/start identity on boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7. STOP absent; authorization deadline2026-10-11T11:13:13Z.
+
+One existing GPU7 worker (UUID GPU-48473162-9548-1a19-04aa-ea86c5349187) runs first control cell n34r2_dev_t00_c0_20261008. Native runner progressed to Stage query10/50; this is activity only, not accepted validity or success. Controller result exists=False; latest owning ledger event=dispatched. Ledger 1334 lines/6677531 bytes SHA256 ee793e453616979e5b0a26fd2ac7fd5690c23d7e323078cd89b5f11c63abf14c; previous prefix intact. All old charges, failures, unknown telemetry and protected reserves preserved.
+
+Completed: reconciled prior turn, current live identities, resource isolation ACTIVE/PASS, ledger prefix, frozen bindings and bounded native log. No launch/replay/recovery, source edits, state mutation or driver lock acquisition.
+
+Next bounded step: monitor existing turn630 controller and native first-cell outcome. On termination reconcile terminal controller result, receipts and private ledger before scientific disposition or any prospective recovery. Keep source/plan/thresholds immutable while this cohort runs. Unresolved evidence: native validity, matched Dev efficacy/promotion, validation20/formal10/required ablations, costs/reproducibility and actual hash-bound original-goal completion. Target not achieved; local driver continues.

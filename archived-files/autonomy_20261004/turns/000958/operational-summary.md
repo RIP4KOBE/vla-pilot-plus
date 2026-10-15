@@ -1,0 +1,5 @@
+Source: `52a87af0bf11f95b21ce17aba456dc98944d9774`. Live controller: {'pid': 2632351, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 141061885, 'state': 'S', 'ppid': 12479}; direct children: [{'pid': 2914465, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 141768893, 'state': 'R', 'ppid': 2632351}]. Driver/coordinator boot and start identities verified. STOP: False; deadline: 2026-10-11T11:13:13Z.
+
+Verified bound current launch/plan/release and unchanged owning ledger prefix. Prior turn957 completed normally. Current ledger: 1445 rows; N35 valid episodes: 7, successes: 0; active attempts: [{'attempt_id': 'n35_dev_t01_n35_20261009', 'event': 'dispatched'}]. Terminal result present: False. Controller remains live. A transient direct child exited during read; no failure inferred from that race. No new dispatch, state/source/plan/ledger edits, replay or protected-result access.
+
+Next bounded step: monitor existing controller through admission/episode; on termination reconcile native audits and frozen prospective scientific gates. Validation/formal/required-ablation completion evidence remains outstanding. Target not met.

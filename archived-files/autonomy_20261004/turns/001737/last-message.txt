@@ -1,0 +1,3 @@
+Repair commit `89506fe1` is reconciled; 50 focused CPU tests passed. Independent source review is running under verified handles.
+
+Ledgers and scientific gates remain preserved. Operational summary and checkpoint are saved. Next: reconcile the review before source adoption or GPU release. Validation, formal and ablation completion remain unevidenced.

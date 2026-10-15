@@ -1,0 +1,3 @@
+Continued the authorized study. N36R4 CPU recovery preparation is running from accepted repair `80a9d945`; GPU release remains disabled pending review.
+
+N36R3’s invalid result and all 506 attempts / 75.6062 GPU-hours remain preserved. Live handles and the next bounded step are recorded in the hash-bound operational summary. Validation, formal evaluation and required ablations remain unresolved.

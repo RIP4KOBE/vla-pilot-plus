@@ -1,0 +1,9 @@
+Completed: [review-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001669/independent-runner-review/review-v1.json) and checksum written and verified.
+
+Verdict: **changes required before measurement**.
+
+- Reproduced unknown-child settlement risk.
+- Identified missing provider-handle validation.
+- Confirmed both downstream accounting gates need repair.
+
+Source and ledger hashes remain unchanged. Existing 91-test evidence verified; no measurement entrypoints executed. `gpu_authorized=false`, `release_enabled=false`, `target_met=false`.

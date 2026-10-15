@@ -1,0 +1,3 @@
+Reconciled N36R4’s completed CPU preparation and recorded the hash-bound handoff. Production identity/accounting checks block release; no GPU work was dispatched. All ledger charges remain intact.
+
+Next: scoped contract repair and independent review. The driver remains active; validation, formal evaluation, and ablation evidence remain outstanding.

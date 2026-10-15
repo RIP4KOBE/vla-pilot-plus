@@ -1,0 +1,3 @@
+Continued the owning study and launched N36’s CPU protocol/accounting drafting executor. Live handles and ledger verified; source and scientific gates remain unchanged.
+
+Operational summary saved. Next: independent protocol review before implementation or GPU release. Validation, formal evaluation, and required ablation evidence remain outstanding.

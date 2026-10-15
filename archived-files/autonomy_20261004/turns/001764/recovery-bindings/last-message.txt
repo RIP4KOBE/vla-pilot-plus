@@ -1,0 +1,5 @@
+Wrote [report-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001764/recovery-bindings/report-v1.json) with exact hashes and focused validation.
+
+**Blocked:** unchanged source pins aborted identity `001723` and supports only one retained three-row predecessor; current history contains two.
+
+Prepared fresh `001764` identity, verified the 145 additions and 6,767 retained rows, and preserved all charges and unknown telemetry. Source, ledgers, and owning state remain unchanged. No release was adopted; measurement remains disabled.

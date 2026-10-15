@@ -1,0 +1,3 @@
+N36’s existing CPU audit repair remains active; process identities and unchanged private ledgers are verified. No duplicate dispatch or source adoption occurred.
+
+Operational summary saved for turn 1173. Next: reconcile the repair’s report and commit, then independently review it before release. Validation, formal evaluation, and required ablation evidence remain outstanding.

@@ -1,0 +1,3 @@
+Reconciled the completed CPU executor into owning state/checkpoint. Candidate `3b05c0b` reports 190 focused test passes; artifact hashes verified. GPU dispatch remains disabled pending integration coverage and independent review.
+
+Ledgers and charges are unchanged. The driver remains active; validation/formal/ablation completion is still unproven. Operational summary saved for continuation.

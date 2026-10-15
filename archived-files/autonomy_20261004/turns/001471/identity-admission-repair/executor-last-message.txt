@@ -1,0 +1,7 @@
+Committed `80a9d945e688da17485239b3d5bb11c558c214d6` → `813f25bc89a3920149739a2bf957b2e1b3db29c4`. Worktree clean; **93 focused CPU tests passed**.
+
+Exact N36R4 identity, retained accounting, output/health routing, and first-C0 pause are supported. No runtime rebuild, release, or GPU activity occurred.
+
+Reports written: [Markdown](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001471/identity-admission-repair/report-v1.md) and adjacent `report-v1.json`.
+
+Elapsed: 611 seconds. Full-cohort start headroom at reporting: 556 seconds. Independent/root review, runtime rebinding, accounting adoption, fresh health, and G3 remain pending. Score `null`; goal complete `false`.

@@ -1,0 +1,3 @@
+N36’s existing CPU executor is live and identity-verified. Private ledgers remain unchanged: 502 attempts, 75.2438 GPU-hours. No duplicate work launched.
+
+Operational summary recorded. Next: review the executor’s completed implementation and audits before any GPU release. Validation, formal, and ablation goals remain unmet.

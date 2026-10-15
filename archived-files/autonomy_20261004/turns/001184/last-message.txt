@@ -1,0 +1,5 @@
+Adopted reviewed N36 source `ab8e8c6`; verified all 34 changed files and preserved ledger history.
+
+No experiment controller is active; no GPU work was launched. Next is pinned runtime verification and prospective release preparation. Validation, formal evaluation, and required ablation evidence remain incomplete.
+
+Operational summary recorded for driver continuation.

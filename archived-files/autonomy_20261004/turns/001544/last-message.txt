@@ -1,0 +1,5 @@
+Verified live identities and unchanged ledgers. The existing G5 CPU executor continues; no duplicate dispatch occurred.
+
+Retained usage: 506 attempts, 75.6062 GPU-hours. Next: review G5 outputs, then remaining readiness gates. Validation/formal/ablation completion remains unevidenced.
+
+Recorded the hash-bound operational summary for turn 001544.

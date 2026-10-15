@@ -1,0 +1,3 @@
+N32R2 remains active under its verified controller: 13 valid completed cells; task-4 triple incomplete. Frozen source, plan and private ledger history are preserved.
+
+Operational summary saved for turn 342. Next: monitor the existing controller and review terminal evidence. Validation, formal and required ablation completion remain outstanding.

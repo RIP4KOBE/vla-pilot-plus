@@ -1,0 +1,64 @@
+{
+  "GPU_model_provider_simulator_calls": 0,
+  "actual_outcomes_or_native_payloads_read": false,
+  "assumed_post_n3_no_retry_snapshot": {
+    "by_bucket": {
+      "baseline": 11,
+      "development": 92,
+      "formal": 0,
+      "recovery": 6,
+      "validation": 0
+    },
+    "dispatched": 109
+  },
+  "candidate_or_phase_authorized": false,
+  "implementation_or_tests_run": false,
+  "limitations": [
+    "slot capacity is not live budget feasibility",
+    "no task/formula/success threshold chosen",
+    "N3 full matrix and all frozen gates remain unchanged",
+    "new task-backed hypothesis and prospective root protocol plus settled admission required"
+  ],
+  "live_ledger_read": false,
+  "memo": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n3-runner-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/conditional-post-n3-resources/memo-v1.md",
+    "sha256": "d1155f979d77ef1f0bc52bde859ac660252911ef96ed7821bc910ef851112bab"
+  },
+  "protected_gpu_hours": 24,
+  "protected_original_slots": 100,
+  "remaining_bucket_slots": {
+    "baseline": 9,
+    "development": 8,
+    "recovery": 14
+  },
+  "schema": "conditional-post-n3-resource-source-review-v1",
+  "source_head": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+  "sources": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/ARBOR_CONTRACT.md",
+      "sha256": "2478b31d2d33df9aa7aa321afa6b172aaadb983a720367c8b1df5fd3b9a9627b"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_003_executed_feedback/protocol.md",
+      "sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_003_executed_feedback/accounting-clarification.md",
+      "sha256": "133c8bd746680cb27fc0c8e0bb5f6116ffc9029045bfdd92482c88692b6419ba"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py",
+      "sha256": "9d1ab138644510edae3eb0c7d3b13e8d1dbfcdb3fc02bd92e232a67d21f993ea"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_plan.py",
+      "sha256": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1"
+    }
+  ],
+  "state_plan_ledger_W_changes": false,
+  "status": "CONTINGENT_CAPACITY_ONLY"
+}

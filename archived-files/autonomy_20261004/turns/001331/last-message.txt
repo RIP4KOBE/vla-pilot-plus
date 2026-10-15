@@ -1,0 +1,5 @@
+N36R3’s existing CPU repair remains active with verified process identities. Source `30c6321715df` and private ledgers are unchanged.
+
+Focused tests passed; eight regression failures remain under diagnosis. Next: reconcile the executor’s final report and independently review before GPU release.
+
+Turn 1331’s hash-bound operational summary is saved. Validation, formal evaluation, and required ablation evidence remain incomplete.

@@ -1,0 +1,7 @@
+Committed `bee9f6a4703e9d5d802d6b8c7950b69beefac4c0`.
+
+All eight cases pass across targeted runs. Only the three authorized tests changed. Production is unchanged; no canonical STOP writes occurred. Failures and containment evidence are preserved.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/report-v1.md>)
+
+GPU, release, adoption, and target flags remain false; score is null. Original scientific goals remain unfulfilled.

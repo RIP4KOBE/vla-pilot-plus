@@ -1,0 +1,6 @@
+Preparation complete: 115 checks passed, including the corrected controller verifier and all 41 manifests. All 43 active controller references were refreshed.
+
+- [Report]( /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001555/graph-rebinding/report-v1.json)
+- [Independent B5 inputs](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001555/graph-rebinding/independent-b5-inputs-v1.json)
+
+Exact hashes and graph roots are recorded. `b5_review` remains null; release remains disabled. G7’s unconditional dispatch veto is preserved. No authority grant, source adoption, or scientific success claimed.

@@ -1,0 +1,7 @@
+Committed `1b8613ae4ab774b215f3aa3ca12027ddbc901831`.
+
+Implemented fail-closed dispatch gates and CPU lifecycle/deep-closure checks. Tests passed after fixture corrections; failed runs remain documented. Ledgers and historical graph are unchanged.
+
+Release remains disabled. Fresh independent review and coordinator adoption/releases are required. No GPU execution or scientific success claimed.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001560/g7-implementation/report-v1.json>)

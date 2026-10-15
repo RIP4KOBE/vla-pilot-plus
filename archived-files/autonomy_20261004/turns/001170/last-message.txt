@@ -1,0 +1,3 @@
+N36’s review finished and found two audit gaps. Recorded repair-required status and the operational handoff; source and ledgers remain unchanged.
+
+No GPU cohort is active. Next is isolated audit repair and independent review before release. Validation, formal evaluation, and required ablation evidence remain outstanding.

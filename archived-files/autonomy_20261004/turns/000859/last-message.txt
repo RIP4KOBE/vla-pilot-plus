@@ -1,0 +1,3 @@
+Adopted the reviewed continuation patch as `969d5fb` and reconciled executor completion. All ledger charges remain unchanged; no GPU work was dispatched.
+
+Next: verify runtime/source closure and freeze the separate missing-11 release. Validation, formal evaluation and ablation evidence remain outstanding. Operational handoff recorded for the continuing local driver.

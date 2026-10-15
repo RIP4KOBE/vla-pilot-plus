@@ -1,0 +1,5 @@
+N34R4 remains active on GPU7: controller 743485 and worker 746235 have verified identities. The episode has progressed to Stage queries; no terminal result exists yet.
+
+Verified authorization, frozen artifacts and ledger prefix. Preserved source `e52618ee`, with no duplicate dispatch or recovery.
+
+Turn 652’s operational summary is saved. The driver continues monitoring; validation, formal and ablation evidence remain outstanding.

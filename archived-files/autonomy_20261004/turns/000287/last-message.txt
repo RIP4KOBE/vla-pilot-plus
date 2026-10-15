@@ -1,0 +1,5 @@
+N32R2 controller PID 1818171 remains live on frozen source `1065f381`. Authority, process identity, frozen bindings, and ledger continuity verified; no restart or duplicate dispatch.
+
+C0/Q0/N32 each remain 0/3 on complete matched Dev tasks. Task3 C0 failed validly; other arms are pending. Original completion evidence remains unmet.
+
+Turn 287 operational summary recorded. Next step: monitor the existing controller.

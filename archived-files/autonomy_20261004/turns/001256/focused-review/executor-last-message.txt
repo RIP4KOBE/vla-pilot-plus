@@ -1,0 +1,3 @@
+Review complete: **focused CPU checks PASS; production acceptance BLOCKED**. Five concrete fix requirements and verified hashes are recorded. No source adoption or scientific promotion; costs remain unchanged.
+
+Reports: [Markdown](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001256/focused-review/report-v1.md>) · [JSON](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001256/focused-review/report-v1.json>)

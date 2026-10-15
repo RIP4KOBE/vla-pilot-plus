@@ -1,0 +1,41 @@
+{
+  "schema": "n32r3-operational-source-adoption-v1",
+  "at": "2026-10-08T11:10:49.547102+00:00",
+  "source_before": "1065f38122379a515b60a9a424f574330405b66f",
+  "source_after": "36aac818c8ea0ec3ce18413e678963818bb5bb5d",
+  "scientific_source": "1065f38122379a515b60a9a424f574330405b66f",
+  "root_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000458/implementation-root-review.json",
+    "sha256": "0c68dae8ab6f86fd6dcd1442d0253a32f23f2ce2901a85b711e326ccd5e6d9d9",
+    "bytes": 5363
+  },
+  "preflight": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000459/source-adoption-preflight.json",
+    "sha256": "b0331220eed4d73a57153048be314a47bda0bc7f208948afd6f767063b872774",
+    "bytes": 1693
+  },
+  "changed_paths": [
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n32r3_bridge.py",
+    "scripts/qd_ed_n32r3_contract.py",
+    "scripts/qd_ed_n32r3_history.py",
+    "scripts/qd_ed_n32r3_prepare.py",
+    "scripts/qd_ed_n32r3_release.py",
+    "scripts/qd_ed_n32r3_runner.py",
+    "scripts/qd_ed_n32r3_supervise.py",
+    "scripts/qd_ed_n32r3_worker.py",
+    "tests/test_n32r3_continuation.py",
+    "tests/test_n32r3_execution.py",
+    "tests/test_n32r3_source.py"
+  ],
+  "adoption": "fast-forward reviewed executor commit; operational source only",
+  "ledger_unchanged": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+    "sha256": "8294b4ed47b8f645f2b3ab6511329f548b5788a5f40d0822b54d3c6c8c814da6",
+    "bytes": 5694864
+  },
+  "gpu_dispatched": false,
+  "budget_adopted": false,
+  "release_enabled": false,
+  "scientific_promotion": false
+}

@@ -1,0 +1,3 @@
+N32R1 stopped invalid because the parent could not verify the worker’s source attestation. Both processes exited; all charges and evidence remain preserved.
+
+Recorded closure and confirmed the exact failure. Source remains `531477e9`. Next: isolated CPU repair, focused tests, then a fresh reviewed recovery release. Validation/formal/ablation goals remain incomplete.

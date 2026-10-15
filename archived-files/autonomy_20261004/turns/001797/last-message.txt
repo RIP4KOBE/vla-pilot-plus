@@ -1,0 +1,3 @@
+Verified live driver and repair executor identities; all four private ledgers are unchanged. N36 repair commit `f5fc546` exists, but its executor is still running.
+
+Recorded the hash-bound turn 1797 operational summary. Next: reconcile the terminal report and independently review the repair before adoption. Validation, formal evaluation, and required ablation evidence remain incomplete.

@@ -1,0 +1,28 @@
+{
+  "current_source": "711602acc32031cfd977a2b3ec2e7ef0582e7377",
+  "scientific_source": "711602acc32031cfd977a2b3ec2e7ef0582e7377",
+  "repair_acceptance": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001447/terminal-reconciliation-v1.json",
+    "bytes": 5205,
+    "sha256": "d16f7947ca180f41b2a3270193cbe59005de7157962d6b61b28e2fcbad7f032a"
+  },
+  "historical_baseline": "1065f38122379a515b60a9a424f574330405b66f",
+  "changed_paths": [
+    "scripts/qd_ed_n36r3_admission.py",
+    "scripts/qd_ed_n36r3_preparation.py",
+    "tests/test_n36r3_accounting_health_repair.py",
+    "tests/test_n36r3_admission.py",
+    "tests/test_n36r3_preparation.py"
+  ],
+  "parent_plan_source": "d01bc1e2e7acc876653a43ddf157d0b4a641f88a",
+  "parent_to_current_paths": [
+    "scripts/qd_ed_n36_runner.py",
+    "scripts/qd_ed_n36r3_admission.py",
+    "scripts/qd_ed_n36r3_preparation.py",
+    "tests/test_n36_cli_references.py",
+    "tests/test_n36r3_accounting_health_repair.py",
+    "tests/test_n36r3_admission.py",
+    "tests/test_n36r3_preparation.py"
+  ],
+  "production_Main_science_receipts_audits_unchanged": true
+}

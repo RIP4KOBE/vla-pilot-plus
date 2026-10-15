@@ -1,0 +1,3 @@
+Continued the owning study. Repair commit `a14f3a8` is reconciled with 213 passing CPU tests; independent review is running.
+
+Private ledgers are unchanged. Live handles and next steps are recorded in the hash-bound operational summary. Validation, formal evaluation and required ablation evidence remain incomplete.

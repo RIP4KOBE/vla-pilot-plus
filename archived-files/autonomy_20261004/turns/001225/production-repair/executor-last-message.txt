@@ -1,0 +1,7 @@
+Committed `ca4e6a96d049c7ebb1f302d755883388ddbfdbd8`.
+
+PR-01 and PR-04 repaired; six focused CPU test methods pass. Exact audits and full worker allowance preserved. Worktree clean.
+
+PR-02/PR-03 remain root-only blockers. No scientific success or readiness claimed.
+
+Reports: [JSON](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001225/production-repair/report-v1.json) · [Markdown](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001225/production-repair/report-v1.md), including hashes and minimal rebind obligations.

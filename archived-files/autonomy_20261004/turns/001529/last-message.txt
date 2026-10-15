@@ -1,0 +1,3 @@
+Verified authority, live executor identity, and unchanged private ledgers. The existing CPU repair remains active; GPU dispatch remains gated.
+
+Saved hash-bound turn 001529 summary. Next: reconcile completed repair and tests, then independent review. Validation, formal evaluation, and required ablation evidence remain incomplete.

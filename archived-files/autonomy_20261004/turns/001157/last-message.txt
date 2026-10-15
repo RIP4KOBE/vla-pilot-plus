@@ -1,0 +1,5 @@
+N36’s existing CPU executor remains live with verified process identities. Latest intermediate tests: 96 passed, 2 failed; implementation continues.
+
+No GPU dispatch or source adoption occurred. All three private ledgers remain unchanged. Turn 1157’s operational summary is saved for continued monitoring and review.
+
+Validation, formal evaluation, and required ablation evidence remain outstanding.

@@ -1,0 +1,201 @@
+diff --git a/scripts/qd_ed_n36r3_admission.py b/scripts/qd_ed_n36r3_admission.py
+index 050807d..421a892 100644
+--- a/scripts/qd_ed_n36r3_admission.py
++++ b/scripts/qd_ed_n36r3_admission.py
+@@ -11,8 +11,8 @@ from scripts import qd_ed_n36r2_admission as previous
+ 
+ OWNER = previous.OWNER
+ SOURCE = previous.SESSION / 'variants/n36r3_generated_import_001299/implementation_worktree'
+-# Fixed successor authorized by node 15.6 / turn 001426; old health stays charged.
+-PREPARATION_ID = 'n36_healthcheck_n36r3_preparation_001426'
++# Fixed successor authorized by node 15.6 / turn 001445; old health stays charged.
++PREPARATION_ID = 'n36_healthcheck_n36r3_preparation_001445'
+ KIND = 'n36r3_resource_preparation_v1'
+ HEALTH = {**previous.HEALTH, 'preparation_id': PREPARATION_ID}
+ JOURNALS = {'attempt-ledger.jsonl', 'gpu-healthcheck-ledger.jsonl',
+@@ -78,7 +78,7 @@ def validate_authority(plan, authority):
+             prefix_rows[name] = [json.loads(line) for line in stream.read(anchor['bytes']).splitlines() if line.strip()]
+     snap = r.budget_snapshot(prefix_rows['attempt-ledger.jsonl'], prefix_rows['gpu-healthcheck-ledger.jsonl'])
+     w.require(snap == accounting['snapshot'] and snap['dispatched'] == snap['reserved_attempts'] == 505
+-              and snap['gpu_hours_consumed'] == 75.53031173955723
++              and snap['gpu_hours_consumed'] == 75.53335346582918
+               and snap['running'] == snap['gpu_healthcheck_inflight'] == 0
+               and all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(prefix_rows['attempt-ledger.jsonl']).values()),
+               'N36R3 retained 505 attempts and exact costs required')
+diff --git a/scripts/qd_ed_n36r3_preparation.py b/scripts/qd_ed_n36r3_preparation.py
+index 245276a..eadba71 100644
+--- a/scripts/qd_ed_n36r3_preparation.py
++++ b/scripts/qd_ed_n36r3_preparation.py
+@@ -46,7 +46,7 @@ def ledger_snapshot(owner, review):
+     events, health = rows['attempt-ledger.jsonl'], rows['gpu-healthcheck-ledger.jsonl']
+     snap = r.budget_snapshot(events, health)
+     w.require(snap['dispatched'] == snap['reserved_attempts'] == 505
+-              and snap['gpu_hours_consumed'] == 75.53031173955723,
++              and snap['gpu_hours_consumed'] == 75.53335346582918,
+               'current accounting differs; fresh root reconciliation required')
+     w.require(all(g[-1]['event'] in r.TERMINAL for g in r.event_groups(events).values())
+               and snap['running'] == snap['gpu_healthcheck_inflight'] == 0,
+@@ -59,7 +59,7 @@ def ledger_snapshot(owner, review):
+ def arithmetic(snap):
+     """Exact decimal prospective deductions; these are not spendable balances."""
+     d = Decimal
+-    w.require(snap['gpu_hours_consumed'] == 75.53031173955723, 'retained charge differs')
++    w.require(snap['gpu_hours_consumed'] == 75.53335346582918, 'retained charge differs')
+     retained = d(str(snap['gpu_hours_consumed']))
+     margin = d('0.23357169027962')
+     protected = sum(d(str(v)) for v in c.CAPS['protected_gpu_hours'].values())
+diff --git a/tests/test_n36r3_accounting_health_repair.py b/tests/test_n36r3_accounting_health_repair.py
+index 095c46a..6314160 100644
+--- a/tests/test_n36r3_accounting_health_repair.py
++++ b/tests/test_n36r3_accounting_health_repair.py
+@@ -1,4 +1,4 @@
+-"""Turn 001426 CPU fixtures only; no real owner, provider or readiness evidence."""
++"""Turn 001445 CPU fixtures only; no real owner, provider or readiness evidence."""
+ import copy
+ import json
+ import math
+@@ -14,9 +14,10 @@ from scripts import qd_ed_n36_accounting as accounting
+ from scripts import qd_ed_n36_contract as c
+ from scripts import qd_ed_final_runner as r
+ 
+-OLD_ID = 'n36_healthcheck_n36r3_preparation_001314'
+-NEW_ID = 'n36_healthcheck_n36r3_preparation_001426'
+-RETAINED = 75.53031173955723
++EARLIER_ID = 'n36_healthcheck_n36r3_preparation_001314'
++OLD_ID = 'n36_healthcheck_n36r3_preparation_001426'
++NEW_ID = 'n36_healthcheck_n36r3_preparation_001445'
++RETAINED = 75.53335346582918
+ 
+ 
+ @pytest.fixture
+@@ -47,9 +48,12 @@ def case(tmp_path, monkeypatch):
+                 'budget_bucket': 'baseline' if i < 100 else 'development' if i < 500 else 'recovery'}
+         events.extend([{**base, 'event': 'reserved'}, {**base, 'event': 'dispatched'},
+                        {**base, 'event': 'aborted', 'gpu_process_wall_seconds': seconds}])
+-    resources = [{'resource_id': OLD_ID, 'event': event,
+-                  'gpu_process_wall_seconds': .00305887314245 * 3600}
+-                 for event in ('reserved', 'dispatched', 'aborted')]
++    resources = [{'resource_id': identity, 'event': event,
++                  'gpu_process_wall_seconds': seconds}
++                 for identity, seconds, terminal in [
++                     (EARLIER_ID, .00305887314245 * 3600, 'aborted'),
++                     (OLD_ID, 10.950214579002932, 'completed')]
++                 for event in ('reserved', 'dispatched', terminal)]
+     rows = {'attempt-ledger.jsonl': events, 'gpu-healthcheck-ledger.jsonl': resources,
+             'gpu-hour-reservation-ledger.jsonl': []}
+     anchors = {}
+@@ -93,9 +97,9 @@ def test_exact_retained_accounting_and_finite_arithmetic(case):
+     assert gate.validate_authority(f.plan, f.authority) == f.rows
+     assert prep.ledger_snapshot(f.owner, f.review)['snapshot'] == f.snapshot
+     result = prep.arithmetic(f.snapshot)
+-    assert result['hours']['retained'] == '75.53031173955723'
+-    assert result['hours']['conservative_after'] == '96.76388342983685'
+-    assert result['hours']['unprotected_effective_after'] == '80.32016349686153'
++    assert result['hours']['retained'] == '75.53335346582918'
++    assert result['hours']['conservative_after'] == '96.76692515610880'
++    assert result['hours']['unprotected_effective_after'] == '80.31712177058958'
+     assert (result['retained_attempts'], result['prospective_attempts']) == (505, 545)
+     assert result['seconds']['cohort_total'] == 75600
+     assert result['health']['max_invocations'] == 41
+@@ -103,7 +107,7 @@ def test_exact_retained_accounting_and_finite_arithmetic(case):
+     assert result['current_headroom'] is None
+ 
+ 
+-@pytest.mark.parametrize('amount', [75.52725286641478, math.nextafter(RETAINED, math.inf), 76.0])
++@pytest.mark.parametrize('amount', [75.52725286641478, 75.53031173955723, math.nextafter(RETAINED, math.inf), 76.0])
+ def test_stale_or_mismatched_accounting_rejected(case, monkeypatch, amount):
+     f = case
+     stale = {**f.snapshot, 'gpu_hours_consumed': amount}
+@@ -131,7 +135,7 @@ def test_all_three_prefixes_remain_strict(case, journal):
+         gate.validate_authority(f.plan, f.authority)
+ 
+ 
+-@pytest.mark.parametrize('identity', [OLD_ID, 'n36_healthcheck_n36r3_arbitrary'])
++@pytest.mark.parametrize('identity', [EARLIER_ID, OLD_ID, 'n36_healthcheck_n36r3_arbitrary'])
+ def test_old_or_arbitrary_authority_identity_rejected(case, identity):
+     f = case
+     f.authority['healthchecks'] = {**gate.HEALTH, 'preparation_id': identity}
+@@ -149,6 +153,7 @@ def test_source_runtime_adoption_stays_exact(case, binding):
+ 
+ 
+ @pytest.mark.parametrize('identity,reused,error', [
++    (EARLIER_ID, False, 'health replay forbidden'),
+     (OLD_ID, False, 'health replay forbidden'),
+     ('n36_healthcheck_n36r3_arbitrary', False, 'one preparation'),
+     (NEW_ID, True, 'health replay forbidden'),
+@@ -224,7 +229,7 @@ def test_episode_admission_uses_verified_suffix_but_retains_global_charge(case,
+     monkeypatch.setattr(accounting, 'retained_margin', lambda *a: .23357169027962)
+     def stop(snapshot, cohort, **kw):
+         assert snapshot['gpu_hours_consumed'] == RETAINED
+-        assert snapshot['gpu_healthcheck_hours'] == .00305887314245
++        assert snapshot['gpu_healthcheck_hours'] == (.00305887314245 + 10.950214579002932 / 3600)
+         assert cohort['gpu_healthcheck_hours'] == cohort['gpu_hours_consumed'] == 0
+         raise ValueError('CPU_STOP_AFTER_COHORT_ACCOUNTING')
+     monkeypatch.setattr(accounting, 'headroom', stop)
+diff --git a/tests/test_n36r3_admission.py b/tests/test_n36r3_admission.py
+index 9b3b967..f6f0283 100644
+--- a/tests/test_n36r3_admission.py
++++ b/tests/test_n36r3_admission.py
+@@ -41,7 +41,7 @@ def setup(tmp_path, monkeypatch):
+         key = saved['attempt_id'] if saved else 'historical_'+str(i)
+         seconds = saved['gpu_seconds'] if saved else 0.
+         if i == 504:
+-            seconds = (75.52725286641478-r.budget_snapshot(events)['gpu_hours_consumed'])*3600
++            seconds = (75.53335346582918-r.budget_snapshot(events)['gpu_hours_consumed'])*3600
+         bucket = 'baseline' if i < 105 else 'development' if i < 418 else 'validation' if i < 478 else 'recovery'
+         base = {'attempt_id':key, 'episode_key':key, 'budget_bucket':bucket}
+         events.extend([{**base,'event':'reserved'}, {**base,'event':'dispatched'},
+@@ -54,7 +54,7 @@ def setup(tmp_path, monkeypatch):
+         p = owner/'data'/name; p.write_text(''.join(json.dumps(e)+'\n' for e in rows))
+         anchors[name] = {**c.ref(p), 'bytes':p.stat().st_size}
+     snap = r.budget_snapshot(events, [])
+-    assert snap['gpu_hours_consumed'] == 75.52725286641478
++    assert snap['gpu_hours_consumed'] == 75.53335346582918
+     original = put('original-accounting', {'ledger_prefixes':anchors,
+         'cost_reconciliation':{'retained_admission_margin_gpu_hours':.23357169027962}})
+     monkeypatch.setattr(c, 'ACCOUNTING_SHA', original['sha256'])
+@@ -463,3 +463,13 @@ def test_readiness_timestamp_fix_preserves_non_time_checks(readiness_case, fault
+     elif fault == 'journal': x.resources[-1]['time_unix'] -= 1
+     with pytest.raises(ValueError):
+         x.check(sync_journal=fault != 'journal')
++
++
++def test_reconciled_retained_snapshot_authority_only(setup):
++    """CPU admission fixture only; do not execute even the synthetic health runner."""
++    f = setup
++    rows = gate.validate_authority(f.plan, f.authority)
++    assert rows['attempt-ledger.jsonl'] == f.events
++    assert f.snap['dispatched'] == f.snap['reserved_attempts'] == 505
++    assert f.snap['gpu_hours_consumed'] == 75.53335346582918
++    assert gate.PREPARATION_ID == 'n36_healthcheck_n36r3_preparation_001445'
+diff --git a/tests/test_n36r3_preparation.py b/tests/test_n36r3_preparation.py
+index e89f8b9..9cfb256 100644
+--- a/tests/test_n36r3_preparation.py
++++ b/tests/test_n36r3_preparation.py
+@@ -72,13 +72,13 @@ def test_launch_stops_on_pause_without_second_call(monkeypatch):
+ 
+ 
+ def test_exact_finite_arithmetic_and_unchanged_reserves():
+-    snap = {'gpu_hours_consumed': 75.52725286641478,
++    snap = {'gpu_hours_consumed': 75.53335346582918,
+             'by_bucket': {'baseline': 100, 'development': 400, 'recovery': 5,
+                           'validation': 0, 'formal': 0}}
+     result = p.arithmetic(snap)
+-    assert result['hours']['conservative_before'] == '75.76082455669440'
+-    assert result['hours']['conservative_after'] == '96.76082455669440'
+-    assert result['hours']['unprotected_effective_after'] == '80.32322237000398'
++    assert result['hours']['conservative_before'] == '75.76692515610880'
++    assert result['hours']['conservative_after'] == '96.76692515610880'
++    assert result['hours']['unprotected_effective_after'] == '80.31712177058958'
+     assert result['seconds']['episodes_total'] + result['seconds']['health_total'] + 200 == 75600
+     assert result['health']['maximum_full_reservations'] == 30
+     assert result['prospective_attempts'] == 545 and result['remaining_attempts'] == 1255
+@@ -107,7 +107,7 @@ def test_snapshot_binds_all_current_bytes_and_rejects_cost_drift(tmp_path, monke
+     review = {'ledger_prefix': p.bound(data/'attempt-ledger.jsonl'),
+               'health_ledger_prefix': p.bound(data/'gpu-healthcheck-ledger.jsonl')}
+     snapshot = {'dispatched': 505, 'reserved_attempts': 505,
+-                'gpu_hours_consumed': 75.52725286641478, 'running': 0, 'gpu_healthcheck_inflight': 0}
++                'gpu_hours_consumed': 75.53335346582918, 'running': 0, 'gpu_healthcheck_inflight': 0}
+     monkeypatch.setattr(p.r, 'budget_snapshot', lambda *a: copy.deepcopy(snapshot))
+     result = p.ledger_snapshot(tmp_path, review)
+     assert len(result['ledger_prefixes']) == 3

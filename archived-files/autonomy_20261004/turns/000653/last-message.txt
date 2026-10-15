@@ -1,0 +1,5 @@
+N34R4 remains active on frozen source `e52618ee`. Controller PID 743485 and worker PID 746235 passed identity checks; the episode advanced to query 15/50.
+
+Authority hashes and ledger prefix verified. No restart or scientific changes made. Turn 653 operational summary saved.
+
+Next: monitor completion and audit the outcome. Validation, formal evaluation, and required ablation evidence remain outstanding; the driver continues.

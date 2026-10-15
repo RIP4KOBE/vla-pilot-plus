@@ -1,0 +1,3 @@
+N36R2 readiness verified on source `30c63217`: GPU7 idle, accounted CUDA/EGL proof valid, official Codex login verified. Ledger history remains unchanged.
+
+Recorded the operational summary and checkpoint. Next: binding updates and independent production review before dispatch. Validation, formal evaluation and ablation completion remain unproven.

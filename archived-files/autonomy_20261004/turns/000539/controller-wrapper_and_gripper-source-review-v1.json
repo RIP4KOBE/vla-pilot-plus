@@ -1,0 +1,32 @@
+{
+  "kind": "deployed_source_review",
+  "at": "2026-10-08T16:11:51.549008+00:00",
+  "runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n32_archive_eligible_capture/root-recovery-release-v2/runtime.owning-v1.json",
+    "sha256": "f5e07434eed3af61a71ce9944e2682995656d6069f659f2057860733ebe53513"
+  },
+  "fixture_only": false,
+  "source_commit": "68c341ef6357887c4ae33ddafad00fab17582302",
+  "sources": [
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/core/env_adapters/libero_adapter.py",
+      "sha256": "22e8be88e1a68bcffdd72536b79e7f9e4d56efdc0b12b5a0c3fb1c7877930c64"
+    },
+    {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/third_party/libero_pro/libero/libero/envs/env_wrapper.py",
+      "sha256": "a782fb76c9792268d28979474fe72849e1e98ada49c8e997a65359a8d6b6acd0"
+    },
+    {
+      "path": "/home/hynx/miniconda3/envs/vla-pilot/lib/python3.12/site-packages/robosuite/models/grippers/panda_gripper.py",
+      "sha256": "a3760a8fc4599fa6f79914304b82466f3c1bda1a945943ca693bb57f00dc59eb"
+    }
+  ],
+  "findings": [
+    "Adapter constructs an empty environment postprocessor step list; its local fallback preserves the transition with no steps.",
+    "Adapter binarizes the last channel (>0 gives +1, otherwise -1), converts to float32 and forwards through current environment step; LIBERO ControlEnv.step forwards to its wrapped env.",
+    "LIBERO ControlEnv defaults to OSC_POSE at 20 Hz and loads the deployed controller config.",
+    "PandaGripper incrementally updates clipped finger commands; -1 opens and +1 closes.",
+    "Actual imported LeRobot pipeline path and remaining postprocessor/decode module closure still require runtime closure review; this source review is not native execution evidence."
+  ],
+  "native_execution_observed": false
+}

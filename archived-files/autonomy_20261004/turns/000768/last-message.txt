@@ -1,0 +1,5 @@
+N34R11 remains active on GPU7: controller 1322966, worker 1615556. Source `4b390b3` and frozen rules are unchanged.
+
+Verified authority hashes, process identities, and ledger continuity. Seven valid outcomes, zero successes; task2 Q0 is running. No restart or duplicate dispatch.
+
+Turn 768 operational summary saved. Next: monitor the existing cohort and reconcile its terminal evidence. Validation/formal/ablation goals remain incomplete.

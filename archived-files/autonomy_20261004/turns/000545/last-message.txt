@@ -1,0 +1,5 @@
+Adopted N34’s reviewed source-integrity repair as `45f9d06`; 96 focused CPU tests passed. State/checkpoint reconciled; ledger and reserves unchanged.
+
+No GPU controller is active. Next: provision the pinned dependency database and verify loaded-runtime coverage before release.
+
+Operational summary saved for driver continuation. Validation, formal evaluation, and ablation evidence remain outstanding; the goal is not complete.

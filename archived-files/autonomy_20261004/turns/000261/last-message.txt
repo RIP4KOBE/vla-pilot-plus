@@ -1,0 +1,3 @@
+N32R2 remains under its existing controller; source `1065f381`, frozen bindings, and ledger history are verified. Task 2’s candidate is pending, with eight valid unsuccessful cells recorded.
+
+Saved turn 261’s operational summary. Next: monitor terminal receipts. Validation, formal, and ablation completion remains unproven.

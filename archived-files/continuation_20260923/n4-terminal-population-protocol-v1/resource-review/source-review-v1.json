@@ -1,0 +1,120 @@
+{
+  "GPU_model_provider_simulator_calls": 0,
+  "actual_scientific_payload_or_live_ledger_reads": false,
+  "dev_seed_metadata_check": {
+    "init_index": 0,
+    "selected_identity_metadata_sha256": "9ddb234c3e1b977e275e69c04f0af1c9561dc0ffead1dcbf79542b9c2c90d8f0",
+    "status": "PASS",
+    "tasks": [
+      0,
+      3,
+      6,
+      9
+    ]
+  },
+  "implementation_tests_plans_reservations_state_changes": false,
+  "maximum_N4_scenario": {
+    "by_bucket": {
+      "baseline": 15,
+      "development": 100,
+      "formal": 0,
+      "recovery": 11,
+      "validation": 0
+    },
+    "dispatches": 126,
+    "local_gpu_hours": 8.5,
+    "margin_seconds_after_local_cap": 212.3426770534735,
+    "new_health_headroom_seconds_if_all_full_windows": 1160.0,
+    "protected_gpu_hours": 24,
+    "protected_original_attempts": 100,
+    "sixteen_full_windows_seconds": 29440,
+    "unprotected_hours_at_start": 8.558984076959298
+  },
+  "memo": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n3-runner-20260924/docs/03_evidence/qd_ed_final/continuation_20260924/n4-resource-runner-review/memo-v1.md",
+    "sha256": "a3e8fd13da0dabc631b1b9c57057fe8ab7cd695163ab7dcaa8fc53c0f2fd4b29"
+  },
+  "open_readiness_items": [
+    "prerequisite exact approved CPU result still required before algorithm implementation",
+    "new N4 closed runner/profile/native-consumer audit/report not implemented or authorized by this review",
+    "actual settled-budget and GPU3 admission remains mandatory",
+    "future protected ablation roles require later exact source mapping"
+  ],
+  "phase_or_candidate_execution_authorized": false,
+  "production_source": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+  "protocols_tracked_in_production_HEAD": false,
+  "schema": "n4-conditional-budget-runner-source-review-v1",
+  "sources": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/ARBOR_CONTRACT.md",
+      "sha256": "2478b31d2d33df9aa7aa321afa6b172aaadb983a720367c8b1df5fd3b9a9627b"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_003_executed_feedback/accounting-clarification.md",
+      "sha256": "133c8bd746680cb27fc0c8e0bb5f6116ffc9029045bfdd92482c88692b6419ba"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_004_terminal_population/protocol.md",
+      "sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_004_terminal_population/q0-transfer-check-protocol.md",
+      "sha256": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py",
+      "sha256": "9d1ab138644510edae3eb0c7d3b13e8d1dbfcdb3fc02bd92e232a67d21f993ea"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_plan.py",
+      "sha256": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_report.py",
+      "sha256": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_supervise.py",
+      "sha256": "e71f3297adea4a05b43bfe2cedd12cf47d849d3a0c5cd55858cbc28da0de0f1f"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/audit_decision_evidence.py",
+      "sha256": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_policy_steer.py",
+      "sha256": "05d9afca7cea50ea943fd8a32f4cd888c6d37df353ec4f896c51f0c5e2e4a144"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/frozen-seed-plan.json",
+      "sha256": "9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1"
+    }
+  ],
+  "status": "BUDGET_ARITHMETIC_PASS_NOT_LAUNCH_READY",
+  "supplied_settled_snapshot": {
+    "by_bucket": {
+      "baseline": 11,
+      "development": 92,
+      "formal": 0,
+      "recovery": 7,
+      "validation": 0
+    },
+    "dispatched": 110,
+    "gpu_hours": 15.441015923040702
+  },
+  "wording_clarification_review": {
+    "aggregate_all12_2of4_criterion_preserved": true,
+    "aggregate_failure_ends_promotion": true,
+    "first_triplet_correctness_only_preserved": true,
+    "individual_valid_failure_retained_no_retry_no_success_early_stop": true,
+    "main_protocol_sha256": "b8562e3f9fffc77efc803c6b056441f7b426333a97eb176b52fdb0fe42088db2",
+    "note": "Earlier memo wording was stale: its source JSON was written after the root text clarification. This update confirms final text and removes that resolved readiness item; it does not claim a separately saved pre-amendment file digest.",
+    "prerequisite_protocol_sha256": "3ff18d22eb934a24f790bef5b411089f9a4c9116b098cfb7baa2b36cbbc277ca",
+    "prior_json_already_captured_final_hashes": true,
+    "status": "RESOLVED_NO_GATE_CHANGE"
+  }
+}

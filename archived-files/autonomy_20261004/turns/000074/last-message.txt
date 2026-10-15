@@ -1,0 +1,3 @@
+Continued autonomously. Verified authorization, process identities, and unchanged ledgers. N31 closed for numeric futility; N32 CPU integration and independent-auditor work is running under PID 970315.
+
+Owning source remains `7428ce8`. State, checkpoint, and turn summary are saved. Next: monitor and review the delivery. Validation, formal evaluation, and ablation goals remain unmet.

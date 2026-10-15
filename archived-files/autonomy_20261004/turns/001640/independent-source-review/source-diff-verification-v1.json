@@ -1,0 +1,49 @@
+{
+  "at": "2026-10-10T21:30:28.332313+00:00",
+  "source_before": "f256fecedbcf0d47b807aeaa196407cb24933a41",
+  "source_after": "bd5dd4dabcb5a1f7823a9e2f51c849cd67767cb6",
+  "files": [
+    {
+      "path": "configs/qd_ed_final/n36_engineering_r1_spec.disabled.json",
+      "base_sha256": "ccd1991b59cdc30043d6b7061cf4ad73f0ae6c867dd6ae0a9f3e72b1d71d6162",
+      "source_sha256": "f240a88296a6dd3808dbcc78028784edbdc66bf7506f0af4270d6c8e22dd01e4",
+      "local_sha256": "f240a88296a6dd3808dbcc78028784edbdc66bf7506f0af4270d6c8e22dd01e4",
+      "matches_report": true,
+      "local_matches_commit": true
+    },
+    {
+      "path": "scripts/qd_ed_n36_engineering_r1.py",
+      "base_sha256": "a50b63594ec635d6b1d6b3bfc1a6ec71f52187f6e17c210081e07b6ccb9cd93a",
+      "source_sha256": "ca4ee94ef1c401a33ea41837c2cc1b8d08beae397d769dc9bf096bc68570283f",
+      "local_sha256": "ca4ee94ef1c401a33ea41837c2cc1b8d08beae397d769dc9bf096bc68570283f",
+      "matches_report": true,
+      "local_matches_commit": true
+    },
+    {
+      "path": "tests/test_n36_engineering_r1.py",
+      "base_sha256": "713e6c6db9f709366ed99eec68d11a7dbe4de53d12512caeed326cf2063b8e55",
+      "source_sha256": "8b1635a3db2cc89ce1a2aa74b01f0e022cb5390b158f16525b001e4023aa41d6",
+      "local_sha256": "8b1635a3db2cc89ce1a2aa74b01f0e022cb5390b158f16525b001e4023aa41d6",
+      "matches_report": true,
+      "local_matches_commit": true
+    }
+  ],
+  "runtime_changed_fields": [
+    "preparation.source",
+    "preparation.source_record"
+  ],
+  "runtime_file_records_unchanged": true,
+  "runtime_file_count": 3300,
+  "source_inventory_count": 1114,
+  "source_inventory_commit": "bd5dd4dabcb5a1f7823a9e2f51c849cd67767cb6",
+  "changed_existing_functions": [
+    "validate_audit_view",
+    "validate_plan_shape"
+  ],
+  "added_functions": [
+    "validate_runtime_binding"
+  ],
+  "all_other_specification_fields_unchanged": true,
+  "tracked_status": "",
+  "head": "bd5dd4dabcb5a1f7823a9e2f51c849cd67767cb6"
+}

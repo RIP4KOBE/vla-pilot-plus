@@ -1,0 +1,3 @@
+N36’s independent CPU runtime review passed and is recorded in the owning state/checkpoint. Source and private ledgers remain unchanged; no GPU controller is active.
+
+Next: reconcile accounting and readiness evidence, then validate a prospective release. Validation, formal evaluation and required ablation evidence remain outstanding. Operational handoff saved for the continuing driver.

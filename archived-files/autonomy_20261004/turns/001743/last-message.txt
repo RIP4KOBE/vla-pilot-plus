@@ -1,0 +1,3 @@
+Reconciled the finished CPU executor and verified 34 artifacts; source `89506fe` and private ledgers remain unchanged. Recorded boundary clarifications and the remaining controller-review gate.
+
+Driver remains active; no GPU worker or duplicate dispatch. Saved turn 1743’s hash-bound summary. Next: focused controller/runtime binding review. Validation, formal evaluation, and required ablations remain incomplete.

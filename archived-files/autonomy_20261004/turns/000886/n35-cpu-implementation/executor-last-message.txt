@@ -1,0 +1,7 @@
+Committed `c3730e5`; isolated worktree preserved for root review.
+
+CPU checks passed across focused runs covering 130 N35 cases and 43 compatibility cases. Independent implementation review and live runtime verification remain pending.
+
+[Report](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000886/n35-cpu-implementation/report-v1.md>)
+
+No GPU execution, B_dev, or benchmark score. `target_met=false`; `gpu_authorized=false`.

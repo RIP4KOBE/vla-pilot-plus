@@ -1,0 +1,5 @@
+Verified controller closure and unchanged ledger. Registered N34’s prospective CPU feasibility screen; no GPU dispatch or scientific-source changes.
+
+Next: test approach reachability on exposed development observations. Validation, formal evaluation, and ablation goals remain unmet.
+
+[Operational summary](../autonomy_20261004/turns/000514/operational-summary.md)

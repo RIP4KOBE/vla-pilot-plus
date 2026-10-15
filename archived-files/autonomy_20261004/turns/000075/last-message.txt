@@ -1,0 +1,3 @@
+Verified authorization, live process identities and unchanged ledgers. N32 CPU integration remains active under PID 970315; owning source remains `7428ce8`.
+
+Saved the operational summary and checkpoint. Next: review the adapter, independent auditor and tests when delivered. Validation, formal evaluation and required ablations remain unmet.

@@ -1,0 +1,268 @@
+"""N36 identity, disabled drafts, finite admission and bare-plan rejection."""
+import copy
+import datetime as dt
+import json
+import math
+from pathlib import Path
+from scripts import qd_ed_n23_worker as w
+from scripts import qd_ed_n36_stop as stop
+
+ROOT = Path(__file__).resolve().parents[1]
+COHORT = 'N36_NONPROGRESS_TANGENT_DEV_001147'
+RECOVERY_COHORT = 'N36R1_NONPROGRESS_TANGENT_DEV_001203'
+DRAFT_RECOVERY_COHORT = 'N36R2_NONPROGRESS_TANGENT_DEV_001250'
+DRAFT_N36R3_COHORT = 'N36R3_NONPROGRESS_TANGENT_DEV_001314'
+IDENTITIES = {COHORT: ('n36', '001147'), RECOVERY_COHORT: ('n36r1', '001203'),
+              DRAFT_RECOVERY_COHORT: ('n36r2', '001250'),
+              DRAFT_N36R3_COHORT: ('n36r3', '001314')}
+ARMS = ('C0', 'Q0', 'N34', 'N36')
+DEADLINE = '2026-10-11T11:13:13Z'
+GPU_UUID = 'GPU-48473162-9548-1a19-04aa-ea86c5349187'
+PROTOCOL_REVIEW_SHA = '91391b76195b91bdb0318ae380820959a5bd4c3beaa6b35c6c7b16a65f121fa9'
+PROTOCOL_SHA = 'd0d16593af612b073d6a85777eae9f10f7b08d608055cd86ca512a8ceeee5d8e'
+ACCOUNTING_SHA = '2c46987e29d9616929fe0c086d3da0761eaf6718a5d1811b58200c18e34d75d0'
+LIMITS = {'primary_cells':40, 'baseline':10, 'development':30, 'recovery':0,
+    'automatic_recoveries':0, 'cohort_gpu_seconds':75600, 'healthcheck_seconds':1800,
+    'episode_seconds':1800, 'cleanup_seconds':40, 'physical_gpu':7, 'gpu_uuid':GPU_UUID}
+CAPS = {'attempts':1800, 'gpu_hours':224.0,
+    'buckets':{'baseline':400,'development':1120,'validation':180,'formal':40,'recovery':60},
+    'protected_gpu_hours':{'validation':32.0,'formal':12.0}}
+WORKER_CONTRACT = {'schema':'n36-same-process-audit-v1', 'arms':list(ARMS),
+    'candidate_audits':['generic','n36_nonprogress_tangent_audit','n36_native_arithmetic'],
+    'n34_audits':['generic','n34_observed_jaw_audit','no_n36_evidence'],
+    'control_audits':['generic','n31_native','no_n34_evidence','no_n36_evidence'],
+    'timeout_includes_audit':True,'external_manifest_required':True,'automatic_recoveries':0}
+
+
+def ref(path):
+    return {'path': str(Path(path).resolve()), 'sha256': w.sha(path)}
+
+
+def stop_path(root=ROOT):
+    """Locate the session STOP in supported checkouts; layout grants no release."""
+    root = Path(root).resolve()
+    if root.name == 'study_worktree':
+        session = root.parent
+    elif (root.name in ('implementation_worktree', 'production_worktree')
+          and root.parent.parent.name == 'variants'):
+        session = root.parent.parent.parent
+    else:
+        raise ValueError('unsupported N36 worktree layout: ' + str(root))
+    # Do not resolve STOP itself: even a dangling symlink must stop admission.
+    return str(session / 'autonomy_20261004/STOP')
+
+
+def validate_stop_binding(plan):
+    w.require(plan.get('stop_authority') == stop.binding(), 'canonical STOP authority differs')
+    w.require(plan['stop_path'] == stop_path(plan['worktree'])
+              and plan['stop_path'] in stop.STOP_PATHS, 'canonical STOP layout differs')
+
+
+def launch_guard(plan, authority, *, need=1840, now=None):
+    validate_stop_binding(plan)
+    end = min(dt.datetime.fromisoformat(value.replace('Z', '+00:00')) for value in
+              (authority['coordinator_ends_at'], authority['weekly_window']['ends_at'])).isoformat()
+    stop.check(now=now, ends_at=end, need=need)
+
+
+def expected_rows(root=ROOT, *, cohort=COHORT):
+    w.require(cohort in IDENTITIES, 'unsupported N36 cohort')
+    prefix, suffix = IDENTITIES[cohort]
+    tasks = json.loads((Path(root) / 'configs/qd_ed_final/n31_dev_task_identities.json').read_text())['tasks']
+    w.require([x['task_id'] for x in tasks] == list(range(10)) and all(x['split'] == 'dev' for x in tasks), 'ten exposed Dev tasks')
+    return [{**task, 'iteration':cohort, 'profile':arm, 'timeout_seconds':1800,
+             'episode_key':f'{prefix}_dev_t{task["task_id"]:02d}_{arm.lower()}_{suffix}',
+             'budget_bucket':'baseline' if arm=='C0' else 'development', 'replacement':None}
+            for task in tasks for arm in ARMS]
+
+
+def cohort(plan):
+    value = plan.get('cohort', COHORT)
+    w.require(value in IDENTITIES, 'unsupported N36 cohort')
+    return value
+
+
+def plan_rows(plan):
+    value = cohort(plan)
+    root = plan.get('worktree', ROOT)
+    return expected_rows(root) if value == COHORT else expected_rows(root, cohort=value)
+
+
+def operational_binding(plan):
+    if cohort(plan) == COHORT:
+        w.require('accounting' not in plan, 'original plan cannot claim recovery accounting')
+        return {}
+    return {**({'resource_routing': plan['resource_routing']} if cohort(plan) in (DRAFT_RECOVERY_COHORT, DRAFT_N36R3_COHORT) and 'resource_routing' in plan else {}), 'cohort': cohort(plan), **{k: plan[k] for k in
+            ('protocol', 'protocol_review', 'accounting')}}
+
+
+def require_row(row, root=ROOT, *, cohort=COHORT):
+    rows = expected_rows(root) if cohort == COHORT else expected_rows(root, cohort=cohort)
+    w.require(row in rows, 'exact N36 identity/bucket/replacement')
+
+
+def event_binding(row, event):
+    w.require(event.get('budget_bucket') == row['budget_bucket']
+              and 'replacement' in event and event['replacement'] == row['replacement'],
+              'N36 accounting/replacement binding')
+    w.require(all(event.get(k) is None for k in ('retry_of', 'recovery_of')),
+              'zero automatic recovery; arbitrary pointers forbidden')
+
+
+def cohort_events(rows, events):
+    """Select by either key or cohort, then reject spoofed identities/buckets."""
+    cohorts = {row['iteration'] for row in rows}
+    w.require(len(cohorts) == 1 and cohorts <= set(IDENTITIES), 'single supported event cohort')
+    selected = next(iter(cohorts))
+    prefix = IDENTITIES[selected][0] + '_dev_'
+    index = {row['episode_key']: row for row in rows}
+    local = []
+    for event in events:
+        identity = event.get('identity', {})
+        w.require(isinstance(identity, dict), 'malformed journal identity')
+        if (identity.get('iteration') == selected or event.get('attempt_id') in index
+                or event.get('episode_key') in index
+                or any(str(event.get(k, '')).startswith(prefix) for k in ('attempt_id', 'episode_key'))):
+            row = index.get(event.get('attempt_id'))
+            w.require(row is not None and event.get('episode_key') == row['episode_key']
+                      and identity == {k: row[k] for k in
+                          ('split', 'iteration', 'profile', 'task_id', 'env_seed', 'policy_seed', 'init_index')},
+                      'exact N36 journal identity')
+            event_binding(row, event)
+            local.append(event)
+    return local
+
+
+def validate_draft(plan):
+    w.require(plan['schema'] == 'n36-release-draft-v1' and plan['frozen'] is False
+              and plan['release_enabled'] is False and plan['episodes'] == plan_rows(plan)
+              and plan['limits'] == LIMITS and plan['worker_contract'] == WORKER_CONTRACT
+              and plan['deadline'] == DEADLINE and plan['stop_path'] == stop_path(plan['worktree'])
+              and plan['phase_authorization'] == {'dev': False, 'validation': False, 'formal': False}
+              and all(plan[k] is None for k in ('root_review', 'authority', 'execution_release'))
+              and (cohort(plan) != COHORT or plan['protocol'] is None),
+              'draft cannot claim authority/release')
+    validate_stop_binding(plan)
+    operational_binding(plan)
+    if cohort(plan) == DRAFT_N36R3_COHORT:
+        validate_n36r3_protocol(plan)
+    if cohort(plan) == RECOVERY_COHORT:
+        from scripts.qd_ed_n36_recovery import validate_protocol
+        validate_protocol(plan)
+    if cohort(plan) == DRAFT_RECOVERY_COHORT:
+        if w.read_ref(plan['protocol']).get('schema') == 'n36r2-prospective-protocol-v1':
+            from scripts.qd_ed_n36r2_admission import validate_protocol
+        else:
+            from scripts.qd_ed_n36r2_draft import validate_protocol
+        validate_protocol(plan)
+    w.require(set(plan['expected_manifests']) == {r['episode_key'] for r in plan['episodes']}, 'manifest coverage')
+
+
+def validate_n36r3_protocol(plan):
+    """Finite preparation only. Preserve historical charges without a new allowance.
+
+    The terminal reconciliation binds the retained ledger prefix; this function
+    never reads the owning ledger or turns that prefix into current headroom.
+    """
+    w.require(cohort(plan) == DRAFT_N36R3_COHORT, 'finite N36R3 draft cohort')
+    protocol = w.read_ref(plan['protocol'])
+    ledger = w.read_ref(plan['accounting'])
+    previous = w.read_ref(protocol['previous_plan'])
+    w.require(previous['cohort'] == DRAFT_RECOVERY_COHORT
+              and previous['episodes'] == expected_rows(plan['worktree'], cohort=DRAFT_RECOVERY_COHORT)
+              and previous['limits'] == LIMITS and previous['worker_contract'] == WORKER_CONTRACT,
+              'exact inherited N36R2 science')
+    inherited = w.read_ref(previous['protocol'])
+    w.read_ref(previous['accounting'])
+    w.require(plan['protocol_review'] == previous['protocol_review']
+              and plan['protocol_review']['sha256'] == PROTOCOL_REVIEW_SHA,
+              'inherited scientific review only')
+    w.read_ref(plan['protocol_review'])
+    terminal = w.read_ref(ledger['terminal_reconciliation'])
+    w.require(terminal['schema'] == 'n36r3-production-closure-terminal-reconciliation-v1'
+              and terminal['release_enabled'] is False, 'retained terminal reconciliation')
+    allocation = w.read_ref(ledger['allocation'])
+    w.require(allocation == {'schema': 'n36r3-allocation-draft-v1',
+              'cohort': DRAFT_N36R3_COHORT, 'episodes': plan_rows(plan),
+              'automatic_recoveries': 0, 'allocation_is_not_authority': True,
+              'release_enabled': False}, 'exact finite N36R3 allocation')
+    w.require(ledger == {'schema': 'n36r3-accounting-draft-v1',
+              'cohort': DRAFT_N36R3_COHORT, 'inherited_accounting': previous['accounting'],
+              'terminal_reconciliation': ledger['terminal_reconciliation'],
+              'retained_ledger_prefix': terminal['ledger_prefix'],
+              'retained_health_ledger_prefix': terminal['health_ledger_prefix'],
+              'allocation': ledger['allocation'], 'all_prior_charges_retained': True,
+              'N36R2_status': 'INVALID', 'N36R2_charges_retained': True,
+              'protected_gpu_hours': CAPS['protected_gpu_hours'],
+              'automatic_recoveries': 0, 'new_budget_authority': False,
+              'current_headroom': None, 'release_enabled': False},
+              'N36R3 retains all charges; root accounting still required')
+    w.require(protocol == {'schema': 'n36r3-operational-protocol-draft-v1',
+              'cohort': DRAFT_N36R3_COHORT, 'previous_plan': protocol['previous_plan'],
+              'inherited_protocol': previous['protocol'],
+              'inherited_protocol_review': plan['protocol_review'],
+              'accounting': plan['accounting'], 'allocation': ledger['allocation'],
+              'episodes': plan_rows(plan), 'automatic_recoveries': 0,
+              'scientific_changes': False, 'release_enabled': False}
+              and inherited['episodes'] == previous['episodes'],
+              'exact structural N36R3 draft; science immutable')
+    return protocol
+
+
+def require_release(plan):
+    # A bare plan can never confer authority. Consumers with caller-supplied
+    # plan/release references must use qd_ed_n36_release.validate_release.
+    raise ValueError('N36 draft only: explicit externally hashed plan and detached root release required')
+
+
+def finite(value, label):
+    w.require(type(value) in (int, float) and math.isfinite(value) and value >= 0, 'unknown/nonfinite ' + label)
+    return value
+
+
+def pre_dispatch(row, allowance, *, now, stop_path, cohort=COHORT):
+    """Pure guard over an authoritative snapshot; never changes charges/reserves.
+
+    All *_remaining values must already include prior reservations, health costs
+    and charges. Exact owning ledger-to-snapshot arithmetic is a root prerequisite.
+    """
+    if cohort == DRAFT_N36R3_COHORT:
+        w.require(allowance.get('n36r3_release_refs') is not None,
+                  'N36R3 draft only; separate root bindings required')
+        from scripts.qd_ed_n36_release import validate_release
+        plan, _, authority = validate_release(*allowance['n36r3_release_refs'])
+        w.require(plan == allowance['n36r3_plan'] and authority == allowance['n36r3_authority'],
+                  'N36R3 admission detached release differs')
+    if cohort == DRAFT_RECOVERY_COHORT:
+        from scripts.qd_ed_n36_release import validate_release
+        plan, _, authority = validate_release(*allowance['n36r2_release_refs'])
+        w.require(plan == allowance['n36r2_plan'] and authority == allowance['n36r2_authority'],
+                  'N36R2 admission detached release differs')
+    w.require(stop_path in stop.STOP_PATHS, 'canonical STOP path differs')
+    stop.check(now=now, ends_at=allowance['authority_ends_at'], need=1840)
+    w.require(now.tzinfo is not None, 'timezone-aware admission time')
+    ends = dt.datetime.fromisoformat(allowance['authority_ends_at'].replace('Z', '+00:00'))
+    starts = dt.datetime.fromisoformat(allowance['authority_starts_at'].replace('Z', '+00:00'))
+    deadline = min(ends, dt.datetime.fromisoformat(DEADLINE.replace('Z', '+00:00')))
+    need = 1840  # Both same-worker audits are inside the 1800s episode bound.
+    w.require(starts <= now and (deadline-now).total_seconds()>=need, 'deadline/authority full attempt unavailable')
+    w.require(allowance['private_budget'] is True and allowance['gpu_idle'] is True
+              and allowance['physical_gpu'] == 7 and allowance['gpu_uuid'] == GPU_UUID
+              and allowance['live_handles'] == [] and allowance['unsettled_reservations'] == 0,
+              'private GPU/settled snapshot required')
+    require_row(row, cohort=cohort)
+    for name in ('global_seconds_remaining', 'private_seconds_remaining', 'cohort_seconds_remaining'):
+        w.require(finite(allowance[name], name) >= need, name + ' insufficient')
+    protected = finite(allowance['protected_seconds_remaining'], 'protected seconds')
+    w.require(min(allowance['global_seconds_remaining'], allowance['private_seconds_remaining']) - protected >= need, 'protected reserve unavailable')
+    w.require(allowance['cohort_seconds_remaining'] <= LIMITS['cohort_gpu_seconds'], 'cohort ceiling')
+    bucket = row['budget_bucket']
+    for name, value in (('bucket', allowance['bucket_attempts_remaining'][bucket]),
+                        ('global', allowance['global_attempts_remaining']),
+                        ('cohort', allowance['cohort_attempts_remaining']),
+                        ('protected', allowance['protected_attempts_remaining'])):
+        w.require(type(value) is int and value >= 0, 'unknown attempt allowance ' + name)
+    w.require(allowance['bucket_attempts_remaining'][bucket] >= 1
+              and allowance['global_attempts_remaining'] - allowance['protected_attempts_remaining'] >= 1
+              and 1 <= allowance['cohort_attempts_remaining'] <= 40, 'attempt/protected cap')
+    return need

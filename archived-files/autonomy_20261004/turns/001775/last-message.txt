@@ -1,0 +1,3 @@
+Continued N36 recovery on source `a5b32cdef`. Scoped accounting and controller-binding checks passed; state, checkpoint, and operational summary are recorded. All charges and unknown telemetry remain preserved.
+
+Next: complete the disabled execution graph and independent review before readiness testing. Validation, formal evaluation, and required ablations remain incomplete.

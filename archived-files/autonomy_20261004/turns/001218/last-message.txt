@@ -1,0 +1,3 @@
+N36R1’s CPU repair exited successfully, reporting all 40 configurations composed. Runtime readiness remains blocked by 160 missing dependency paths; GPU release stays disabled.
+
+Recorded live-process reconciliation, unchanged ledgers, and the next repair step in turn 001218’s operational summary. Validation, formal evaluation, and required ablation evidence remain incomplete.

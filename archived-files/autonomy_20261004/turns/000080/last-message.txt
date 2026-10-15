@@ -1,0 +1,3 @@
+N32’s CPU runtime and auditor delivery is reviewed and accepted; recorded final tests passed 48/48. Source and ledgers remain preserved, with no GPU dispatch.
+
+The live driver retains coordination. State/checkpoint and operational summary now direct the next step: prepare bound runtime manifests, controller integration, and the prospective Dev protocol. Validation, formal, and ablation goals remain unmet.

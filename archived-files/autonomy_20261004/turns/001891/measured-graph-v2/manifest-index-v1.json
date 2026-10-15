@@ -1,0 +1,162 @@
+{
+  "n36r4_dev_t00_c0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/00.json",
+    "sha256": "4b9ed8fbcc40cdeb24c1b6496b9746e128d4cfbab09f8d45403542376a3cde41"
+  },
+  "n36r4_dev_t00_n34_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/02.json",
+    "sha256": "f1fd6bf80dfb888f5484498d2e88cfb376578aa6e53cbce4dab8f50821d62a8b"
+  },
+  "n36r4_dev_t00_n36_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/03.json",
+    "sha256": "4f1051de95c30e9e1f4331b50e6439d15d43d87c0eced8dba76e4db876815d7a"
+  },
+  "n36r4_dev_t00_q0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/01.json",
+    "sha256": "a151a13d1b7a965c6f5d4ec0cd8191a76eda82dd01072b462155a81a82afad79"
+  },
+  "n36r4_dev_t01_c0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/04.json",
+    "sha256": "54d8152b30051503159f88c4694ca013b32dcf87875cd170fbbc1ea25e128913"
+  },
+  "n36r4_dev_t01_n34_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/06.json",
+    "sha256": "ce91f5831c6eac7a3265f82eb843ff694e39bf9d6b788ae2164bf9eb804788d6"
+  },
+  "n36r4_dev_t01_n36_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/07.json",
+    "sha256": "3e8131bed5d48bed0046cedc1ef403dfd541b03eb06420ebcd37db8049037537"
+  },
+  "n36r4_dev_t01_q0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/05.json",
+    "sha256": "cf9e986c668699ede462e6b8e8e8129859a3eb786f3b35a2e8415f31f4f3a9ec"
+  },
+  "n36r4_dev_t02_c0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/08.json",
+    "sha256": "4e0cf2ae2dcb81d879b58bc6203aeb350ff294582e2f82e9540fd31132c4e071"
+  },
+  "n36r4_dev_t02_n34_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/10.json",
+    "sha256": "d19dc1179301bb688d05b6110eda82c58a53179d05d551ba4650f5f1aac1af53"
+  },
+  "n36r4_dev_t02_n36_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/11.json",
+    "sha256": "a935d0528b4d6ddc72305e201d3a17a6925f756f856c6003dac83157bdbddd12"
+  },
+  "n36r4_dev_t02_q0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/09.json",
+    "sha256": "fb754dd6576c899ba8f9be329cfe4f2f2be83df7e77ca5a434e467e74145cb2f"
+  },
+  "n36r4_dev_t03_c0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/12.json",
+    "sha256": "6634f0361b87a5d9fd8fd8e80044e620198adca48e280a528b44eaab38e8c1d1"
+  },
+  "n36r4_dev_t03_n34_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/14.json",
+    "sha256": "8f621ac23aa22dbf4777162ed2e0a08b435e0b87f440a2b6a5403f7fe0efd98b"
+  },
+  "n36r4_dev_t03_n36_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/15.json",
+    "sha256": "91a9d96c370a0a79e7907d028cebe917bf85a27323b336daab8656d5f30147e7"
+  },
+  "n36r4_dev_t03_q0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/13.json",
+    "sha256": "01945a03edbd407b233818888bcfc837106ceb376d260087aba410525bd47ae5"
+  },
+  "n36r4_dev_t04_c0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/16.json",
+    "sha256": "6979b11622d8fef8fd4b738b67791ca64e279d6190bffaa6a5732179ab11d88b"
+  },
+  "n36r4_dev_t04_n34_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/18.json",
+    "sha256": "380c1a2cfb2ec2ec56051348f7f670d7594abc343b47178e89a919ef7ce98bc8"
+  },
+  "n36r4_dev_t04_n36_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/19.json",
+    "sha256": "22b341d97934d23b16c93f3f7837ccedebdb76b855d3e433564e046ea0568657"
+  },
+  "n36r4_dev_t04_q0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/17.json",
+    "sha256": "7d984340df71238a261f419b1de031b59f6a8fdf14ea42dbac4a222497b6925f"
+  },
+  "n36r4_dev_t05_c0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/20.json",
+    "sha256": "1535599803202cefa3521cd69b259dd20427482b4a10af251106cef8276d74cd"
+  },
+  "n36r4_dev_t05_n34_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/22.json",
+    "sha256": "f6fe6ac56b7b195044ed5caba40f5afee85cc74533cdca479eb2d4176f13ab01"
+  },
+  "n36r4_dev_t05_n36_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/23.json",
+    "sha256": "5218031c166ded8ebc0bef13a6c0f9fd1012ede343eddc50a86ce7e18b05b08b"
+  },
+  "n36r4_dev_t05_q0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/21.json",
+    "sha256": "ee29e669d37e42e0f923b28fd4853762fcecec7e6c314b69c0fa8e83bf9b96cc"
+  },
+  "n36r4_dev_t06_c0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/24.json",
+    "sha256": "082b7e9b1d48e4ec6df31469450e81d7230d2847c1720d6a0acdb5a79825b2c8"
+  },
+  "n36r4_dev_t06_n34_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/26.json",
+    "sha256": "29a8f431d37792d60e6d693bd0b1033d311c6aff56d103d4d898af5bef4ed7de"
+  },
+  "n36r4_dev_t06_n36_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/27.json",
+    "sha256": "7a466263343a78240e4ca73381aa323d47f1cc20a1c6b7b4ac295ca954a77cb2"
+  },
+  "n36r4_dev_t06_q0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/25.json",
+    "sha256": "a21eb32db293ba4a2572afb62596ed80e54789e547c4f2fa15e03acb0a5f6112"
+  },
+  "n36r4_dev_t07_c0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/28.json",
+    "sha256": "ce0fff86b2802432ec5de2fc39b3b7500221a49a37e00dfda1df03651434779e"
+  },
+  "n36r4_dev_t07_n34_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/30.json",
+    "sha256": "51c65cffe12d9922526e1aa98d54bd0aa040e50ffb40bb02dc386d2e0a188fe9"
+  },
+  "n36r4_dev_t07_n36_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/31.json",
+    "sha256": "fd33379f50c973092bfc4a93b57a4999234cb0dfb178e5f5dc9a5b72c5e55715"
+  },
+  "n36r4_dev_t07_q0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/29.json",
+    "sha256": "65cc06887b911f92d9f2e1f5b571534772a1337457256f3d73615bef0bcd30c3"
+  },
+  "n36r4_dev_t08_c0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/32.json",
+    "sha256": "45dbc56a89835271d341ecab2457922853c8762625e69cc48c5e087c3638cc2b"
+  },
+  "n36r4_dev_t08_n34_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/34.json",
+    "sha256": "0e484f543ec29942707423c4f63613f02edf4e5165bf4228ac4ef46e6dd19fb3"
+  },
+  "n36r4_dev_t08_n36_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/35.json",
+    "sha256": "41d61fd0ec1f4bd870206123e37f1716235d9aac5592061fbf825ab3256b1eb5"
+  },
+  "n36r4_dev_t08_q0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/33.json",
+    "sha256": "4e8a0edc085800ce9ed7960ba6d33dc219212cc2038a34ffcec547c21d9de118"
+  },
+  "n36r4_dev_t09_c0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/36.json",
+    "sha256": "9afd5f45b758bac01cab554a2376b8e13645470156d240ec9db6317e43b4b2bf"
+  },
+  "n36r4_dev_t09_n34_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/38.json",
+    "sha256": "e4ed8e6752434625d8d6a005e4a0692942bc18f6be2e4969d58c8813bb3d68f0"
+  },
+  "n36r4_dev_t09_n36_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/39.json",
+    "sha256": "3cc578dda8fd597dc56a335f8236cb6725adb3eb0641a0b7135ad9556c096c2c"
+  },
+  "n36r4_dev_t09_q0_001467": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001891/measured-graph-v2/audit-manifests/37.json",
+    "sha256": "48bf3e83913f9dc6ea690d0e3feae19ae9bdbfe921c6601b9f622b6113b80e6a"
+  }
+}

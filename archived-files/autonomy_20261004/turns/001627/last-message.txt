@@ -1,0 +1,3 @@
+Continuation is active. Authorization, process identities, isolation, and ledger hashes were verified. One bounded CPU executor is refreshing N36 recovery bindings; its live handles and next steps are recorded.
+
+No GPU experiment was launched. Scientific review gates remain intact, and validation/formal/ablation completion is still unproven.

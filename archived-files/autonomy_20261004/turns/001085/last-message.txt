@@ -1,0 +1,5 @@
+N35 controller remains live; frozen bindings and ledger integrity verified. No restart or duplicate dispatch.
+
+Interim Dev: C0 1/6, Q0 0/6, N34 1/6, N35 1/6. Validation, formal evaluation and required ablations remain unresolved.
+
+Turn 001085 operational summary saved. Next step: monitor the existing controller’s next admission or outcome.

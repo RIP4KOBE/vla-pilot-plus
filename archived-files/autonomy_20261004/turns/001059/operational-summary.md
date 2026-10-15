@@ -1,0 +1,9 @@
+# Turn 001059 operational summary
+
+Frozen source `52a87af0bf11f95b21ce17aba456dc98944d9774`. N35 controller PID 2632351, boot `2a1fa95f-ab0d-488c-a298-fc488ddd2af7`, start ticks 141061885 verified live. Driver PID 268073/start 97715947 verified; prior turn completed normally. Controller CPU ticks advanced beyond prior 706425 to 715172; children: [{'pid': 3556861, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 143328543, 'state': 'R', 'ppid': 2632351, 'cpu_ticks': 2933}, {'pid': 3557434, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 143331417, 'state': 'R', 'ppid': 2632351, 'cpu_ticks': 78}]. Bound handoff/authorization hashes verified, as were current launch/plan/release and continuation/completion-contract bindings. Resource isolation ACTIVE/PASS.
+
+STOP absent: True; deadline elapsed: False; window ends 2026-10-11T11:13:13Z. Ledger retained prefix verified; current 1484 rows, 7399909 bytes, SHA256 d2b50f9f73d884207cf5eb058f1edc2efb26d19169eedeaf91d1f86bcc8ae293. Interim Dev counts: {"C0": {"valid": 5, "success": 0}, "Q0": {"valid": 5, "success": 0}, "N34": {"valid": 5, "success": 0}, "N35": {"valid": 5, "success": 0}}. Pending/running: ['n35_dev_t05_c0_20261009']. Terminal result exists: False. Controller admitted the next attempt while monitored; no recovery needed. No source/protocol changes, process signals, duplicate dispatch, ledger/state mutation or protected-result inspection performed.
+
+Next bounded step: monitor existing controller and current episode; reconcile native audits and costs at terminal closure before scientific disposition. Validation, formal and required ablation evidence remain incomplete; original goal is not met. Preserve all charges, unknown telemetry and reserves.
+
+Reconciliation: end-reconciliation-v1.json SHA256 decfd4bd6aed3752b4d6f3820e410fd56af485036d151dfe5b1bb84174f36660.

@@ -1,0 +1,169 @@
+{
+  "started_at": "2026-10-10T21:01:18.074398+00:00",
+  "before": "b8d6b98164f24a599a9aa1fa6ce862b12cb2fcf6",
+  "target": "f256fecedbcf0d47b807aeaa196407cb24933a41",
+  "tracked_clean": true,
+  "exact_reviewed_files": [
+    {
+      "path": "configs/qd_ed_final/n36_engineering_r1_spec.disabled.json",
+      "sha256": "ccd1991b59cdc30043d6b7061cf4ad73f0ae6c867dd6ae0a9f3e72b1d71d6162"
+    },
+    {
+      "path": "scripts/qd_ed_n36_bridge.py",
+      "sha256": "a39b299b195b23b827cb773b90a17e706da4a6f4256f8ed2a9b341344cd8baf8"
+    },
+    {
+      "path": "scripts/qd_ed_n36_engineering_api.py",
+      "sha256": "b0be672c9705f2a4f9eaee7d9e5f1a2cb614e07584fd7283eb53878dacb45c63"
+    },
+    {
+      "path": "scripts/qd_ed_n36_engineering_r1.py",
+      "sha256": "a50b63594ec635d6b1d6b3bfc1a6ec71f52187f6e17c210081e07b6ccb9cd93a"
+    },
+    {
+      "path": "scripts/qd_ed_n36_healthcheck.py",
+      "sha256": "24c28f61e523b7724169e152d48ebf6cecffbdd7608ba162c748f219a65d2b41"
+    },
+    {
+      "path": "scripts/qd_ed_n36_release.py",
+      "sha256": "b38cd939a319f380bfdd92588d259b7eb134adf8eb5c978acc1e7af5bd5bc109"
+    },
+    {
+      "path": "scripts/qd_ed_n36_runner.py",
+      "sha256": "3fd9103b82d7cddc8947753764ed51c52219f59e1ad40772b55d3ef3e737cba9"
+    },
+    {
+      "path": "scripts/qd_ed_n36_worker.py",
+      "sha256": "f0a5670b9ad53bc2640177c4e3f739703ff153ce5714d5cf80c98fae5fc331e3"
+    },
+    {
+      "path": "tests/n36_engineering_cpu_fixture.py",
+      "sha256": "c7febea51b51cae64ee8259a268225fa757ac11ab00db85bb5e0b13dfca3e7fb"
+    },
+    {
+      "path": "tests/test_n36_engineering.py",
+      "sha256": "514e4ba5c9edcab651777b89bd9d691c5ede750bf89b67757813210cd3d840fa"
+    },
+    {
+      "path": "tests/test_n36_engineering_r1.py",
+      "sha256": "713e6c6db9f709366ed99eec68d11a7dbe4de53d12512caeed326cf2063b8e55"
+    },
+    {
+      "path": "tests/test_n36_stop_guard.py",
+      "sha256": "a694cacbd4fb746b50a4f712e2268acdf22a2847f5697c2682420f66347fe191"
+    }
+  ],
+  "source_diff_sha256": "9590b441d3b5e661500377ac17edbaacae7f36bcef9ebb9542677de2a4b0a00d",
+  "live_workers": [],
+  "inaccessible_processes": [],
+  "ledger_before": {
+    "attempt-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "sha256": "501510963420bacc7b680044d040ca2ba0883a89c907646db70f947b2575d8af",
+      "bytes": 7572377
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "sha256": "9dd949d47ffbc3549eaf0ee6638833ec7a6123f7ad71d895a73e45e1f753e793",
+      "bytes": 114767
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+      "bytes": 401
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "b8d6b98164f24a599a9aa1fa6ce862b12cb2fcf6\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=no"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "merge-base",
+        "--is-ancestor",
+        "b8d6b98164f24a599a9aa1fa6ce862b12cb2fcf6",
+        "f256fecedbcf0d47b807aeaa196407cb24933a41"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "merge",
+        "--ff-only",
+        "--no-edit",
+        "f256fecedbcf0d47b807aeaa196407cb24933a41"
+      ],
+      "exit_code": 0,
+      "stdout": "Updating b8d6b98..f256fec\nFast-forward\n .../n36_engineering_r1_spec.disabled.json          | 198 +++++\n scripts/qd_ed_n36_bridge.py                        |   9 +-\n scripts/qd_ed_n36_engineering_api.py               |  17 +\n scripts/qd_ed_n36_engineering_r1.py                | 832 +++++++++++++++++++++\n scripts/qd_ed_n36_healthcheck.py                   |   3 +-\n scripts/qd_ed_n36_release.py                       |   3 +-\n scripts/qd_ed_n36_runner.py                        |   3 +-\n scripts/qd_ed_n36_worker.py                        |  18 +-\n tests/n36_engineering_cpu_fixture.py               |   4 +-\n tests/test_n36_engineering.py                      |   8 +\n tests/test_n36_engineering_r1.py                   | 293 ++++++++\n tests/test_n36_stop_guard.py                       |   4 +-\n 12 files changed, 1378 insertions(+), 14 deletions(-)\n create mode 100644 configs/qd_ed_final/n36_engineering_r1_spec.disabled.json\n create mode 100644 scripts/qd_ed_n36_engineering_api.py\n create mode 100644 scripts/qd_ed_n36_engineering_r1.py\n create mode 100644 tests/test_n36_engineering_r1.py\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "f256fecedbcf0d47b807aeaa196407cb24933a41\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=no"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "release_enabled": false,
+  "after": "f256fecedbcf0d47b807aeaa196407cb24933a41",
+  "completed_at": "2026-10-10T21:01:18.313605+00:00",
+  "tracked_clean_after": true,
+  "preparatory_source_placement_only": true,
+  "root_adoption": false,
+  "gpu_authorized": false
+}

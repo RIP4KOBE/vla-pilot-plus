@@ -1,0 +1,11 @@
+Turn915 — 2026-10-09T12:00:47.353371+00:00
+
+Current source52a87af0bf11f95b21ce17aba456dc98944d9774 unchanged. Driver268073/start97715947, coordinator2611542/start140985683 verified on boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. Prior turn914 exit0 reconciled, no live controller/episode/executor; historical N34 controller2303352 and N31 handles absent. STOP absent; window ends2026-10-11T11:13:13Z.
+
+Completed: hash-bound single operational bootstrap probe authority,120-second child+40-second cleanup reservation within existing N35 health/total allowance. GPU7 UUID48473162-9548-1a19-04aa-ea86c5349187 admitted idle. Actual CUDA/EGL synthetic tensor/render check PASS; zero simulation steps, no model/Stage or episode dispatch. Probe PID2615998 exited; 10.746654169 seconds charged append-only to private health ledger. Production reusable_probe accepted actual evidence. Original runtime untouched; new runtime.gpu-ready-v1.json ready. Benchmark/source unchanged. Native delegation unavailable (no thread); root created only operational wrapper.
+
+Accounting:474 episode dispatches retained, episode/health aggregate69.99866756560088, separate health counter0.23655687199321304, retained conservative margin0.23357169027962; conservative admission total70.2322392558805. Do not add health counter again to this reconciled total or erase margin/history. Probe kind n35_resource_preparation_v1 must count in N35 cumulative health/total allowances. Protected reserves unchanged.
+
+Next: Bind turn915 runtime.gpu-ready-v1.json into a new N35 runtime closure/controller-semantics proof and fresh all40 disabled draft, preserving turn914 receipts and module inventory; revalidate changed bindings only. Reconcile final prospective accounting including charged N35 preparation probe, then freeze all40 root review/plan/detached release and pass public validate_release before Dev dispatch. No additional GPU probe unless new evidence invalidates turn915 proof.
+
+Unresolved: release binding/public validation, actual N35 Dev efficacy/native audit, scientific promotion, original validation/formal/required ablations and hash-bound completion. Goal remains unmet. No live GPU handle at handoff; driver continues.

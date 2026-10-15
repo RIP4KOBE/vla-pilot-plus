@@ -1,0 +1,3 @@
+Verified authorization, process identities, and unchanged owning ledgers. Started a bounded CPU executor to prepare fresh recovery bindings; recorded its handles and the next monitoring step.
+
+No GPU experiment launched. Validation, formal evaluation, and required ablation completion remain unevidenced.

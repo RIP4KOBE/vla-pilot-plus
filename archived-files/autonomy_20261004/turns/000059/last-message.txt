@@ -1,0 +1,5 @@
+N31 finished cleanly: C0, Q0 and N31 each scored 0/6. The frozen futility gate rejected N31; tasks 6–9 remain Unknown.
+
+Verified all 18 native audits and retained all charges. Recorded terminal review and synchronized owning state/checkpoint/tree. Source `7428ce8` remains unchanged; controller and worker exited.
+
+Next: bounded diagnosis of proposal selection, executed grasp commands and target motion. Validation/formal/ablation goals remain unmet. Operational summary saved for autonomous continuation.

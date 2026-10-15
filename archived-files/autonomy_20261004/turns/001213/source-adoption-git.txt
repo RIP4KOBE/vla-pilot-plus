@@ -1,0 +1,16 @@
+Updating ab8e8c6..066f2bf
+Fast-forward
+ scripts/qd_ed_n36_accounting.py |  15 ++-
+ scripts/qd_ed_n36_bridge.py     |   4 +-
+ scripts/qd_ed_n36_contract.py   |  56 +++++++--
+ scripts/qd_ed_n36_prepare.py    |  18 ++-
+ scripts/qd_ed_n36_recovery.py   | 102 ++++++++++++++++
+ scripts/qd_ed_n36_release.py    |  55 ++++++---
+ scripts/qd_ed_n36_runner.py     |   2 +-
+ scripts/qd_ed_n36_supervise.py  |   8 +-
+ scripts/qd_ed_n36_worker.py     |   2 +
+ tests/test_n36_recovery.py      | 254 ++++++++++++++++++++++++++++++++++++++++
+ tests/test_n36_release.py       |   1 +
+ 11 files changed, 476 insertions(+), 41 deletions(-)
+ create mode 100644 scripts/qd_ed_n36_recovery.py
+ create mode 100644 tests/test_n36_recovery.py

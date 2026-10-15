@@ -1,0 +1,3 @@
+N36 audit repair remains live and identity-verified. No duplicate dispatch; ledger unchanged at 502 attempts / 75.244 GPU-hours.
+
+Operational summary recorded. Next: reconcile the repair’s final report and commit, then independent review. Validation, formal evaluation, and required ablation evidence remain outstanding.

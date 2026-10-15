@@ -1,0 +1,7 @@
+Committed R1 fixture repair as `b034abcfbf3aa73a827e7cab342260f06cc2cc16`.
+
+Final-commit CPU suite: **240 passed, 49 deselected**. Real receipt verification remains active. Only tests changed; worktree is clean.
+
+[Report with commands and hashes](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001800/fixture-repair/report-v1.json)
+
+R2 adoption remains root-owned. No scientific score or task-success claim.

@@ -1,0 +1,3 @@
+N32R2 remains under its verified controller; no restart or duplicate dispatch occurred. Frozen hashes and ledger history are intact.
+
+Six audited outcomes are valid failures. Task2 C0 awaits terminal reconciliation. Operational summary saved; validation, formal, and ablation evidence remain outstanding.

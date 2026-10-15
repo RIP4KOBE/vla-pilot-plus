@@ -1,0 +1,3 @@
+Continued monitoring the verified N36R3 executor. Repair commit `e36f8b9` passed 12 focused CPU tests; final report and release review remain pending.
+
+No duplicate dispatch or ledger changes. Validation, formal evaluation, and required ablations remain unproven. Hash-bound turn summary saved for driver continuation.

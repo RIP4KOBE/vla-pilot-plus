@@ -1,0 +1,18 @@
+{
+  "schema": "n34-cpu-source-evidence-v1",
+  "base": "04d1255016fa13a2d467995b9e37a6a829356a1c",
+  "commit": "a4edcfd650f94d5e40ab437c46d591058ccb6e73",
+  "tree": "6a5fe100f77f35fe4b388ff40c23dd9cb6fd542c",
+  "changed_files": {
+    "configs/config.yaml": "27b7f412da19d722711eede97075711597f371868c91938935a0aadef35a53bc",
+    "configs/qd_ed_final/candidate_n34.json": "0e488614b813004f755413ac9a9d28d74d7e2c8b9c682fbd5cda81ae1515923f",
+    "core/qd_observed_jaw_approach.py": "532d5a4399b389e14e6941bb4f41838b85de7e6916f45d0db3fbf631517e7dca",
+    "core/rdt_libero_action_converter.py": "229c7256b9796a1cf8017be8d7717affd2546563870ea52bd8a2eb92eb7705ee",
+    "core/rdt_policy_steer.py": "afeebb022646a7e0fae373e2884126440527fc0ef74b3306b62dcd384e1543e3",
+    "docs/experiments/n34_cpu_implementation.md": "3f07813358807153a2cdac4450b9b70d81308db605584809e32934b1391cdb4c",
+    "main.py": "f6475bb8b98c7b333b0555366e4c4d0affea0ab235366f2eb3bc7841de37100d",
+    "scripts/qd_ed_n34_native.py": "2d96c9c17704bc614adca716c8558cf81051af3934aa0744b8a50cfe1f54bc6c",
+    "scripts/qd_ed_n34_reference.py": "e6645381d4bc9ce709d647f3b3f49c047a76ecff7e8e9f57679a34f0eb459d1c",
+    "tests/test_n34_observed_jaw.py": "db5ee0c68ba28ed7544fa7dd100c0dfea3d5e3f88b9c3e236bec846e08f3ec7f"
+  }
+}

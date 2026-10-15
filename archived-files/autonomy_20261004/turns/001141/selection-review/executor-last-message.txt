@@ -1,0 +1,6 @@
+**PASS for bounded selection plausibility.** Native-reference replay retains the detour after the first update in all three task-0 packets; all three task-6 packets reject it. Prospective survival remains unproven. No GPU or adoption is authorized.
+
+Reports include exact comparisons, hashes, limitations and preserved errors:
+
+- [report-v1.md](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001141/selection-review/report-v1.md)
+- [report-v1.json](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001141/selection-review/report-v1.json)

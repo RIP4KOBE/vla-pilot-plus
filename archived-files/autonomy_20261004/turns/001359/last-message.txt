@@ -1,0 +1,3 @@
+N36R3 review remains active under verified PIDs 1139735/1139736 for candidate source `21fc93e`; owning source remains `bee9f6a`. No GPU dispatched; all three ledgers are unchanged.
+
+Saved turn 001359’s operational summary. Next: reconcile the reviewer’s terminal report before adoption and readiness checks. Validation, formal evaluation, and required ablation evidence remain outstanding.

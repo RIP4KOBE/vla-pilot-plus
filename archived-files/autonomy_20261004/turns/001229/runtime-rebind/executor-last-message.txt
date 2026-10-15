@@ -1,0 +1,5 @@
+Completed the owner-bound bundle at `ca4e6a96…`: **all40 and 58 checks passed**. Inherited readiness was preserved within its verified scope. Source, state, and ledgers remain unchanged.
+
+Reports: [Markdown](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001229/runtime-rebind/report-v1.md) · [JSON](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001229/runtime-rebind/report-v1.json)
+
+The bundle remains **disabled and unfrozen**. Reports contain exact remaining root review and public release-validation commands. No GPU/inference execution or scientific-success claim; validation/formal/ablation goals remain unmet.

@@ -1,0 +1,57 @@
+{
+  "approved": false,
+  "independent_b5": "PENDING_RENEWED_INDEPENDENT_REVIEW",
+  "kind": "source_adoption",
+  "new_root_approval": false,
+  "prior_authority": {
+    "bytes": 384004,
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001595/root-source-adoption-v1.json",
+    "sha256": "192fb6a0aa28a8121139c435c7bc8054fa9f92a3e4182de0f6c3d47f111d20f7"
+  },
+  "proposed_binding_replacements": {
+    "audit_plan": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001598/readiness-binding-refresh/audit-view.disabled-v1.json",
+      "sha256": "c5c1874c138693c256ea36e97bd6be738f42534b56aed356785cd56328f3bae8"
+    },
+    "controller_semantics": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001598/readiness-binding-refresh/controller-semantics.proposed-v1.json",
+      "sha256": "93fac6b1cee0da02d8835a0b388ab39eb881fba3976cd2df16a6897e97cd3672"
+    },
+    "engineering_manifest": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001598/readiness-binding-refresh/engineering-manifest.disabled-v1.json",
+      "sha256": "5336e4880d55519c01d6b3562f1a4a02eb917f0f4d5ba36e9b06069a95d4cafe"
+    },
+    "runtime": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001597/runtime.readiness-verified-v1.json",
+      "sha256": "d68870143e68008352710bec1f97db4fe1a3dae9c77ca2dd0ba6162262a5acfe"
+    },
+    "runtime_closure": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001598/readiness-binding-refresh/runtime-closure.disabled-v1.json",
+      "sha256": "9c151aa0148fc54f0f689a99d74fb2a92a2b0f18bc62ad05259618fb8b47d7e3"
+    }
+  },
+  "proposed_predecessors": {
+    "protocol_acceptance": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001598/readiness-binding-refresh/root-inputs/protocol_acceptance.proposed-v1.json",
+      "sha256": "60054983e5678ba323bc9b2b8ae768dbc279a5b4cd243a892c6516c3ed924c15"
+    }
+  },
+  "release_enabled": false,
+  "schema": "n36-readiness-root-binding-proposal-v1",
+  "status": "PROPOSED_REQUIRES_COORDINATOR_ATTESTATION",
+  "unchanged_semantic_fields": [
+    "schema",
+    "approved",
+    "scope",
+    "accounting",
+    "source",
+    "scientific_source",
+    "scientific_equivalence",
+    "native_build",
+    "deployment",
+    "b5_review",
+    "protocol_acceptance",
+    "owner_root",
+    "source_cwd"
+  ]
+}

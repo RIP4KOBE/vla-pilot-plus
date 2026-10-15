@@ -1,0 +1,5 @@
+N36 source `b8d6b981` passed production runtime and audit closure, including all 40 manifests. Saved the hash-bound summary and checkpoint.
+
+Driver remains active; no GPU worker is running. Ledgers are unchanged.
+
+Next: gated, metered healthcheck, then engineering episode release. Validation, formal evaluation, and required ablation evidence remain incomplete.

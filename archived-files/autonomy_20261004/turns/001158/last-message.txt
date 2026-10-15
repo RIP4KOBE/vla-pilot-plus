@@ -1,0 +1,3 @@
+N36’s existing CPU executor remains live and is progressing through tests. Verified process identities and unchanged private ledgers; no duplicate dispatch or source adoption.
+
+Recorded turn 001158’s operational summary. Next: review the executor’s completed implementation and audit evidence. Validation, formal, and required ablation evidence remain outstanding.

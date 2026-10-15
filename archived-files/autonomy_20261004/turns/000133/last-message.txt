@@ -1,0 +1,3 @@
+N32R1 controller remains live with verified identity and frozen hashes. The first C0 worker exited; its reported 0/1 remains provisional pending native audit and accounting. Ledger history is intact.
+
+Turn 133 operational summary saved. Next: monitor controller closure without restarting. Validation, formal, and required ablation evidence remain incomplete.

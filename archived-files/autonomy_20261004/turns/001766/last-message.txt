@@ -1,0 +1,5 @@
+Continuation recorded. Verified live identities and unchanged private ledgers; launched a bounded CPU repair for recovery identity and accounting checks.
+
+Executor PID: `3390720`; base source: `89506fe`. Next: review its committed changes and focused tests before any experiment dispatch.
+
+Validation, formal evaluation, and required ablations remain incomplete.

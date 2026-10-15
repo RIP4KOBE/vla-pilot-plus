@@ -1,0 +1,36 @@
+{
+  "schema": "n36-reviewed-source-placement-result-v1",
+  "at": "2026-10-11T03:34:47.269465+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001774/source-placement-authority-v1.json",
+    "sha256": "0cea760b36c53fb6703f8323c6a92d22d6d4a6f97ecdcb85a57ea9baf5b51f99",
+    "bytes": 1429
+  },
+  "source_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001770/recovery-source-review/review-v1.json",
+    "sha256": "cee0b13bcea16a755388dd591afe46b382b396d23c17f8f7a1618ac6ed39bdcc",
+    "bytes": 6048
+  },
+  "destination": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "before": "89506fe1d9e2c753b66f6d3349963f6e9b316560",
+  "after": "a5b32cdefc0879e98011f86b1559e4250926ba62",
+  "tree": "c3a48b381df47bc7243635b348d212285f45cd47",
+  "tracked_clean": true,
+  "reviewed_files_verified": 2,
+  "merge_output": "Updating 89506fe..a5b32cd\nFast-forward\n scripts/qd_ed_n36_engineering_r1.py | 177 ++++++++++++++++++++++++---------\n tests/test_n36_engineering_r1.py    | 189 +++++++++++++++++++++++++++++++++++-\n 2 files changed, 313 insertions(+), 53 deletions(-)",
+  "tests_reused": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001770/recovery-source-review/test-results-v1.json",
+    "bytes": 951,
+    "sha256": "f58111b54cba0239bfa0a6bb9a722a7952d00ec4a0d851f3432e06eb30278096"
+  },
+  "tests_passed_previously": 85,
+  "no_new_source_edits": true,
+  "measurement_authorized": false,
+  "gpu_dispatches": 0,
+  "remaining_gates": [
+    "Fresh recovery binding review and root reconciliation",
+    "Fresh controller/runtime binding review",
+    "Complete disabled downstream graph and static validation",
+    "Independent graph review and separate measurement release"
+  ]
+}

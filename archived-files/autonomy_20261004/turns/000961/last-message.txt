@@ -1,0 +1,3 @@
+N35 remains active; controller identity, frozen bindings, and ledger continuity verified. Seven valid cohort episodes have no successes; task-1 N35 is running.
+
+Operational summary recorded for turn 961. Next: monitor to termination and reconcile native audits. Original validation/formal/ablation goal remains unmet.

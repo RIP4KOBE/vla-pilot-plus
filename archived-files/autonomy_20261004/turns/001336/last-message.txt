@@ -1,0 +1,3 @@
+Reconciled the completed CPU review and updated the owning checkpoint. Scoped PASS verified; eight fixture failures remain the next bounded repair.
+
+No GPU dispatch or ledger changes. Driver remains active. Validation, formal evaluation, and required ablation evidence are still incomplete.

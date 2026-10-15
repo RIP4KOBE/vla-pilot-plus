@@ -1,0 +1,3 @@
+N32R2 remains active with verified controller/worker identities, frozen artifacts, and intact ledger history. Five valid development failures are recorded; task 1 N32 is pending.
+
+Saved turn 214’s operational summary. The driver continues monitoring. Validation, formal, and required ablation evidence remains outstanding.

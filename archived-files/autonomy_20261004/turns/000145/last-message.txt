@@ -1,0 +1,3 @@
+Continued monitoring N32R2 on source `1065f381`. The existing CPU executor remains active; ledgers are unchanged, with no unsettled attempts.
+
+Recorded turn 145’s operational summary. Next: review delivery and resolve 696 runtime inventory failures before GPU admission. Validation, formal and ablation completion remain unproven.

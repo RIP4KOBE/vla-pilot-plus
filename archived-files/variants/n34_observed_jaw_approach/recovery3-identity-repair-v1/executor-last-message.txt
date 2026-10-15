@@ -1,0 +1,8 @@
+Committed `38a723c303e1a69993b6ec1c97bdc26195e44a56`.
+
+- R3 all30 identities and exact turn634 recovery binding implemented.
+- Prior invalid charges retained; science and audits unchanged.
+- 201 focused CPU tests passed; git clean.
+- Root review/adoption pending.
+
+Artifacts: [result](../recovery3-identity-repair-v1/implementation-result-v1.json) · [report](../recovery3-identity-repair-v1/report-v1.md).

@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-08T11:49:02.589308+00:00",
+  "review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000466/command-path-root-review.json",
+    "sha256": "248ab97859f39679574de668048e647b85ef922b4d939f159992a9e8a53e42f4",
+    "bytes": 3382
+  },
+  "source_before": "36aac818c8ea0ec3ce18413e678963818bb5bb5d",
+  "changed_paths": [
+    "scripts/qd_ed_n32r3_bridge.py",
+    "scripts/qd_ed_n32r3_contract.py",
+    "scripts/qd_ed_n32r3_paths.py",
+    "tests/test_n32r3_paths.py"
+  ],
+  "ledger": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+    "sha256": "8294b4ed47b8f645f2b3ab6511329f548b5788a5f40d0822b54d3c6c8c814da6",
+    "bytes": 5694864
+  },
+  "prior_turn_exit": 0,
+  "controller": null,
+  "repair_pids_absent": true,
+  "stop_absent": true
+}

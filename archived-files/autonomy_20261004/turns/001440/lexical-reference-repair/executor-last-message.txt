@@ -1,0 +1,12 @@
+Committed isolated fix: `d01bc1e2e7ac` → `e36f8b945f6b`.
+
+- Preserves exact absolute plan/release strings and supplied hashes; rejects relative paths.
+- All verification consumers remain unchanged.
+- **12 focused CPU tests passed**; both forwarding cases fail against the original `main()`.
+- Adjacent N36 forwarding is intact. Matching predecessor CLI bugs are outside first-C0 and remain untouched.
+
+Root source adoption, bindings, runtime verification, compatible health evidence, first-C0, and G3 remain pending. No launch, replay, owner-state changes, or frozen-artifact edits occurred.
+
+Reports: [JSON](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001440/lexical-reference-repair/report-v1.json) · [Markdown](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001440/lexical-reference-repair/report-v1.md)
+
+Stopped after the bounded repair and reports.

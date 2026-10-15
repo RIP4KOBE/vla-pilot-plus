@@ -1,0 +1,3 @@
+N34’s existing CPU integration executor remains live and is repairing test failures. Identities and unchanged private ledgers verified; no duplicate dispatch.
+
+Turn 529 operational summary saved. Next: reconcile terminal tests and source/runtime evidence before GPU release. Validation, formal evaluation and required ablations remain incomplete.

@@ -1,0 +1,8 @@
+Committed `a37d2e529a57072db7b162f718aa0a8bbdbfa9af` on `exp/n34-continuation11-20261009`.
+
+- CPU checks: **128 tests + 35 subtests passed**.
+- Scientific committed content unchanged; retained19 verified.
+- No GPU dispatch, promotion, or release approval.
+- Root freeze remains pending; 132 pinned dependency files need materialization.
+
+[Report](../continuation11-implementation-v1/report-v1.md) · [Implementation result](../continuation11-implementation-v1/implementation-result-v1.json)

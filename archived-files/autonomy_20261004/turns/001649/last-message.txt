@@ -1,0 +1,3 @@
+Reconciled the completed N36 review: 56 CPU checks passed; deployment and readiness-policy blockers remain. Owning state/checkpoint and hash-bound summary are updated. No GPU dispatch occurred.
+
+Next: prospective readiness repair and source placement. Validation, formal and ablation completion remain unproven.

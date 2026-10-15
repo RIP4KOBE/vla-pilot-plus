@@ -1,0 +1,3 @@
+N32’s CPU release-preparation executor remains live and is progressing. N31 remains closed for numeric futility; ledger history is intact.
+
+Recorded turn 87’s operational summary. Next: review N32’s completed delivery before GPU release. Validation, formal evaluation, and required ablation evidence remain outstanding.

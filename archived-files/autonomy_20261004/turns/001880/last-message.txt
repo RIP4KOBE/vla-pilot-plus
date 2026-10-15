@@ -1,0 +1,3 @@
+Controller binding review passed the production validator. Source and ledgers remain unchanged; no experiment controller is live.
+
+Recorded the operational handoff. Next: resolve canonical path constraints and complete release admission. Validation, formal and ablation evidence remain incomplete.

@@ -1,0 +1,5 @@
+**PASS_SCOPED_CPU** — no blocking findings; 62 CPU checks passed.
+
+Wrote [review-v1.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001721/independent-import-review/review-v1.json) and its SHA-256 sidecar.
+
+Consumed identity and charge remain unchanged; no replay occurred. This review grants neither runtime readiness nor scientific promotion.

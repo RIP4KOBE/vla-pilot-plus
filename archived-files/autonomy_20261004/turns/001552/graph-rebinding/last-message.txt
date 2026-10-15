@@ -1,0 +1,7 @@
+Rebound all 43 affected artifacts; all 41 exact manifest checks passed.
+
+Blocker: turn001551 controller evidence references contain `bytes`; the candidate verifier accepts only `path` and `sha256`. Proof retained unchanged.
+
+[Report]( /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001552/graph-rebinding/report-v1.json) · [B5 inputs](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001552/graph-rebinding/independent-b5-inputs-v1.json)
+
+`b5_review: null`; `release_enabled: false`. No authority grant, source adoption, or scientific success claimed.

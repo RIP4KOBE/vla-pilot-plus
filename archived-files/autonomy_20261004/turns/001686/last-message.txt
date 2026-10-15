@@ -1,0 +1,3 @@
+Continued on source `a14f3a8`. Verified driver identity, resource isolation and unchanged ledgers. Independent CPU review is running under PID `2944316`; no GPU work was dispatched.
+
+Saved the operational handoff. Next: reconcile the review and address any blockers. Validation, formal evaluation and required ablation evidence remain incomplete.

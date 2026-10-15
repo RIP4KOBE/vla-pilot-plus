@@ -1,0 +1,3 @@
+N36’s CPU review completed; bounded selection plausibility is recorded. No GPU dispatch or source change occurred.
+
+Next: prospective N36 protocol and accounting review. Validation, formal evaluation, and required ablation evidence remain outstanding. The autonomous driver remains active.

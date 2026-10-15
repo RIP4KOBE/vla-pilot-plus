@@ -1,0 +1,3 @@
+N32’s CPU adapter executor remains live with verified identity. Private ledgers are unchanged; no duplicate work was launched.
+
+Recorded turn 92’s operational summary. Next: review the executor’s committed delivery before any GPU release. Validation, formal evaluation, and required ablation evidence remain outstanding.

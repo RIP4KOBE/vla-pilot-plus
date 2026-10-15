@@ -1,0 +1,5 @@
+Verified authority, live driver identities and unchanged ledgers. GPU7 remains occupied; no new work was dispatched or charged.
+
+N36R3 source remains `21fc93e`. Next: charged readiness check once GPU7 is idle, then first-C0 review. Validation, formal and ablation evidence remain incomplete.
+
+Hash-bound operational summary saved for turn `001365`; driver continuation remains active.

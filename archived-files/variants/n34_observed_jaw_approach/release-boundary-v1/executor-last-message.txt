@@ -1,0 +1,7 @@
+Committed as `60fc00a55b1b8dfb5c98b52e92d979b0869b4cad`. Working tree is clean.
+
+All consumers now require full detached-release validation; worker startup rejects before execution side effects. Focused CPU tests passed. No real release was accepted or dispatched.
+
+[Report](../release-boundary-v1/report-v1.md) · [Implementation result](../release-boundary-v1/implementation-result-v1.json)
+
+Root independently reviews and adopts.

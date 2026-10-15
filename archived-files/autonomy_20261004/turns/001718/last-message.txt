@@ -1,0 +1,3 @@
+Readiness measurement failed importing `_remote_module_non_scriptable`. All measurement processes have exited; charges and incomplete telemetry are preserved.
+
+Updated owning state/checkpoint and saved a hash-bound operational summary. Next: bounded import-handling repair and accounting reconciliation. Validation, formal evaluation and ablation goals remain unmet.

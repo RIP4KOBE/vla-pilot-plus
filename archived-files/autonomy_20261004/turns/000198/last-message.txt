@@ -1,0 +1,5 @@
+N32R2 controller PID 1818171 remains live on source `1065f381`; frozen hashes and private ledger prefixes verified. No restart or duplicate dispatch.
+
+Task0 C0/Q0/N32 each scored 0/1; task1 C0 failed validly. Next: monitor task1 Q0 progression. Validation, formal, and required ablation evidence remain outstanding.
+
+Turn 198 operational summary saved; driver continuation remains active.

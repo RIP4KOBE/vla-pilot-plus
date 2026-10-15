@@ -1,0 +1,3 @@
+Integrated reviewed N36R3 source at `bee9f6a4`, preserving existing state and ledger contents. Recorded the operational handoff; no GPU cohort is running.
+
+Next: refresh exact runtime bindings, complete charged health readiness, then release first C0. Validation, formal evaluation, and required ablation evidence remain outstanding.

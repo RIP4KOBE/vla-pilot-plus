@@ -1,0 +1,5 @@
+Verified continuity and preserved the existing CPU executor. No GPU cohort is running; charges remain unchanged.
+
+Dependency preparation reports a symlink-scope blocker. Next: reconcile its terminal report and resolve the exact pinned dependency handling.
+
+Turn 1535’s hash-bound operational summary is saved. Validation, formal, and ablation completion remain unevidenced.

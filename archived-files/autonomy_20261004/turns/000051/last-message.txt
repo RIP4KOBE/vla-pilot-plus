@@ -1,0 +1,3 @@
+N31 remains active on GPU7, source `7428ce8`. Controller 203563, monitor 203562, and Q0 worker 793606 have verified identities. Both ledger prefixes are preserved.
+
+Five matched triples remain 0/5 for all arms; task 5 is incomplete. No scientific promotion. Operational summary saved for turn 51; the driver continues monitoring toward terminal audit and disposition.

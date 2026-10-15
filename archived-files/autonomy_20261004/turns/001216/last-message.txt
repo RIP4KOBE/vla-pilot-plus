@@ -1,0 +1,3 @@
+Continued N36R1 from source `066f2bf57e05`. Reconciled the exited preparation and launched bounded CPU repair (wrapper `278173`, executor `278174`) for missing pinned dependencies.
+
+Ledgers unchanged: 503 attempts, 75.267794 GPU-hours. Next: verify repaired runtime and manifests before release review. Validation, formal evaluation, and required ablations remain unresolved. Operational handoff recorded for the driver.

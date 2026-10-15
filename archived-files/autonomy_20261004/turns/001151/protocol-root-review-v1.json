@@ -1,0 +1,85 @@
+{
+  "schema": "n36-root-protocol-accounting-review-v1",
+  "at": "2026-10-09T21:57:07.476141+00:00",
+  "node_id": "15.6",
+  "status": "PASS_PROTOCOL_DESIGN_FOR_ISOLATED_CPU_IMPLEMENTATION_ONLY",
+  "reviewer": "Current root coordinator; independent of completed protocol-drafting executor. No second-agent review claimed.",
+  "source": "52a87af0bf11f95b21ce17aba456dc98944d9774",
+  "protocol": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001147/protocol-preparation/protocol-v1.json",
+    "sha256": "d0d16593af612b073d6a85777eae9f10f7b08d608055cd86ca512a8ceeee5d8e"
+  },
+  "accounting_draft": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001147/protocol-preparation/prospective-accounting-v1.json",
+    "sha256": "2c46987e29d9616929fe0c086d3da0761eaf6718a5d1811b58200c18e34d75d0"
+  },
+  "draft_report": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001147/protocol-preparation/report-v1.json",
+    "sha256": "8a6c6580a7656f7308029d302fb79a61aadeab59e6b933dc81b44c6fb89c084e"
+  },
+  "terminal_reconciliation": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001150/protocol-terminal-reconciliation-v1.json",
+    "sha256": "935f995f69aa68757e22838a682b1d5f6c2be8f54e86a46e1f546401338c11ab"
+  },
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c"
+  },
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+      "sha256": "aff9bf3e50b5d82b06cbb54f067746e3eeb6c27e499235519b903f42957ac368",
+      "bytes": 7513934
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-healthcheck-ledger.jsonl",
+      "sha256": "b4df8fb3c8e45bbe24e560e55262819430d0c5a4da9754f09062d59fdb480ff6",
+      "bytes": 71240
+    },
+    "gpu-hour-reservation-ledger.jsonl": {
+      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/gpu-hour-reservation-ledger.jsonl",
+      "sha256": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+      "bytes": 401
+    }
+  },
+  "checks": {
+    "direct_bound_references": "PASS",
+    "fresh_unique_task_major_episode_identities": "PASS_40_CELLS_DEV_ONLY",
+    "same_matched_seeds_bddl_init_rows": "PASS_AGAINST_PREVIOUS_DEV_PROTOCOL",
+    "attempt_bucket_arithmetic": "PASS_502_PLUS_40_EQUALS_542",
+    "gpu_seconds": "PASS_40_TIMES_1840_PLUS_1800_PLUS_200_EQUALS_75600",
+    "source_head": "UNCHANGED",
+    "controller_and_drafting_handles": "ABSENT",
+    "driver_and_current_coordinator_boot_start": "MATCH",
+    "STOP": "ABSENT"
+  },
+  "scientific_decisions": [
+    "Accept the once-per-adjacent-decision eligibility latch across ten ordinary offspring updates. Registered proposal inherits N34 insertion schedule; source ObservedJawDecision.prepare binds each actual current archive best. This is a prospective lifecycle decision, not evidence that first-insertion CPU plausibility survives later competition. Do not replay later historical offspring or force a direct competitor/selection.",
+    "Accept fresh C0/Q0/N34/N36 task-major design and N36>=N34 path-removal comparator in addition to original complete10, >=5, >=C0 and >=Q0. This stricter local gate does not replace required final QD/ED ablations or protected validation/formal gates.",
+    "Futility is sound only at complete valid quadruples: remaining N36 maximum below5 or any already observed comparator total makes final gate impossible. Invalid/missing mandatory audit stops admission; unrun outcomes remain Unknown.",
+    "Accept independent N36 memory with N35 disabled, exact occurrence rather than byte-alias origin, full8 acknowledgement, identity continuity, fixed-order binary64 dot predicate and one-decision expiry. Inside-box close remains unchanged; inactive fallback remains N34.",
+    "Accept deterministic tangent path, current observed geometry, native once-cast encoding, other15/remainder preservation and unchanged scoring/archive/176 evaluations/11 batches. Clipping breaks nominal endpoint cancellation; no collision avoidance or contact inference is licensed.",
+    "All-round native evidence must establish actual loaded code/build, arithmetic, origin, archive, decode, commit, acknowledgements and physical response. CPU scan model and first-insertion results cannot substitute. Auditor negatives must independently reject corrupted/missing required telemetry; producer PASS flags alone are insufficient."
+  ],
+  "accounting_review": {
+    "caps_adopted": false,
+    "reservation_adopted": false,
+    "exact_decimal_effective_cap": "221.08404692669838",
+    "exact_decimal_conservative_charge": "75.47736480243835",
+    "exact_decimal_protected_remaining": "36.2408240024308155",
+    "exact_decimal_unprotected_after_21h": "88.3658581218292145",
+    "float_serialization_note": "Draft binary64 effective cap 221.08404692669836 differs by roundoff from source decimal221.08404692669838. Later adoption must use the authority decimal string, preserving current exact cap; not a budget extension.",
+    "wall_hours_remaining": 37.268201071944446,
+    "wall_feasibility": "21h worst-case occupancy fits current window, but implementation/review/release and idle wait still consume time. Recompute at release and each admission; no guarantee of all40 completion.",
+    "healthchecks": "41 is invocation upper bound;1800s aggregate reservation overrides41*60, including cleanup. No retries or disguised episode probes.",
+    "historical_n31_deadline_unchanged": "2026-10-10T17:42:00Z"
+  },
+  "limitations": [
+    "No deployed N36 implementation or native audit yet.",
+    "First-insertion-only overlapping selected Dev windows; final selection and physical benefit Unknown.",
+    "No cumulative budget amendment, GPU release, protected access, scientific promotion or goal completion."
+  ],
+  "next_action": "Dispatch one bounded CPU implementation executor in an isolated N36 variant worktree from source52a87af0bf11f95b21ce17aba456dc98944d9774, using this reviewed protocol. Implement independent nonprogress memory/path plus complete native audit/controller negatives; then independent source review and prospective source/runtime/accounting release. No GPU dispatch or protected access until those gates pass.",
+  "gpu_authorized": false,
+  "target_met": false
+}

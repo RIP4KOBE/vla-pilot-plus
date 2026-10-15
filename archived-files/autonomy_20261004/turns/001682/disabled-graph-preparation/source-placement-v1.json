@@ -1,0 +1,96 @@
+{
+  "schema": "n36-exact-source-placement-receipt-v1",
+  "at": "2026-10-10T23:08:16.530466+00:00",
+  "before": [
+    "bd5dd4dabcb5a1f7823a9e2f51c849cd67767cb6",
+    "9f721e00c2adb20a35425a9967b34babc5d56119"
+  ],
+  "after": [
+    "a14f3a8b9dff175145504c7ca9ed8569a9b3dafb",
+    "43d7d04dd5b5fb138721f1f53099c4d395ba9aa7"
+  ],
+  "tracked_clean": true,
+  "exact_placement": true,
+  "adoption": false,
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "rev-parse",
+        "HEAD",
+        "HEAD^{tree}"
+      ],
+      "returncode": 0,
+      "stdout": "bd5dd4dabcb5a1f7823a9e2f51c849cd67767cb6\n9f721e00c2adb20a35425a9967b34babc5d56119\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "status",
+        "--porcelain",
+        "--untracked-files=no"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "merge-base",
+        "--is-ancestor",
+        "HEAD",
+        "a14f3a8b9dff175145504c7ca9ed8569a9b3dafb"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "merge",
+        "--ff-only",
+        "a14f3a8b9dff175145504c7ca9ed8569a9b3dafb"
+      ],
+      "returncode": 0,
+      "stdout": "Updating bd5dd4d..a14f3a8\nFast-forward\n .../n36_engineering_r1_spec.disabled.json          |  50 +-\n scripts/qd_ed_n36_engineering_r1.py                | 137 +++-\n scripts/qd_ed_n36_readiness_prepare.py             | 851 +++++++++++++++++++\n tests/test_n36_engineering_r1.py                   | 279 ++++++-\n tests/test_n36_readiness_prepare.py                | 907 +++++++++++++++++++++\n 5 files changed, 2184 insertions(+), 40 deletions(-)\n create mode 100644 scripts/qd_ed_n36_readiness_prepare.py\n create mode 100644 tests/test_n36_readiness_prepare.py\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "rev-parse",
+        "HEAD",
+        "HEAD^{tree}"
+      ],
+      "returncode": 0,
+      "stdout": "a14f3a8b9dff175145504c7ca9ed8569a9b3dafb\n43d7d04dd5b5fb138721f1f53099c4d395ba9aa7\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+        "status",
+        "--porcelain",
+        "--untracked-files=no"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

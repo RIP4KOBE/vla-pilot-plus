@@ -1,0 +1,3 @@
+Continuation recorded. Official gpt-6-astra CPU executor PID 3193401 is preparing the recovery-prefix contract; source `1c10f9dd` and ledgers remain unchanged.
+
+Next: review its artifacts, then repair the validator. GPU dispatch remains blocked; validation, formal and ablation completion is not yet evidenced.

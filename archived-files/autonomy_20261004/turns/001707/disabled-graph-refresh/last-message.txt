@@ -1,0 +1,5 @@
+Generated the disabled source/runtime graph, all 40 audit manifests, and the separate engineering manifest. Focused checks passed; complete graph validation remains blocked on fresh controller root attestation. Independent deployed-graph review is pending.
+
+Source and owner state were unchanged; no GPU or measurement work ran. The report explicitly records the schema-required audit-only `frozen=true` distinction.
+
+[Report and adjacent SHA256 file](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001707/disabled-graph-refresh/report-v1.json)

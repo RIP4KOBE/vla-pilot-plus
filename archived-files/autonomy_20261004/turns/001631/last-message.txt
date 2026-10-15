@@ -1,0 +1,3 @@
+Prepared a disabled N36 R1 runtime manifest: four source pins verified against reviewed commit `f256fece`; 3,296 other records preserved. Ledgers are unchanged; no GPU cohort is running.
+
+Saved the operational handoff. Next: refresh dependent bindings and complete reviews and fresh readiness checks. Validation/formal/ablation completion remains unproven.

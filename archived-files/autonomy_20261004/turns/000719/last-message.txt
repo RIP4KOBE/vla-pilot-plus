@@ -1,0 +1,3 @@
+Adopted the N34R11 identity repair; all 12 focused tests passed. Charges, reserves, and scientific gates remain intact.
+
+No GPU cohort is active. Recorded the operational handoff for runtime regeneration and release review. Validation, formal evaluation, and ablation evidence remain outstanding; the local driver continues.

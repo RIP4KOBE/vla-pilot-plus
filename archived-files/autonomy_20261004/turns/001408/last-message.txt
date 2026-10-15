@@ -1,0 +1,3 @@
+Continued N36R3 recovery with one CPU-only binding refresh for source `4347951`; executor PID `1383124` is recorded for monitoring.
+
+Ledger unchanged: 505 attempts, 75.5273 GPU-hours. GPU release remains disabled pending binding review and adoption. Operational handoff saved; validation, formal evaluation and required ablations remain incomplete.

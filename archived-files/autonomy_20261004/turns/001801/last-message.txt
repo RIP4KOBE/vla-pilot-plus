@@ -1,0 +1,3 @@
+Verified authorization, live process identities, and unchanged private ledgers. The existing N36 CPU repair executor remains active; no duplicate or GPU dispatch occurred.
+
+Saved the hash-bound turn summary. Next: review repair results and source scope. Validation, formal evaluation, and required ablation completion remain unevidenced.

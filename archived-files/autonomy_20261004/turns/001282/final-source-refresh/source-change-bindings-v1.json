@@ -1,0 +1,59 @@
+{
+  "base_commit": "b1d20fc0481721da6ebaab161c5a2ef7c3d50173",
+  "commit": "30c6321715df86c5bab623db607bab2811aed56d",
+  "changes": [
+    {
+      "path": "scripts/qd_ed_n36_accounting.py",
+      "before": "4d10fe13da2b7332724a53978591edc61dc301798e0c608b1525bb6abae0fd66",
+      "after": "796d4135991f3a09302bfd789cbe5fe9d8596c070ea4870f7c4651d5a67f3e5c"
+    },
+    {
+      "path": "scripts/qd_ed_n36_bootstrap.py",
+      "before": "84c569b975a21a5d075245e28b827acc7e23c8e10c00f31a3eba0febe0743cc4",
+      "after": "fe7d92193675d587c98977ced4a4e4602e1d2c3f4bf068afe22500acba5f52e6"
+    },
+    {
+      "path": "scripts/qd_ed_n36_contract.py",
+      "before": "7320e0909e4963c46a82f3821bdcdc6da82f2909d2808b5a25a0c23c632d886c",
+      "after": "b3feaf43d33844b8110eddccdb77ecdc36c70784633fcff699b0e6df15441160"
+    },
+    {
+      "path": "scripts/qd_ed_n36_healthcheck.py",
+      "before": "e2a093db8bd0cf651c1964ec64033632972766a7d6c150aac15ee7c23a59cfd4",
+      "after": "3c90ab05e35abc8974c8973587513c2c5cc216d7173cbcaaaf4a7bd6550b18d9"
+    },
+    {
+      "path": "scripts/qd_ed_n36_release.py",
+      "before": "5559156d4aa86fd25c53eab0668187f173a82ac895d86fbafd03bad390a92840",
+      "after": "4a195b1414d4e75c07fe6ec43a0d0454f8d7f8763076246527eccd674d5fcf81"
+    },
+    {
+      "path": "scripts/qd_ed_n36_runner.py",
+      "before": "52af9edab97ac1bea091a94df9d175717c5b2a4c7f0124ddd24938cff91a914d",
+      "after": "258175e47a3d817c6a7c9fc96336eb8e4a06b54aeb896ac3f4fa3d5195bc065c"
+    },
+    {
+      "path": "scripts/qd_ed_n36_source.py",
+      "before": "fee530b27c092df3a58633a1900ff5422ea2a5fe5c1a45db6dd7ef8a5b4dd8d0",
+      "after": "15092a028d5c317eab34c4dc01942d1b135b8e7ff0d44a26300260899f0460a9"
+    },
+    {
+      "path": "scripts/qd_ed_n36_worker.py",
+      "before": "4a4f75d420e72edaa798ca30a220ffef81b3867c2042da17d7b16bb289936d66",
+      "after": "f719b22fe54c4beb4ef908040cc130efca7c28ce46fad68243745ac46cda5726"
+    },
+    {
+      "path": "scripts/qd_ed_n36r2_admission.py",
+      "before": null,
+      "after": "cbf254f2c040c7530c508a0d4bec14b1e87cfef221534fbcab4303376764f102"
+    },
+    {
+      "path": "tests/test_n36r2_admission.py",
+      "before": null,
+      "after": "c03dcba0280be7c2eeae244fa7d3cfe687cbbcc164d2e285126a179df13ad1d7"
+    }
+  ],
+  "unchanged_files": 1078,
+  "scientific_bytes_unchanged_outside_exact_engineering_delta": true,
+  "schema_note": "Production requires source == scientific_source; both full records refresh. All non-delta source bytes remain exact."
+}

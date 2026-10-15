@@ -1,0 +1,3 @@
+N32R2 controller 1818171 remains live on frozen source `1065f381`. Artifact hashes and owning ledger prefixes verified; no duplicate dispatch or restart.
+
+Two matched development triples remain settled: C0/Q0/N32 each 0/2. Turn 220’s operational summary is saved. Next: monitor the existing controller. Validation, formal and required ablation evidence remain outstanding.

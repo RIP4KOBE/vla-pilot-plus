@@ -1,0 +1,3 @@
+Continued N36R3: the CPU-only binding refresh for accepted source `4e632c3` is running with verified process identities. State, checkpoint, and hash-bound operational summary are recorded; all ledger charges remain intact.
+
+Next: review refreshed bindings, then fresh health evidence and first-C0 release checks. Validation, formal evaluation, and required ablations remain incomplete.

@@ -1,0 +1,5 @@
+Verified authorization, live process identities, unchanged source, and preserved ledger prefixes. The existing CPU executor remains active; no duplicate or GPU work was launched.
+
+The recovery draft is blocked by specification bindings. Next: reconcile terminal output and independently review the binding amendment. Validation, formal evaluation, and ablation evidence remain incomplete.
+
+Operational summary saved for driver continuation.

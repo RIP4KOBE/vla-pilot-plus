@@ -1,0 +1,5 @@
+Completed the bounded disabled refresh at `f661a570…`. [Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001817/disabled-binding-refresh/report-v1.json>) includes hash-bound candidates, boundaries, checks, and prerequisite commands.
+
+Policy admission passed. P3 controller/final graph review and P4 fresh resource/accounting/release remain blocked as expected. Packet verification passed.
+
+Measurement remains disabled. No source edits, placement, state/ledger writes, or delegation. Finished in 366 seconds.

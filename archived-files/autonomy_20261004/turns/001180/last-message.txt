@@ -1,0 +1,5 @@
+N36’s CPU audit repair completed at `ab8e8c6`; independent review is running under PID 54424. Owning source remains `52a87af`.
+
+Ledgers are unchanged: 502 attempts, 75.2438 GPU-hours. No GPU dispatch occurred. Operational summary saved.
+
+Next: reconcile the review before source adoption and runtime preparation. Validation, formal evaluation, and required ablation evidence remain outstanding.

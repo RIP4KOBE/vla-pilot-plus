@@ -1,0 +1,3 @@
+N34’s controller remains live and is progressing through release revalidation before GPU admission. No duplicate dispatch or recovery was needed; frozen source and private ledgers remain unchanged.
+
+Saved the [operational summary](../autonomy_20261004/turns/000596/operational-summary.md). The driver continues monitoring. Validation, formal evaluation, and required ablation evidence remain outstanding.

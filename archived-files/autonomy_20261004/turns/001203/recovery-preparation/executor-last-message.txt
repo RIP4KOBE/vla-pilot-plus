@@ -1,0 +1,7 @@
+Prepared [report-v1.json](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001203/recovery-preparation/report-v1.json) and [report-v1.md](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001203/recovery-preparation/report-v1.md).
+
+Draft GPU7-visible metadata matches the unchanged strict predicate; all 75 binary hashes match. CUDA remained uninitialized.
+
+Release is blocked: immutable source hard-codes original identities. Fresh N36R1 identities remain non-executable proposals, with `release_enabled=false`.
+
+Original records, ledger, and failed-attempt charge are preserved. No GPU work, source edits, budget adoption, or RT-03/04 evidence claimed.

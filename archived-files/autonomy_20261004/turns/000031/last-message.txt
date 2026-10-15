@@ -1,0 +1,5 @@
+N31 continues on frozen source `7428ce8`; controller `203563` has dispatched task4 C0.
+
+Four matched triples are audited: C0/Q0/N31 each 0/4 successes. Ledger history is preserved. No promotion or completion claim is justified.
+
+Operational summary saved for turn 31. Next: monitor the existing cohort, then review terminal evidence and accounting.

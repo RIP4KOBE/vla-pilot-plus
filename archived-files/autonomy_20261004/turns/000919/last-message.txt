@@ -1,0 +1,3 @@
+N35 remains running on GPU7: controller `2632351`, worker `2635111`, source `52a87af0`. Frozen bindings and ledger continuity verified; no restart or scientific changes made.
+
+Turn919 reconciliation and operational summary saved. Next: monitor the existing cohort and audit terminal outcomes. Validation, formal evaluation and required ablation evidence remain outstanding.

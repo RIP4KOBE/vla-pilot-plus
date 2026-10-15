@@ -1,0 +1,3 @@
+Adopted the reviewed N34R8 identity repair as `28fbcba4`. All charges and ledger hashes are preserved; no GPU controller is active.
+
+Next: regenerate runtime manifests and validate the prospective release before dispatch. Validation, formal evaluation, and ablation evidence remain outstanding. Operational summary recorded for driver continuation.

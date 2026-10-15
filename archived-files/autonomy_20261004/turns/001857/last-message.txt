@@ -1,0 +1,3 @@
+Reconciled the completed N36 audit: it failed because the preparation release expired during verification. Recorded the diagnosis and hash-bound operational summary; all ledgers remain unchanged, with no GPU dispatch.
+
+Next: bounded review of release-lifetime handling. Validation, formal evaluation, and required ablation evidence remain outstanding.

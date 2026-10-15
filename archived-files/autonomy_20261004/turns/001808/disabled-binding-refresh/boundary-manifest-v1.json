@@ -1,0 +1,441 @@
+{
+  "artifact_field_boundaries": [
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/disabled-runtime.json",
+        "sha256": "7089022c26651b82fcacaac800e812405f9582d49e5304bfa72da59840d70198"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/disabled-runtime.json",
+        "sha256": "eb34ebe1515483a24154266efa387edd6fa55e64d63df4a6ad92845082ed8d6a"
+      },
+      "boundary": "runtime",
+      "changed_json_pointers": [
+        "/preparation/source",
+        "/preparation/source_record/path",
+        "/preparation/source_record/sha256"
+      ],
+      "unchanged_top_level_fields": [
+        "artifact_root",
+        "controls_label_suffix",
+        "cuda_egl_probe",
+        "cuda_egl_verified",
+        "dependencies",
+        "egl_device_metadata_path",
+        "environment",
+        "files",
+        "frozen_stage_provider",
+        "gpu_mapping",
+        "main_overrides",
+        "metadata_mapping_verified",
+        "prior_provider_manifest",
+        "provider_evidence",
+        "provider_frozen_at",
+        "provider_note",
+        "provider_ready",
+        "schema",
+        "stage_condition",
+        "stage_engineering_condition",
+        "stage_recovered_error_condition",
+        "tasks",
+        "worktree"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/runtime-closure.prospective-disabled-v1.json",
+        "sha256": "f12b068574b84f902b24d190125f752c752bb1745bb92337be56f4cefa2b4d12"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/runtime-closure.prospective-disabled-v1.json",
+        "sha256": "5f647f58c370ba29b06009db90cc3a9c4b83a5f65dbac80d2a9c7a4be2bbe7ab"
+      },
+      "boundary": "runtime_closure",
+      "changed_json_pointers": [
+        "/modules/scripts.qd_ed_n36_source/sha256",
+        "/runtime/path",
+        "/runtime/sha256"
+      ],
+      "unchanged_top_level_fields": [
+        "distribution_versions",
+        "generated_modules",
+        "interpreter",
+        "module_aliases",
+        "required_after",
+        "schema",
+        "versions"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/preparation-policy.unassigned-disabled-v1.json",
+        "sha256": "60f960b9d6d125faa496132af2af1544a6d1aec8d5f8db67912c4b3daad89e88"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/preparation-policy.prospective-disabled-v1.json",
+        "sha256": "1a4e298bb1aea40ff527740c819d0983a92ea22db453db3b26250e81909c6e8b"
+      },
+      "boundary": "policy",
+      "changed_json_pointers": [
+        "/acceptance_path",
+        "/accounting_path",
+        "/disabled_runtime_path",
+        "/gpu_path",
+        "/previous_specification/path",
+        "/previous_specification/sha256",
+        "/proof_path",
+        "/provider_path",
+        "/release_path",
+        "/resource_id"
+      ],
+      "unchanged_top_level_fields": [
+        "baseline",
+        "deadline",
+        "not_before",
+        "schema"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/specification.prospective-disabled-v1.json",
+        "sha256": "d983afb6285c19f7b720b0313316cfb6fc686c5c53dcfe94bac852c09f6d2e6a"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/specification.prospective-disabled-v1.json",
+        "sha256": "54aba4118f57282ac3b95ed5d3392f5a271ae8c1f9b484b0a2844485e3913c55"
+      },
+      "boundary": "specification",
+      "changed_json_pointers": [
+        "/runtime_binding/amendment/path",
+        "/runtime_binding/amendment/sha256",
+        "/runtime_binding/preparation/path",
+        "/runtime_binding/preparation/sha256",
+        "/runtime_binding/runtime_path",
+        "/runtime_binding/source_change_allowlist",
+        "/runtime_binding/source_record_path"
+      ],
+      "unchanged_top_level_fields": [
+        "accounting_proposal",
+        "binding_requirements",
+        "canonical_runtime",
+        "decision",
+        "deployment_source_cwd",
+        "downstream_slots",
+        "full_audit_view",
+        "gpu_authorized",
+        "node_id",
+        "not_a_released_plan",
+        "parent_specification",
+        "prospective_amendment",
+        "readiness_recovery",
+        "recovery_prefix_contract",
+        "release_enabled",
+        "retained_ledger_prefixes",
+        "retained_snapshot",
+        "retained_snapshot_reference",
+        "root_adopted",
+        "schema",
+        "scope",
+        "source_adoption_required",
+        "source_base_commit",
+        "status",
+        "unchanged_files_and_rules"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/controller-semantics.pending-disabled-v1.json",
+        "sha256": "fc68b5168f0ef4c394578a4c46b929e351b84b22df7d5a2d1ee471488d760a33"
+      },
+      "before": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001783/controller-semantics.root-reviewed-disabled-v1.json",
+        "sha256": "11321dee989d76614e36fef6d588b2a89d406923f519c30ae8d4ebcbe7e7c07a"
+      },
+      "boundary": "controller_semantics",
+      "changed_json_pointers": [
+        "/at",
+        "/historical_review",
+        "/historical_review_only",
+        "/inherited_review",
+        "/review_evidence/scale_action",
+        "/review_evidence/set_goal",
+        "/review_evidence/wrapper_and_gripper",
+        "/review_scope",
+        "/reviewer",
+        "/root_acceptance",
+        "/runtime/path",
+        "/runtime/sha256",
+        "/runtime_closure/path",
+        "/runtime_closure/sha256",
+        "/source_commit",
+        "/status"
+      ],
+      "unchanged_top_level_fields": [
+        "b5_review",
+        "class",
+        "gpu_authorized",
+        "independent_review_claimed",
+        "instance",
+        "instance_scope",
+        "module",
+        "native_execution_observed",
+        "physical_gain_certified",
+        "production_eligible",
+        "readiness_eligible",
+        "release_enabled",
+        "schema",
+        "scientific_promotion",
+        "semantics",
+        "source"
+      ]
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/graph.partial-disabled-v1.json",
+        "sha256": "84deee2a42e86d78ccff729abc05748871da5b36bf31e1e4b822104cdd01a6b2"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001784/graph.complete-disabled-v1.json",
+        "sha256": "21fdd12e5bd7b616c71848fb0080280a9c8e79549b7eb4c203925e0895bb3f07"
+      },
+      "boundary": "graph",
+      "changed_json_pointers": [
+        "/amendment",
+        "/audit",
+        "/controller_semantics/path",
+        "/controller_semantics/sha256",
+        "/full40_manifests",
+        "/graph_complete",
+        "/historical_accounting_only",
+        "/historical_graph_only",
+        "/plan",
+        "/policy/path",
+        "/policy/sha256",
+        "/recovery_identity_status",
+        "/recovery_of",
+        "/recovery_prefix_contract",
+        "/relocation_map",
+        "/resource_id",
+        "/retained_charge_gpu_hours",
+        "/review_status",
+        "/root_controller_acceptance",
+        "/runtime/path",
+        "/runtime/sha256",
+        "/runtime_closure/path",
+        "/runtime_closure/sha256",
+        "/schema",
+        "/scientific_equivalence",
+        "/scientific_source_anchor",
+        "/separate_engineering_manifest",
+        "/source_adopted",
+        "/source_record/path",
+        "/source_record/sha256",
+        "/specification/path",
+        "/specification/sha256",
+        "/status"
+      ],
+      "unchanged_top_level_fields": [
+        "authority",
+        "b5_review",
+        "frozen",
+        "gpu_authorized",
+        "graph_verified",
+        "independent_review_claimed",
+        "native_build",
+        "provider_measurement_authorized",
+        "provider_ready",
+        "release_enabled",
+        "root_acceptance",
+        "runtime_ready"
+      ]
+    }
+  ],
+  "graph_reference_boundaries": [
+    {
+      "after": null,
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001784/all40-audit.disabled-v1.json",
+        "sha256": "4b2f9d06f35a96274ffb3dfb31b42e11e2c20de6454b1474c69a23c805751d5d"
+      },
+      "disposition": "UNFILLED_AFFECTED_OR_REVIEW_SLOT; HISTORICAL_REFERENCE_NOT_CARRIED_FORWARD",
+      "slot": "audit"
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/controller-semantics.pending-disabled-v1.json",
+        "sha256": "fc68b5168f0ef4c394578a4c46b929e351b84b22df7d5a2d1ee471488d760a33"
+      },
+      "before": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001783/controller-semantics.root-reviewed-disabled-v1.json",
+        "sha256": "11321dee989d76614e36fef6d588b2a89d406923f519c30ae8d4ebcbe7e7c07a"
+      },
+      "disposition": "REFRESHED_CANDIDATE_NOT_ADMITTED",
+      "slot": "controller_semantics"
+    },
+    {
+      "after": null,
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001784/full40-manifest-index-v1.json",
+        "sha256": "82ad0e5f79981e1e77b5c9b5b53375b5c653f351df077c424c7e8ee48db55ea5"
+      },
+      "disposition": "UNFILLED_AFFECTED_OR_REVIEW_SLOT; HISTORICAL_REFERENCE_NOT_CARRIED_FORWARD",
+      "slot": "full40_manifests"
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/native-build.disabled-v1.json",
+        "sha256": "46e8d4858a503e859333d5350ec9e0d011de51f4c5d066c041639cb97b6f1cea"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/native-build.disabled-v1.json",
+        "sha256": "46e8d4858a503e859333d5350ec9e0d011de51f4c5d066c041639cb97b6f1cea"
+      },
+      "disposition": "REUSED_EXACT_UNCHANGED_NATIVE_INVENTORY_ONLY",
+      "slot": "native_build"
+    },
+    {
+      "after": null,
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001784/engineering-plan.disabled-v1.json",
+        "sha256": "cb1166d0075c9002b7f8eed36bda161b1575cc5a249f2ac8c9ff68a8b14be0d3"
+      },
+      "disposition": "UNFILLED_AFFECTED_OR_REVIEW_SLOT; HISTORICAL_REFERENCE_NOT_CARRIED_FORWARD",
+      "slot": "plan"
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/preparation-policy.unassigned-disabled-v1.json",
+        "sha256": "60f960b9d6d125faa496132af2af1544a6d1aec8d5f8db67912c4b3daad89e88"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/preparation-policy.prospective-disabled-v1.json",
+        "sha256": "1a4e298bb1aea40ff527740c819d0983a92ea22db453db3b26250e81909c6e8b"
+      },
+      "disposition": "REFRESHED_CANDIDATE_NOT_ADMITTED",
+      "slot": "policy"
+    },
+    {
+      "after": null,
+      "before": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001775/recovery-prefix-contract.root-reviewed-disabled-v2.json",
+        "sha256": "0d6b5f6c6e0db4daec713a36b886de18a7c99f531328d0cec4b23f5f2ee8b936"
+      },
+      "disposition": "UNFILLED_AFFECTED_OR_REVIEW_SLOT; HISTORICAL_REFERENCE_NOT_CARRIED_FORWARD",
+      "slot": "recovery_prefix_contract"
+    },
+    {
+      "after": null,
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001784/disabled-relocation-map-v1.json",
+        "sha256": "d5089aefe16cd4a0542f62bb810be24dd83d5a2b235717a2cbb661976ae91570"
+      },
+      "disposition": "UNFILLED_AFFECTED_OR_REVIEW_SLOT; HISTORICAL_REFERENCE_NOT_CARRIED_FORWARD",
+      "slot": "relocation_map"
+    },
+    {
+      "after": null,
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001783/root-controller-binding-attestation-v1.json",
+        "sha256": "795c6557ba0343217485c84e776042a5f90f792d0d35de100672501d8743055c"
+      },
+      "disposition": "UNFILLED_AFFECTED_OR_REVIEW_SLOT; HISTORICAL_REFERENCE_NOT_CARRIED_FORWARD",
+      "slot": "root_controller_acceptance"
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/disabled-runtime.json",
+        "sha256": "7089022c26651b82fcacaac800e812405f9582d49e5304bfa72da59840d70198"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/disabled-runtime.json",
+        "sha256": "eb34ebe1515483a24154266efa387edd6fa55e64d63df4a6ad92845082ed8d6a"
+      },
+      "disposition": "REFRESHED_CANDIDATE_NOT_ADMITTED",
+      "slot": "runtime"
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/runtime-closure.prospective-disabled-v1.json",
+        "sha256": "f12b068574b84f902b24d190125f752c752bb1745bb92337be56f4cefa2b4d12"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/runtime-closure.prospective-disabled-v1.json",
+        "sha256": "5f647f58c370ba29b06009db90cc3a9c4b83a5f65dbac80d2a9c7a4be2bbe7ab"
+      },
+      "disposition": "REFRESHED_CANDIDATE_NOT_ADMITTED",
+      "slot": "runtime_closure"
+    },
+    {
+      "after": null,
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/scientific-equivalence-v1.json",
+        "sha256": "c06de36e633e62c881184bddd8759d995fe7153f5838128fad532403481c1e98"
+      },
+      "disposition": "UNFILLED_AFFECTED_OR_REVIEW_SLOT; HISTORICAL_REFERENCE_NOT_CARRIED_FORWARD",
+      "slot": "scientific_equivalence"
+    },
+    {
+      "after": null,
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001784/engineering-manifest.disabled-v1.json",
+        "sha256": "2017b02b04dcda407eb003d8829c13044c03f022441adfa1280351d710725a11"
+      },
+      "disposition": "UNFILLED_AFFECTED_OR_REVIEW_SLOT; HISTORICAL_REFERENCE_NOT_CARRIED_FORWARD",
+      "slot": "separate_engineering_manifest"
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/source-record.json",
+        "sha256": "bde0741fcfb4cae4bb99f7a124eabfbaf2194b33f005f311c65e9fc96ee48e29"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/source-record.json",
+        "sha256": "a7657917082dedf2fb71f7bdefe714fb8ab5d565fa7be250c024044b4ffb66f3"
+      },
+      "disposition": "REFRESHED_CANDIDATE_NOT_ADMITTED",
+      "slot": "source_record"
+    },
+    {
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001808/disabled-binding-refresh/specification.prospective-disabled-v1.json",
+        "sha256": "d983afb6285c19f7b720b0313316cfb6fc686c5c53dcfe94bac852c09f6d2e6a"
+      },
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001779/canonical-path-rebinding/specification.prospective-disabled-v1.json",
+        "sha256": "54aba4118f57282ac3b95ed5d3392f5a271ae8c1f9b484b0a2844485e3913c55"
+      },
+      "disposition": "REFRESHED_CANDIDATE_NOT_ADMITTED",
+      "slot": "specification"
+    }
+  ],
+  "historical_only": [
+    "001787 B5 acceptance",
+    "001783 controller root review and its evidence leaves",
+    "old source-bound full40, engineering manifest, audit, plan and scientific-equivalence evidence",
+    "old recovery-prefix contract and consumed preparation resource identity"
+  ],
+  "not_claimed": [
+    "fresh native execution",
+    "loaded controller behavior",
+    "full production graph validation",
+    "independent review",
+    "scientific score"
+  ],
+  "schema": "n36-disabled-binding-boundaries-v1",
+  "source_inventory_delta": [
+    "scripts/qd_ed_n36_readiness_prepare.py",
+    "scripts/qd_ed_n36_source.py",
+    "tests/test_n36_preparation_binding.py",
+    "tests/test_n36_readiness_prepare.py"
+  ],
+  "unchanged": [
+    "all source inventory paths listed in source-delta-v1.json except the exact four changes",
+    "scientific source anchor 1065f38122379a515b60a9a424f574330405b66f",
+    "all specification top-level fields outside runtime_binding (including scientific rules, scope, accounting and frozen thresholds)",
+    "runtime outside preparation.source and preparation.source_record",
+    "closure outside runtime and modules.scripts.qd_ed_n36_source.sha256",
+    "native manifest bytes/reference; no native library rescan",
+    "controller instance, semantics, source module identity and expected configuration",
+    "every historical file; both worktree HEADs and tracked bytes; owner state, ledgers, checkpoints and locks"
+  ]
+}

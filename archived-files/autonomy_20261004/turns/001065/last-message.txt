@@ -1,0 +1,5 @@
+N35 controller remains live; frozen bindings and ledger integrity verified. No restart or duplicate dispatch.
+
+Dev results remain C0 1/6; Q0, N34, N35 each 0/5. Task 5 is incomplete. Validation/formal/ablation completion remains unproven.
+
+Turn 001065 summary recorded. Next: monitor existing controller for task 5 Q0 progress.

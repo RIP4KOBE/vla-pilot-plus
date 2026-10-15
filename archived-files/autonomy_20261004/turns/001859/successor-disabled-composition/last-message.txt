@@ -1,0 +1,3 @@
+Created the disabled successor graph with all four exact predecessors and 41 rebound manifests. Policy, capture, budget, and structural checks passed; owner gates remain null. No GPU, source, or owner-state changes.
+
+[Final report and tested next commands](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001859/successor-disabled-composition/report-final-v2.json). Original `report-v1.json` is preserved.

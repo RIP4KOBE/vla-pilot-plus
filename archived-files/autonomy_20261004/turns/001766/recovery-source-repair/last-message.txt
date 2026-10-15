@@ -1,0 +1,7 @@
+Committed `a5b32cdefc0879e98011f86b1559e4250926ba62`.
+
+- Added prospective hash-bound specification selection and exact multi-predecessor history checks.
+- All 85 focused CPU tests passed; worktree clean.
+- No ledger/state writes, measurement, or identity consumption.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001766/recovery-source-repair/report-v1.json>) includes binding interfaces and remaining gaps. This is repair evidence only; fresh bindings and independent acceptance remain required.

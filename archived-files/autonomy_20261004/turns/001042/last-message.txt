@@ -1,0 +1,5 @@
+N35 remains active on GPU7; controller/worker identities, frozen bindings, and ledger continuity verified. No restart or duplicate dispatch.
+
+Dev evidence: 18 valid outcomes, zero successes; task-4 comparator still running. Completion remains unproven.
+
+Turn 001042 operational summary saved. The driver continues monitoring under the existing authorization.

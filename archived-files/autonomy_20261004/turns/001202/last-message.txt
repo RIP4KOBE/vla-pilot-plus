@@ -1,0 +1,3 @@
+N36’s audit failure reproduces from GPU visibility changing PyTorch’s build metadata. Recorded the diagnosis and continuation checkpoint; source, audits, and charges remain unchanged.
+
+No cohort is running. Next: independently reviewed prospective runtime repair and fresh recovery release. Validation, formal, and ablation goals remain unmet.

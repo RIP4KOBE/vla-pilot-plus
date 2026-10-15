@@ -1,0 +1,3 @@
+N36R3’s independent CPU review passed. Recorded hash-bound source/runtime adoption for `711602ac` and updated the owning checkpoint.
+
+No GPU worker is active; charges remain 505 attempts / 75.53335 GPU-hours. Next: finite accounting adoption, fresh health check, then first-C0 execution with mandatory G3 review. Validation, formal evaluation, and required ablations remain incomplete.

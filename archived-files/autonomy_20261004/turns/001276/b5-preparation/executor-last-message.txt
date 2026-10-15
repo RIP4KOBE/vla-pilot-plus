@@ -1,0 +1,9 @@
+Prepared the [B5 package and reports](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001276/b5-preparation/report-v1.md).
+
+- Commit: `30c6321715df86c5bab623db607bab2811aed56d`
+- 11 CPU tests and 52 rejection checks passed.
+- Both invalid charges preserved; no cap amendment needed.
+- Concurrent owner-state drift recorded; budgets and ledgers unchanged.
+- Release remains disabled. Source rebindings, independent review, adoption, and detached release remain required.
+
+No production execution.

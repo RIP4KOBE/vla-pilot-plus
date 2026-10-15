@@ -1,0 +1,3 @@
+Continued the owning study. Reconciled the failed CPU executor and launched one replacement through the verified ChatGPT login; it is active.
+
+Scientific source, GPU gates, and ledger history remain unchanged. Hash-bound operational summary recorded. Next: reconcile the repair and independently review it. Validation/formal/ablation completion remains unproven.

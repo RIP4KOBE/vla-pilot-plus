@@ -1,0 +1,3 @@
+Adopted reviewed N34 integration at `c14e1e9`; GPU dispatch remains disabled pending runtime, controller, accounting, and release verification.
+
+Historical charges are unchanged. State, checkpoint, and operational handoff are updated. The validation/formal/ablation goal remains unmet.

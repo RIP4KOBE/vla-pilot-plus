@@ -1,0 +1,7 @@
+Committed `969b71f9a8d902bfc74746db76b8de6e2e211e24`. **91 focused CPU tests passed.** Worktree clean; owning ledgers and immutable runtime unchanged.
+
+Implemented the preparation runner, durable accounting, and process-bound receipt envelope. No live measurement occurred; no runtime-readiness claim.
+
+Blocker: unchanged production health auditing rejects preparation ledger entries, requiring a separate reviewed accounting amendment.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001661/readiness-runner-implementation/report-v1.json>)

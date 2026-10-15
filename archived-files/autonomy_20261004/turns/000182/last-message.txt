@@ -1,0 +1,3 @@
+N32R2 controller PID 1818171 remains live on frozen source `1065f381`. Ledger prefixes and frozen artifact hashes verified; no restart or duplicate dispatch.
+
+Task 0 remains 0/1 for C0, Q0 and N32. Turn 182’s operational summary is saved. Next: monitor the existing cohort. Validation, formal and required ablation evidence remain outstanding.

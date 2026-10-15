@@ -1,0 +1,3 @@
+Verified authorization, live executor identity, and unchanged ledgers. G7 CPU repair continues; a restart/receipt test failure remains unresolved. GPU release stays disabled.
+
+Saved the hash-bound turn 001568 operational summary. Next: reconcile the executor’s results after exit and review the repair. Original-goal completion remains unproven.

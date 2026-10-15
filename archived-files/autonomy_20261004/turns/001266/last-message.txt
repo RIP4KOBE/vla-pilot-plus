@@ -1,0 +1,3 @@
+Continued autonomously: reconciled repair commit `b1d20fc` and launched its independent CPU review. Live identities and a hash-bound operational summary are recorded.
+
+All charges remain intact. GPU admission awaits review and source/runtime checks; validation, formal and ablation completion remains unproven.

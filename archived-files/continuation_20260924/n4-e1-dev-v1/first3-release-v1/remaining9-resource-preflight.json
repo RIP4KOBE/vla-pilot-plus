@@ -1,0 +1,66 @@
+{
+  "CPU_source_model_inputs_verified": true,
+  "GPU_dispatches": 0,
+  "budget_snapshot": {
+    "aborted": 4,
+    "by_bucket": {
+      "baseline": 17,
+      "development": 60,
+      "formal": 0,
+      "recovery": 6,
+      "validation": 0
+    },
+    "completed": 79,
+    "dispatched": 83,
+    "gpu_healthcheck_hours": 0.20961513444019236,
+    "gpu_healthcheck_inflight": 0,
+    "gpu_hours_by_bucket": {
+      "baseline": 2.030877001005235,
+      "development": 8.806771174646112,
+      "formal": 0.0,
+      "recovery": 1.0769918294311285,
+      "validation": 0.0
+    },
+    "gpu_hours_consumed": 11.914640005082477,
+    "invalid": 6,
+    "reserved_attempts": 83,
+    "running": 0,
+    "valid": 73
+  },
+  "checkpoint": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/first3-release-v1/correctness-checkpoint.json",
+    "sha256": "8cf09fcd39fc0e0ef0053d9d38d93623b61a7320ba154605028bc9cc6281a58c"
+  },
+  "first3_root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/first3-release-v1/root-review.json",
+    "sha256": "be8e071c24c23601858ba5fea29a7ffe0cc3499e28e0793b0d68d8179af60156"
+  },
+  "first_remaining_row": "n4e1_dev_t03_c0_20260924",
+  "physical_gpu": 3,
+  "plan": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/first3-release-v1/plan.checkpoint.frozen.json",
+    "sha256": "46abd2b4d9b7c3a4fc294a2d0b0766bf4a29c5f4450cc7c323bd5729feea2cfe"
+  },
+  "protected_phase_authorized": false,
+  "protected_validation_formal_attempts": 100,
+  "protected_validation_formal_hours": 24,
+  "release": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260924/n4-e1-dev-v1/first3-release-v1/remaining9-execution-release.json",
+    "sha256": "950df39a5177313bf5ecdab19bccc8f63991556ee42e4490458bd2185607a169"
+  },
+  "remaining_keys": [
+    "n4e1_dev_t03_c0_20260924",
+    "n4e1_dev_t03_q0_20260924",
+    "n4e1_dev_t03_n4_20260924",
+    "n4e1_dev_t06_c0_20260924",
+    "n4e1_dev_t06_q0_20260924",
+    "n4e1_dev_t06_n4_20260924",
+    "n4e1_dev_t09_c0_20260924",
+    "n4e1_dev_t09_q0_20260924",
+    "n4e1_dev_t09_n4_20260924"
+  ],
+  "schema": "n4e1-remaining9-resource-preflight-v1",
+  "scientific_promotion": false,
+  "status": "PASS_CPU_SOURCE_RESOURCE",
+  "utc": "2026-09-24T10:52:02.302025+00:00"
+}

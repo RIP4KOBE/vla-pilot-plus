@@ -1,0 +1,25 @@
+{
+  "schema": "n36-test-evidence-production-binding-placement-v1",
+  "at": "2026-10-11T07:47:16.979485+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "bytes": 1942,
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c"
+  },
+  "root_review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001843/parity-root-review-v1.json",
+    "bytes": 2020,
+    "sha256": "18a0e293f494e4c0fb1712d03e01ce7a1f695454f195cd6badb350bbb6fa8a9d"
+  },
+  "decision": "PRESERVE_TEST_COMMIT_ON_EXISTING_BRANCH_RESTORE_IDLE_DEPLOYMENT_TO_GRAPH_PIN",
+  "production_commit": "808e27f702564fe51db45016e139b68ecb476f8c",
+  "test_commit": "ea5d7646f1d64531e6aec1f4b7abc5455af93b5a",
+  "retained_test_branch": "exp/n36-engineering-adapter-001482",
+  "changed_paths": [
+    "tests/test_n36_engineering_parity.py",
+    "tests/test_n36_engineering_r1.py"
+  ],
+  "rationale": "Only tests changed. Existing verify_source binds checkout HEAD to source commit. Preserve reviewed test evidence on its existing branch and select the exact previously admitted production commit; no scientific or runtime changes and no provenance recomposition.",
+  "gpu_authorized": false,
+  "release_enabled": false
+}

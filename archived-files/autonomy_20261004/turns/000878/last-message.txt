@@ -1,0 +1,5 @@
+Reconciled live identities and unchanged ledgers. N34 remains closed without promotion.
+
+Registered N35’s closure-persistence hypothesis with a frozen CPU feasibility gate; tree integrity passed. No GPU dispatch or scientific source changes.
+
+Saved the operational handoff for independent feasibility review. Validation, formal evaluation and required ablation evidence remain incomplete.

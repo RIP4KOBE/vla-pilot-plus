@@ -1,0 +1,5 @@
+Continued the owning study. Reconciled the completed recovery executor and launched an independent binding review; its live process identities are verified.
+
+Source and ledgers remain unchanged. GPU execution awaits binding review and admission checks. Validation, formal, and ablation completion remain unproven.
+
+Saved the operational summary for driver continuation.

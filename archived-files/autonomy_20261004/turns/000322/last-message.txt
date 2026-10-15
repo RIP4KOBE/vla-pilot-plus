@@ -1,0 +1,3 @@
+N32R2 controller identity verified; task4 C0 has now dispatched. Frozen source `1065f381` and ledger history remain intact.
+
+Completed tasks0–3 are 0/4 for each arm; promotion and original-goal evidence remain unmet. Operational summary saved for turn322. Next step: monitor the existing controller and reconcile its terminal evidence.

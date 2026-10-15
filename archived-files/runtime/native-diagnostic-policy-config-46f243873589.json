@@ -1,0 +1,30 @@
+{
+  "source_commit": "46f243873589f37620a40fee4381e12d06113e7b",
+  "policy_configuration": {
+    "pretrained_path": "/mnt/data/hf_cache/hub/RDT-1B-LIBERO-Object",
+    "weight_variant": "ema",
+    "text_encoder": "/mnt/data/hf_cache/hub/models--google--t5-v1_1-xxl",
+    "vision_encoder": "/mnt/data/hf_cache/hub/models--google--siglip-so400m-patch14-384",
+    "num_inference_steps": null,
+    "action_chunk_horizon": 8,
+    "control_frequency": 20,
+    "debug_first_step": false,
+    "undo_libero_preprocessor_flip": false,
+    "fail_on_zero_language_embedding": true,
+    "semantics": "libero_gt_rollout"
+  },
+  "scope": {
+    "input_kind": "deterministic_synthetic_images_and_proprioception",
+    "prediction_path": "RDTSteer._predict_unguided",
+    "batch_size": 1,
+    "predict_unguided_invocations": 1,
+    "environment_instances": 0,
+    "simulation_steps": 0,
+    "action_vectors_executed": 0,
+    "stage_calls": 0,
+    "guided_warmup_calls": 0,
+    "scientific_episode": false,
+    "limitation": "B1-only diagnostic cannot establish guided-transition or EGL causality",
+    "gym_type_imports_allowed": true
+  }
+}

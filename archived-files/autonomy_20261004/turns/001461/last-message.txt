@@ -1,0 +1,3 @@
+Continuation is active. N36R3’s INVALID stop and all charges are preserved. One verified CPU executor is repairing the DINOv2 import audit; no GPU replay occurred.
+
+Operational summary saved for driver continuation. Next: review repair evidence before a fresh recovery release. Validation, formal evaluation, and ablations remain incomplete.

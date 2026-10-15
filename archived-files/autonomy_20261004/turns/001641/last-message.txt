@@ -1,0 +1,3 @@
+Verified authority, live process identities and unchanged private ledgers. The independent CPU review remains active; no duplicate worker or GPU dispatch was launched.
+
+Recorded turn 1641’s hash-bound operational summary. Next: reconcile the completed review, then advance required checks. Validation, formal and ablation evidence remain incomplete.

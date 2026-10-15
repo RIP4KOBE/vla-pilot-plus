@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="4.714" timestamp="2026-10-10T07:06:15.931170+00:00" hostname="hynx"><testcase classname="tests.test_n36_audit_repair" name="test_compiled_bytes_join_rejects_changed_source_and_loader" time="3.588" /></testsuite></testsuites>

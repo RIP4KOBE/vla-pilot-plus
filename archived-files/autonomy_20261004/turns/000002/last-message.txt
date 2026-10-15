@@ -1,0 +1,5 @@
+N31 continues on GPU7 under unchanged source `7428ce8a51f7`. Controller `203563`, monitor `203562`, and Q0 worker `250338` have verified identities.
+
+C0 task 0 recorded a valid failure; Q0 remains running. Prior coordinator transport failure required no recovery. Operational summary saved.
+
+Next: monitor existing controller and audit its next result. Validation, formal, and ablation completion remain unproven.

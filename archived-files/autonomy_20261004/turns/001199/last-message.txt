@@ -1,0 +1,3 @@
+N36’s corrected release passed full validation. Source and scientific rules remain unchanged; the failed release record is preserved.
+
+No GPU worker is running. Recorded the next step: locked adoption and one bootstrapped controller launch. Validation/formal/ablation completion remains unproved.

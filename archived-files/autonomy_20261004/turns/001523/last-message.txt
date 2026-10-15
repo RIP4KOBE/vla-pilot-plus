@@ -1,0 +1,3 @@
+Verified authority, process identities, and unchanged private ledgers. The existing N36 CPU test remains active; no GPU cohort is running.
+
+Recorded hash-bound turn 001523 summary. Next: inspect the test’s terminal result. Validation, formal evaluation, and required ablation evidence remain incomplete.

@@ -1,0 +1,3 @@
+Reconciled the completed owner-path repair and accepted its scoped CPU review: 44 tests passed. Owning state, checkpoint, and operational summary are updated; ledger charges remain unchanged.
+
+Next: refresh source/runtime bindings and obtain independent B5 review before GPU release. Validation, formal, and ablation evidence remain outstanding.

@@ -1,0 +1,7 @@
+Committed as `b86ac1291b08ba2b6bf33e7a6e19326016f4c40e`.
+
+Added disabled hash-bound preparation artifacts and a restart-persistent first-C0 pause. Focused tests: 24 passed; existing STOP-fixture failure documented. Owning ledgers unchanged.
+
+Reports: [JSON](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001323/release-preparation/report-v1.json>) · [Markdown](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001323/release-preparation/report-v1.md>).
+
+`score=null`, `production_accepted=false`, `release_enabled=false`. Root adoption, readiness, release, and actual-production G3 reconciliation remain outstanding.

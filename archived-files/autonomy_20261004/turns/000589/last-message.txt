@@ -1,0 +1,3 @@
+N34 controller PID 3365423 remains live and is revalidating the frozen release. Source `3acfda1`, bound records, and private ledger prefixes verified; no new dispatch or terminal result.
+
+Turn 589’s operational summary is recorded. The driver continues monitoring. Validation, formal evaluation, and required ablation evidence remain outstanding.

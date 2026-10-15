@@ -1,0 +1,3 @@
+Existing N36R2 CPU preparation remains active with verified process identities. Accounting is unchanged: 504 attempts, 75.49265 GPU-hours.
+
+Turn 1271’s operational summary is saved. Next: reconcile the executor’s final report and complete review before GPU admission. Validation, formal evaluation, and required ablations remain incomplete.

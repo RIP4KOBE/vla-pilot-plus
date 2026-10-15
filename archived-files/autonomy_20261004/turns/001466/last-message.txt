@@ -1,0 +1,3 @@
+Accepted the scoped DINO import repair after independent review and two passing CPU regressions. Recorded the review and operational handoff; ledgers remain unchanged, with no live GPU cohort.
+
+Next: prepare a separately identified recovery and review its release. Validation, formal evaluation, and required ablation evidence remain outstanding.

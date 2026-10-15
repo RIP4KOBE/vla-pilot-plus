@@ -1,0 +1,3 @@
+Reconciled the completed CPU refresh: 57 artifact hashes verified; source and private ledgers unchanged. Updated owning state, checkpoint, and operational summary.
+
+The graph check still requires reviewed controller semantics. Independent review and root attestation are next. GPU release remains disabled; the research goal is not yet evidenced.

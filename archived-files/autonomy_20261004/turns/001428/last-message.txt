@@ -1,0 +1,3 @@
+Reconciled repair commit `d01bc1e`; its report records 19 passing CPU tests. All ledger charges remain intact, with no active GPU worker.
+
+Saved the operational summary and next step: refresh bindings, obtain independent B5 review, then proceed through gated health and first-C0 execution. Original validation/formal/ablation goals remain unmet.

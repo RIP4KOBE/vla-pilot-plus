@@ -1,0 +1,3 @@
+Reconciled the executor’s normal exit and repaired proof-reference metadata. The unchanged verifier passes; source and ledgers remain unchanged.
+
+Saved the hash-bound turn summary. Next: rebind the corrected proof, then independent B5 review. GPU release remains disabled; validation, formal, and ablation goals remain unproven.

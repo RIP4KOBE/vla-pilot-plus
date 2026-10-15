@@ -1,0 +1,3 @@
+Continued the owning study and launched independent review of corrected source `b8d6b981`. Reviewer identities verified; state, checkpoint, and operational summary saved.
+
+Ledger unchanged. No GPU episode dispatched. Next: reconcile the review, then refresh affected proofs. Validation, formal evaluation, and required ablation evidence remain incomplete.

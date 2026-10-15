@@ -1,0 +1,3 @@
+Verified authority, live process identities and unchanged private ledgers. N32R2’s existing CPU executor remains active on source `1065f381`; no duplicate or GPU job launched.
+
+Recorded turn 144’s operational summary. Next: review release delivery and resolve runtime dependency closure before GPU admission. Validation, formal and ablation completion remain unproven.

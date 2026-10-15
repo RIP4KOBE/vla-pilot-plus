@@ -1,0 +1,3 @@
+Reconciled the N36 repair at `d3225489`: 186 CPU tests passed, and all owning ledgers remain unchanged. Independent review is running with verified process identities; the operational summary and checkpoint are saved.
+
+Next: reconcile that review before readiness preparation. Validation, formal evaluation, and required ablation evidence remain incomplete.

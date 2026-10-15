@@ -1,0 +1,3 @@
+N36R4 CPU repair remains live with verified process identities. Ledger history is intact; no duplicate dispatch occurred.
+
+Recorded the hash-bound turn summary. Next: reconcile repair results, independently review, and check deadline fit before GPU release. Validation, formal, and ablation completion remain unproven.

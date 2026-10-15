@@ -1,0 +1,3 @@
+Verified authority, live process identities, and unchanged private ledgers. N36 recovery executor remains active on CPU tests; no duplicate launched.
+
+Hash-bound turn summary recorded. Next: reconcile its terminal report and independently review the recovery. Validation, formal evaluation, and required ablations remain incomplete.

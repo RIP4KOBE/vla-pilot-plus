@@ -1,0 +1,3 @@
+N31 continues under the original controller on frozen source `7428ce8`. Six audited cells yield C0/Q0/N31 each 0/2; task2 C0 is now dispatched.
+
+Authorization, process identities, and ledger continuity verified. Operational summary saved. Next: monitor the existing cohort, then review terminal evidence. Original validation/formal/ablation goal remains unmet.

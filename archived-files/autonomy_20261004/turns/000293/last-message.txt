@@ -1,0 +1,5 @@
+N32R2 remains live on frozen source `1065f381`: controller 1818171, task‑3 Q0 worker 3090295. Identity, release hashes and ledger continuity verified; no restart or duplicate dispatch.
+
+Matched Dev tasks 0–2 remain 0/3 for each arm. Validation, formal and required ablation evidence remain incomplete.
+
+Turn 293 operational summary saved. Next step: monitor the existing cohort for its next outcome.

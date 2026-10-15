@@ -1,0 +1,5 @@
+N35 protocol review passed; one isolated CPU implementation executor is running (PID 2470970). Owning source and private ledgers remain unchanged.
+
+Next: review implementation, native audits and CPU tests before GPU release. Validation, formal evaluation and required ablations remain incomplete.
+
+[Operational summary](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000886/operational-summary.md)

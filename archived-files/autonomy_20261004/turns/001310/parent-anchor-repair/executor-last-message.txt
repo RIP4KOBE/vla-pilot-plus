@@ -1,0 +1,8 @@
+Committed test-only repair: `3849c4d3c75fe2fdc7853d3b923d9cc4e9966e0d`.
+
+- Final run: **106 passed**, including both phases and 64 binding substitutions.
+- Cumulative tests: **19.78/180 seconds**.
+- Production unchanged; historical evidence preserved; worktree clean.
+- G2–G4 remain open. No scientific or release claim.
+
+Reports: [JSON](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001310/parent-anchor-repair/report-v1.json>) · [Markdown](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001310/parent-anchor-repair/report-v1.md>)

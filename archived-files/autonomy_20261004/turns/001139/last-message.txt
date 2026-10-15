@@ -1,0 +1,5 @@
+N35 remains rejected by its frozen futility gate. Registered N36 for CPU feasibility review: a nonprogress-triggered detour proposal.
+
+Source and ledger are unchanged; no GPU cohort is active. Next is bounded feasibility review before any release. Validation, formal evaluation and required ablations remain incomplete.
+
+[Operational summary](../autonomy_20261004/turns/001139/operational-summary.md)

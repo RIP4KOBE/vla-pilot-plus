@@ -1,0 +1,53 @@
+{
+  "copies": [
+    {
+      "original": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001429/binding-refresh/refresh-bindings-v1.py",
+        "bytes": 12965,
+        "sha256": "02884bed16dbb5214b6009fe813b1d958f4b32d163971d5b25179204e6bf87ec"
+      },
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001443/binding-refresh/refresh-bindings-v1.py",
+        "bytes": 12942,
+        "sha256": "06250ee353d6c9b5a57eb8550ce902f8d5d10daae1bd370dd54e42cfbe8cb6b9"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001429/binding-refresh/complete-bindings-v1.py",
+        "bytes": 8894,
+        "sha256": "ddae36f794a4baf188f9cfaa712b739787b9db6113c6bd519aef441839dc3656"
+      },
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001443/binding-refresh/complete-bindings-v1.py",
+        "bytes": 9168,
+        "sha256": "11ed215750c8cdab64c63c9385c4f3b300497d0e01e207ff5da86891e91221e8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001429/binding-refresh/finalize-report-v1.py",
+        "bytes": 15584,
+        "sha256": "f88e6c03de4b5989fc8f6d9384c4e7902af1174c25c901ce3858150e9740db30"
+      },
+      "new": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001443/binding-refresh/finalize-report-v1.py",
+        "bytes": 14430,
+        "sha256": "b04d5df7b95c7bea228169dff8d4da5777f5b8b6bc15857c8e8881d2f5bc7cab"
+      }
+    }
+  ],
+  "manifest_tooling_inspected": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001432/manifest-refresh/refresh-v1.py",
+    "bytes": 3833,
+    "sha256": "008ec6cf47071a9bdcae9c2589d1c42e3af7cc5bacc1e58f87cb0e08987a25cb"
+  },
+  "acceptance_rewritten": false,
+  "adaptations": [
+    "status and changed_files string schema",
+    "retained actual 75.53335346582918 GPUh",
+    "charged health identity requires later fresh identity",
+    "accurate current report and inspection provenance"
+  ],
+  "audit_guards_preserved": true
+}

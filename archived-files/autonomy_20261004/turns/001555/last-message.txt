@@ -1,0 +1,7 @@
+Continuation recorded in the [operational summary](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001555/operational-summary-v1.json).
+
+- Source unchanged: `dcd89047`.
+- CPU executor running: PID `2241432`; no GPU cohort.
+- All ledger charges preserved.
+- Next: verify corrected graph, then independent B5 review.
+- Validation/formal/ablation completion remains unproven.

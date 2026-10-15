@@ -1,0 +1,44 @@
+{
+  "status": "APPLIED_THREE_FILES_CPU_VALIDATED_NOT_COMMITTED",
+  "base_commit": "e131ff67f97a5da7fd68d1dd9a8dfe6e08253dea",
+  "files": [
+    {
+      "target": "core/egl_context_drift.py",
+      "base_sha256": null,
+      "candidate_sha256": "54162566be17e1b0a0cfbc01995ee2f509e708743ddb03bf3d7d04c8613152b2"
+    },
+    {
+      "target": "core/render_phase_diagnostics.py",
+      "base_sha256": "5c347b7988056de384f582b0fe12e4dc32d1999577812c83205925d02339804c",
+      "candidate_sha256": "9da08b8c9897cb973409014ce328c913cd144b7b726cce2905ca3f61e8c0b389"
+    },
+    {
+      "target": "tests/test_egl_context_drift.py",
+      "base_sha256": null,
+      "candidate_sha256": "f30507b1f8e6943f51ad2754b786036d9c5e703ea83737c89d857a862f1b6367"
+    }
+  ],
+  "patch_sha256": "078f517ac1acdbeddf50cde9482e544ca2a421c4312973fb3383f1c712d90fe1",
+  "cpu_tests": {
+    "passed": 8,
+    "seconds": 0.04,
+    "native_queries": 0,
+    "gpu_calls": 0
+  },
+  "git_apply_check": "passed",
+  "native_side_effect_safety_proven": false,
+  "maximum_observations_per_episode": 3,
+  "maximum_native_getter_calls_per_episode": 6,
+  "symbol_resolution": "Independent ctypes function view resolves exactly two standard getter symbols from the already-loaded EGL DLL handle; no lazy platform property and no DLL load.",
+  "combined_cpu_tests": {
+    "passed": 26,
+    "seconds": 0.4,
+    "files": [
+      "tests/test_egl_context_drift.py",
+      "tests/test_render_phase_diagnostics.py",
+      "tests/test_episode_phase_timing.py"
+    ],
+    "native_egl_queries": 0,
+    "gpu_calls": 0
+  }
+}

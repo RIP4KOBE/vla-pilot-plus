@@ -1,0 +1,1 @@
+Current Image. Describe this static preparation image. Return exactly three short lines.

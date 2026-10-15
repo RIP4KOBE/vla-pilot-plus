@@ -1,0 +1,5 @@
+N31 continues on GPU7 with frozen source `7428ce8`. Controller `203563`, monitor `203562`, and worker `284821` have verified identities.
+
+C0/Q0 task-0 outcomes are valid failures; N31 remains pending. No restart or duplicate dispatch occurred.
+
+Saved turn 7’s operational summary. Next: monitor the existing cohort and audit terminal evidence against the frozen gate. Validation, formal and required ablation completion remain unproven.

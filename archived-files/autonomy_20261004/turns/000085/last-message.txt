@@ -1,0 +1,3 @@
+Verified authorization, live process identities, and intact private ledgers. N31 remains rejected by its Dev futility gate. The existing N32 CPU executor is progressing; no duplicate dispatch occurred.
+
+Turn 85 summary is saved. Next: review its completed release delivery before GPU dispatch. Validation, formal, and ablation evidence remain outstanding.

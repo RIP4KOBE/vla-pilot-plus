@@ -1,0 +1,32 @@
+{
+  "schema": "n36-recovery-prefix-source-placement-authority-v1",
+  "at": "2026-10-11T01:46:33.999872+00:00",
+  "standing_authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "bytes": 1942,
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c"
+  },
+  "review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001737/independent-source-review/review-v1.json",
+    "bytes": 20959,
+    "sha256": "bb50f7f65fd5ac51bfab58da8506f28a4c6da2b84c4527387407fd3da68d75a3"
+  },
+  "terminal_reconciliation": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001739/terminal-reconciliation-v1.json",
+    "bytes": 3796,
+    "sha256": "6b82b4a99bde53a96284c3735ab2733dc15368e4c24b0e02566b1bd101252894"
+  },
+  "worktree": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+  "before": "1c10f9dd2afed8f8301e61f42dde46b8fa9565ed",
+  "after": "89506fe1d9e2c753b66f6d3349963f6e9b316560",
+  "scope": "Exact independently reviewed fast-forward in isolated implementation route only. Production source adoption, release, readiness spending and GPU dispatch remain gated. Preserve untracked artifacts.",
+  "stop_authority": {
+    "schema": "n36-canonical-stop-v1",
+    "owner_source": "ca4e6a96d049c7ebb1f302d755883388ddbfdbd8",
+    "paths": [
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/STOP",
+      "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/STOP"
+    ],
+    "deadline": "2026-10-11T11:13:13Z"
+  }
+}

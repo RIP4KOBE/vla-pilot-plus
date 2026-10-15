@@ -1,0 +1,3 @@
+Continued N36R3 on source `bee9f6a4`. One bounded CPU executor is refreshing exact runtime bindings; its live handles and next steps are recorded.
+
+All 505 attempts and 75.5273 GPU-hours remain charged. No GPU dispatch occurred. Validation, formal, and ablation completion evidence remains outstanding.

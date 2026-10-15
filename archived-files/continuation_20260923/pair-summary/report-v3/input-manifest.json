@@ -1,0 +1,55 @@
+{
+  "schema": "qd-ed-observed-pair-summary-input-v1",
+  "plan": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/plan.frozen.json",
+    "sha256": "ac123471db9fa9468661238982b3bdb5cb1a68010ec8261e0e5b12239c57e7e8"
+  },
+  "episodes": {
+    "observed_pairs_t00_c0_20260923": {
+      "status": "complete",
+      "terminal": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__observed_pairs_t00_c0_20260923__f73c35c67529/attempt-result.json",
+        "sha256": "169e5f88836131d7c71e4cf628be753d6a8220b73898b8713056baa2aabed5db"
+      },
+      "audit": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__observed_pairs_t00_c0_20260923__f73c35c67529/eds_eval/decision-evidence-audit.json",
+        "sha256": "543ce8c42e9882db86a77144de18cff9fb4da63c912a4e94d409158654377795"
+      },
+      "analysis": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/analysis/t00-c0/run_20260923T063829Z/selected-decision-analysis.json",
+        "sha256": "42c14eda7fd3b89bd4c002c62d8508f0eab52d2d64c68dc2be1c68ed55bcd594"
+      }
+    },
+    "observed_pairs_t00_q0_20260923": {
+      "status": "complete",
+      "terminal": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__observed_pairs_t00_q0_20260923__6aac763a6c7a/attempt-result.json",
+        "sha256": "fc50cc7d52cc806a9cfdc6934e38a2ad6068129fe2fa3ef3081addcf67b2c827"
+      },
+      "audit": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__observed_pairs_t00_q0_20260923__6aac763a6c7a/eds_eval/decision-evidence-audit.json",
+        "sha256": "91b8d3dd8eddf6f15d1e834969937d35f979f001d1bac3dfd82ec225d337d1cf"
+      },
+      "analysis": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/analysis/t00-q0/run_20260923T065354Z/selected-decision-analysis.json",
+        "sha256": "7cc32f0718a644eaac479e88bdc9ae6405167a31b0148bf55735bd37fe1ea754"
+      }
+    },
+    "observed_pairs_t05_c0_20260923": {
+      "status": "complete",
+      "terminal": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__observed_pairs_t05_c0_20260923__75738ad50e8c/attempt-result.json",
+        "sha256": "e0819e9c6185791456309682bee0fd186c541f52b6a3f55df8da28b181fc63cf"
+      },
+      "audit": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__observed_pairs_t05_c0_20260923__75738ad50e8c/eds_eval/decision-evidence-audit.json",
+        "sha256": "4e019c030a56591278f81ce2c1dcaf5537d2d67587c97934f6f16f4ed0257eae"
+      },
+      "analysis": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/observed-pairs-v1/analysis/t05-c0/run_20260923T070936Z/selected-decision-analysis.json",
+        "sha256": "bd9327cdc72ccf5baf96a3a47b18cd743740da8dd4eac81bd7eba28cf67d8d4e"
+      }
+    },
+    "observed_pairs_t05_q0_20260923": null
+  }
+}

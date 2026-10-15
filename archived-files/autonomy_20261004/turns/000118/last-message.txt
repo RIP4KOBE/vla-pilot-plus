@@ -1,0 +1,3 @@
+Accepted the N32 CPU repair after reviewing code, 33 passing tests, and the 549-file verification evidence. Recorded the review and operational handoff; both ledger prefixes remain intact.
+
+Next: integrate the reviewed source and prepare a distinct recovery release. No GPU dispatch occurred. Validation, formal evaluation, and required ablations remain unmet.

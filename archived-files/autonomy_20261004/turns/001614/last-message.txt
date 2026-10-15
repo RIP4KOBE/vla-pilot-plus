@@ -1,0 +1,3 @@
+N36’s existing controller dispatched the engineering C0 episode on GPU7. Controller PID 2561917 and worker PID 2574133 are live on frozen source `b8d6b981`; ledger history is intact.
+
+Turn 001614’s hash-bound summary is saved. Next: monitor completion and reconcile charges/native audits. Validation, formal evaluation and required ablation evidence remain outstanding.

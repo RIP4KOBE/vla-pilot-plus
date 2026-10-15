@@ -1,0 +1,3 @@
+Integrated N32R1 identity repair at `531477e9`; all 10 focused tests passed. Prior charges remain intact. Driver is live; no GPU cohort is active.
+
+Recorded the operational handoff. Next: prepare and validate the fresh recovery release. Validation, formal, and ablation evidence remain incomplete.

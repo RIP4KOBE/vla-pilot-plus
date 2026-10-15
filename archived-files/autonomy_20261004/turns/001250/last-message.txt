@@ -1,0 +1,3 @@
+Continued with one official CPU executor preparing N36R2’s recovery identity and runtime evidence. No GPU job launched.
+
+All 504 dispatches and 75.49265 GPU-hours remain charged; N36R1 remains invalid. Operational handoff recorded. Validation, formal evaluation, and ablation completion remain unmet.

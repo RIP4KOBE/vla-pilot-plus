@@ -1,0 +1,5 @@
+Verdict: disabled B5 preparation accepted within CPU scope; production remains blocked pending final-source refresh, adoption, readiness, and external release.
+
+Confirmed 504 attempts / 75.49265038509455 GPUh retained. Future worker receipts are required before attempt acceptance, not before dispatch.
+
+Reports written: [JSON](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001281/independent-review/report-v1.json>) · [Markdown](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001281/independent-review/report-v1.md>).

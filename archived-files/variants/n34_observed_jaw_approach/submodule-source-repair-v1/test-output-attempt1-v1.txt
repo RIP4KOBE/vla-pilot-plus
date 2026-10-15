@@ -1,0 +1,820 @@
+FFFFFFFFFFFFFFFFFFFFF................................................... [ 75%]
+........................                                                 [100%]
+=================================== FAILURES ===================================
+_______ test_complete_dependency_inventory_uses_pins_not_heads_or_globs ________
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_complete_dependency_inven0/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '9fa346046314910b84fd884f7c0ca9843e085545', '248a19702614e98702d97b36c824c926b2b3baca')
+
+    def test_complete_dependency_inventory_uses_pins_not_heads_or_globs(dependencies):
+        root, database, pin, other = dependencies
+        assert git(root, '--git-dir=' + str(database), 'rev-parse', 'HEAD') == other != pin
+        expected = ({source.LEROBOT + '/' + p for p in LEROBOT_FILES}
+                    | {source.LIBERO + '/' + p for p in LIBERO_FILES}
+                    | {source.RDT + '/scripts/maniskill_model.py'})
+>       assert source.dependency_paths(root) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_dependency_source_fail_closed[bytes-third_party/lerobot-src/lerobot/processor/env_processor.py] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_dependency_source_fail_cl0/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), 'fb40dd3ca91b27cb502a7f6e546c1c39e7769192', '7ecea3cbccef0acfb1aa1c75408b54b62a1acd94')
+dependency = 'third_party/lerobot'
+relative = 'src/lerobot/processor/env_processor.py', fault = 'bytes'
+
+    @pytest.mark.parametrize('dependency,relative', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py'),
+    ])
+    @pytest.mark.parametrize('fault', ['bytes', 'missing', 'symlink', 'parent_symlink', 'unpinned'])
+    def test_dependency_source_fail_closed(dependencies, dependency, relative, fault):
+        root, *_ = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_dependency_source_fail_closed[bytes-third_party/libero_pro-libero/libero/envs/env_wrapper.py] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_dependency_source_fail_cl1/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), 'fb40dd3ca91b27cb502a7f6e546c1c39e7769192', '7ecea3cbccef0acfb1aa1c75408b54b62a1acd94')
+dependency = 'third_party/libero_pro'
+relative = 'libero/libero/envs/env_wrapper.py', fault = 'bytes'
+
+    @pytest.mark.parametrize('dependency,relative', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py'),
+    ])
+    @pytest.mark.parametrize('fault', ['bytes', 'missing', 'symlink', 'parent_symlink', 'unpinned'])
+    def test_dependency_source_fail_closed(dependencies, dependency, relative, fault):
+        root, *_ = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_dependency_source_fail_closed[missing-third_party/lerobot-src/lerobot/processor/env_processor.py] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_dependency_source_fail_cl2/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), 'fb40dd3ca91b27cb502a7f6e546c1c39e7769192', '7ecea3cbccef0acfb1aa1c75408b54b62a1acd94')
+dependency = 'third_party/lerobot'
+relative = 'src/lerobot/processor/env_processor.py', fault = 'missing'
+
+    @pytest.mark.parametrize('dependency,relative', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py'),
+    ])
+    @pytest.mark.parametrize('fault', ['bytes', 'missing', 'symlink', 'parent_symlink', 'unpinned'])
+    def test_dependency_source_fail_closed(dependencies, dependency, relative, fault):
+        root, *_ = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_dependency_source_fail_closed[missing-third_party/libero_pro-libero/libero/envs/env_wrapper.py] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_dependency_source_fail_cl3/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), 'fb40dd3ca91b27cb502a7f6e546c1c39e7769192', '7ecea3cbccef0acfb1aa1c75408b54b62a1acd94')
+dependency = 'third_party/libero_pro'
+relative = 'libero/libero/envs/env_wrapper.py', fault = 'missing'
+
+    @pytest.mark.parametrize('dependency,relative', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py'),
+    ])
+    @pytest.mark.parametrize('fault', ['bytes', 'missing', 'symlink', 'parent_symlink', 'unpinned'])
+    def test_dependency_source_fail_closed(dependencies, dependency, relative, fault):
+        root, *_ = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_dependency_source_fail_closed[symlink-third_party/lerobot-src/lerobot/processor/env_processor.py] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_dependency_source_fail_cl4/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '6d52d37f1738c0bedb047f31f88940a99db490ef', 'aab4dcbc0c40223d3b9a7c2b5d7fcbe6eac0642d')
+dependency = 'third_party/lerobot'
+relative = 'src/lerobot/processor/env_processor.py', fault = 'symlink'
+
+    @pytest.mark.parametrize('dependency,relative', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py'),
+    ])
+    @pytest.mark.parametrize('fault', ['bytes', 'missing', 'symlink', 'parent_symlink', 'unpinned'])
+    def test_dependency_source_fail_closed(dependencies, dependency, relative, fault):
+        root, *_ = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_dependency_source_fail_closed[symlink-third_party/libero_pro-libero/libero/envs/env_wrapper.py] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_dependency_source_fail_cl5/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '6d52d37f1738c0bedb047f31f88940a99db490ef', 'aab4dcbc0c40223d3b9a7c2b5d7fcbe6eac0642d')
+dependency = 'third_party/libero_pro'
+relative = 'libero/libero/envs/env_wrapper.py', fault = 'symlink'
+
+    @pytest.mark.parametrize('dependency,relative', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py'),
+    ])
+    @pytest.mark.parametrize('fault', ['bytes', 'missing', 'symlink', 'parent_symlink', 'unpinned'])
+    def test_dependency_source_fail_closed(dependencies, dependency, relative, fault):
+        root, *_ = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_dependency_source_fail_closed[parent_symlink-third_party/lerobot-src/lerobot/processor/env_processor.py] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_dependency_source_fail_cl6/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '6d52d37f1738c0bedb047f31f88940a99db490ef', 'aab4dcbc0c40223d3b9a7c2b5d7fcbe6eac0642d')
+dependency = 'third_party/lerobot'
+relative = 'src/lerobot/processor/env_processor.py', fault = 'parent_symlink'
+
+    @pytest.mark.parametrize('dependency,relative', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py'),
+    ])
+    @pytest.mark.parametrize('fault', ['bytes', 'missing', 'symlink', 'parent_symlink', 'unpinned'])
+    def test_dependency_source_fail_closed(dependencies, dependency, relative, fault):
+        root, *_ = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_dependency_source_fail_closed[parent_symlink-third_party/libero_pro-libero/libero/envs/env_wrapper.py] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_dependency_source_fail_cl7/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '6d52d37f1738c0bedb047f31f88940a99db490ef', 'aab4dcbc0c40223d3b9a7c2b5d7fcbe6eac0642d')
+dependency = 'third_party/libero_pro'
+relative = 'libero/libero/envs/env_wrapper.py', fault = 'parent_symlink'
+
+    @pytest.mark.parametrize('dependency,relative', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py'),
+    ])
+    @pytest.mark.parametrize('fault', ['bytes', 'missing', 'symlink', 'parent_symlink', 'unpinned'])
+    def test_dependency_source_fail_closed(dependencies, dependency, relative, fault):
+        root, *_ = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_dependency_source_fail_closed[unpinned-third_party/lerobot-src/lerobot/processor/env_processor.py] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_dependency_source_fail_cl8/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), 'ce0055c3cbcfbae2863b084ba1adacf2f4075f65', '2b05212944b9daa439b47b6a3e486dd7e0ddcb35')
+dependency = 'third_party/lerobot'
+relative = 'src/lerobot/processor/env_processor.py', fault = 'unpinned'
+
+    @pytest.mark.parametrize('dependency,relative', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py'),
+    ])
+    @pytest.mark.parametrize('fault', ['bytes', 'missing', 'symlink', 'parent_symlink', 'unpinned'])
+    def test_dependency_source_fail_closed(dependencies, dependency, relative, fault):
+        root, *_ = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_dependency_source_fail_closed[unpinned-third_party/libero_pro-libero/libero/envs/env_wrapper.py] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_dependency_source_fail_cl9/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), 'ce0055c3cbcfbae2863b084ba1adacf2f4075f65', '2b05212944b9daa439b47b6a3e486dd7e0ddcb35')
+dependency = 'third_party/libero_pro'
+relative = 'libero/libero/envs/env_wrapper.py', fault = 'unpinned'
+
+    @pytest.mark.parametrize('dependency,relative', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py'),
+    ])
+    @pytest.mark.parametrize('fault', ['bytes', 'missing', 'symlink', 'parent_symlink', 'unpinned'])
+    def test_dependency_source_fail_closed(dependencies, dependency, relative, fault):
+        root, *_ = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_________________ test_lerobot_object_trust_failures[database] _________________
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_lerobot_object_trust_fail0/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), 'ce0055c3cbcfbae2863b084ba1adacf2f4075f65', '2b05212944b9daa439b47b6a3e486dd7e0ddcb35')
+fault = 'database'
+
+    @pytest.mark.parametrize('fault', ['database', 'object', 'wrong_head_bytes', 'gitlink', 'tree_pin'])
+    def test_lerobot_object_trust_failures(dependencies, fault):
+        root, database, pin, other = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+__________________ test_lerobot_object_trust_failures[object] __________________
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_lerobot_object_trust_fail1/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), 'ce0055c3cbcfbae2863b084ba1adacf2f4075f65', '2b05212944b9daa439b47b6a3e486dd7e0ddcb35')
+fault = 'object'
+
+    @pytest.mark.parametrize('fault', ['database', 'object', 'wrong_head_bytes', 'gitlink', 'tree_pin'])
+    def test_lerobot_object_trust_failures(dependencies, fault):
+        root, database, pin, other = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_____________ test_lerobot_object_trust_failures[wrong_head_bytes] _____________
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_lerobot_object_trust_fail2/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '76bd2995f1ee65b6202f81d5dadca2ae64a48515', 'e1335433d65a2f11c8114e44f3157456f30cfcdf')
+fault = 'wrong_head_bytes'
+
+    @pytest.mark.parametrize('fault', ['database', 'object', 'wrong_head_bytes', 'gitlink', 'tree_pin'])
+    def test_lerobot_object_trust_failures(dependencies, fault):
+        root, database, pin, other = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_________________ test_lerobot_object_trust_failures[gitlink] __________________
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_lerobot_object_trust_fail3/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '76bd2995f1ee65b6202f81d5dadca2ae64a48515', 'e1335433d65a2f11c8114e44f3157456f30cfcdf')
+fault = 'gitlink'
+
+    @pytest.mark.parametrize('fault', ['database', 'object', 'wrong_head_bytes', 'gitlink', 'tree_pin'])
+    def test_lerobot_object_trust_failures(dependencies, fault):
+        root, database, pin, other = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_________________ test_lerobot_object_trust_failures[tree_pin] _________________
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_lerobot_object_trust_fail4/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '76bd2995f1ee65b6202f81d5dadca2ae64a48515', 'e1335433d65a2f11c8114e44f3157456f30cfcdf')
+fault = 'tree_pin'
+
+    @pytest.mark.parametrize('fault', ['database', 'object', 'wrong_head_bytes', 'gitlink', 'tree_pin'])
+    def test_lerobot_object_trust_failures(dependencies, fault):
+        root, database, pin, other = dependencies
+>       paths = source.dependency_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_loaded_checkout_modules_require_frozen_inventory[third_party/lerobot-src/lerobot/processor/env_processor.py-lerobot.processor.env_processor] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_loaded_checkout_modules_r0/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '76bd2995f1ee65b6202f81d5dadca2ae64a48515', 'e1335433d65a2f11c8114e44f3157456f30cfcdf')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7e0f4ff3e210>
+dependency = 'third_party/lerobot'
+relative = 'src/lerobot/processor/env_processor.py'
+module = 'lerobot.processor.env_processor'
+
+    @pytest.mark.parametrize('dependency,relative,module', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py', 'lerobot.processor.env_processor'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py', 'libero.libero.envs.env_wrapper'),
+    ])
+    def test_loaded_checkout_modules_require_frozen_inventory(dependencies, monkeypatch, dependency, relative, module):
+        root, *_ = dependencies
+        name = dependency + '/' + relative
+>       record = source.source_record(root, source.dependency_paths(root))
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_loaded_checkout_modules_require_frozen_inventory[third_party/libero_pro-libero/libero/envs/env_wrapper.py-libero.libero.envs.env_wrapper] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_loaded_checkout_modules_r1/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '02e7806c10ef4db1583466ba139abd561a0cbda4', '04d2a562dfc9558e8c60145354eba58c5d3dff08')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7e0f4ff3ea20>
+dependency = 'third_party/libero_pro'
+relative = 'libero/libero/envs/env_wrapper.py'
+module = 'libero.libero.envs.env_wrapper'
+
+    @pytest.mark.parametrize('dependency,relative,module', [
+        (source.LEROBOT, 'src/lerobot/processor/env_processor.py', 'lerobot.processor.env_processor'),
+        (source.LIBERO, 'libero/libero/envs/env_wrapper.py', 'libero.libero.envs.env_wrapper'),
+    ])
+    def test_loaded_checkout_modules_require_frozen_inventory(dependencies, monkeypatch, dependency, relative, module):
+        root, *_ = dependencies
+        name = dependency + '/' + relative
+>       record = source.source_record(root, source.dependency_paths(root))
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_bridge_rejects_rehashed_missing_dependency_inventory[third_party/lerobot] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_bridge_rejects_rehashed_m0/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '02e7806c10ef4db1583466ba139abd561a0cbda4', '04d2a562dfc9558e8c60145354eba58c5d3dff08')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7e0f4ff3ce90>
+dependency = 'third_party/lerobot'
+
+    @pytest.mark.parametrize('dependency', [source.LEROBOT, source.LIBERO])
+    def test_bridge_rejects_rehashed_missing_dependency_inventory(dependencies, monkeypatch, dependency):
+        root, *_ = dependencies
+        monkeypatch.setattr(bridge.helpers, 'source_paths', lambda _: {'file.py'})
+        monkeypatch.setattr(bridge, 'scientific_paths', lambda _: {'file.py'})
+        monkeypatch.setattr(bridge, 'SCIENTIFIC_COMMIT', git(root, 'rev-parse', 'HEAD'))
+>       paths = bridge.source_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_bridge.py:33: in source_paths
+    paths.update(closure.dependency_paths(root))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_ test_bridge_rejects_rehashed_missing_dependency_inventory[third_party/libero_pro] _
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_bridge_rejects_rehashed_m1/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '02e7806c10ef4db1583466ba139abd561a0cbda4', '04d2a562dfc9558e8c60145354eba58c5d3dff08')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7e0f4ff3e450>
+dependency = 'third_party/libero_pro'
+
+    @pytest.mark.parametrize('dependency', [source.LEROBOT, source.LIBERO])
+    def test_bridge_rejects_rehashed_missing_dependency_inventory(dependencies, monkeypatch, dependency):
+        root, *_ = dependencies
+        monkeypatch.setattr(bridge.helpers, 'source_paths', lambda _: {'file.py'})
+        monkeypatch.setattr(bridge, 'scientific_paths', lambda _: {'file.py'})
+        monkeypatch.setattr(bridge, 'SCIENTIFIC_COMMIT', git(root, 'rev-parse', 'HEAD'))
+>       paths = bridge.source_paths(root)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_bridge.py:33: in source_paths
+    paths.update(closure.dependency_paths(root))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+_________ test_linked_worktree_uses_registered_objects_and_local_bytes _________
+
+dependencies = (PosixPath('/tmp/pytest-of-hynx/pytest-447/test_linked_worktree_uses_regi0/super'), PosixPath('/tmp/pytest-of-hynx/pyt.../modules/third_party/lerobot'), '02e7806c10ef4db1583466ba139abd561a0cbda4', '04d2a562dfc9558e8c60145354eba58c5d3dff08')
+
+    def test_linked_worktree_uses_registered_objects_and_local_bytes(dependencies):
+        root, _, _, _ = dependencies
+        linked = root.parent / 'linked-dependencies'
+        git(root, 'worktree', 'add', '-q', '--detach', str(linked), 'HEAD')
+>       paths = source.dependency_paths(linked)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_n34_dependency_source.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/qd_ed_n34_source.py:58: in dependency_paths
+    paths.update(submodule_paths(root, submodule, commit))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:42: in submodule_paths
+    pin, database = submodule_pin(root, submodule, commit)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n34_source.py:28: in submodule_pin
+    mode, kind, pin = w._source_entry(root, commit, submodule)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/qd_ed_n23_worker.py:74: in _source_entry
+    require(len(rows) == 2 and not rows[1], "source Git object missing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'source Git object missing'
+
+    def require(condition, reason):
+        if not condition:
+>           raise ValueError(reason)
+E           ValueError: source Git object missing
+
+scripts/qd_ed_n23_worker.py:35: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_n34_dependency_source.py::test_complete_dependency_inventory_uses_pins_not_heads_or_globs
+FAILED tests/test_n34_dependency_source.py::test_dependency_source_fail_closed[bytes-third_party/lerobot-src/lerobot/processor/env_processor.py]
+FAILED tests/test_n34_dependency_source.py::test_dependency_source_fail_closed[bytes-third_party/libero_pro-libero/libero/envs/env_wrapper.py]
+FAILED tests/test_n34_dependency_source.py::test_dependency_source_fail_closed[missing-third_party/lerobot-src/lerobot/processor/env_processor.py]
+FAILED tests/test_n34_dependency_source.py::test_dependency_source_fail_closed[missing-third_party/libero_pro-libero/libero/envs/env_wrapper.py]
+FAILED tests/test_n34_dependency_source.py::test_dependency_source_fail_closed[symlink-third_party/lerobot-src/lerobot/processor/env_processor.py]
+FAILED tests/test_n34_dependency_source.py::test_dependency_source_fail_closed[symlink-third_party/libero_pro-libero/libero/envs/env_wrapper.py]
+FAILED tests/test_n34_dependency_source.py::test_dependency_source_fail_closed[parent_symlink-third_party/lerobot-src/lerobot/processor/env_processor.py]
+FAILED tests/test_n34_dependency_source.py::test_dependency_source_fail_closed[parent_symlink-third_party/libero_pro-libero/libero/envs/env_wrapper.py]
+FAILED tests/test_n34_dependency_source.py::test_dependency_source_fail_closed[unpinned-third_party/lerobot-src/lerobot/processor/env_processor.py]
+FAILED tests/test_n34_dependency_source.py::test_dependency_source_fail_closed[unpinned-third_party/libero_pro-libero/libero/envs/env_wrapper.py]
+FAILED tests/test_n34_dependency_source.py::test_lerobot_object_trust_failures[database]
+FAILED tests/test_n34_dependency_source.py::test_lerobot_object_trust_failures[object]
+FAILED tests/test_n34_dependency_source.py::test_lerobot_object_trust_failures[wrong_head_bytes]
+FAILED tests/test_n34_dependency_source.py::test_lerobot_object_trust_failures[gitlink]
+FAILED tests/test_n34_dependency_source.py::test_lerobot_object_trust_failures[tree_pin]
+FAILED tests/test_n34_dependency_source.py::test_loaded_checkout_modules_require_frozen_inventory[third_party/lerobot-src/lerobot/processor/env_processor.py-lerobot.processor.env_processor]
+FAILED tests/test_n34_dependency_source.py::test_loaded_checkout_modules_require_frozen_inventory[third_party/libero_pro-libero/libero/envs/env_wrapper.py-libero.libero.envs.env_wrapper]
+FAILED tests/test_n34_dependency_source.py::test_bridge_rejects_rehashed_missing_dependency_inventory[third_party/lerobot]
+FAILED tests/test_n34_dependency_source.py::test_bridge_rejects_rehashed_missing_dependency_inventory[third_party/libero_pro]
+FAILED tests/test_n34_dependency_source.py::test_linked_worktree_uses_registered_objects_and_local_bytes
+21 failed, 75 passed in 31.46s

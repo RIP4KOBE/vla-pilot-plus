@@ -1,0 +1,3 @@
+N36’s existing CPU protocol executor remains live and verified. No duplicate work launched; source, ledger, budgets, and scientific gates are unchanged.
+
+Operational summary saved for turn 1149. Next: review the completed protocol and accounting before implementation. Validation, formal, and required ablation evidence remain outstanding.

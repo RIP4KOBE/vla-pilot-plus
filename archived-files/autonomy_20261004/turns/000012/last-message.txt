@@ -1,0 +1,5 @@
+N31 continues on GPU7 with frozen source `7428ce8`. Controller `203563`, monitor `203562`, and worker `360211` identities verified; prior ledger history is intact.
+
+Audited results: C0 0/2, Q0 0/2, N31 0/1. Task 1 N31 is running. No restart or duplicate dispatch occurred.
+
+Turn 12 operational summary recorded. Next: monitor the existing cohort and audit its terminal evidence. Validation, formal evaluation, and required ablations remain unresolved.

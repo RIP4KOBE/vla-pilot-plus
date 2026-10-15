@@ -1,0 +1,3 @@
+First-C0 release failed closed on a probe/completion timestamp mismatch; no GPU episode was dispatched. An official gpt-6-astra CPU repair executor is running. Evidence, charges, and scientific gates remain preserved.
+
+Operational handoff recorded. Next: review the repair and tests before release. Validation, formal evaluation, and required ablations remain incomplete.

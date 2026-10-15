@@ -1,0 +1,3 @@
+Accepted the CPU repair after independent source review and verification of 16 passing focused tests. Updated owning state/checkpoint and saved the operational summary.
+
+Current source remains `531477e9`; no GPU dispatch occurred. Next: adopt reviewed commit `6baa9305` and prepare a fresh prospective recovery release. All prior charges remain intact; validation, formal, and ablation goals remain unproved.

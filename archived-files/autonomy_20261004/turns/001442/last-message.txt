@@ -1,0 +1,3 @@
+Reconciled and accepted repair `e36f8b9`; 12 focused CPU tests passed. No GPU dispatch or ledger changes.
+
+Saved hash-bound operational summary and updated owning checkpoints. Next: source bindings and runtime/health review before first-C0. Validation, formal evaluation and required ablations remain unproven.

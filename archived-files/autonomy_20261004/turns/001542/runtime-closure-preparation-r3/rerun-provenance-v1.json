@@ -1,0 +1,12 @@
+{
+  "prior_script": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001542/runtime-closure-preparation-r2/prepare-disabled-v1.py",
+    "sha256": "c152b13c16e859bbfcec8af498c94904342802f5d441772707875805d298f199"
+  },
+  "script": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001542/runtime-closure-preparation-r3/prepare-disabled-v1.py",
+    "sha256": "3f60a0e7ff56a03bc1f0db992ff9dcafd85f63e0242899e138e2360ad8a85a5a"
+  },
+  "change": "Allow passive hashing of frozen inventoried GraphQL validation library source under exact wandb vendor library directory; protected study validation/formal paths remain forbidden; no imports and no source changes.",
+  "output_route_changed": true
+}

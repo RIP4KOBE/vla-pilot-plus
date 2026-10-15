@@ -1,0 +1,242 @@
+{
+  "prior_runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001314/production-closure/runtime.isolated.disabled-v1.json",
+    "sha256": "56b619c3ff22d1abbb23c800b6585c6cbfc37b9e0289c24a1d16e26e477ba9b9"
+  },
+  "changes": [
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001314/production-closure/libero-config/config.yaml",
+        "sha256": "ce4aa8d44e6380dda4f38277ba4406dc37bfd2987f3c1422ff4bdc892394266a",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001314/production-closure/libero-config/config.yaml",
+        "size_bytes": 727
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001317/closure-repair/libero-config/config.yaml",
+        "sha256": "ce4aa8d44e6380dda4f38277ba4406dc37bfd2987f3c1422ff4bdc892394266a",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001317/closure-repair/libero-config/config.yaml",
+        "size_bytes": 727
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../CONTRIBUTING.md",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/contributing.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/CONTRIBUTING.md",
+        "sha256": "3ea89ee932de7ad1442924849d5a4b5a235c61ac75eb95712e95a507b7f6f6ed",
+        "size_bytes": 11330
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/contributing.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/contributing.md",
+        "sha256": "3ea89ee932de7ad1442924849d5a4b5a235c61ac75eb95712e95a507b7f6f6ed",
+        "size_bytes": 11330
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/policy_act_README.md",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/act/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/policy_act_README.md",
+        "sha256": "146d6951776b64e59dc001ea3b0a899c69d3556dab58ae890f6cf2c34764e0d2",
+        "size_bytes": 319
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/act/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/act/README.md",
+        "sha256": "146d6951776b64e59dc001ea3b0a899c69d3556dab58ae890f6cf2c34764e0d2",
+        "size_bytes": 319
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/policy_diffusion_README.md",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/diffusion/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/policy_diffusion_README.md",
+        "sha256": "0cae7913f1322708cd024ebc0bd07f4736ca2ba3bf52cdcc3a90999f76116b5e",
+        "size_bytes": 410
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/diffusion/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/diffusion/README.md",
+        "sha256": "0cae7913f1322708cd024ebc0bd07f4736ca2ba3bf52cdcc3a90999f76116b5e",
+        "size_bytes": 410
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/policy_groot_README.md",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/groot/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/policy_groot_README.md",
+        "sha256": "8233fadd1925681e278be5951f212a1faf8de89dd7c15ca878d44dae4a255118",
+        "size_bytes": 1239
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/groot/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/groot/README.md",
+        "sha256": "8233fadd1925681e278be5951f212a1faf8de89dd7c15ca878d44dae4a255118",
+        "size_bytes": 1239
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/policy_smolvla_README.md",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/smolvla/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/policy_smolvla_README.md",
+        "sha256": "518995d5cb706f7e70e8aa606b71c53279f6d6cf6ed8a988c15bb903cc5af16c",
+        "size_bytes": 536
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/smolvla/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/smolvla/README.md",
+        "sha256": "518995d5cb706f7e70e8aa606b71c53279f6d6cf6ed8a988c15bb903cc5af16c",
+        "size_bytes": 536
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/policy_tdmpc_README.md",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/tdmpc/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/policy_tdmpc_README.md",
+        "sha256": "6227f422719d11a585ba36fc8a724421d3005cbb34350029e3dc491518b8b388",
+        "size_bytes": 265
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/tdmpc/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/tdmpc/README.md",
+        "sha256": "6227f422719d11a585ba36fc8a724421d3005cbb34350029e3dc491518b8b388",
+        "size_bytes": 265
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/policy_vqbet_README.md",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/vqbet/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/policy_vqbet_README.md",
+        "sha256": "b80931a074f1bebf79b33bcac668edf999cc657c3665937e697da4e263ce3837",
+        "size_bytes": 333
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/vqbet/README.md",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/policies/vqbet/README.md",
+        "sha256": "b80931a074f1bebf79b33bcac668edf999cc657c3665937e697da4e263ce3837",
+        "size_bytes": 333
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/hope_jr.mdx",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/hope_jr/hope_jr.mdx",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/hope_jr.mdx",
+        "sha256": "22d67f395fb6de8d0c8acf29d2fab0804f5340c76ca6f16436f2100692fd71f0",
+        "size_bytes": 8610
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/hope_jr/hope_jr.mdx",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/hope_jr/hope_jr.mdx",
+        "sha256": "22d67f395fb6de8d0c8acf29d2fab0804f5340c76ca6f16436f2100692fd71f0",
+        "size_bytes": 8610
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/koch.mdx",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/koch_follower/koch.mdx",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/koch.mdx",
+        "sha256": "b5e0c2b1c5c3cc249fa2f36f519eb0ec44762995df8f39592f7d44714bdf8ba3",
+        "size_bytes": 9675
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/koch_follower/koch.mdx",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/koch_follower/koch.mdx",
+        "sha256": "b5e0c2b1c5c3cc249fa2f36f519eb0ec44762995df8f39592f7d44714bdf8ba3",
+        "size_bytes": 9675
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/lekiwi.mdx",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/lekiwi/lekiwi.mdx",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/lekiwi.mdx",
+        "sha256": "c26a7ac141eb25d56785e69fc10ee45176c09135461bebfe010e169a198d874a",
+        "size_bytes": 13834
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/lekiwi/lekiwi.mdx",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/lekiwi/lekiwi.mdx",
+        "sha256": "c26a7ac141eb25d56785e69fc10ee45176c09135461bebfe010e169a198d874a",
+        "size_bytes": 13834
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/so100.mdx",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/so100_follower/so100.mdx",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/so100.mdx",
+        "sha256": "15916fec0727ebb5aa05fa0ddc0da1d8867f07b331322e81bb681f2a22bf09f0",
+        "size_bytes": 19920
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/so100_follower/so100.mdx",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/so100_follower/so100.mdx",
+        "sha256": "15916fec0727ebb5aa05fa0ddc0da1d8867f07b331322e81bb681f2a22bf09f0",
+        "size_bytes": 19920
+      }
+    },
+    {
+      "before": {
+        "link_target": "../../../../docs/source/so101.mdx",
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/so101_follower/so101.mdx",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/docs/source/so101.mdx",
+        "sha256": "0a94b54cfc5fe7e5f4ac04a0eecd40e54de0e05447edad76f61aa89bb539fa7e",
+        "size_bytes": 14080
+      },
+      "after": {
+        "ownership_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot",
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/so101_follower/so101.mdx",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/third_party/lerobot/src/lerobot/robots/so101_follower/so101.mdx",
+        "sha256": "0a94b54cfc5fe7e5f4ac04a0eecd40e54de0e05447edad76f61aa89bb539fa7e",
+        "size_bytes": 14080
+      }
+    },
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_contract.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_contract.py",
+        "sha256": "b3feaf43d33844b8110eddccdb77ecdc36c70784633fcff699b0e6df15441160",
+        "size_bytes": 11202
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_contract.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_contract.py",
+        "sha256": "04045c629a1b54b0f82e174a77536d16bcc1a548f88970ee213ffc1245adff5b",
+        "size_bytes": 14979
+      }
+    }
+  ],
+  "inventory_entries_removed": false,
+  "isolated_regular_symlink_target_copies": 12
+}

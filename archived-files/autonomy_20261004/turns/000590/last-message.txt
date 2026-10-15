@@ -1,0 +1,3 @@
+N34 controller PID 3365423 remains live, revalidating its frozen release before GPU admission. Source and ledger hashes are intact; no new dispatch or charges occurred.
+
+Turn 590’s operational summary is recorded. The driver continues monitoring. Validation, formal evaluation and required ablation evidence remain outstanding.

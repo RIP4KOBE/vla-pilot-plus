@@ -1,0 +1,3 @@
+Verified authorization, live identities, frozen N36R3 source and unchanged ledgers. GPU7 remains occupied by a foreign process; no dispatch or preemption occurred.
+
+Saved hash-bound turn 1370 summary. Next: run the authorized healthcheck once GPU7 is idle. Validation, formal and required ablation evidence remains outstanding; the driver continues.

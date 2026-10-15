@@ -1,0 +1,3 @@
+N32R2 remains active under verified controller PID 1818171, source `1065f381`. Frozen bindings and ledger history are intact; no duplicate dispatch occurred.
+
+Tasks 0–3: C0/Q0/N32 each 0/4. Completion remains unproven. Turn 317’s operational summary records the next step: monitor task 4 or terminal evidence.

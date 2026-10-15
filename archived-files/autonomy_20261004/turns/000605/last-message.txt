@@ -1,0 +1,3 @@
+N34 remains active on GPU7. Controller and worker identities match; worker CPU time is advancing. Frozen source, release hashes and ledger history are intact.
+
+Turn 605’s operational summary is recorded. Next: monitor terminal evidence and reconcile costs. Validation, formal evaluation and required ablations remain unresolved; no completion is claimed.

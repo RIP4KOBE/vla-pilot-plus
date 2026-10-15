@@ -1,0 +1,7 @@
+Status: **BLOCKED_INCOMPLETE_DISABLED_GRAPH**.
+
+Saved permitted projections, builder scripts, command evidence, hashes, and exact artifact manifests. Preserved `report-v1.json`; [report-v2.json](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001740/recovery-graph-refresh/report-v2.json) records the final status.
+
+Blockers: audit requires `frozen=true`, complete source verification reads prohibited Poe files, and external controller acceptance is missing. All 41 manifests remain absent.
+
+Source and journals are unchanged. All authorization flags remain false/null; independent B5 and root adoption remain required.

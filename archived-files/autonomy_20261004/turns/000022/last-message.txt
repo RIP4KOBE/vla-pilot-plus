@@ -1,0 +1,3 @@
+N31 continues under the original controller, source `7428ce8`. Eight cells are audited, with no successes; task2 N31 is now running as PID 476509.
+
+Ledger history and process identities verified. Operational summary saved for turn22. Next: monitor the cohort, then review its terminal evidence. Validation, formal and ablation goals remain unproven.

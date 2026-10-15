@@ -1,0 +1,3 @@
+Adopted reviewed N36R2 source `30c6321` and finite accounting. All 504 attempts, 75.49265 GPU-hours, and protected reserves remain intact.
+
+No GPU worker is live. Next: readiness checks and required release reviews. Operational handoff saved; validation/formal/ablation completion remains unproven.

@@ -1,0 +1,5 @@
+Committed B1/B3 engineering repairs as `b1d20fc0481721da6ebaab161c5a2ef7c3d50173`. Focused CPU checks pass; failure logs are retained. Worktree is clean and preserved.
+
+GPU release/admission remain disabled. Independent review, B2/B4/B5, and full post-episode coverage remain pending.
+
+Reports: [Markdown](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001259/engineering-repair/report-v1.md) · [JSON](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001259/engineering-repair/report-v1.json)

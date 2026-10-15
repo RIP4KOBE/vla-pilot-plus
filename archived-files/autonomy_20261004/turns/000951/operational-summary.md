@@ -1,0 +1,5 @@
+Source: `52a87af0bf11f95b21ce17aba456dc98944d9774`. N35 controller PID 2632351 / boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7 / start 141061885 remains live. Direct children: [{'pid': 2846753, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 141610137, 'state': 'R', 'ppid': 2632351}].
+
+Verified bound authority and handoff, frozen launch/plan/release hashes, driver/controller identities, and retained owning ledger prefix. Prior turn completed normally. STOP absent; authorization ends 2026-10-11T11:13:13Z. Six cohort episodes have valid unsuccessful receipts; task0 complete quartet and task1 C0/Q0. Task1 N34 is now dispatched, with its outcome unresolved. Controller terminal result remains absent. No new coordinator dispatch, restart, scientific edits or protected-result access.
+
+Next bounded step: monitor the existing N35 cohort and reconcile native terminal/ledger evidence under its frozen prospective protocol when available. Original validation/formal/required-ablation evidence remains outstanding; no completion claimed.

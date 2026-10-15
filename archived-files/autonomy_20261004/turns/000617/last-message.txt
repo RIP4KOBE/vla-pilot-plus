@@ -1,0 +1,5 @@
+Continued the authorized study. Verified live identities and unchanged ledgers, then launched one isolated CPU-only repair for N34 recovery identities and accounting.
+
+Source remains `2d61cff3`. No GPU cohort is running. Next: review the repair and verify the fresh release before dispatch. Validation, formal evaluation, and ablation evidence remain incomplete.
+
+Operational summary recorded for driver continuation.

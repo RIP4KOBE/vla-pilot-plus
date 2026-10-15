@@ -1,0 +1,27 @@
+{
+  "source": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001250/recovery-preparation/source.permitted-only-v1.json",
+    "sha256": "7cb389ee948ae6c83f5cf35528447391fea0e7c69ff29e782ddbc8645d9159d0"
+  },
+  "complete": false,
+  "excluded_without_opening": [
+    "scripts/qd_ed_poe_launch.py"
+  ],
+  "source_commit": "88b3c28cb49f610be382b24cce4c5df57bc41661",
+  "accepted_base": "e95745853ec2fbb95e55915e99644a4dc0443261",
+  "materialized": [
+    {
+      "submodule": "third_party/rdt",
+      "pin": "b896f4dcac8ed1c3fae4a056200db267607f131f",
+      "read_only_database": "/home/hynx/lizhuo/VLA-Pilot++/.git/modules/third_party/rdt",
+      "files": 132
+    },
+    {
+      "submodule": "third_party/lerobot",
+      "pin": "715debf6c1723a28f1a57d4274a8c4ec35b6a417",
+      "read_only_database": "/home/hynx/lizhuo/VLA-Pilot++/.git/modules/third_party/lerobot",
+      "files": 405
+    }
+  ],
+  "complete_source_gate": "BLOCKED: prohibited file is a required production inventory member"
+}

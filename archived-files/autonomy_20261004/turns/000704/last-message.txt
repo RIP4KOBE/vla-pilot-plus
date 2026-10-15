@@ -1,0 +1,3 @@
+N34R9 terminal accounting is reconciled: 452 dispatches, 64.57234 GPU-hours, zero running workers. All charges and ledger history are preserved.
+
+Saved the hash-bound closure and operational handoff. Next is CPU dependency-inventory repair before a fresh reviewed release. Validation, formal evaluation and required ablations remain outstanding; the driver continues.

@@ -1,0 +1,9 @@
+Turn 983 operational summary — 2026-10-09T15:17:15.805809+00:00
+
+Current source: 52a87af0bf11f95b21ce17aba456dc98944d9774. N35 launch/plan/release hashes verified; state and checkpoint active controller agree. Controller: {"pid": 2632351, "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7", "start_ticks": 141061885, "state": "S", "ppid": 12479}. Children: [{"pid": 3086181, "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7", "start_ticks": 142182464, "state": "R", "ppid": 2632351}]. GPU7 compute: none observed. STOP=False; deadline elapsed=False; authorization ends 2026-10-11T11:13:13Z.
+
+Prior turn982 completed normally. Retained owning ledger prefix verified; current ledger 7251775 bytes, 1454 rows, SHA256 98f39f16706d6a50797d0812e277b98959faf98ea2d66f7e8d9942b6e94d6e68. Cohort latest events: {"n35_dev_t00_c0_20261009": "valid", "n35_dev_t00_q0_20261009": "valid", "n35_dev_t00_n34_20261009": "valid", "n35_dev_t00_n35_20261009": "valid", "n35_dev_t01_c0_20261009": "valid", "n35_dev_t01_q0_20261009": "valid", "n35_dev_t01_n34_20261009": "valid", "n35_dev_t01_n35_20261009": "valid", "n35_dev_t02_c0_20261009": "valid", "n35_dev_t02_q0_20261009": "valid", "n35_dev_t02_n34_20261009": "dispatched"}. Controller result exists=False. Controller verification log advances. No duplicate dispatch, recovery, process signal, source/plan/scientific threshold, budget or ledger mutation.
+
+Next bounded step: monitor existing N35 controller for next prospective cell and eventual terminal/native reconciliation. Preserve frozen cohort and private accounting. Original validation/formal/required-ablation evidence remains incomplete; target_met=false. Historical next_action/current_iteration fields remain stale; active_controller and frozen release identify current work.
+
+Reconciliation: end-reconciliation-v1.json SHA256 d5a70baf5e72beb6f3dfe7baf8222993e8750e44ae4b136a671fe87f1d1e8570.

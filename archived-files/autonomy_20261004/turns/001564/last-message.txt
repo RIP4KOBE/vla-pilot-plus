@@ -1,0 +1,3 @@
+Existing N36 G7 executor remains live; CPU integration tests are running. All private ledgers are unchanged, and no duplicate work was launched.
+
+Turn 1564’s hash-bound operational summary is recorded. Next: reconcile terminal output and review the repair. Validation, formal evaluation and ablation completion remain unproven.

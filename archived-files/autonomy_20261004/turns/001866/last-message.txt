@@ -1,0 +1,3 @@
+Reconciled stale accounting subtotals without changing ledger charges. The fresh readiness release passed validation and budget checks; independent review is running.
+
+Saved the operational handoff with live handles and next steps. No GPU experiment launched. Validation, formal evaluation and required ablation evidence remain outstanding.

@@ -1,0 +1,10 @@
+Committed isolated repair: `d01bc1e2e7acc876653a43ddf157d0b4a641f88a`.
+
+- Exact retained accounting: **75.53031173955723**, 505 attempts.
+- Fixed fresh identity: `n36_healthcheck_n36r3_preparation_001426`.
+- Preserved historical charges and strict checks; corrected dependent admission routing.
+- **19 focused CPU tests passed.** Worktree clean.
+
+[Repair report](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001426/accounting-health-repair/report-v1.md) and adjacent `report-v1.json` contain exact changes, arithmetic and test history.
+
+Binding refresh, new B5, root adoption, genuine charged production health, first-C0 release and G3 remain pending. No production execution or adoption performed.

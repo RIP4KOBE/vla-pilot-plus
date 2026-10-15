@@ -1,0 +1,3 @@
+Image transport passed under the frozen account/model policy. N32R2 remains closed; all outcomes and charges are preserved.
+
+Recorded a bounded continuation preparation scope and updated state/checkpoint. Next: verify recovery provenance and freeze its release before GPU dispatch. Source is unchanged; validation/formal/ablation goals remain unmet.

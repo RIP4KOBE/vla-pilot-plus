@@ -1,0 +1,3 @@
+Reconciled B5 failure: runtime records contained stale source hashes. A bounded CPU-only repair is running on unchanged source `b8d6b981`.
+
+Owning state, checkpoint, and sealed operational summary are updated. GPU dispatch remains gated on fresh independent review. Validation, formal evaluation, and required ablation evidence remain incomplete.

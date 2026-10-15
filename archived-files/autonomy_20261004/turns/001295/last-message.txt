@@ -1,0 +1,3 @@
+N36R2’s final plan is frozen; plan, review, authority, and source checks passed. Source remains `30c6321`. No GPU cohort is running; all charges remain preserved.
+
+Recorded turn 001295’s operational handoff. Next: production review, full release verification, and locked admission. Validation, formal, and required ablation evidence remain incomplete; the driver continues.

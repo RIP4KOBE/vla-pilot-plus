@@ -1,0 +1,3 @@
+N32R2 remains live on frozen source `1065f381`; controller identity and ledger integrity verified. C0/Q0/N32 each remain 0/3 on completed matched tasks.
+
+No restart or duplicate dispatch. Turn 270 operational summary saved. Next step is continued monitoring; validation, formal, and ablation completion remain unproven.

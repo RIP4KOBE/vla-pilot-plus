@@ -1,0 +1,5 @@
+N34R11 stopped at its frozen cohort budget limit. Reconciled all 19 attempts; no worker remains live.
+
+Matched results: C0 0/6, Q0 0/6, N34 1/6. Promotion gates remain unmet.
+
+Saved the hash-bound reconciliation and operational summary. Next: review a separately frozen continuation under existing authorization, preserving all outcomes and charges.

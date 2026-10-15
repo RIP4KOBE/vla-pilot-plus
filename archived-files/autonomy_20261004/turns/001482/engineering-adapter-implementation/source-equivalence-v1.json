@@ -1,0 +1,24 @@
+{
+  "all_changes_within_operational_allowlist": true,
+  "audit_closure_ast_exact_extraction": true,
+  "changed_paths": [
+    "scripts/qd_ed_n36_bridge.py",
+    "scripts/qd_ed_n36_engineering.py",
+    "scripts/qd_ed_n36_healthcheck.py",
+    "scripts/qd_ed_n36_release.py",
+    "scripts/qd_ed_n36_report.py",
+    "scripts/qd_ed_n36_runner.py",
+    "scripts/qd_ed_n36_worker.py",
+    "tests/test_n36_engineering.py"
+  ],
+  "full_contract_limits_identities_expected_rows_unchanged": true,
+  "independent_review": false,
+  "release_enabled": false,
+  "retained_closure_top_level_statements": 21,
+  "schema": "n36-engineering-implementation-source-check-v1",
+  "scientific_paths_unchanged": true,
+  "source_base": "813f25bc89a3920149739a2bf957b2e1b3db29c4",
+  "source_final": "3b05c0b557b59bf3dc9ddbb11593a41a4e49f4d1",
+  "source_inventory_refreshed_for_release": false,
+  "supervisor_thresholds_stopping_rules_unchanged": true
+}

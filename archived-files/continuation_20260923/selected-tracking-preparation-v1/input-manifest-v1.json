@@ -1,0 +1,27 @@
+{
+  "chronology_authorization": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/full-dev-closed-loop-preparation-v1/actual-read-authorization-v1.json",
+    "sha256": "bd2312f951d2933ec9d7f17956077fd7a95e5b8c4af94fefcddc80e729bff00b"
+  },
+  "chronology_index": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/full-dev-closed-loop-analysis/read-v1/index.json",
+    "sha256": "a0d26a8b61761a95c48d1c93dc80b8c5cc0c5f3779aa2bac7facb78f0583a7c0"
+  },
+  "chronology_provenance": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/full-dev-closed-loop-analysis/read-v1/inputs-and-audit.json",
+    "sha256": "ccfc8cd622ab2c9c659a6ae89dc618c853a77dc4f80af3e590ba44589d74a3ce"
+  },
+  "chronology_status": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/full-dev-closed-loop-analysis/read-v1/status.json",
+    "sha256": "e906dbb3f4e8424589428eee3490ec5b5d26fb5843dd7da851514df392ce3c06"
+  },
+  "fresh_audit_bindings": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/full-dev-closed-loop-analysis/read-v1-fresh-audit-bindings.json",
+    "sha256": "1fbe250181457e9f86bfe202341e26265eaff9f77e4ede1045721fba9590d749"
+  },
+  "matrix_report": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-matrix-report/report-full-dev-v1.json",
+    "sha256": "d376f98a0d0d23d7b73b0a20ab768594c63ed6a6abce9473e0e67d2247bc88ab"
+  },
+  "schema": "selected-tracking-input-v1"
+}

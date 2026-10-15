@@ -1,0 +1,5 @@
+N31 continues on GPU7 under verified controller 203563, monitor 203562 and worker 421229. Source remains `7428ce8a`.
+
+Seven audited cells: C0 0/3, Q0 0/2, N31 0/2. Task 2 Q0 remains active. Ledger history is intact; no restart or scientific changes were made.
+
+Turn 18 operational summary saved. Next: monitor cohort completion and audit results. Validation, formal and ablation goals remain unproven.

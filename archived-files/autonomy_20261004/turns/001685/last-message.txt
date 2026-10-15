@@ -1,0 +1,3 @@
+Reconciled the completed CPU preparation at source `a14f3a8b`; verified 67 artifact hashes and unchanged ledgers. No executor remains live.
+
+Fourteen checks passed; complete graph validation remains blocked pending independent controller-semantics review. Recorded state/checkpoint and operational handoff. Next is that review; GPU release remains disabled. Validation/formal/ablation completion is still unproven.

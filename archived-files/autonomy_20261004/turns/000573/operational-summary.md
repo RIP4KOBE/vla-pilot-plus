@@ -1,0 +1,7 @@
+Turn 573 — 2026-10-08T18:23:14.333891+00:00
+
+Current source 3acfda1adea7b4d9880c81dab7e3882f1587d4d0; frozen N34 source/plan/release unchanged and launch/script/authority hashes verified. Exact bound handoff and user authorization verified. Prior turn572 exited normally; its sole controller launch and authority adoption reconciled against owning checkpoint/state and three unchanged private ledger prefixes. Isolation ACTIVE/PASS; STOP absent; authorization deadline 2026-10-11T11:13:13Z.
+
+Live controller PID3008475/start134644051, driver PID268073/start97715947, coordinator PID3025623/start134653320; all on boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7. Controller CPU ticks advanced from1768 at prior turn to8156. Status RUNNING_RELEASE_REVALIDATION_AND_LOCKED_ADMISSION; terminal result absent at observation. No N34 attempt dispatched; retained accounting442 attempts/62.81145837588456GPUh. No scientific/source/state/ledger edits, no dispatch/restart or signals this turn.
+
+Next bounded step: monitor that exact controller and owning ledger. Full release validation takes about10minutes; current admission stage is expected. If terminal, reconcile actual outputs and charges before bounded diagnosis. Never duplicate the controller or interrupt an active episode. Keep frozen gates and protected reserves intact. Native N34 validity/efficacy, fresh validation20/formal10 and required ablation evidence remain unresolved. No completion record; local driver continues.

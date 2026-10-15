@@ -1,0 +1,12 @@
+{
+  "prior_script": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001542/runtime-closure-preparation/prepare-disabled-v1.py",
+    "sha256": "5526af4b7d8adc224834f428bb75d6034f0975df8a24b1d35e276a92429027df"
+  },
+  "script": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/../autonomy_20261004/turns/001542/runtime-closure-preparation-r2/prepare-disabled-v1.py",
+    "sha256": "c152b13c16e859bbfcec8af498c94904342802f5d441772707875805d298f199"
+  },
+  "change": "Allow passive hashing only of exact inventoried huggingface_hub/utils/_git_credential.py library source, still verified against frozen SHA256 6a8f6babead51e7f258214956448c3017e24224362edb6b2637eb54c34a04a98; no credentials or imports; all other guards and scientific audits unchanged.",
+  "output_route_changed": true
+}

@@ -1,0 +1,3 @@
+Reconciled the completed N36 repair at `b8d6b981`; four focused CPU tests passed. Owning state, checkpoint, and operational summary are updated; ledgers are unchanged.
+
+Next: independent corrected-source review. The driver remains live. GPU release and scientific promotion remain gated; validation, formal evaluation, and required ablation evidence are incomplete.

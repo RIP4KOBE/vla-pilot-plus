@@ -1,0 +1,5 @@
+Review complete. Generated-import checks pass; **full consumer acceptance fails** on both frozen importlib aliases. Reports include the precise cause, narrow repair, test-coverage weakness, hashes and executable evidence.
+
+[Markdown report](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001304/generated-import-review/report-v1.md) · [JSON report](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001304/generated-import-review/report-v1.json)
+
+Focused CPU checks took 5.33 seconds. No source or ledger changes.

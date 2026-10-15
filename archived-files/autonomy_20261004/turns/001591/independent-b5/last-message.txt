@@ -1,0 +1,5 @@
+Preparation-level B5 **PASS**: 168 checks passed; prior stale-binding defects resolved. Prior FAIL retained.
+
+[Report](</home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001591/independent-b5/report-v1.json>) and `report-v1.sha256` written; checksum verified.
+
+Dispatch remains unauthorized. Release, source/accounting adoption, GPU dispatch, and target-met flags remain false. Protocol acceptance, readiness, and detached releases remain outstanding.

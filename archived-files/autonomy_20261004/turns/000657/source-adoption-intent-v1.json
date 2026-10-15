@@ -1,0 +1,32 @@
+{
+  "schema": "n34r5-source-adoption-v1",
+  "at": "2026-10-08T22:30:53.779749+00:00",
+  "source_before": "e52618ee42c656d83f50178a3f47b7e25225f68d",
+  "candidate": "77e759096d1a2b114ab8ea4dd1240115607935d8",
+  "root_review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000657/engineering-review-v1.json",
+    "sha256": "5cbb9b8d1a4bf204ad529fb4928e20681d745c8bccc18cb8ffb08773c084f515"
+  },
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6716738,
+      "sha256": "03542bb80d88c8d0245fc52931f730110aa9b98818b5b91e55fd8888e9cbc681"
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7"
+    }
+  },
+  "gpu_dispatch": false,
+  "scientific_promotion": false,
+  "next_step": "Regenerate composed N34R5 runtime closure and30 fresh manifests on adopted source using turn655 corrected import inventory. Freeze fresh prospective accounting/protocol/root review/release; pass full public validation before idle GPU7 admission. Preserve five invalid charges, unknown telemetry, scientific thresholds and protected gates.",
+  "scientific_source_resolution": {
+    "current_n34_implementation": "71ffff1a0f70d9874b309db9ef1843c02bf17ebf",
+    "historical_state_field": "1065f38122379a515b60a9a424f574330405b66f",
+    "basis": {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000524/n34-cpu-source-adoption-v1.json",
+      "sha256": "7c7b06e50013fccea43a6a61e3c29f5da7e79396525751a817218ef91c1f4f88"
+    },
+    "historical_field_preserved": true
+  }
+}

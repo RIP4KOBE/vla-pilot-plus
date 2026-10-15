@@ -1,0 +1,7 @@
+Committed `e95745853ec2fbb95e55915e99644a4dc0443261`: finite alias validation against frozen native paths/hashes and live module identity, plus failure-origin diagnostics.
+
+CPU checks: **239 passed, 74 subtests passed**. Existing composition fixture remains blocked by checkout layout. Workspace clean; reports and SHA-256 manifest verified.
+
+[Repair report](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001243/repair/report-v1.md)
+
+N36R1 remains invalid. No GPU use or promotion; independent review and new recovery identity/accounting/release remain required.

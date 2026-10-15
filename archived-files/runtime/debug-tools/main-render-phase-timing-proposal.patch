@@ -1,0 +1,723 @@
+--- a/main.py
++++ b/main.py
+@@ -12,6 +12,7 @@
+ """
+ 
+ import os
++import faulthandler
+ import inspect
+ import warnings
+ from pathlib import Path
+@@ -1052,6 +1053,63 @@
+             )
+         except Exception as e:
+             log.warning(f"Failed to append episode metadata to {metadata_path}: {e}")
++
++    def _enable_phase_diagnostics(self):
++        """Use existing stderr for native-fault Python stacks, without locals."""
++        try:
++            config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
++            if config.get("enabled", False):
++                faulthandler.enable(all_threads=True)
++        except Exception:
++            log.warning("Native-fault stack diagnostics unavailable")
++
++    def _enable_render_phase_diagnostics(self):
++        """Observe existing instances only when EDS diagnostics are enabled."""
++        try:
++            previous = getattr(self, "_render_phase_diagnostics", None)
++            if previous is not None:
++                previous.close()
++            self._render_phase_diagnostics = None
++            config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
++            if not config.get("enabled", False):
++                return
++            from core.render_phase_diagnostics import RenderPhaseDiagnostics
++            observer = RenderPhaseDiagnostics(
++                Path(config.get("output_dir") or self.output_dir) / "render_phase_timing.jsonl")
++            observer.install(self.adapter)
++            self._render_phase_diagnostics = observer
++        except Exception:
++            log.warning("Render phase timing unavailable")
++
++    def _append_phase_timing(self, *, episode, global_step, name, event, elapsed_s):
++        """Best-effort scalar phase markers; never log operation inputs/errors."""
++        observed_wall_s = float(elapsed_s)
++        observer_overhead_s = 0.0
++        observer = getattr(self, "_render_phase_diagnostics", None)
++        if observer is not None:
++            try:
++                overhead = observer.set_phase(episode, global_step, name, event)
++                if event == "exit":
++                    observer_overhead_s = float(overhead)
++                    elapsed_s = max(0.0, observed_wall_s - observer_overhead_s)
++            except Exception:
++                pass
++        if getattr(self, "_phase_timing_write_failed", False):
++            return
++        try:
++            config = _config_section_to_dict(self.config.get("eds_eval"), "main.eds_eval")
++            if not config.get("enabled", False):
++                return
++            path = Path(config.get("output_dir") or self.output_dir) / "phase_timing.jsonl"
++            append_jsonl(path, {
++                "schema": "qd-ed-phase-timing-v2", "episode": int(episode),
++                "global_step": int(global_step), "name": name, "event": event,
++                "elapsed_s": float(elapsed_s), "observed_wall_s": observed_wall_s,
++                "nested_observer_s": observer_overhead_s,
++            })
++        except Exception:
++            self._phase_timing_write_failed = True
++            log.warning("Phase timing unavailable; diagnostic writes disabled")
+ 
+     def _api_compute_snapshot(self):
+         """Read only counters, never requests, endpoints, headers, or credentials."""
+@@ -1459,7 +1517,14 @@
+         set_episode_context = getattr(self.policy, "set_eds_episode_context", None)
+         if callable(set_episode_context):
+             set_episode_context(int(episode), int(episode_seed))
++        self._enable_phase_diagnostics()
++        self._enable_render_phase_diagnostics()
++        self._append_phase_timing(episode=episode, global_step=0,
++            name="initial_policy_observation", event="enter", elapsed_s=0.0)
++        phase_started_s = time.perf_counter()
+         observation = self._get_policy_observation()
++        self._append_phase_timing(episode=episode, global_step=0,
++            name="initial_policy_observation", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+         qpos_violations_since_last_metric = _gripper_qpos_violation_count(observation)
+         if qpos_violations_since_last_metric:
+             self._append_safety_event(
+@@ -1539,6 +1604,10 @@
+             if generate_new_chunk:
+                 execution_horizon_stage_change = False
+ 
++            if generate_new_chunk:
++                self._append_phase_timing(episode=episode, global_step=global_steps,
++                    name="chunk_keypoints_stage", event="enter", elapsed_s=0.0)
++            phase_started_s = time.perf_counter()
+             if generate_new_chunk and self.config.get("use_guidance", True) and hasattr(self, 'guidance_fns'):
+                 keypoints = self.keypoint_tracker.get_keypoint_positions()
+                 mask_ids = self.keypoint_tracker.get_mask_ids()
+@@ -1574,6 +1643,10 @@
+                 use_guidance = False
+                 keypoints = None
+                 current_guidance_fns = None
++
++            if generate_new_chunk:
++                self._append_phase_timing(episode=episode, global_step=global_steps,
++                    name="chunk_keypoints_stage", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+ 
+             guidance_type = str(self.config.get("guidance_type", "vls")).lower()
+             if guidance_type not in {"vls", "eds"}:
+@@ -1651,9 +1724,13 @@
+                     )
+                 select_kwargs.update(legacy_vls_kwargs)
+ 
++            self._append_phase_timing(episode=episode, global_step=global_steps,
++                name="select_action_fresh" if generate_new_chunk else "select_action_cached", event="enter", elapsed_s=0.0)
+             select_action_start_s = time.perf_counter()
+             action_chunk = self.policy.select_action(**select_kwargs)
+             select_action_latency_s = float(time.perf_counter() - select_action_start_s)
++            self._append_phase_timing(episode=episode, global_step=global_steps,
++                name="select_action_fresh" if generate_new_chunk else "select_action_cached", event="exit", elapsed_s=select_action_latency_s)
+             if hasattr(self.adapter, 'env_postprocessor'):
+                 action_transition = {"action": action_chunk}
+                 action_transition = self.adapter.env_postprocessor(action_transition)
+@@ -1727,6 +1804,10 @@
+                         )
+                     )
+ 
++            if generate_new_chunk:
++                self._append_phase_timing(episode=episode, global_step=global_steps,
++                    name="diagnostic_artifacts", event="enter", elapsed_s=0.0)
++            phase_started_s = time.perf_counter()
+             if (
+                 generate_new_chunk
+                 and use_guidance
+@@ -1853,7 +1934,14 @@
+                     )
+                     pretest_chunks_saved += 1
+ 
++            if generate_new_chunk:
++                self._append_phase_timing(episode=episode, global_step=global_steps,
++                    name="diagnostic_artifacts", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
++
+             # Get image and add status overlay
++            self._append_phase_timing(episode=episode, global_step=global_steps,
++                name="debug_visualization_overlay", event="enter", elapsed_s=0.0)
++            phase_started_s = time.perf_counter()
+             if self.config.get("debug_draw_trajectory", False):
+                 from utils.vis_utils import draw_action_trajectory_on_vlm_image
+                 visualization_action_chunk = _get_visualization_action_chunk(
+@@ -1910,8 +1998,20 @@
+                 ])
+ 
+             image_with_status = add_text_to_image(image, status_text)
++            self._append_phase_timing(episode=episode, global_step=global_steps,
++                name="debug_visualization_overlay", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
++            self._append_phase_timing(episode=episode, global_step=global_steps,
++                name="video_add_frame", event="enter", elapsed_s=0.0)
++            phase_started_s = time.perf_counter()
+             self.video_recorder.add_frame(self.adapter.vlm_camera, image_with_status)
++            self._append_phase_timing(episode=episode, global_step=global_steps,
++                name="video_add_frame", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
++            self._append_phase_timing(episode=episode, global_step=global_steps,
++                name="adapter_step", event="enter", elapsed_s=0.0)
++            phase_started_s = time.perf_counter()
+             obs, reward, terminated, truncated, info = self.adapter.step(action_chunk[0][action_executed])
++            self._append_phase_timing(episode=episode, global_step=global_steps,
++                name="adapter_step", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+             previous_executed_action = action_chunk[0][action_executed]
+             if torch.is_tensor(previous_executed_action):
+                 previous_executed_action = previous_executed_action.detach().cpu().clone()
+@@ -1926,7 +2026,12 @@
+             if action_executed == resolved_action_horizon:
+                 action_executed = 0
+ 
++            self._append_phase_timing(episode=episode, global_step=global_steps,
++                name="policy_observation", event="enter", elapsed_s=0.0)
++            phase_started_s = time.perf_counter()
+             observation = self._get_policy_observation()
++            self._append_phase_timing(episode=episode, global_step=global_steps,
++                name="policy_observation", event="exit", elapsed_s=time.perf_counter() - phase_started_s)
+             global_steps += 1
+             current_qpos_violations = _gripper_qpos_violation_count(observation)
+             qpos_violations_since_last_metric += current_qpos_violations
+--- /dev/null
++++ b/core/render_phase_diagnostics.py
+@@ -0,0 +1,167 @@
++"""Opt-in observations of existing LIBERO instances; no simulator/GPU imports.
++
++Records host wall time only. The original sim.render retains its render lock;
++the interval before offscreen_render is NOT an isolated lock-wait measurement.
++"""
++import json
++import time
++from pathlib import Path
++
++
++class RenderPhaseDiagnostics:
++    def __init__(self, path):
++        self.path = Path(path)
++        self._phase = None
++        self._stack = []
++        self._sequence = 0
++        self._hooks = []
++        self._failed = False
++        self._observer_elapsed_s = 0.0
++        self._io_elapsed_s = 0.0
++        self._record_count = 0
++        self._phase_baseline = (0.0, 0.0, 0)
++
++    def set_phase(self, episode, global_step, name, event):
++        if event == "enter":
++            self._phase = (int(episode), int(global_step), name)
++            self._phase_baseline = (self._observer_elapsed_s, self._io_elapsed_s, self._record_count)
++            return 0.0
++        self._phase = None
++        overhead, io, count = self._phase_baseline
++        estimated_overhead = self._observer_elapsed_s - overhead
++        if self._record_count > count:
++            self._write({"schema": "qd-ed-render-overhead-v1", "episode": int(episode),
++                "global_step": int(global_step), "parent_phase": name,
++                "record_count": self._record_count - count,
++                "estimated_observer_s": estimated_overhead, "append_io_s": self._io_elapsed_s - io},
++                self.path.with_name("render_phase_overhead.jsonl"))
++        return estimated_overhead
++
++    def _write(self, record, path=None):
++        if self._failed:
++            return
++        started = time.perf_counter()
++        try:
++            destination = path or self.path
++            destination.parent.mkdir(parents=True, exist_ok=True)
++            with destination.open("a") as stream:
++                stream.write(json.dumps(record, allow_nan=False) + "\n")
++            if path is None:
++                self._record_count += 1
++        except Exception:
++            # Diagnostic failures never expose input/exception text or stop control.
++            self._failed = True
++        finally:
++            self._io_elapsed_s += time.perf_counter() - started
++
++    @staticmethod
++    def _render_fields(args, kwargs):
++        # Only the public sim.render scalar signature; never repr/serialize args.
++        def dimension(value):
++            return value if type(value) is int and 0 < value <= 65536 else None
++        camera = kwargs.get("camera_name")
++        return {
++            "camera": camera if camera in (None, "agentview", "robot0_eye_in_hand") else "other",
++            "width": dimension(kwargs.get("width", args[0] if args else None)),
++            "height": dimension(kwargs.get("height", args[1] if len(args) > 1 else None)),
++            "depth": kwargs.get("depth") if type(kwargs.get("depth")) is bool else False,
++            "segmentation": kwargs.get("segmentation") if type(kwargs.get("segmentation")) is bool else False,
++        }
++
++    def _hook(self, obj, attribute, name, before=None):
++        if any(item[0] is obj and item[1] == attribute for item in self._hooks):
++            return
++        original = getattr(obj, attribute)
++        if not callable(original):
++            raise TypeError("Diagnostic hook requires an existing callable")
++        own = vars(obj)
++        had_own = attribute in own
++        own_value = own.get(attribute)
++
++        def observed(*args, **kwargs):
++            if self._failed or self._phase is None:
++                return original(*args, **kwargs)
++            observer_started = time.perf_counter()
++            try:
++                if before is not None:
++                    before()
++                episode, global_step, parent_phase = self._phase
++                self._sequence += 1
++                call_id = self._sequence
++                parent_call_id = self._stack[-1][0] if self._stack else None
++                fields = self._render_fields(args, kwargs) if name == "sim_render_total" else (
++                    self._stack[-1][1] if self._stack else {})
++                record = {"schema": "qd-ed-render-phase-v1", "episode": episode,
++                    "global_step": global_step, "parent_phase": parent_phase,
++                    "name": name, "call_id": call_id, "parent_call_id": parent_call_id,
++                    **fields}
++                self._write({**record, "event": "enter", "elapsed_s": 0.0,
++                    "observed_wall_s": 0.0, "nested_observer_s": 0.0})
++                self._stack.append((call_id, fields))
++                self._observer_elapsed_s += time.perf_counter() - observer_started
++                nested_baseline = self._observer_elapsed_s
++                started = time.perf_counter()
++            except Exception:
++                self._failed = True
++                return original(*args, **kwargs)
++            cleanup_started = None
++            try:
++                result = original(*args, **kwargs)
++            except BaseException:
++                # Native abort leaves enter-only too; Python failures remain identical.
++                raise
++            else:
++                wall = time.perf_counter() - started
++                cleanup_started = time.perf_counter()
++                nested_overhead = self._observer_elapsed_s - nested_baseline
++                self._write({**record, "event": "exit", "elapsed_s": max(0.0, wall - nested_overhead),
++                    "observed_wall_s": wall, "nested_observer_s": nested_overhead})
++                return result
++            finally:
++                # Only local cleanup on failure: no exit event, no retry/replacement.
++                if cleanup_started is None:
++                    cleanup_started = time.perf_counter()
++                self._stack.pop()
++                self._observer_elapsed_s += time.perf_counter() - cleanup_started
++
++        setattr(obj, attribute, observed)
++        self._hooks.append((obj, attribute, had_own, own_value, observed))
++
++    def _render_context(self, sim):
++        context = sim._render_context_offscreen
++        if context is None:
++            return
++        # Reuse an existing context, including a replacement created by production.
++        # This never constructs a context or calls make_current/render itself.
++        self._hook(context, "render", "offscreen_render")
++        self._hook(context, "read_pixels", "read_pixels")
++
++    def install(self, adapter):
++        """Install on the existing, known LIBERO object chain, not proxy wrappers."""
++        try:
++            env = adapter._env[adapter.current_task_idx]
++            domain = env._env.env
++            sim = domain.sim
++            self._hook(env, "_format_raw_obs", "format_raw_obs")
++            self._hook(domain, "_pre_action", "controller_pre_action")
++            self._hook(domain, "_update_observables", "update_observables")
++            self._hook(sim, "forward", "physics_forward")
++            self._hook(sim, "step", "physics_step")
++            self._render_context(sim)
++            self._hook(sim, "render", "sim_render_total", before=lambda: self._render_context(sim))
++        except Exception:
++            self.close()
++            raise
++
++    def close(self):
++        self._phase = None
++        for obj, attribute, had_own, own_value, observed in reversed(self._hooks):
++            try:
++                if vars(obj).get(attribute) is observed:
++                    if had_own:
++                        setattr(obj, attribute, own_value)
++                    else:
++                        delattr(obj, attribute)
++            except Exception:
++                self._failed = True
++        self._hooks.clear()
+--- /dev/null
++++ b/tests/test_episode_phase_timing.py
+@@ -0,0 +1,150 @@
++"""CPU-only diagnostic tests; main, models and simulators are never imported."""
++import ast
++import json
++from pathlib import Path
++from types import SimpleNamespace
++
++import pytest
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def timing_runner(tmp_path, append=None, fault_enable=None):
++    tree = ast.parse((ROOT / "main.py").read_text())
++    main = next(node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == "Main")
++    methods = [node for node in main.body if isinstance(node, ast.FunctionDef)
++               and node.name in {"_append_phase_timing", "_enable_phase_diagnostics"}]
++    cls = ast.ClassDef(name="Runner", bases=[], keywords=[], body=methods, decorator_list=[])
++    def writer(path, record):
++        path.parent.mkdir(parents=True, exist_ok=True)
++        with path.open("a") as stream:
++            stream.write(json.dumps(record, allow_nan=False) + "\n")
++    warnings, fault_calls = [], []
++    namespace = {"Path": Path, "append_jsonl": append or writer,
++                 "_config_section_to_dict": lambda section, _: section or {},
++                 "log": SimpleNamespace(warning=warnings.append),
++                 "faulthandler": SimpleNamespace(enable=fault_enable or
++                     (lambda **kwargs: fault_calls.append(kwargs)))}
++    exec(compile(ast.fix_missing_locations(ast.Module(body=[cls], type_ignores=[])),
++                 "<phase-diagnostic-methods>", "exec"), namespace)
++    runner = namespace["Runner"]()
++    runner.config = {"eds_eval": {"enabled": True, "output_dir": str(tmp_path / "eds")}}
++    runner.output_dir = str(tmp_path)
++    return runner, warnings, main, fault_calls
++
++
++def test_phase_pairs_append_only_public_scalars_to_eval_directory(tmp_path):
++    runner, _, _, _ = timing_runner(tmp_path)
++    for step in (0, 1):
++        for event, elapsed in (("enter", 0.0), ("exit", 0.125)):
++            runner._append_phase_timing(episode=2, global_step=step,
++                name="adapter_step", event=event, elapsed_s=elapsed)
++    records = [json.loads(line) for line in (tmp_path / "eds/phase_timing.jsonl").read_text().splitlines()]
++    assert [(r["global_step"], r["event"]) for r in records] == [(0,"enter"),(0,"exit"),(1,"enter"),(1,"exit")]
++    for record in records:
++        assert record == {"schema": "qd-ed-phase-timing-v2", "episode": 2,
++            "global_step": record["global_step"], "name": "adapter_step", "event": record["event"],
++            "elapsed_s": 0.0 if record["event"] == "enter" else 0.125,
++            "observed_wall_s": 0.0 if record["event"] == "enter" else 0.125, "nested_observer_s": 0.0}
++    assert not (tmp_path / "phase_timing.jsonl").exists()
++
++
++def test_disabled_eval_has_neither_timing_io_nor_fault_handler_change(tmp_path):
++    runner, _, _, fault_calls = timing_runner(tmp_path)
++    runner.config["eds_eval"]["enabled"] = False
++    runner._enable_phase_diagnostics()
++    runner._append_phase_timing(episode=0, global_step=0,
++        name="adapter_step", event="enter", elapsed_s=0)
++    assert not (tmp_path / "eds").exists()
++    assert fault_calls == []
++
++
++def test_diagnostic_write_failure_does_not_raise_or_expose_error_content(tmp_path):
++    def broken(*_args):
++        raise OSError("private provider value should not be logged")
++    runner, warnings, _, _ = timing_runner(tmp_path, append=broken)
++    for event in ("enter", "exit"):
++        runner._append_phase_timing(episode=0, global_step=0,
++            name="adapter_step", event=event, elapsed_s=0)
++    assert warnings == ["Phase timing unavailable; diagnostic writes disabled"]
++    assert runner._phase_timing_write_failed is True
++
++
++def test_original_action_exception_leaves_enter_only_and_propagates_unchanged(tmp_path):
++    records = []
++    runner, _, main, _ = timing_runner(tmp_path, append=lambda _path, record: records.append(record))
++    episode = next(node for node in main.body if isinstance(node, ast.FunctionDef)
++                   and node.name == "_run_episode")
++    loop = next(node for node in episode.body if isinstance(node, ast.While))
++    position = next(i for i, node in enumerate(loop.body) if isinstance(node, ast.Assign)
++        and isinstance(node.value, ast.Call) and ast.unparse(node.value.func) == "self.adapter.step")
++    # Real enter/start/action/exit statements; no simulator or live process.
++    statements = loop.body[position - 2:position + 2]
++    error = RuntimeError("original action failure")
++    def fail(_action):
++        raise error
++    runner.adapter = SimpleNamespace(step=fail)
++    namespace = {"self": runner, "action_chunk": [[0]], "action_executed": 0,
++                 "episode": 0, "global_steps": 0, "time": SimpleNamespace(perf_counter=lambda: 1)}
++    with pytest.raises(RuntimeError) as caught:
++        exec(compile(ast.fix_missing_locations(ast.Module(body=statements, type_ignores=[])),
++                     "<actual-action-phase-statements>", "exec"), namespace)
++    assert caught.value is error
++    assert len(records) == 1 and records[0]["event"] == "enter"
++    assert records[0]["name"] == "adapter_step"
++
++
++def test_fault_handler_uses_all_threads_and_existing_stderr(tmp_path):
++    runner, _, _, fault_calls = timing_runner(tmp_path)
++    runner._enable_phase_diagnostics()
++    assert fault_calls == [{"all_threads": True}]
++
++
++def test_fault_handler_setup_failure_does_not_interrupt_control_or_log_error(tmp_path):
++    def broken(**_kwargs):
++        raise OSError("private stderr initialization detail")
++    runner, warnings, _, _ = timing_runner(tmp_path, fault_enable=broken)
++    runner._enable_phase_diagnostics()
++    assert warnings == ["Native-fault stack diagnostics unavailable"]
++
++
++def test_parent_context_is_updated_even_after_main_writer_failure(tmp_path):
++    runner, _, _, _ = timing_runner(tmp_path)
++    calls = []
++    runner._render_phase_diagnostics = SimpleNamespace(set_phase=lambda *args: calls.append(args))
++    runner._phase_timing_write_failed = True
++    runner._append_phase_timing(episode=1, global_step=4,
++        name="adapter_step", event="exit", elapsed_s=0)
++    assert calls == [(1, 4, "adapter_step", "exit")]
++
++
++def test_cached_fresh_and_stage_instrumentation_remains_around_actual_calls(tmp_path):
++    _, _, main, _ = timing_runner(tmp_path)
++    episode = next(node for node in main.body if isinstance(node, ast.FunctionDef)
++                   and node.name == "_run_episode")
++    loop = next(node for node in episode.body if isinstance(node, ast.While))
++    pos = next(i for i, node in enumerate(loop.body) if isinstance(node, ast.Assign)
++        and isinstance(node.value, ast.Call) and ast.unparse(node.value.func) == "self.policy.select_action")
++    assert ast.unparse(loop.body[pos - 2].value.func) == "self._append_phase_timing"
++    assert ast.unparse(loop.body[pos + 2].value.func) == "self._append_phase_timing"
++    for node in (loop.body[pos - 2], loop.body[pos + 2]):
++        name = next(kw.value for kw in node.value.keywords if kw.arg == "name")
++        assert isinstance(name, ast.IfExp)
++        assert name.body.value == "select_action_fresh"
++        assert name.orelse.value == "select_action_cached"
++    markers = [node for node in ast.walk(episode) if isinstance(node, ast.Call)
++        and isinstance(node.func, ast.Attribute) and node.func.attr == "_append_phase_timing"]
++    stage = [node for node in markers if any(kw.arg == "name" and isinstance(kw.value, ast.Constant)
++        and kw.value.value == "chunk_keypoints_stage" for kw in node.keywords)]
++    assert [next(kw.value.value for kw in node.keywords if kw.arg == "event") for node in stage] == ["enter", "exit"]
++
++
++def test_main_phase_separates_original_wall_and_nested_observer_estimate(tmp_path):
++    captured = []
++    runner, _, _, _ = timing_runner(tmp_path, append=lambda path, record: captured.append(record))
++    runner._render_phase_diagnostics = SimpleNamespace(set_phase=lambda *args: 0.25)
++    runner._append_phase_timing(episode=0, global_step=0,
++        name="adapter_step", event="exit", elapsed_s=1.0)
++    assert captured[0]["observed_wall_s"] == 1.0
++    assert captured[0]["nested_observer_s"] == 0.25
++    assert captured[0]["elapsed_s"] == 0.75
+--- /dev/null
++++ b/tests/test_render_phase_diagnostics.py
+@@ -0,0 +1,212 @@
++"""CPU mocks only: no main, torch, CUDA, MuJoCo or simulator imports."""
++import importlib.util
++import json
++from pathlib import Path
++from types import SimpleNamespace
++
++import pytest
++
++ROOT = Path(__file__).resolve().parents[1]
++spec = importlib.util.spec_from_file_location("render_phase_under_test", ROOT / "core/render_phase_diagnostics.py")
++module = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(module)
++RenderPhaseDiagnostics = module.RenderPhaseDiagnostics
++
++
++def fixture_graph():
++    calls = []
++    pixels = object()
++    class Context:
++        def render(self, *args, **kwargs):
++            calls.append(("context.render", args, kwargs))
++        def read_pixels(self, *args, **kwargs):
++            calls.append(("context.read_pixels", args, kwargs))
++            return pixels
++    class Sim:
++        def __init__(self):
++            self._render_context_offscreen = Context()
++        def forward(self, *args, **kwargs):
++            calls.append(("forward", args, kwargs))
++        def step(self, *args, **kwargs):
++            calls.append(("physics.step", args, kwargs))
++        def render(self, width=None, height=None, *, camera_name=None, depth=False, segmentation=False):
++            calls.append(("sim.render", (width, height), dict(camera_name=camera_name, depth=depth, segmentation=segmentation)))
++            self._render_context_offscreen.render(width=width, height=height, camera_id=0, segmentation=segmentation)
++            return self._render_context_offscreen.read_pixels(width, height, depth=depth, segmentation=segmentation)
++    class Domain:
++        def __init__(self):
++            self.sim = Sim()
++        def _pre_action(self, *args, **kwargs):
++            calls.append(("pre_action", args, kwargs))
++        def _update_observables(self, *args, **kwargs):
++            calls.append(("update_observables", args, kwargs))
++            return self.sim.render(width=128, height=128, camera_name="robot0_eye_in_hand", depth=True)
++    class Env:
++        def __init__(self):
++            self._env = SimpleNamespace(env=Domain())
++        def _format_raw_obs(self, observation):
++            calls.append(("format_raw_obs", (observation,), {}))
++            return observation
++    env = Env()
++    adapter = SimpleNamespace(_env=[env], current_task_idx=0)
++    return adapter, env, env._env.env, env._env.env.sim, pixels, calls
++
++
++def records(path):
++    return [json.loads(line) for line in path.read_text().splitlines()]
++
++
++def test_original_call_order_arguments_objects_and_return_are_preserved(tmp_path):
++    adapter, env, domain, sim, pixels, calls = fixture_graph()
++    token = object()
++    def operations():
++        sim.forward(token, flag=True)
++        domain._pre_action(token, policy_step=False)
++        sim.step(False)
++        assert domain._update_observables(force=True) is pixels
++        assert env._format_raw_obs(token) is token
++    operations()
++    expected = list(calls)
++    calls.clear()
++    observer = RenderPhaseDiagnostics(tmp_path / "phases.jsonl")
++    observer.install(adapter)
++    observer.set_phase(1, 3, "adapter_step", "enter")
++    operations()
++    assert calls == expected
++    assert calls[0][1][0] is token
++    observer.close()
++
++
++def test_shared_render_has_nested_ids_and_distinct_overlay_observation_parents(tmp_path):
++    adapter, _, domain, sim, pixels, _ = fixture_graph()
++    path = tmp_path / "phases.jsonl"
++    observer = RenderPhaseDiagnostics(path)
++    observer.install(adapter)
++    observer.set_phase(0, 2, "debug_visualization_overlay", "enter")
++    assert sim.render(640, 480, camera_name="agentview") is pixels
++    observer.set_phase(0, 2, "debug_visualization_overlay", "exit")
++    observer.set_phase(0, 2, "adapter_step", "enter")
++    assert domain._update_observables() is pixels
++    rows = records(path)
++    enters = {r["call_id"]: r for r in rows if r["event"] == "enter"}
++    assert len(rows) == 14
++    for row in rows:
++        assert set(row) <= {"schema", "episode", "global_step", "parent_phase", "name", "call_id", "parent_call_id", "event", "elapsed_s", "observed_wall_s", "nested_observer_s", "camera", "width", "height", "depth", "segmentation"}
++        assert row["elapsed_s"] >= 0
++        if row["event"] == "exit":
++            assert row["name"] == enters[row["call_id"]]["name"]
++        if row["name"] in {"offscreen_render", "read_pixels"}:
++            assert enters[row["parent_call_id"]]["name"] == "sim_render_total"
++    assert {r["camera"] for r in rows if r["name"] == "sim_render_total"} == {"agentview", "robot0_eye_in_hand"}
++    assert {r["parent_phase"] for r in rows} == {"debug_visualization_overlay", "adapter_step"}
++    observer.close()
++
++
++def test_phase_overhead_summary_counts_records_and_excludes_nested_logging(tmp_path):
++    adapter, _, domain, _, _, _ = fixture_graph()
++    path = tmp_path / "phases.jsonl"
++    observer = RenderPhaseDiagnostics(path)
++    observer.install(adapter)
++    observer.set_phase(0, 0, "adapter_step", "enter")
++    domain._update_observables()
++    overhead = observer.set_phase(0, 0, "adapter_step", "exit")
++    summary = records(tmp_path / "render_phase_overhead.jsonl")[0]
++    assert summary["record_count"] == len(records(path)) == 8
++    assert summary["estimated_observer_s"] == overhead
++    assert overhead >= summary["append_io_s"] >= 0
++    for row in records(path):
++        assert row["elapsed_s"] == max(0, row["observed_wall_s"] - row["nested_observer_s"])
++    render = next(r for r in records(path) if r["name"] == "sim_render_total" and r["event"] == "exit")
++    assert render["nested_observer_s"] > 0
++    observer.close()
++
++
++def test_operation_exception_is_identical_and_leaves_unmatched_enter(tmp_path):
++    adapter, _, _, sim, _, calls = fixture_graph()
++    error = RuntimeError("private operation detail")
++    def fail(*args, **kwargs):
++        calls.append(("failure", args, kwargs))
++        raise error
++    sim._render_context_offscreen.read_pixels = fail
++    path = tmp_path / "phases.jsonl"
++    observer = RenderPhaseDiagnostics(path)
++    observer.install(adapter)
++    observer.set_phase(0, 0, "debug_visualization_overlay", "enter")
++    with pytest.raises(RuntimeError) as caught:
++        sim.render(640, 480)
++    assert caught.value is error
++    assert [r["event"] for r in records(path) if r["name"] == "read_pixels"] == ["enter"]
++    assert [r["event"] for r in records(path) if r["name"] == "sim_render_total"] == ["enter"]
++    assert "private" not in path.read_text()
++    assert observer._stack == []
++    assert sum(c[0] == "failure" for c in calls) == 1
++    observer.close()
++
++
++def test_write_failure_does_not_change_operation_result_or_retry_it(tmp_path):
++    adapter, _, _, sim, pixels, calls = fixture_graph()
++    blocked = tmp_path / "file_not_directory"
++    blocked.write_text("existing")
++    observer = RenderPhaseDiagnostics(blocked / "phases.jsonl")
++    observer.install(adapter)
++    observer.set_phase(0, 0, "debug_visualization_overlay", "enter")
++    assert sim.render(640, 480) is pixels
++    assert observer._failed
++    assert [c[0] for c in calls] == ["sim.render", "context.render", "context.read_pixels"]
++    observer.close()
++
++
++def test_no_phase_means_no_io_and_close_restores_inherited_and_instance_bindings(tmp_path):
++    adapter, env, domain, sim, pixels, _ = fixture_graph()
++    original_forward = lambda *args, **kwargs: None
++    sim.forward = original_forward
++    objects = [env, domain, sim, sim._render_context_offscreen]
++    original_keys = [set(vars(obj)) for obj in objects]
++    path = tmp_path / "phases.jsonl"
++    observer = RenderPhaseDiagnostics(path)
++    observer.install(adapter)
++    assert sim.render(640, 480) is pixels
++    assert not path.exists()
++    observer.close()
++    assert [set(vars(obj)) for obj in objects] == original_keys
++    assert sim.forward is original_forward
++    assert sim.render.__func__ is type(sim).render
++
++
++def test_public_camera_allowlist_and_no_input_or_environment_serialization(tmp_path, monkeypatch):
++    adapter, _, _, sim, pixels, _ = fixture_graph()
++    monkeypatch.setenv("POE_API_KEY", "not-a-real-secret-must-not-appear")
++    path = tmp_path / "phases.jsonl"
++    observer = RenderPhaseDiagnostics(path)
++    observer.install(adapter)
++    observer.set_phase(0, 0, "debug_visualization_overlay", "enter")
++    assert sim.render(640, 480, camera_name="private-camera-name") is pixels
++    data = path.read_text()
++    assert "private-camera-name" not in data and "not-a-real-secret" not in data and "POE" not in data
++    assert {r["camera"] for r in records(path)} == {"other"}
++    observer.close()
++
++
++def test_existing_replacement_context_gets_wrapped_without_extra_render(tmp_path):
++    adapter, _, _, sim, pixels, calls = fixture_graph()
++    path = tmp_path / "phases.jsonl"
++    observer = RenderPhaseDiagnostics(path)
++    observer.install(adapter)
++    sim._render_context_offscreen = type(sim._render_context_offscreen)()
++    observer.set_phase(0, 0, "debug_visualization_overlay", "enter")
++    assert sim.render(640, 480) is pixels
++    assert len(calls) == 3
++    assert [r["name"] for r in records(path) if r["event"] == "enter"] == ["sim_render_total", "offscreen_render", "read_pixels"]
++    observer.close()
++
++
++def test_failed_install_rolls_back_all_partial_bindings(tmp_path):
++    adapter, env, domain, sim, _, _ = fixture_graph()
++    domain._update_observables = None
++    observer = RenderPhaseDiagnostics(tmp_path / "phases.jsonl")
++    with pytest.raises(TypeError):
++        observer.install(adapter)
++    assert "_format_raw_obs" not in vars(env)
++    assert "_pre_action" not in vars(domain)
++    assert "forward" not in vars(sim)
++    assert observer._hooks == []

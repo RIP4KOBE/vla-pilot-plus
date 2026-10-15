@@ -1,0 +1,3 @@
+N35 remains live on GPU7. Controller identity, frozen bindings, and ledger integrity verified. Seven completed cells are valid but unsuccessful; task1 N35 remains running.
+
+Saved the operational summary for continued monitoring. No restart or scientific changes. Validation, formal evaluation, and required ablation evidence remain outstanding.

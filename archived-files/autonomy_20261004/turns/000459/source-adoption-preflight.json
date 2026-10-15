@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-08T11:10:49.309335+00:00",
+  "source_before": "1065f38122379a515b60a9a424f574330405b66f",
+  "target": "36aac818c8ea0ec3ce18413e678963818bb5bb5d",
+  "review": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000458/implementation-root-review.json",
+    "sha256": "0c68dae8ab6f86fd6dcd1442d0253a32f23f2ce2901a85b711e326ccd5e6d9d9",
+    "bytes": 5363
+  },
+  "changed_paths": [
+    "scripts/qd_ed_final_runner.py",
+    "scripts/qd_ed_n32r3_bridge.py",
+    "scripts/qd_ed_n32r3_contract.py",
+    "scripts/qd_ed_n32r3_history.py",
+    "scripts/qd_ed_n32r3_prepare.py",
+    "scripts/qd_ed_n32r3_release.py",
+    "scripts/qd_ed_n32r3_runner.py",
+    "scripts/qd_ed_n32r3_supervise.py",
+    "scripts/qd_ed_n32r3_worker.py",
+    "tests/test_n32r3_continuation.py",
+    "tests/test_n32r3_execution.py",
+    "tests/test_n32r3_source.py"
+  ],
+  "ledger_prefix": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/data/attempt-ledger.jsonl",
+    "sha256": "8294b4ed47b8f645f2b3ab6511329f548b5788a5f40d0822b54d3c6c8c814da6",
+    "bytes": 5694864
+  },
+  "live_handles": {
+    "268073": {
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "start_ticks": 97715947,
+      "state": "S"
+    },
+    "913715": {
+      "boot_id": "2a1fa95f-ab0d-488c-a298-fc488ddd2af7",
+      "start_ticks": 132055712,
+      "state": "S"
+    }
+  },
+  "closed_handles_absent": [
+    841531,
+    841533,
+    1818171
+  ],
+  "STOP": false,
+  "prior_turn_completed": true
+}

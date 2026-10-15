@@ -1,0 +1,3 @@
+Continued from accepted source `a14f3a8b`. CPU-only deployment and evidence-reference preparation is running; process identities verified and ledgers unchanged.
+
+State, checkpoint, and operational summary are recorded. Next: reconcile preparation outputs and independently review them before measurement release. Validation, formal evaluation, and required ablations remain incomplete.

@@ -1,0 +1,9 @@
+Prepared the new **disabled** binding set and all 40 manifests. Source, owner state, ledgers, and old artifacts remain unchanged. No GPU/provider calls or release.
+
+Hash-bound [report-v1.json](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001419/binding-refresh/report-v1.json) records checks, commands, and blockers:
+
+- Root controller review, exact independent B5, and root adoption.
+- New health preparation identity and finite accounting amendment; stale accounting-helper rejection preserved.
+- Production parent attestation and fresh health remain pending. First-C0 G3 pause preserved.
+
+Retained: **505 attempts / 75.53031173955723 GPUh**. Score: **null**. Goal incomplete.

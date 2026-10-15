@@ -1,0 +1,8 @@
+Committed narrow repair and tests as `cd6c969cbfdf006fd017553448bed2e61fc0380e`.
+
+- V3 binds exact terminal status and telemetry; v1/v2 remain unchanged.
+- 157 focused, 88 receipt, and 8 source-scope cases passed. Exact retained raw bytes and charges verified.
+- One unrelated parity-test failure reproduced on the starting source.
+- `.scope-admission-001805/` preserved. No GPU/provider calls or owner-state changes.
+
+[Report, diff, logs, and hashes](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001822/completed-predecessor-repair/report-v1.json). Implementation evidence only; no research-success claim.

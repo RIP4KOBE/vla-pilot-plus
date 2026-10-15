@@ -1,0 +1,25 @@
+{
+  "cpu_tests_passed": 17,
+  "files": [
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/production_egl_identity_observer.py",
+      "sha256": "3d5392455339e7db268b15bc07da251fe42db0ec201ea0162534143c5ae49fc2"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/test_production_egl_identity_observer.py",
+      "sha256": "f29e5fa189f385c0ea648cd885954cc308543aa2877b44bc662735d213ed4a35"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/production-egl-identity-proposal.md",
+      "sha256": "edae3d008a6da2f935c9fe83f2b13db90ad8e1c60086603f10c6058808c2fbe8"
+    },
+    {
+      "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/production-egl-identity-proposal.patch",
+      "sha256": "ccfe8ede68fe20e9c190078e1864f2fd17c9f3f575a3ff835f8808d134d51f33"
+    }
+  ],
+  "gpu_execution_performed": false,
+  "revision": "loaded_raw_entrypoints_extension_gated",
+  "source_or_head_modified": false,
+  "status": "unapplied_proposal"
+}

@@ -1,0 +1,25 @@
+import pathlib,json,hashlib,datetime,fcntl,os,yaml
+W=pathlib.Path.cwd(); A=W.parent/'autonomy_20261004'; T=A/'turns/001610'; P=A/'turns/001609'; C=W/'.arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator'
+def read(p):return json.loads(p.read_text())
+def ref(p):return {'path':str(p),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+def write(p,v,y=False):
+ q=p.with_name(p.name+'.tmp-001610');q.write_text(yaml.safe_dump(v,sort_keys=False,allow_unicode=True) if y else json.dumps(v,indent=2)+'\n');os.replace(q,p)
+boot=pathlib.Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+def ident(h):
+ p=pathlib.Path('/proc')/str(h['pid'])/'stat';a=p.read_text().rsplit(')',1)[1].split() if p.exists() else []; m=bool(a and int(a[19])==h['start_ticks'] and h['boot_id']==boot);return {**h,'identity_matches':m,'live':bool(m and a[0]!='Z'),'observed_state':a[0] if a else None}
+prior=read(P/'operational-summary-v1.json'); prefixes={}
+for name,r in prior['ledger_prefixes'].items():
+ b=pathlib.Path(r['path']).read_bytes();assert hashlib.sha256(b[:r['bytes']]).hexdigest()==r['sha256'];prefixes[name]=ref(pathlib.Path(r['path']))
+rows=[json.loads(l) for l in (W/'data/gpu-healthcheck-ledger.jsonl').read_text().splitlines()]; rows=[r for r in rows if r.get('resource_id')=='n36_healthcheck_engineering_t00_c0_001479'];assert [r['event'] for r in rows]==['reserved','dispatched','completed']; last=rows[-1];assert last['validation_status']=='passed';assert read(P/'health-operation-exit-v1.json')['exit']==0
+handles={'wrapper':ident(read(P/'health-operation-launch-v1.json')['wrapper']),'health_operation':ident(read(P/'health-operation-process-v1.json'))};assert not any(h['live'] for h in handles.values())
+out=pathlib.Path(last['output_dir']); now=datetime.datetime.now(datetime.timezone.utc).isoformat();nxt='Prepare and verify a separate frozen engineering-only C0 episode release against accepted production plan, settled health evidence and current STOP/deadline/idle GPU7 checks. Do not replay the completed healthcheck. No scientific promotion; original validation/formal/required ablations remain unproven.'
+r={'schema':'n36-engineering-health-terminal-reconciliation-v1','at':now,'source':prior['current_source'],'exit':ref(P/'health-operation-exit-v1.json'),'handles':handles,'ledger_prefixes_preserved':True,'ledger_prefixes':prefixes,'health_events':rows,'artifacts':{n:ref(out/n) for n in ['healthcheck-result.json','probe-evidence.json','process.json','command.json','probe.log']},'charge_gpu_seconds':last['gpu_process_wall_seconds'],'charge_gpu_hours':last['gpu_process_wall_seconds']/3600,'scientific_eligible':False,'target_met':False,'next_action':nxt};write(T/'health-terminal-reconciliation-v1.json',r)
+d=read(A/'driver-status.json');s={'schema':'autonomy-operational-summary-v1','at':now,'turn':1610,'deadline':prior['deadline'],'stop_exists':(A/'STOP').exists(),'current_source':prior['current_source'],'owner_source':prior['owner_source'],'driver':ident(d['driver']),'coordinator':ident(d['process']),'live_handles':{},'terminal_handles':handles,'ledger_prefixes':prefixes,'prior_ledger_prefixes':prior['ledger_prefixes'],'ledger_prefixes_preserved':True,'completed_work':['Verified bound handoff and user authority; reconciled live health operation without duplicate dispatch.','Observed one health reservation, one dispatch and one passed completion, exit 0; recorded exact charge and native evidence.'],'health_terminal_reconciliation':ref(T/'health-terminal-reconciliation-v1.json'),'health_charge_gpu_hours':r['charge_gpu_hours'],'next_bounded_step':nxt,'unresolved_evidence':['Engineering-only C0 episode release and execution pending.','Original validation, formal and required ablation evidence incomplete.'],'target_met':False,'gpu_dispatch_this_turn':False};write(T/'operational-summary-v1.json',s);(T/'operational-summary-v1.sha256').write_text(ref(T/'operational-summary-v1.json')['sha256']+'\n')
+with (C/'state.lock').open('a') as l:
+ fcntl.flock(l,fcntl.LOCK_EX)
+ with (W/'data/qd-ed-state.lock').open('a') as l2:
+  fcntl.flock(l2,fcntl.LOCK_EX)
+  for p,y in [(W/'research-state.yaml',True),(C/'checkpoint.json',False)]:
+   v=yaml.safe_load(p.read_text()) if y else read(p);v.update(status='N36_ENGINEERING_HEALTH_PASS_EPISODE_RELEASE_PENDING',latest_operational_summary=ref(T/'operational-summary-v1.json'),n36_engineering_health_terminal_reconciliation=ref(T/'health-terminal-reconciliation-v1.json'),next_action=nxt,updated_at=now);v['n36_engineering_live_health_operation']['status']='TERMINAL_PASS_RECONCILED';v['n36_engineering_live_health_operation']['live_handles']=[];write(p,v,y)
+  p=C/'idea_tree.json';v=read(p);v['nodes']['15.6'].update(result='ENGINEERING_HEALTH_PASS_EPISODE_RELEASE_PENDING',insight='GPU7 context probe passed and exact charge retained. Engineering episode not yet released; no scientific promotion.',n36_engineering_operational_summary=ref(T/'operational-summary-v1.json'));write(p,v)
+print(json.dumps({'summary':ref(T/'operational-summary-v1.json'),'charge_gpu_hours':r['charge_gpu_hours'],'next':nxt}))

@@ -1,0 +1,5 @@
+N32R2 controller PID 1818171 remains live on source `1065f381`; frozen artifact hashes and ledger prefixes verified. No restart or duplicate dispatch.
+
+Task 0: all arms 0/1; task 1 C0 failed validly. Next: monitor task 1 Q0. Validation, formal, and ablation evidence remain outstanding.
+
+Turn 195 operational summary saved.

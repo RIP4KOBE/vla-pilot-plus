@@ -1,0 +1,5 @@
+Continued the owning study. Authorization, isolation, process identities, and ledger integrity verified; independent release review passed.
+
+CPU readiness validation remains active on source `808e27f`, PID `4052738`. State/checkpoint and hash-bound turn summary are saved. Next: monitor and reconcile its result without replay.
+
+Validation, formal, and required ablation evidence remain incomplete.

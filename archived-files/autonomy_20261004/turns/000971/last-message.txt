@@ -1,0 +1,3 @@
+N35 remains active on GPU7 with verified controller/worker identities and an intact ledger. Eight Dev cells completed validly without success; task 2 C0 is running.
+
+Recorded turn 971’s operational summary. No restart, duplicate dispatch, or frozen-rule changes. Monitoring continues through the existing driver; validation, formal, and ablation evidence remain outstanding.

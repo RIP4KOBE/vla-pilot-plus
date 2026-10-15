@@ -1,0 +1,35 @@
+{
+  "schema": "qd-ed-n2-report-input-v1",
+  "script_sha256": "8299647ed0ec904e230058a96a8d0b2d2714e2a3879341ea6917416093c3dfe2",
+  "protocol_sha256": "5ff1478eec7a9d8e1e7fb0914d762bacd86195125ff863a7c918f533c225417c",
+  "authorization": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-matrix-report/authorization-v1.json",
+    "sha256": "0cfece7faab94068938cc868e42bd1a8f73f9b2834ebe38e2c879ee0e135baac"
+  },
+  "base_plan": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n2-dev-v1/plan.frozen.json",
+    "sha256": "ec037ec84555bd46d3b776f29979545d21b21c1f3671c3bd32b07e933d5cdc45"
+  },
+  "plan_revisions": [],
+  "input_scope_complete": false,
+  "attempts": [
+    {
+      "terminal": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/attempt-result.json",
+        "sha256": "4bb2e01c0fdf04bd653c913e0187c533d4f7d0440286bdab00ea5577968d7efa"
+      },
+      "audit": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/eds_eval/decision-evidence-audit.json",
+        "sha256": "b0729cc540f0d856d80ccc23bac69bde3a410152ec8a9dfb9bf40bda45e8bc06"
+      },
+      "compute": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/eds_eval/episode_compute.jsonl",
+        "sha256": "2eb2861abb63ef2bfce11feb3f3dbaa3721da44c435e400898644b8410333239"
+      },
+      "metrics": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/attempts/rdt-qd-ed-final-20260921T093925Z__n2_dev_t00_c0_20260923__3cc1e46f83d0/eds_eval/eds_metrics.jsonl",
+        "sha256": "5ca9860afa3f783966c8e700992fade2d10d0ecc508571c18e023192b11d5aca"
+      }
+    }
+  ]
+}

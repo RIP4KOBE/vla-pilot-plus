@@ -1,0 +1,3 @@
+Continued N36R2 recovery: reconciled the completed source refresh, verified 116 bound references, and launched independent review (PID 691501).
+
+All charges remain intact: 504 attempts, 75.49265 GPU-hours. GPU release stays disabled pending review. Operational handoff saved; validation, formal evaluation, and ablation goals remain unmet.

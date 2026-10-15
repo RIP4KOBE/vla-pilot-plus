@@ -1,0 +1,5 @@
+Completed: 160 paths restored, including 12 pinned symlinks. All 3,291 runtime files and 40 composed manifests passed CPU checks; no conflicts.
+
+`release_enabled=false`. No scientific success claimed.
+
+[JSON report](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001219/runtime-input-repair/report-v1.json) · [Markdown report](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001219/runtime-input-repair/report-v1.md)

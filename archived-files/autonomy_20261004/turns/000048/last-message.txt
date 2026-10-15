@@ -1,0 +1,5 @@
+N31 continues on GPU7 under source `7428ce8a`. Controller `203563`, monitor `203562`, and worker `735819` have verified identities; task 5 C0 remains active.
+
+Five matched Dev triples are audited: all arms 0/5. No promotion or completion evidence yet. Ledger history and frozen rules remain intact.
+
+Turn 48’s operational summary is saved. Next: monitor the existing controller and reconcile terminal evidence when available.

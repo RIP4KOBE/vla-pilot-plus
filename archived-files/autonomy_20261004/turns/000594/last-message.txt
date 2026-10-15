@@ -1,0 +1,3 @@
+N34 controller PID 3365423 remains live with verified identity and advancing CPU activity. Release revalidation is ongoing; no new GPU attempt or result is recorded.
+
+Frozen bindings and ledger prefixes are intact. Turn 594’s operational summary is saved. The driver continues monitoring; validation, formal evaluation, and required ablation evidence remain unresolved.

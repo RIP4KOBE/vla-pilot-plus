@@ -1,0 +1,71 @@
+{
+  "schema": "n36-source-adoption-intent-v1",
+  "at": "2026-10-09T23:10:34.902280+00:00",
+  "old_source": "52a87af0bf11f95b21ce17aba456dc98944d9774",
+  "reviewed_source": "ab8e8c6f8fdfb66c3a82b0135c0441cf542a9557",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c"
+  },
+  "acceptance": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001183/repair-review-terminal-reconciliation-v1.json",
+    "sha256": "7946482969106300404ffe2056326d3addeea24512c3936d14d70acf430c447f"
+  },
+  "review": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001180/repair-review/report-v1.json",
+    "sha256": "b718bddf7ca5e5ea8b771f3054ba33bb04560fa55f5a64f35774103d910d6beb"
+  },
+  "changed_files": [
+    "configs/config.yaml",
+    "core/env_adapters/libero_adapter.py",
+    "core/qd_nonprogress_tangent.py",
+    "core/rdt_policy_steer.py",
+    "docs/n36-cpu-audit-repair.md",
+    "docs/n36-cpu-implementation.md",
+    "main.py",
+    "scripts/qd_ed_n36_accounting.py",
+    "scripts/qd_ed_n36_arithmetic.py",
+    "scripts/qd_ed_n36_bootstrap.py",
+    "scripts/qd_ed_n36_bridge.py",
+    "scripts/qd_ed_n36_build.py",
+    "scripts/qd_ed_n36_contract.py",
+    "scripts/qd_ed_n36_healthcheck.py",
+    "scripts/qd_ed_n36_lifecycle.py",
+    "scripts/qd_ed_n36_native.py",
+    "scripts/qd_ed_n36_prepare.py",
+    "scripts/qd_ed_n36_reference.py",
+    "scripts/qd_ed_n36_release.py",
+    "scripts/qd_ed_n36_report.py",
+    "scripts/qd_ed_n36_response.py",
+    "scripts/qd_ed_n36_runner.py",
+    "scripts/qd_ed_n36_source.py",
+    "scripts/qd_ed_n36_supervise.py",
+    "scripts/qd_ed_n36_worker.py",
+    "tests/test_n36_audit_repair.py",
+    "tests/test_n36_boundaries.py",
+    "tests/test_n36_build.py",
+    "tests/test_n36_compatibility.py",
+    "tests/test_n36_composition.py",
+    "tests/test_n36_controller.py",
+    "tests/test_n36_integration.py",
+    "tests/test_n36_release.py",
+    "tests/test_n36_runner.py"
+  ],
+  "preserved_dirty_hashes": {
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/checkpoint.json": "69169cb6456c86c59ecc0fd17d0960f19449215fc42b73736529e4b12698a8b0",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.json": "154855b0b7eae9c0051a3b60d5157108307f7aca53ca3cd7ecf529b37e6ffe75",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/idea_tree.md": "ec6e7abce51314d1fc18dee86ffe9851ab507891e973095b602709951bae057e",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/.coordinator/messages.jsonl": "6f863d77194ecec8c61833b2e52ba0491ce052a2c8200122bc1ed0d6148c41ac",
+    ".arbor/sessions/rdt-qd-ed-final-20260921T093925Z/REPORT.md": "8ea77d177ad899545828db0ad9f559179299df94b85d14396e249badc09e9b5e",
+    "data/attempt-ledger.jsonl": "aff9bf3e50b5d82b06cbb54f067746e3eeb6c27e499235519b903f42957ac368",
+    "data/exposure-registry.jsonl": "b628db432f3536424a9c69157a39d522dc3ea9782f1b0d877b31a3a285013c71",
+    "data/gpu-healthcheck-ledger.jsonl": "b4df8fb3c8e45bbe24e560e55262819430d0c5a4da9754f09062d59fdb480ff6",
+    "data/gpu-hour-reservation-ledger.jsonl": "56f71b65976773ab83cb78ead4ef78a2fa494fce118bad10bf01e25d9e2618b8",
+    "docs/03_evidence/qd_ed_final/iteration-ledger.md": "d4bfbcf2fc3d7b6f01e2c7d681465db7bda968e645e782b5f6e3f415929195cc",
+    "research-state.yaml": "984a41bbf85c2e9f7b0eff1284fad18bb80f850a7082ab34b3514118ba06a544",
+    "research_config.yaml": "6d682df3e289dc211d22e42e268059e3ffd2e5f40c452c0a8c9ac527621a42f1"
+  },
+  "gpu_dispatch_authorized": false,
+  "scientific_promotion": false,
+  "scope": "Exact reviewed source integration for prospective Dev preparation only; no benchmark promotion or protected evaluation."
+}

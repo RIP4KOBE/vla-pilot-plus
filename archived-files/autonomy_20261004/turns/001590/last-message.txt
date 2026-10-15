@@ -1,0 +1,3 @@
+Reconciled the completed CPU refresh and verified sealed artifact hashes. Owning state/checkpoint updated; ledgers and charges unchanged. No GPU cohort is running.
+
+Next: fresh independent B5 review, followed by remaining release gates. Validation/formal/ablation completion remains unproven. Operational summary saved for driver continuation.

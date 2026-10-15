@@ -1,0 +1,7 @@
+Frozen source `52a87af0bf11f95b21ce17aba456dc98944d9774`. N35 controller PID 2632351, boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7, start 141061885 remains live; driver PID 268073 retains ownership. Observed direct child identities are retained in end-reconciliation-v1.json. STOP absent; authorization deadline 2026-10-11T11:13:13Z has not elapsed.
+
+Verified bound handoff/authorization, current launch/plan/release and previous ledger prefix. Previous turn completed normally. Owning ledger now has 1505 rows / 7503565 bytes: 27 N35 cohort valid outcomes and one dispatched cell, n35_dev_t06_n35_20261009, on assigned physical GPU7. Validity counts are not success counts. Current controller status is coarse and unchanged; ledger proves new admission since the prior turn. Charged GPU hours at admission 75.05009718427263, protected reserves 36.24082400243081 GPUh, episode reservation 1840 seconds; all history retained. No terminal result. No recovery, duplicate dispatch, signals, source/protocol/state edits, or coordinator-lock acquisition.
+
+Next bounded step: monitor existing task6 N35 worker and controller; after terminal cohort result reconcile native evidence, complete/partial denominators, costs and frozen promotion gates. Validation/formal/required-ablation completion evidence remains unresolved; original goal incomplete.
+
+Reconciliation SHA-256: 96d35d469f23b2eef09b856effd762d93b04aacfb8eec1d1f488f56fa2370a7d.

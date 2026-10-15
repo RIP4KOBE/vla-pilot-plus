@@ -1,0 +1,887 @@
+schema: qd-ed-final-state-v1
+run_id: 20260921T093925Z
+run_name: rdt-qd-ed-final-20260921T093925Z
+branch: exp/rdt-qd-ed-final-20260921T093925Z
+worktree: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z
+artifacts: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z
+source_commit: 744e08ba4398f2f8e34fb05619c829fc01397f69
+gpu_pool:
+- 3
+max_concurrent_gpu_workers: 1
+project_target:
+  status: TARGET_NOT_MET
+  required_formal_successes: 5
+  achieved: false
+study:
+  status: CONCLUDED_TARGET_NOT_MET
+  mode: real
+  interaction: auto
+  concluded_at: '2026-09-22T12:20:20.701128+00:00'
+  decision: TARGET_NOT_MET / NO_ADOPTION
+  automatic_continuation: false
+candidate:
+  id: N1
+  arbor_node: '4.1'
+  status: INVALID_NOT_PROMOTABLE_COHORT
+  protocol: experiments/iteration_001_execution_intent/protocol.md
+  protocol_commit: 56031d2
+  primary_change: target_distance_gripper_duty_v1
+  online_score: null
+  scientific_decision: INVALID
+  ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
+  algorithm_effect: UNKNOWN_UNEVALUATED
+  closure_reason: One original N1 control cell is nonretryable invalid;4dispatches/1unique
+    cell already used means completing all30original cells would require33attempts,
+    exceeding the frozen30attempt cap. No retry or rename can repair this cohort.
+budget:
+  max_gpu_hours: 48.0
+  gpu_hours_consumed: 1.0262591123256264
+  max_episode_attempts: 240
+  reserved:
+    baseline: 20
+    development: 100
+    validation: 60
+    formal: 40
+    recovery: 20
+  dispatched: 11
+  aborted: 8
+  valid: 0
+  running: 0
+  invalid: 3
+  completed: 3
+  gpu_hour_reservations:
+    validation: 14.0
+    formal: 10.0
+historical:
+  Q0:
+    profile: eds_quality_diversity_sparse_primary
+    success_count: 2
+    denominator: 10
+    tasks:
+    - 5
+    - 8
+  C0:
+    profile: p2_stage_on_abs_rbf_control
+    success_count: 3
+    denominator: 10
+    tasks:
+    - 3
+    - 8
+    - 9
+  Q1:
+    profile: eds_quality_diversity_uniform_expand20
+    success_count: 2
+    denominator: 10
+    tasks:
+    - 5
+    - 7
+  previous_study_outcome: TARGET_NOT_MET_NO_ADOPTION
+  previous_effective_attempts: 70
+  previous_reservations: 98
+  previous_gpu_hours: 6.946832055555556
+  previous_formal_episodes: 0
+active_iteration: iteration_001_execution_intent
+next_action: 'Study closed: TARGET_NOT_MET / NO_ADOPTION. No further automatic GPU
+  or scientific dispatch. Preserve all evidence and closed cohorts; see docs/03_evidence/qd_ed_final/final-report.md.'
+source_spec_sha256: 3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef
+derived_indexes:
+- .arbor/sessions/rdt-qd-ed-final-20260921T093925Z
+authority: This file and docs/03_evidence/qd_ed_final/iteration-ledger.md; attempt
+  ledger is append-only event evidence, not a second mutable state.
+online_blockers: []
+updated_at: '2026-09-22T12:20:20.701128+00:00'
+seed_plan:
+  path: data/frozen-seed-plan.json
+  sha256: 9bbcf7107f6be4f739870a034ea84c4695819bdc1bffe5aa1148f453acf4a6b1
+cpu_validation:
+  integrated_passed: 631
+  post_accounting_change_focused_passed: 51
+  online_evidence: false
+  codex_integration_passed: 673
+  codex_integration_seconds: 40.74
+  startup_repair_passed: 118
+  gpu5_runner_passed: 61
+  gpu5_probe_metadata_passed: 64
+  available_gpu_queue_passed: 26
+  monitor_repair_runner_probe_queue_passed: 122
+  native_policy_probe_passed: 37
+  native_probe_queue_passed: 17
+  native_probe_queue_integrated_passed: 80
+  native_probe_queue_journal_wait_passed: 22
+  render_phase_timing_proposal_passed: 18
+  production_egl_observer_proposal_passed: 17
+  context_drift_and_timing_passed: 26
+  observer_lifecycle_and_dormant_context_passed: 30
+  existing_run_seed_regression_passed: 1
+  scene_model_probe_passed: 6
+  model_load_phases_probe_passed: 3
+  cuda_first_probe_passed: 5
+  render_thread_probe_passed: 4
+  render_process_probe_passed: 6
+  render_process_supervisor_passed: 9
+  render_idle_probe_passed: 5
+  model_first_probe_passed: 3
+  context_lifetime_probe_passed: 6
+  native_render_lifetime_helper_passed: 17
+  native_render_lifetime_probe_passed: 3
+prepared_baseline_plan:
+  path: data/qd-ed-final-plan.json
+  episodes: 20
+  frozen: true
+  refresh_source_fingerprints_before_freeze: true
+  source_commit: 4d9cd5d31e8dde6d298ec10805cde4542d5765a2
+  sha256: 2d12ceb95b51a6d8bea317864b801711cdc138fd685382e23d5b4526192432ac
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/baseline-codex-4d9cd5d31e8d.json
+engineering_baseline_changes:
+- Task-identity-bound guidance cache Stage descriptions; canonical tensor reward guidance
+  remains identical.
+- Owned LIBERO path/dependency bindings instead of stale old-worktree absolute paths.
+- Single-task process with explicit policy_seed and env_seed instead of legacy sequential
+  seed0 RNG stream; same across all arms.
+cuda_egl_context_verified: true
+stage_provider_ready: true
+runner:
+  by_bucket:
+    baseline: 1
+    development: 5
+    validation: 0
+    formal: 0
+    recovery: 5
+  reserved_attempts: 11
+  gpu_hours_by_bucket:
+    baseline: 0.019651524036631195
+    development: 0.2929994372140047
+    validation: 0.0
+    formal: 0.0
+    recovery: 0.7136081510749904
+  gpu_healthcheck_hours: 0.23690014577186147
+  gpu_healthcheck_inflight: 0
+  last_attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_cuda_memcheck_c0_t00__66eec8a1ab74
+  last_event: valid
+gpu_admission_last_observation:
+  physical_gpu: 3
+  physical_index: 3
+  uuid: GPU-62052fa1-37e0-79dc-21aa-5c0f25c0c315
+  must_recheck_before_dispatch: true
+provider_migration_probe:
+  artifact: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/codex-stage-production-probe-v2-20260922/result.json
+  synthetic_image_only: true
+  gpu_hours: 0
+  episode_attempts: 0
+  input_tokens: 9780
+  output_tokens: 69
+  reasoning_output_tokens: 21
+  production_adapter_ready: true
+stage_condition:
+  label: codex_login_astra_low_v1
+  backend: codex_cli
+  model: gpt-6-astra
+  auth_mode: chatgpt
+  reasoning_effort: low
+  cli_version: 0.155.1
+  runtime_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/runtime-manifest.json
+  provider_amendment: experiments/iteration_001_execution_intent/codex-provider-amendment.md
+  http_request_retry_counts: unobserved_null
+  logical_calls_tokens_latency: observed
+startup_failure:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__baseline_dev_t00_q0__49b1a88877f7
+  actions_executed: 0
+  stage_queries: 0
+  outcome_valid: false
+  reason: Stage configuration overwritten by grounding configuration during component
+    initialization
+  retry_allowed: false
+closed_baseline:
+  status: CLOSED_INCOMPLETE_INVALID
+  expected: 20
+  dispatched: 1
+  invalid: 1
+  not_dispatched: 19
+  complete_success_rate: null
+  report: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/iteration_000_intake/closed-incomplete-baseline-report.json
+active_plan:
+  path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json
+  source_commit: 8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2
+  sha256: 6e08d9783d3e66fade7bb75b11da4145b76e186301fb2530bfea86c001e990d3
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json
+  frozen: true
+  iteration: N1
+  expected_unique_scientific_cells: 30
+  rows_including_recovery: 33
+  candidate_dispatch_authorized: false
+  status: CLOSED_INCOMPLETE_N1_NOT_ELIGIBLE
+hardware_migration:
+  previous_physical_gpu: 7
+  authorized_physical_gpu: 5
+  user_instruction: 改用5
+  authorized_at: '2026-09-22T04:31:51.394735+00:00'
+  max_concurrent_gpu_workers: 1
+  earlier_attempts_and_costs_preserved: true
+  egl_device_index: 7
+  metadata_verified: true
+  cuda_egl_verified: false
+previous_gpu7_active_plan:
+  path: data/qd-ed-n1-dev-plan.json
+  source_commit: 71b5880c3dac41a5d26ba678b366f962b5a4af1f
+  sha256: 080985fead54fac3806702c0d8db51904ef94c6aa2231b21cecbf38c7f7bcbfd
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-dev-codex-71b5880c3dac.json
+  iteration: N1
+  controls: 20
+  candidate_cells: 10
+  candidate_dispatch_authorized: false
+authorized_gpu_selection:
+  policy: GPU3 only for all subsequent execution of this task; wait if unavailable;
+    no automatic fallback
+  candidate_indices:
+  - 3
+  selected_physical_gpu: 3
+  user_instruction: 确保当前任务后续都在GPU3完成
+  authorized_at: '2026-09-22T08:25:04.726856+00:00'
+  single_exclusive_worker: true
+  rescan_if_unavailable: true
+  reconfirmed_at: '2026-09-22T10:31:01.328229+00:00'
+resource_queue:
+  pid: 3996172
+  proc_start_ticks: '373125345'
+  source_commit: 8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-monitor-recovery-plan.json
+  plan_sha256: 456c2c992c07b528909fdda892ce49890d3e18f17f6bbe99d1e2a736e6ee8f33
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue.log
+  started_at: '2026-09-22T05:43:42.696206+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-n1-monitor-recovery-plan.json
+  - --episode-key
+  - n1_dev_t00_q0_r3
+  - --episode-key
+  - n1_dev_t00_c0
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/available-gpu-queue-status.json
+  scope: explicit linked r3 Q0 recovery and paired P2; stop for review
+  idle_stability_seconds: 120
+  status: failed
+  last_verified_at: '2026-09-22T06:19:36.975062+00:00'
+  active_plan_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json
+  selected_physical_gpu: 6
+  archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8fb001b-native-abort
+prepared_stable_queue_plan:
+  path: data/qd-ed-n1-stable-queue-plan.json
+  source_commit: 32d4d97c9773a2099b59c3128b3476e6980e95d5
+  sha256: 10c280b86d48b25d5e750100103ae1771d1771e87eb22ba26a25b0026420c269
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-stable-queue-32d4d97c9773.json
+  frozen: true
+  iteration: N1
+  expected_unique_scientific_cells: 30
+  rows_including_recovery: 32
+  candidate_dispatch_authorized: false
+prepared_monitor_recovery_plan:
+  path: data/qd-ed-n1-monitor-recovery-plan.json
+  source_commit: 8fb001b7903c5e6a2a74a5ef6a7f2845ca7e9fe2
+  sha256: 456c2c992c07b528909fdda892ce49890d3e18f17f6bbe99d1e2a736e6ee8f33
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/n1-monitor-recovery-8fb001b7903c.json
+  frozen: true
+  iteration: N1
+  expected_unique_scientific_cells: 30
+  rows_including_recovery: 33
+  candidate_dispatch_authorized: false
+last_infrastructure_recovery:
+  retry_of: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r2__5621b7ebde96
+  original_episode_key: n1_dev_t00_q0_r2
+  new_episode_key: n1_dev_t00_q0_r3
+  identity:
+    split: dev
+    iteration: N1
+    profile: Q0
+    task_id: 0
+    env_seed: 1969522881
+    policy_seed: 1969522881
+    init_index: 0
+  budget_bucket: recovery
+  reason: NVIDIA metadata exclusivity query exceeded5-second monitor timeout
+native_failure:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r3__6df33a24c65f
+  physical_gpu: 6
+  signal: SIGABRT
+  exit_code: -6
+  outcome_valid: false
+  retry_allowed: false
+  stage_successful_queries: 1
+  last_stage_global_step: 24
+  guidance_before: true
+  guidance_after: false
+  root_cause: Unknown
+  core_available: false
+  confirmed_by: apport entry for pid4006998 signal6 corelimit0; no crashfile
+real_stage_transport_evidence:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__n1_dev_t00_q0_r3__6df33a24c65f
+  global_step: 24
+  backend: codex_cli
+  model: gpt-6-astra
+  query_ok: true
+  latency_seconds: 19.772138726897538
+  input_tokens: 10800
+  output_tokens: 42
+  reasoning_output_tokens: 0
+  logical_calls: 1
+  failed_calls: 0
+  http_requests_retries: null
+  task_success_claimed: false
+native_diagnostic:
+  status: MATCHING_COMPLETED_GPU6_B1_EVIDENCE_REUSED
+  script: scripts/qd_ed_policy_native_probe.py
+  scope: B1 native inference on deterministic synthetic inputs; no simulator, actions,
+    Stage call or scientific episode
+  timeout_seconds: 600
+  source_plan_pending_freeze: false
+  limitation: Cannot establish guided-transition or EGL causality
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json
+  plan_sha256: 1ca7b9d970fc9b014820fc69596ec28100c55aed63a1416d23e7c1873d6d55a5
+  source_commit: 8771eaa74ede4159efb004e0709232175a6c0b8d
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/native-gpu7-queue-8771eaa74ede.json
+  physical_gpu: 7
+  reused_resource_id: rdt-qd-ed-final-20260921T093925Z__gpu6_native_b1__b689d3b01c36
+  matching_checks:
+    scope: true
+    synthetic_seed_task: true
+    policy_configuration: true
+    native_script_fingerprint: true
+    runtime_inventory: true
+    shared_source_fingerprints: true
+    evidence_digest: true
+  physical_gpu7_executed: false
+gpu_authorization_history:
+- policy: any idle GPU on current server
+  candidate_indices:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  selected_physical_gpu: 6
+  user_instruction: 帮我使用当前服务器上任何能用的GPU来跑这个任务即可
+  authorized_at: '2026-09-22T04:58:53.637965+00:00'
+  single_exclusive_worker: true
+  rescan_if_unavailable: true
+- policy: GPU7 only; wait if unavailable
+  candidate_indices:
+  - 7
+  selected_physical_gpu: 7
+  user_instruction: 后续任务都收敛到GPU7上完成
+  authorized_at: '2026-09-22T06:36:54.904959+00:00'
+  single_exclusive_worker: true
+  rescan_if_unavailable: true
+resource_journal_anomaly:
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu6_cuda_egl__74d84549721c
+  output_namespace: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z
+  observed_terminal: completed
+  wall_seconds: 15.178619010839611
+  note: Written concurrently from a different artifact namespace, not dispatched by
+    this continuation. Preserve append-only evidence and conservatively retain cost;
+    do not broaden GPU7 authorization.
+  additional_resource:
+    resource_id: rdt-qd-ed-final-20260921T093925Z__gpu6_native_b1__b689d3b01c36
+    event: completed
+    wall_seconds: 116.84877258958295
+  concurrent_attempt:
+    attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00__6e57273c45b3
+    physical_gpu: 6
+    source_commit: 5cafac6586e2b2d5f05468de466fbd56c8334405
+    output_namespace: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-gpu6-20260922T063626Z
+    status: aborted
+    not_launched_by_this_continuation: true
+    gpu_process_wall_seconds: 695.8362217219546
+  scope_question_pending: true
+  continuation_decision: User requires continued work until completion; observed GPU6
+    attempt already infrastructure-aborted. Preserve evidence/costs; this continuation
+    launches only GPU7 and does not stop unrelated external workers.
+  new_concurrent_attempt:
+    attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df
+    physical_gpu: 5
+    source_commit: 79cdce092b4e9c32b42634262cc9d1f7e14bec4b
+    worker_pid: 115030
+    queue_pid: 107052
+    status: infrastructure_aborted_Xid31
+    not_launched_by_this_continuation: true
+  concurrent_serialization_diagnostic:
+    attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu5_egl_serial_c0_t00__00baf2a27328
+    physical_gpu: 5
+    status: aborted_Xid31
+    source_commit: c6f73da3a5bd8fe091e3058d8c469a0bdb349d17
+    gpu_process_wall_seconds: 87.51905658841133
+    context_matches_before_first_render: true
+    explicit_cuda_sync_and_context_bind_did_not_prevent_fault: true
+    not_launched_by_this_continuation: true
+previous_native_resource_queue:
+  pid: 4127385
+  proc_start_ticks: '373525473'
+  source_commit: 8771eaa74ede4159efb004e0709232175a6c0b8d
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json
+  plan_sha256: 1ca7b9d970fc9b014820fc69596ec28100c55aed63a1416d23e7c1873d6d55a5
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue.log
+  started_at: '2026-09-22T06:50:23.972162+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_native_probe_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json
+  - --poll-seconds
+  - '30'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json
+  authorized_physical_gpus:
+  - 7
+  scope: one bounded native diagnostic; no scientific episodes
+  status: failed
+  last_verified_at: '2026-09-22T06:55:26.355675+00:00'
+  heartbeat_unix: 1790060124.6141038
+  reason: state/ledger GPU accounting mismatch
+  archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8771eaa-shared-state-accounting
+native_resource_queue:
+  pid: 4193300
+  proc_start_ticks: '373729486'
+  source_commit: 8771eaa74ede4159efb004e0709232175a6c0b8d
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json
+  plan_sha256: 1ca7b9d970fc9b014820fc69596ec28100c55aed63a1416d23e7c1873d6d55a5
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue.log
+  started_at: '2026-09-22T07:24:24.103366+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_native_probe_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-native-gpu7-queue-v2-plan.json
+  - --poll-seconds
+  - '30'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/native-probe-queue-status.json
+  authorized_physical_gpus:
+  - 7
+  scope: one bounded native diagnostic; no scientific episodes
+  status: interrupted_before_dispatch_for_nonredundant_diagnosis
+  last_verified_at: '2026-09-22T08:17:43.179597+00:00'
+  heartbeat_unix: 1790062224.3071046
+  archived_evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/queue-history/8771eaa-b1-evidence-reused
+user_persistence_instruction: 完成任务后再停止
+prepared_render_diagnostics:
+  status: CPU_REVIEWED_APPLIED
+  patch: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/main-render-phase-timing-proposal.patch
+  sha256: 7d62df655c630a318c28f28ea7a99765ab1482880a179e3a63fcd7207ae927da
+  base_source_commit: 8771eaa74ede4159efb004e0709232175a6c0b8d
+  cpu_tests_passed: 18
+  main_original_operations_ast_unchanged: true
+  draft_protocol: experiments/iteration_001_execution_intent/gpu7-render-timing-diagnostic-draft.md
+  gpu_execution_authorized_by_patch: false
+  timing_limit: inclusive host timings; observer overhead estimated, no kernel time
+    or isolated lock-wait claim
+  protocol: experiments/iteration_001_execution_intent/gpu3-render-timing-diagnostic.md
+prepared_production_context_observer:
+  status: CPU_REVIEWED_UNAPPLIED
+  patch: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/production-egl-identity-proposal.patch
+  sha256: ccfe8ede68fe20e9c190078e1864f2fd17c9f3f575a3ff835f8808d134d51f33
+  helper_sha256: 3d5392455339e7db268b15bc07da251fe42db0ec201ea0162534143c5ae49fc2
+  cpu_tests_passed: 17
+  native_queries_tested: false
+  limitation: Already-loaded raw entrypoints only; unsupported or client-only extension
+    evidence staysUnknown. CPU transparency does not prove native driver behavior
+    is side-effect-free.
+prepared_gpu3_render_plan:
+  path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-c0-render-plan.json
+  sha256: 6b434d451cdae49b5c2047d257633616bfb1e55f59d2d34a10d5e2e8042af28a
+  source_commit: e131ff67f97a5da7fd68d1dd9a8dfe6e08253dea
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/gpu3-c0-render-e131ff67f97a.json
+  frozen: true
+  episode_key: gpu3_native_c0_t00_r2
+  retry_of: rdt-qd-ed-final-20260921T093925Z__gpu6_native_c0_t00_r1__03c5d2b4a1df
+gpu3_render_queue:
+  pid: 134110
+  proc_start_ticks: '374175557'
+  source_commit: e131ff67f97a5da7fd68d1dd9a8dfe6e08253dea
+  plan_path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-c0-render-plan.json
+  plan_sha256: 6b434d451cdae49b5c2047d257633616bfb1e55f59d2d34a10d5e2e8042af28a
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/queue.log
+  started_at: '2026-09-22T08:38:44.819111+00:00'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-c0-render-plan.json
+  - --episode-key
+  - gpu3_native_c0_t00_r2
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/queue-status.json
+  authorized_physical_gpus:
+  - 3
+  status: interrupted_after_owned_Xid31
+  scope: one C0 render diagnostic; continue coordinator after result
+  last_verified_at: '2026-09-22T08:50:52.025777+00:00'
+gpu3_native_failure:
+  attempt_id: rdt-qd-ed-final-20260921T093925Z__gpu3_native_c0_t00_r2__79342697c4d2
+  physical_gpu: 3
+  worker_pid: 142266
+  queue_pid: 134110
+  owned_xids:
+  - 31
+  - 109
+  gpu_process_wall_seconds: 179.21637980407104
+  retry_allowed: false
+  outcome_valid: false
+  actions_completed: 1
+  fresh_policy_calls: 1
+  stage_queries: 0
+  evidence: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-diagnostic/kernel-observations.json
+  causal_status: Unknown; repeated graphics MMU faults and timeout, not explained
+    by physical GPU migration or Stage invocation
+prepared_gpu3_context_plan:
+  path: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-context-drift-plan.json
+  sha256: 0fe02b5667cf4f88728ead4cc7c1e6bc9b304b5801a721260523a7ce0a8fac25
+  source_commit: 37178ab96079e88a6f027b47a09290b3f9a3de02
+  snapshot: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/frozen_plans/gpu3-context-drift-37178ab96079.json
+  frozen: true
+  episode_key: gpu3_context_drift_c0_t00
+  stop_after: three diagnostic boundaries
+  status: NOT_DISPATCHED_SUPERSEDED_BY_STRONGER_CONCURRENT_EVIDENCE
+gpu3_context_queue:
+  pid: 164924
+  proc_start_ticks: '374286377'
+  argv:
+  - /home/hynx/miniconda3/envs/vla-pilot/bin/python
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_available_gpu_queue.py
+  - --plan
+  - /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/data/qd-ed-gpu3-context-drift-plan.json
+  - --episode-key
+  - gpu3_context_drift_c0_t00
+  - --poll-seconds
+  - '30'
+  - --idle-seconds
+  - '120'
+  - --status-path
+  - /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/queue-status.json
+  physical_gpu: 3
+  plan_sha256: 0fe02b5667cf4f88728ead4cc7c1e6bc9b304b5801a721260523a7ce0a8fac25
+  source_commit: 37178ab96079e88a6f027b47a09290b3f9a3de02
+  supervisor_pid: 164897
+  supervisor_sha256: 72b9138d6c5b8db95b4de18322d5847712fba8ba7b7e78d05d033b1cf6a580a7
+  started_at: '2026-09-22T08:57:13.012324+00:00'
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/queue-status.json
+  log_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/queue.log
+  supervisor_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-drift-diagnostic/supervise.py
+  status: failed_before_dispatch_shared_study_inflight
+  last_verified_at: '2026-09-22T09:10:48.651780+00:00'
+  gpu_dispatched: false
+gpu3_static_scene_diagnostic:
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-static-scene-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-static-scene-diagnostic/frozen-contract.json
+  contract_sha256: a080ed9625989cef5b0de19321fc367e14bfbaf0ed934ffb0a62b6b84ff98695
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-static-scene.py
+  tool_session_id: 26447
+  phase: completed
+  source_commit: a5e1236daa8de7eea3a9882028304bdcbc3096e2
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_static_scene__b8f0b3b6214f
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-static-scene-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_static_scene__b8f0b3b6214f/healthcheck-result.json
+  gpu_process_wall_seconds: 10.327968017198145
+  frame_count: 12
+  actions: 0
+  integration_transitions: 0
+  stage_calls: 0
+  owned_xids: []
+gpu3_scene_model_diagnostic:
+  status: ABORTED_OWNED_XID31_AFTER_LOAD_BEFORE_PREDICTION
+  protocol: experiments/iteration_001_execution_intent/gpu3-scene-model-diagnostic.md
+  physical_gpu: 3
+  maximum_gpu_process_seconds: 600
+  automatic_retry: false
+  tool_session_id: 31926
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-model.py
+  script_sha256: 82981d32eaf709ac3c7e4232749b92baeb86994fa98bdd49c81347819d715e70
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-scene-model.py
+  supervisor_sha256: 01549695362503f2960f1eff80e280d0e70a60e3ab3c0e96816664975f6358d1
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/status.json
+  source_commit: 9b1b4727a50c11ee0a36bb96aa64810807439039
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_scene_model__c83cfb349cba
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_scene_model__c83cfb349cba/healthcheck-result.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/frozen-contract.json
+  contract_sha256: 30b237ff4171bf0e49fd0f80e5234868ee73f62dc414e9507386dc34563f11bb
+  gpu_process_wall_seconds: 73.72699015820399
+  prediction_calls: 0
+  owned_xids:
+  - 31
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-scene-model-diagnostic/diagnostic-analysis.json
+gpu3_load_phase_diagnostic:
+  status: ABORTED_NONFINITE_DEPTH_AFTER_CUDA_INIT_SEED
+  physical_gpu: 3
+  source_commit: d9416fb7bf56c5135ef49c6bdaa9935de9e14e18
+  tool_session_id: 95403
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-model-load-phases.py
+  script_sha256: 741c087a21228b5dc5f49801c3734b93ed690760a3731eb5c8b6b3138a0775a4
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-model-load-phases.py
+  supervisor_sha256: ab2796fe17200ab1178d9c1befb2fc5cfd49c8a9d4230a9a3181f1c9c1d4c735
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/frozen-contract.json
+  protocol: experiments/iteration_001_execution_intent/gpu3-model-load-phases-diagnostic.md
+  automatic_retry: false
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_model_load_phases__52ec6c4eb068
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_model_load_phases__52ec6c4eb068/healthcheck-result.json
+  contract_sha256: f87139677662de6cf65a47383c7d521b0b9c91b606ef88bac5f3fd8917337f3e
+  gpu_process_wall_seconds: 42.836270067840815
+  model_loads: 0
+  model_forward_calls: 0
+  owned_xids: []
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-load-phases-diagnostic/diagnostic-analysis.json
+gpu3_cuda_first_diagnostic:
+  status: ABORTED_NONFINITE_DEPTH_AFTER_T5_LOAD
+  physical_gpu: 3
+  protocol: experiments/iteration_001_execution_intent/gpu3-cuda-first-diagnostic.md
+  automatic_retry: false
+  source_commit: be658cd47b3895ee56873c71b333d8046bca1708
+  tool_session_id: 25421
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-cuda-first.py
+  script_sha256: b0c4dd043cc2bb9b96ca72bf25ca40099a5da8b64a9651ab1e2fa24773725f9c
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-cuda-first.py
+  supervisor_sha256: c9fdd50852c16e53ce2a1ccca2835cbcd5f4bf22e080244bdac1b9fc85b1a35e
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/frozen-contract.json
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_first__c40589cf6c65
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_cuda_first__c40589cf6c65/healthcheck-result.json
+  contract_sha256: 5dc28f10b3bc99a12e9d917c0efcfb12f550d953ccd206a342e31681b8d4c502
+  gpu_process_wall_seconds: 82.97216953756288
+  model_forward_calls: 0
+  actions: 0
+  integration_transitions: 0
+  owned_xids: []
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-cuda-first-diagnostic/diagnostic-analysis.json
+gpu3_render_thread_diagnostic:
+  status: ABORTED_OWNED_XID31_AFTER_MODEL_LOAD
+  physical_gpu: 3
+  automatic_retry: false
+  production_patch_applied: false
+  scope: same static scene, model loading and one B1; all environment/context work
+    confined to one dedicated thread; zero actions/integration
+  protocol: experiments/iteration_001_execution_intent/gpu3-render-thread-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-thread.py
+  script_sha256: ce9457f5e184e6cad285a1444f97fefbaa1b8c353346e310b7c738cf76855ed0
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-render-thread.py
+  supervisor_sha256: 51e604cecf10f8eca134ba4edc6eba5354453ac94149892667fb680cd528792f
+  maximum_gpu_process_seconds: 600
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/frozen-contract.json
+  tool_session_id: 49770
+  source_commit: 5192e5d48f978cfe62fefd80e2a3426033b109f5
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_render_thread__be460ba14398
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_thread__be460ba14398/healthcheck-result.json
+  contract_sha256: 1eba79779c181c19774ddab2980cc5e0b2518ab651c6b014b6b7c7fc06343a83
+  gpu_process_wall_seconds: 72.35227173706517
+  model_forward_calls: 0
+  prediction_calls: 0
+  owned_xids:
+  - 31
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-thread-diagnostic/diagnostic-analysis.json
+  cleanup_success: true
+gpu3_render_process_diagnostic:
+  status: ABORTED_RENDERER_XID31_AFTER_MODEL_LOAD
+  physical_gpu: 3
+  automatic_retry: false
+  production_patch_applied: false
+  scope: one model parent and one fresh spawn renderer on GPU3; original static scene,
+    model load and one B1; zero actions/integration
+  protocol: experiments/iteration_001_execution_intent/gpu3-render-process-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-process.py
+  script_sha256: 9eff1e42185316c5070b1d581e6238169657d1bdff9f4e20ebb76ac583e1a390
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-render-process.py
+  supervisor_sha256: 588e568057e54006a5b8e4b1b7002328647129c6006dacc29ad2509c6c05fc24
+  maximum_gpu_process_seconds: 600
+  maximum_cleanup_seconds: 40
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/frozen-contract.json
+  tool_session_id: 5827
+  source_commit: c1da591478b155e0bbfa191d1e62ac99dee5b050
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_render_process__7a179aced1de
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_process__7a179aced1de/healthcheck-result.json
+  contract_sha256: f7bbb68c2515413a89ce7869dd06a698c1d9224e247a36fb5ebfba9f9dfd5d6c
+  gpu_process_wall_seconds: 72.52888720668852
+  prediction_calls: 0
+  owned_xids:
+  - 31
+  cleanup_success: true
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-process-diagnostic/diagnostic-analysis.json
+gpu3_render_idle_diagnostic:
+  status: PASS_75_SECOND_NO_MODEL_IDLE_CONTROL
+  physical_gpu: 3
+  automatic_retry: false
+  idle_seconds: 75
+  maximum_gpu_process_seconds: 180
+  model_loads: 0
+  scope: same static scene and cameras before/after75s idle; no CUDA initialization/model/action/integration
+  protocol: experiments/iteration_001_execution_intent/gpu3-render-idle-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-render-idle.py
+  script_sha256: ec415acee0e57f29603bdf7dc6771ca6d55bdad31e22c28e9ab1463a6767ad05
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-render-idle.py
+  supervisor_sha256: bde008e92f2bbb96ef1cac1d7887d58a2fd3fd95b8ee2b9813c0da47106a6ae1
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/frozen-contract.json
+  tool_session_id: 23388
+  source_commit: a850f974625f09e7a5823a9a38169fdd845d86e7
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_render_idle__8d9503386162
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-render-idle-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_render_idle__8d9503386162/healthcheck-result.json
+  contract_sha256: a0688ad3ebc0d732606b546614d052ca685f438fcd82d627113548cffdcc460b
+  gpu_process_wall_seconds: 82.93174356641248
+  frame_count: 10
+  all_static_hashes_match: true
+  owned_xids: []
+gpu3_model_first_diagnostic:
+  status: ABORTED_OWNED_XID31_AFTER_VALID_B1
+  physical_gpu: 3
+  automatic_retry: false
+  maximum_gpu_process_seconds: 600
+  scope: complete original model load before first application EGL context, then frozen
+    static scene and oneB1; zero actions/integration
+  protocol: experiments/iteration_001_execution_intent/gpu3-model-first-diagnostic.md
+  production_patch_applied: false
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-model-first.py
+  script_sha256: 63d0acaed3b5c1a3088dab79f49c2f224374406a0d9078c4c3aeeb2364eb2519
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-model-first.py
+  supervisor_sha256: e834d28838e0e9c324af42b7fcb8aa67f789f61963e36952b0cc41f5816edfde
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/frozen-contract.json
+  tool_session_id: 85251
+  source_commit: c97b1395f14c9d027ed2e88180b0820b7b888e24
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_model_first__256bd92ec777
+  worker_pid: 414431
+  worker_proc_start_ticks: '375188103'
+  supervisor_pid: 411006
+  contract_sha256: cf240423e1bc27969425d963cb9c208bf0a02011fc02abd2591ee66de0e0e1e1
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_model_first__256bd92ec777/healthcheck-result.json
+  gpu_process_wall_seconds: 73.69034509593621
+  pre_prediction_static_hashes_match: true
+  model_load_seconds: 64.78850958216935
+  prediction_calls: 1
+  model_forward_calls: 5
+  owned_xids:
+  - 31
+  cleanup_success: true
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-model-first-diagnostic/diagnostic-analysis.json
+gpu3_context_lifetime_diagnostic:
+  status: ABORTED_IMAGE_HASH_MISMATCH_NO_XID
+  physical_gpu: 3
+  automatic_retry: false
+  maximum_gpu_process_seconds: 600
+  production_patch_applied: false
+  scope: Retire complete rendering context before original B1, then recreate matching
+    context; fixed static scene, zero actions/integration.
+  protocol: experiments/iteration_001_execution_intent/gpu3-context-lifetime-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-context-lifetime.py
+  script_sha256: 76c600819d57cc7179b3ba75c3f88ba5901053e68f38523ebbbe021c9785784f
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-context-lifetime.py
+  supervisor_sha256: 995dcaae05ada01d445aadbee8ed9eae16b30f2216fd71e88a79dd63e78e6e69
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/frozen-contract.json
+  tool_session_id: 23017
+  source_commit: 5a6290a07f95447a509182329adfe0a4ea4cf5bb
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_context_lifetime__a426c0351816
+  worker_pid: 436246
+  worker_proc_start_ticks: '375288263'
+  supervisor_pid: 432062
+  contract_sha256: cd742189842d2de2217b2c03602dc5829ed29b0a66fde99589decfebacc0ebe0
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_context_lifetime__a426c0351816/healthcheck-result.json
+  gpu_process_wall_seconds: 81.47155109513551
+  finite_frame_count: 10
+  static_hash_mismatches:
+  - phase: after_prediction_sync
+    camera: agentview
+    width: 128
+    rgb_sha256: 6bcd547193f484aaf3f5d94cfe77a2f7bcb2ff6aa3ff8cedc909cd9239c8a741
+    matches_static: false
+  prediction_calls: 1
+  model_forward_calls: 5
+  mj_forward_calls: 6
+  owned_xids: []
+  cleanup_success: true
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-context-lifetime-diagnostic/diagnostic-analysis.json
+gpu3_native_render_lifetime_diagnostic:
+  status: ABORTED_RGB_PARITY_BEFORE_MODEL_LOAD
+  physical_gpu: 3
+  automatic_retry: false
+  maximum_gpu_process_seconds: 600
+  production_patch_applied: false
+  scope: Original scene-first static/model/B1 order; native resources held only across
+    full render/readback, stable Python scene/camera/options; no extra mj_forward
+    or CUDA operations; zero actions/integration.
+  protocol: experiments/iteration_001_execution_intent/gpu3-native-render-lifetime-diagnostic.md
+  script: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/libero-task0-native-render-lifetime.py
+  script_sha256: cf48e493e74f2e44283eff537e1339c6ccb8e1a0ef643cbe4a65b11681c307c5
+  helper: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/native-render-lifetime-proposal/native_render_lifetime.py
+  helper_sha256: ebbff19af379a2e0db523ef32df66cb2edbef6e62d74090db45957e4767b55c0
+  supervisor: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/debug-tools/supervise-native-render-lifetime.py
+  supervisor_sha256: a156aa0e7d752b57e1c4a554991036963c8a420edcb8186479f4a4546f064fd1
+  status_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/status.json
+  contract_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/frozen-contract.json
+  tool_session_id: 25711
+  source_commit: 2435f86f601fa97070f6697670b29063078e91ac
+  resource_id: rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056
+  worker_pid: 458749
+  contract_sha256: 535ebb5115237529d775fde8e1b334552d811d94fd90a95e549ed71eaebcca78
+  result_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/rdt-qd-ed-final-20260921T093925Z__gpu3_native_render_lifetime__72a4dc721056/healthcheck-result.json
+  analysis_path: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/gpu3-native-render-lifetime-diagnostic/diagnostic-analysis.json
+  gpu_process_wall_seconds: 6.335480608046055
+  model_loads: 0
+  prediction_calls: 0
+  finite_frame_count: 6
+  owned_xids: []
+  cleanup_success: true
+closed_n1:
+  status: INVALID_NOT_PROMOTABLE
+  dispatched_attempts: 4
+  unique_dispatched_cells: 1
+  expected_unique_cells: 30
+  undispatched_unique_cells: 29
+  required_attempts_to_fill_original_matrix: 33
+  frozen_attempt_cap: 30
+  nonretryable_invalid_control: true
+  candidate_online_evaluations: 0
+  algorithm_effect: UNKNOWN
+  source_protocol: experiments/iteration_001_execution_intent/protocol.md
+  ordering_amendment: experiments/iteration_001_execution_intent/startup-repair-amendment.md
+  old_plan_preserved: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/runtime/resource_queue/89d2dd719e0346bd9011931cc66731a0/plan.json
+  new_same_candidate_comparison_authorized: false
+bounded_mechanism_review:
+  status: COMPLETE_NO_SUPPORTED_SUCCESSOR
+  scope: One targeted review of existing historical/diagnostic evidence for a genuinely
+    different falsifiable QD-ED successor. No renamed N1, no new GPU/scientific dispatch.
+  if_no_supported_hypothesis: CONCLUDE_TARGET_NOT_MET
+  authority: User specification section6 permits failure review and next mechanism;
+    prior N1 limits remain binding.
+  decision: CONCLUDE_TARGET_NOT_MET
+  evidence_gap: Executed-horizon proposal lacks exact t8Z/start-EEF/provider-quality
+    reconstruction, actual selection changes and lawful next-observation progress
+    linkage; existing XY argmin differences do not establish quality misranking.
+final_delivery:
+  status: FINALIZED_NEGATIVE_RESULT
+  report: /home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/03_evidence/qd_ed_final/final-report.md
+  accounting: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/final_delivery/accounting.json
+  artifact_manifest: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/final_delivery/manifest.json
+  preclosure_audit: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/final_delivery/preclosure-audit.json
+  last_execution_source_commit: 2435f86f601fa97070f6697670b29063078e91ac
+  best_effective_candidate: null
+  candidate_online_evaluations: 0
+  validation_executed: false
+  formal_executed: false
+  owned_gpu_workers: []
+  active_queue: null
+  automatic_dispatch_authorized: false
+  stop_authority: 'User specification sections 6 and 10: bounded review found no supported
+    successor mechanism. Budget remains available; target not achieved.'

@@ -1,0 +1,3 @@
+Continuation verified. N36’s existing CPU executor remains active; source and private ledgers are unchanged. GPU dispatch remains disabled pending tests and review.
+
+Recorded the hash-bound turn 001561 operational summary. Next: reconcile executor results and independently review changes. Validation, formal evaluation, and required ablation evidence remain incomplete.

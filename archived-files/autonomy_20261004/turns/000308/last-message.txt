@@ -1,0 +1,3 @@
+N32R2 remains active on frozen source `1065f381`. Controller 1818171 and worker 3808578 identities are verified; ledger history is intact.
+
+Turn 308’s operational summary is saved. Next: monitor task 3’s outcome and native audits. Validation, formal evaluation and required ablation evidence remain outstanding.

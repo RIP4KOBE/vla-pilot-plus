@@ -1,0 +1,3 @@
+N36R1 remains live: controller 391755, runner 391766, worker 396903. Frozen hashes and ledger history verified; first C0 Dev cell is undergoing audits.
+
+Operational summary saved for continued driver monitoring. Validation, formal evaluation, and required ablation evidence remain outstanding.

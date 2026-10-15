@@ -1,0 +1,3 @@
+Continued on source `a14f3a8`. A readiness accounting gap blocks measurement release; independent CPU review is running under verified PIDs `2980510/2980511`.
+
+No GPU dispatch or ledger charges were added. State, checkpoint, and operational summary are saved. Next: reconcile the review and resolve admission. Validation, formal, and ablation goals remain unmet.

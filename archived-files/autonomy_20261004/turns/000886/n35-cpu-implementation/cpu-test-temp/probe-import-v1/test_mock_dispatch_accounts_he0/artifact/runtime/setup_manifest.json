@@ -1,0 +1,21 @@
+{
+  "worktree": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000886/n35-cpu-implementation/cpu-test-temp/probe-import-v1/test_mock_dispatch_accounts_he0/worktree",
+  "artifact_root": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000886/n35-cpu-implementation/cpu-test-temp/probe-import-v1/test_mock_dispatch_accounts_he0/artifact",
+  "metadata_mapping_verified": true,
+  "provider_ready": false,
+  "cuda_egl_verified": true,
+  "gpu_mapping": {
+    "physical_gpu": 5,
+    "metadata_mapping_verified": true,
+    "uuid": "GPU-unit-test",
+    "egl_device_index": 7,
+    "pci_bus_id": "0000:a1:00.0",
+    "cuda_egl_verified": true
+  },
+  "environment": {},
+  "cuda_egl_probe": {
+    "resource_id": "unit-test__gpu5_cuda_egl__b1a9456b5bc0",
+    "evidence_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000886/n35-cpu-implementation/cpu-test-temp/probe-import-v1/test_mock_dispatch_accounts_he0/artifact/runtime/probes/unit-test__gpu5_cuda_egl__b1a9456b5bc0/probe-evidence.json",
+    "evidence_sha256": "547c2ab54101e55eda774f26a8510e996df4d0987fe43708a260a268efefef98"
+  }
+}

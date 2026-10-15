@@ -1,0 +1,3 @@
+Refreshed and verified all 40 disabled manifests against the reviewed controller semantics. Recorded the result in owning state, checkpoint, and operational summary.
+
+Source and ledgers remain unchanged. Next: independent exact-binding review, then accounting and health readiness. No GPU dispatched; the original research goal remains unmet.

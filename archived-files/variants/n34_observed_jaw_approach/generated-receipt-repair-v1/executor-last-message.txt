@@ -1,0 +1,8 @@
+Committed `dc327becc00cd205bda0bd7905c24e6ade8efd6b`.
+
+- Repaired parent consumption with retained, process-bound generated-origin evidence.
+- Preserved ordinary inventory and controller/native gates.
+- Passed 112 focused CPU checks.
+- Wrote `report-v1.md` and `implementation-result-v1.json` in `generated-receipt-repair-v1`.
+
+Post-cleanup attestation limitations are documented. Worktree is clean; ready for root review and adoption.

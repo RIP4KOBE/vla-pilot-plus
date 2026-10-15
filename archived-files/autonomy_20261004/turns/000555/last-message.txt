@@ -1,0 +1,3 @@
+Verified ownership, live driver identity, and unchanged ledgers. N34’s CPU import probe passed, but the parent receipt verifier would reject the generated Torch module. Recorded the blocker and bounded repair scope in the owning checkpoint.
+
+No GPU dispatched. Validation, formal evaluation, and required ablation evidence remain outstanding; the driver continues.

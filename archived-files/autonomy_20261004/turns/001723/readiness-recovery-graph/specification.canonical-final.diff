@@ -1,0 +1,40 @@
+--- /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/engineering-r1-spec.prospective-disabled-v7.json
++++ /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001723/readiness-recovery-graph/engineering-r1-spec.canonical-prospective-disabled-v1.json
+@@ -108,6 +108,10 @@
+     "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001616/prospective-recovery-amendment-v1.json",
+     "sha256": "fe3c11c3a4be56f74149dc7e21a59eef59611478841d0fa8993bc79f8760e5ba"
+   },
++  "readiness_recovery": {
++    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001723/readiness-recovery-graph/recovery-identity.prospective-disabled-v1.json",
++    "sha256": "5594e2968c68ca8d8babb7f45d8032b241da87fa25bdcdce62ac7a6a0d83e99a"
++  },
+   "release_enabled": false,
+   "retained_ledger_prefixes": {
+     "attempt-ledger.jsonl": {
+@@ -197,14 +201,14 @@
+       "preparation.readiness_proof"
+     ],
+     "preparation": {
+-      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/preparation-policy.prospective-disabled-v2.json",
+-      "sha256": "df24b4319407825e4dd31550fdf4f8e79b256c2ff7137b698151164e5edebc80"
++      "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001723/readiness-recovery-graph/preparation-policy.canonical-prospective-disabled-v1.json",
++      "sha256": "416345f05c277957c46db864794ea5826b789d2e23910a2c59ad1e6f38dd906e"
+     },
+     "repair_authority": {
+       "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001651/readiness-implementation/authority-v1.json",
+       "sha256": "1da564c70827ed7acfc47e121f67e015b17f86e018c67a3c0c6ac35d5cb45692"
+     },
+-    "runtime_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/prospective-runtime.measured-v1.json",
++    "runtime_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001723/readiness-recovery-graph/runtime.measured.pending-v1.json",
+     "schema": "n36-r1-evidence-runtime-derivation-v2",
+     "source_base": "bd5dd4dabcb5a1f7823a9e2f51c849cd67767cb6",
+     "source_change_allowlist": [
+@@ -214,7 +218,7 @@
+       "scripts/qd_ed_n36_readiness_prepare.py",
+       "tests/test_n36_readiness_prepare.py"
+     ],
+-    "source_record_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/prospective-final-source-v1.json",
++    "source_record_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001723/readiness-recovery-graph/source-record.prospective-disabled-v1.json",
+     "technical_justification": "A static final runtime digest in source would bind a runtime whose source inventory includes that same source digest and commit, creating a cycle. Pin the exact 001631 template and repair authority instead; permit only a complete verified current committed source inventory at fixed prospective paths. Runtime file records are unchanged because these three repair paths are absent from the template files. All non-source preparation fields, dependencies, model/native bytes and false readiness remain exact. This is disabled preparation only; review, B5, adoption and separately released fresh health/episode gates remain required."
+   },
+   "schema": "n36-engineering-r1-operational-spec-v1",

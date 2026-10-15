@@ -1,0 +1,3 @@
+N34 controller PID 3365423 remains live in release revalidation/admission. Identity and frozen artifact hashes verified; ledgers unchanged at 442 dispatches / 62.81146 GPU-hours.
+
+Saved turn 583’s operational summary. No duplicate dispatch or scientific changes. Driver continuation remains active; validation, formal, and ablation evidence is still outstanding.

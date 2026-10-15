@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="8" time="27.904" timestamp="2026-10-10T07:05:22.425903+00:00" hostname="hynx"><testcase classname="tests.test_n36_stop_guard" name="test_stop_after_worker_entry_prevents_main_and_retains_receipt[0]" time="0.014" /><testcase classname="tests.test_n36_stop_guard" name="test_stop_after_worker_entry_prevents_main_and_retains_receipt[1]" time="0.016" /><testcase classname="tests.test_n36_audit_repair" name="test_stale_cache_repro_and_frozen_source_execution" time="2.803" /><testcase classname="tests.test_n36_audit_repair" name="test_unsafe_entry_rejects_and_sourceless_rejects" time="8.009" /><testcase classname="tests.test_n36_audit_repair" name="test_actual_runner_to_worker_entry_ignores_poisoned_dependencies" time="9.015" /><testcase classname="tests.test_n36_audit_repair" name="test_compiled_bytes_join_rejects_changed_source_and_loader" time="2.933"><failure message="AssertionError: Traceback (most recent call last):&#10;    File &quot;/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_bootstrap.py&quot;, line 138, in &lt;module&gt;&#10;      runpy.run_module(target, run_name='__main__', alter_sys=True)&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 226, in run_module&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 98, in _run_module_code&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/attest_check.py&quot;, line 37, in &lt;module&gt;&#10;      receipt=source.attest(root,frozen,runtime,binding=binding)&#10;              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_source.py&quot;, line 236, in attest&#10;      require(index.get(path, generated.get(name)) == digest and sha(Path(path)) == digest,&#10;    File &quot;/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_source.py&quot;, line 18, in require&#10;      raise ValueError(reason)&#10;  ValueError: N36 compiled source not frozen: torch._VF&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/home/hynx/miniconda3/envs/vla-pilot/bin/python', '-I', '-S', '-B', '-X', 'pycache_prefix=/dev/null', '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_bootstrap.py', 'attest_check'], returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File &quot;/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_bootstrap.py&quot;, line 138, in &lt;module&gt;\n    runpy.run_module(target, run_name=\'__main__\', alter_sys=True)\n  File &quot;&lt;frozen runpy&gt;&quot;, line 226, in run_module\n  File &quot;&lt;frozen runpy&gt;&quot;, line 98, in _run_module_code\n  File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code\n  File &quot;/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/attest_check.py&quot;, line 37, in &lt;module&gt;\n    receipt=source.attest(root,frozen,runtime,binding=binding)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_source.py&quot;, line 236, in attest\n    require(index.get(path, generated.get(name)) == digest and sha(Path(path)) == digest,\n  File &quot;/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_source.py&quot;, line 18, in require\n    raise ValueError(reason)\nValueError: N36 compiled source not frozen: torch._VF\n').returncode">tmp_path = PosixPath('/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0')
+
+    def test_compiled_bytes_join_rejects_changed_source_and_loader(tmp_path):
+        root = bootstrap_tree(tmp_path)
+        (root/'fixture.py').write_text('value = "frozen"\n')
+        (root/'attest_check.py').write_text('''import sys, hashlib
+    from pathlib import Path
+    from scripts import qd_ed_n36_source as source
+    import fixture
+    root=Path(__file__).parent
+    state=source.active()
+    # Explicitly synthetic inventories; this does not attest the installed runtime.
+    def inventories():
+        files=[{'path':str(p.relative_to(root)),'sha256':source.sha(p)} for p in root.rglob('*.py')]
+        runtime={'modules':{},'generated_modules':{},'interpreter':source.interpreter_identity()}
+        for name,module in list(sys.modules.items()):
+            path=getattr(module,'__file__',None)
+            if path and Path(path).is_file() and not Path(path).resolve().is_relative_to(root):
+                runtime['modules'][name]={'path':str(Path(path).resolve()),'sha256':source.sha(path)}
+        return {'files':files},runtime
+    frozen,runtime=inventories()
+    for name in ('os.path','posixpath'):
+        runtime['modules'][name]={'path':str(Path(sys.modules[name].__file__).resolve()),'sha256':source.sha(sys.modules[name].__file__)}
+    __SYNTHETIC_BINDING__
+    receipt=source.attest(root,frozen,runtime,binding=binding)
+    assert any(r['module']=='fixture' for r in receipt['compiled'])
+    (root/'fixture.py').write_text('value = "other!"\\n')
+    new,_=inventories()
+    try: source.attest(root,new,runtime,binding=binding)
+    except ValueError as e: assert 'compiled source not frozen' in str(e)
+    else: raise AssertionError('live compiled bytes not checked')
+    import importlib.machinery
+    importlib.machinery.SourceFileLoader.get_code=lambda *a:None
+    try: source.active()
+    except ValueError as e: assert 'loader replaced' in str(e)
+    else: raise AssertionError('loader replacement accepted')
+    print('compiled source joins verified')
+    '''.replace('__SYNTHETIC_BINDING__',SYNTHETIC_BINDING))
+        result = run(command(sys.executable, root, 'attest_check'), root)
+&gt;       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_bootstrap.py", line 138, in &lt;module&gt;
+E             runpy.run_module(target, run_name='__main__', alter_sys=True)
+E           File "&lt;frozen runpy&gt;", line 226, in run_module
+E           File "&lt;frozen runpy&gt;", line 98, in _run_module_code
+E           File "&lt;frozen runpy&gt;", line 88, in _run_code
+E           File "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/attest_check.py", line 37, in &lt;module&gt;
+E             receipt=source.attest(root,frozen,runtime,binding=binding)
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_source.py", line 236, in attest
+E             require(index.get(path, generated.get(name)) == digest and sha(Path(path)) == digest,
+E           File "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_source.py", line 18, in require
+E             raise ValueError(reason)
+E         ValueError: N36 compiled source not frozen: torch._VF
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/home/hynx/miniconda3/envs/vla-pilot/bin/python', '-I', '-S', '-B', '-X', 'pycache_prefix=/dev/null', '/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_bootstrap.py', 'attest_check'], returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_bootstrap.py", line 138, in &lt;module&gt;\n    runpy.run_module(target, run_name=\'__main__\', alter_sys=True)\n  File "&lt;frozen runpy&gt;", line 226, in run_module\n  File "&lt;frozen runpy&gt;", line 98, in _run_module_code\n  File "&lt;frozen runpy&gt;", line 88, in _run_code\n  File "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/attest_check.py", line 37, in &lt;module&gt;\n    receipt=source.attest(root,frozen,runtime,binding=binding)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_source.py", line 236, in attest\n    require(index.get(path, generated.get(name)) == digest and sha(Path(path)) == digest,\n  File "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001337/fixture-repair/tmp/pytest-v3/test_compiled_bytes_join_rejec0/scripts/qd_ed_n36_source.py", line 18, in require\n    raise ValueError(reason)\nValueError: N36 compiled source not frozen: torch._VF\n').returncode
+
+tests/test_n36_audit_repair.py:313: AssertionError</failure></testcase><testcase classname="tests.test_n36_audit_repair" name="test_main_source_entry_preserves_script_semantics" time="2.583" /><testcase classname="tests.test_n36r2_draft" name="test_new_identity_cannot_release_or_admit" time="0.001" /></testsuite></testsuites>

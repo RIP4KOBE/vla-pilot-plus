@@ -1,0 +1,3 @@
+**BLOCK**: accounting omits the effective 221.084-hour ceiling and leaves retained healthcheck charges unreconciled. Scientific protocol checks passed; no GPU or validation release.
+
+Wrote [report-v1.md](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000883/n35-protocol-review/report-v1.md) and [report-v1.json](/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000883/n35-protocol-review/report-v1.json), with verified input hashes, blockers, and implementation obligations.

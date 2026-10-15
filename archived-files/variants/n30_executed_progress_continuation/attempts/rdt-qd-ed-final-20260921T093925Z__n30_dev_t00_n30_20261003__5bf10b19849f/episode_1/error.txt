@@ -1,0 +1,8 @@
+Error during episode execution:
+Traceback (most recent call last):
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py", line 1539, in run
+    self._run_episode(episode, episode_dir, episode_seed)
+  File "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/study_worktree/main.py", line 1830, in _run_episode
+    obs, keypoints, keypoint_tracking_snapshot, episode)
+    ^^^
+UnboundLocalError: cannot access local variable 'obs' where it is not associated with a value

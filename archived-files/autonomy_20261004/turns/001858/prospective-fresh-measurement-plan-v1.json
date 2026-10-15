@@ -1,0 +1,140 @@
+{
+  "schema": "n36-fresh-measurement-lifetime-plan-v1",
+  "status": "CPU_DESIGN_SELECTED_NOT_ADOPTED",
+  "at": "2026-10-11T09:01:15.372651+00:00",
+  "authority": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/user-authorization-v1.json",
+    "bytes": 1942,
+    "sha256": "a8d4dfc38b1fd5e9895d5a78b8eab0d0334ef5cb2716ba6aeeb35a8140c5506c"
+  },
+  "source": {
+    "commit": "808e27f702564fe51db45016e139b68ecb476f8c",
+    "worktree": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree",
+    "test_evidence_commit": "ea5d7646f1d64531e6aec1f4b7abc5455af93b5a",
+    "test_branch": "exp/n36-engineering-adapter-001482"
+  },
+  "decision": "Preserve current freshness semantics; compose a new disabled successor measurement graph and identity. Do not reuse expired readiness or modify source solely to accept it.",
+  "resource_id": "n36_readiness_preparation_recovery_001858",
+  "predecessors": [
+    {
+      "resource_id": "n36_readiness_preparation_001651",
+      "events": [
+        "reserved",
+        "dispatched",
+        "aborted"
+      ],
+      "terminal_status": "aborted",
+      "raw_sequence": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001858/retained-predecessor-1.raw.jsonl",
+        "bytes": 5143,
+        "sha256": "e8c6de14d4f184dfe26fd877fbb0dfb93ab727ee498c483e8d314846fbe1160f"
+      },
+      "own_start": 0,
+      "own_end": 5143,
+      "global_start": 114767,
+      "global_end": 119910,
+      "retained_charge_gpu_seconds": "162.70163536071777"
+    },
+    {
+      "resource_id": "n36_readiness_preparation_recovery_001723",
+      "events": [
+        "reserved",
+        "dispatched",
+        "aborted"
+      ],
+      "terminal_status": "aborted",
+      "raw_sequence": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001858/retained-predecessor-2.raw.jsonl",
+        "bytes": 5135,
+        "sha256": "938bc431bae864b5b0af81105681ce6b7a9e665cb8ae497275ef7639243c2d9a"
+      },
+      "own_start": 5143,
+      "own_end": 10278,
+      "global_start": 119910,
+      "global_end": 125045,
+      "retained_charge_gpu_seconds": "234.03980207443237"
+    },
+    {
+      "resource_id": "n36_readiness_preparation_recovery_001771",
+      "events": [
+        "reserved",
+        "dispatched",
+        "completed"
+      ],
+      "terminal_status": "completed",
+      "raw_sequence": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001858/retained-predecessor-3.raw.jsonl",
+        "bytes": 5726,
+        "sha256": "c761642a1a0ac8c25ff9315c7a59aa54c0ae4b4c972d1bff759d4a2e228e5419"
+      },
+      "own_start": 10278,
+      "own_end": 16004,
+      "global_start": 125045,
+      "global_end": 130771,
+      "retained_charge_gpu_seconds": "234.72371816635132"
+    },
+    {
+      "resource_id": "n36_readiness_preparation_recovery_001827",
+      "events": [
+        "reserved",
+        "dispatched",
+        "completed"
+      ],
+      "terminal_status": "completed",
+      "raw_sequence": {
+        "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001858/retained-predecessor-4.raw.jsonl",
+        "bytes": 5580,
+        "sha256": "4556b493e0e035c512824eccbf9c624956b64f7d102b85f7c96a5b87a7724194"
+      },
+      "own_start": 16004,
+      "own_end": 21584,
+      "global_start": 130771,
+      "global_end": 136351,
+      "retained_charge_gpu_seconds": "270.01767802238464"
+    }
+  ],
+  "source_changes_planned": false,
+  "release_lifetime": {
+    "issued_at": "Actual future issuance after disabled graph admission",
+    "expires_at": "2026-10-11T11:13:13+00:00",
+    "reason": "Prior release was arbitrarily capped at one hour by turn001845 prepare-release script; production policy already permits expiry through its fixed deadline.",
+    "unchanged_deadline": true
+  },
+  "finite_limits": {
+    "gpu_seconds": 600,
+    "provider_calls": 1,
+    "episode_attempts": 0,
+    "health_invocations": 0,
+    "automatic_recoveries": 0
+  },
+  "arithmetic": {
+    "baseline_gpu_hours": "75.64264702604362",
+    "retained_preparation_gpu_seconds": "901.48283362388610",
+    "reconstructed_current_gpu_hours": "75.89305892427247725",
+    "new_reservation_gpu_hours": "0.1666666666666666666666666667",
+    "protected_gpu_hours": "36.2408240024308155",
+    "retained_margin_gpu_hours": "0.23357169027962",
+    "total_committed_upper_bound": "112.5341212836495794166666667",
+    "effective_cap_gpu_hours": "221.08404692669838",
+    "remaining_after_commitment": "108.5499256430488005833333333",
+    "method": "Add all four distinct preparation terminal charges once to original snapshot; readiness journal mirrors global health, never double charge. Production snapshot verification remains mandatory."
+  },
+  "prerequisites": [
+    "Fresh four-predecessor recovery prefix with all raw sequences and complete private ledgers retained.",
+    "Rebind disabled specification, preparation policy, source record, accounting contract, manifests and review records without source/algorithm changes; existing production validators must accept all bindings.",
+    "CPU graph review and production accounting snapshot before root measurement release; no borrowing protected reserves.",
+    "Issue at actual current time through original deadline, current STOP/idle GPU7 admission, exact one-use runner release.",
+    "Preserve full audit and independent B5; health/episode each require separately fresh releases."
+  ],
+  "not_authorized_by_this_record": [
+    "GPU dispatch",
+    "provider measurement",
+    "health",
+    "episode",
+    "validation",
+    "formal"
+  ],
+  "gpu_authorized": false,
+  "release_enabled": false,
+  "independent_review_completed": false
+}

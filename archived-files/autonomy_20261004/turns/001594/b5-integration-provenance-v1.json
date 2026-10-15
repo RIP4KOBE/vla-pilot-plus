@@ -1,0 +1,77 @@
+{
+  "schema": "n36-b5-operational-token-integration-v1",
+  "at": "2026-10-10T19:32:55.480898+00:00",
+  "status": "PASS_EXACT_CONSUMER_REVIEW_SCHEMA",
+  "independent_report": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001591/independent-b5/report-v1.json",
+    "bytes": 24300,
+    "sha256": "bab1a3dcd6484b91e435692fb6e3504e2bee1c0ff7fac0b6ca32135fe9eb6b64"
+  },
+  "terminal_reconciliation": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001593/terminal-reconciliation-v1.json",
+    "bytes": 12138,
+    "sha256": "1ee39906b020756037444f84e689f291e30efa2f923897288e40a31fe3fdfecf"
+  },
+  "reviewed_plan": {
+    "bytes": 386913,
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001588/attested-consumer-refresh/engineering-plan.disabled-v1.json",
+    "sha256": "07dcfaa7c757b56b55b560cb42ae175ff3ac43c0532d3d2e156c5cc996f3d936"
+  },
+  "consumer": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36_engineering_adapter_001482/implementation_worktree/scripts/qd_ed_n36_engineering.py",
+    "bytes": 45703,
+    "sha256": "d93eed25e93fb4a211180cc9abdc76d767ca278a7663dbedd1f29aee53874af1"
+  },
+  "token": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001594/independent-b5.operational-v1.json",
+    "bytes": 383155,
+    "sha256": "1395d4205f8da2b15f562d45a624f2d4e5d4caf3886ea1557d76804ad5be4c14"
+  },
+  "binding_fields": [
+    "scope",
+    "accounting",
+    "audit_plan",
+    "engineering_manifest",
+    "source",
+    "scientific_source",
+    "scientific_equivalence",
+    "runtime",
+    "runtime_closure",
+    "native_build",
+    "controller_semantics",
+    "deployment"
+  ],
+  "validation": "Exact review dictionary extracted from hash-verified production validate_authority AST; JSON equality passed. Full validate_authority/readiness not executed.",
+  "prior_report_and_plan_unchanged": true,
+  "source_adopted": false,
+  "accounting_adopted": false,
+  "release_enabled": false,
+  "gpu_dispatch": false,
+  "target_met": false,
+  "outstanding_gates": [
+    {
+      "gate": "ROOT_PROTOCOL_ACCEPTANCE",
+      "satisfied": false
+    },
+    {
+      "gate": "SOURCE_AND_ACCOUNTING_ADOPTION",
+      "satisfied": false
+    },
+    {
+      "gate": "ACTUAL_RUNTIME_PROVIDER_CUDA_EGL_AND_NATIVE_READINESS",
+      "satisfied": false
+    },
+    {
+      "gate": "DETACHED_PROSPECTIVE_HEALTH_AND_EPISODE_RELEASES",
+      "satisfied": false
+    },
+    {
+      "gate": "FRESH_STOP_DEADLINE_BUDGET_AND_HEADROOM_AT_ANY_FUTURE_DISPATCH",
+      "satisfied": false
+    },
+    {
+      "gate": "FUTURE_WORKER_RECEIPTS_AND_SCIENTIFIC_SUCCESS",
+      "satisfied": false
+    }
+  ]
+}

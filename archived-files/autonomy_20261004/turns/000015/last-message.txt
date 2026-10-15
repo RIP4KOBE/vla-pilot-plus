@@ -1,0 +1,3 @@
+N31 continues on frozen source `7428ce8`, controller PID 203563. Task 2 C0 is running as the sole GPU7 worker, PID 393223.
+
+Six audited cells give C0/Q0/N31 each 0/2. Process identities and ledger continuity verified; operational summary saved. Next: monitor the existing cohort and review terminal evidence. Validation/formal/ablation completion remains unproven.

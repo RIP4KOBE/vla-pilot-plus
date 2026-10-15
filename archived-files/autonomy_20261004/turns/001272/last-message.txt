@@ -1,0 +1,3 @@
+N36R2 CPU preparation exited normally; verified 107 artifact hashes and recorded its terminal status.
+
+Accounting remains 504 attempts / 75.49265 GPU-hours. No GPU dispatch occurred. Next: independent artifact review and B5 admission. Validation, formal, and ablation goals remain unproven; the driver remains active.

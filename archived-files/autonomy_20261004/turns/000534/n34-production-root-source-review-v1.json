@@ -1,0 +1,121 @@
+{
+  "schema": "n34-production-root-source-review-v1",
+  "at": "2026-10-08T15:50:39.412800+00:00",
+  "decision": "ACCEPT_DISABLED_CPU_INTEGRATION_ONLY",
+  "source_before": "71ffff1a0f70d9874b309db9ef1843c02bf17ebf",
+  "implementation_commit": "d93129b24d09711458975c5964c2127e01442a4f",
+  "reviewed_files": [
+    {
+      "path": "docs/experiments/n34_production_integration.md",
+      "sha256": "ace4f065db0113f68f4c9eff92451ba2e3d8e6c3de761e99bcd5e82cedecb66b"
+    },
+    {
+      "path": "scripts/qd_ed_n34_bridge.py",
+      "sha256": "f49b3b7013408845e5ea8b995f2cf292432a8730acec95e574deb791137b8a21"
+    },
+    {
+      "path": "scripts/qd_ed_n34_contract.py",
+      "sha256": "74322970413b001fe77065e6d1609245f5155952db5fa01a3af9aaf625a9ade6"
+    },
+    {
+      "path": "scripts/qd_ed_n34_controller.py",
+      "sha256": "4457225e6eca22a5e1c174d13df95b698b92864eee476e3053d237bdbb5ca0ab"
+    },
+    {
+      "path": "scripts/qd_ed_n34_prepare.py",
+      "sha256": "eb82674d5688696dfb15fc13a1b501610be0d0e36a753acdd5c018ce4bc301f7"
+    },
+    {
+      "path": "scripts/qd_ed_n34_release.py",
+      "sha256": "1ea95af7b77c1a04baf8c381c4faa698489ebe86c483c7f8cf9b9806341c21f8"
+    },
+    {
+      "path": "scripts/qd_ed_n34_report.py",
+      "sha256": "38cde357a44ecf8ff11b500e179773e3409769e4d5dd27f067c27a7a181d1216"
+    },
+    {
+      "path": "scripts/qd_ed_n34_runner.py",
+      "sha256": "6743de2c2d48ff85b71c94df715f64e20a5c6ee7d8568481c43fe48a980a0a5a"
+    },
+    {
+      "path": "scripts/qd_ed_n34_source.py",
+      "sha256": "b647ce648bc30abea60262beaebfa2c71bbc34f6af52638457eda691032df8a5"
+    },
+    {
+      "path": "scripts/qd_ed_n34_supervise.py",
+      "sha256": "572a0257517015f5ad0b6015fc1075dcff08703cd509ca73d6a87dd3e59889c1"
+    },
+    {
+      "path": "scripts/qd_ed_n34_worker.py",
+      "sha256": "12c142c00ae740b451abc40e0cd42aba06f230da22cc5775eadb5e5fd6260476"
+    },
+    {
+      "path": "tests/test_n34_lifecycle.py",
+      "sha256": "e1b5045d7b024a0712a31d6366141b3cd9041721fc6b2c127542e565d63f2050"
+    },
+    {
+      "path": "tests/test_n34_production_integration.py",
+      "sha256": "2b027ce94a2780e0c0fec78a90254dab02a85708e7b351f57bad0a1a365ecc7b"
+    },
+    {
+      "path": "tests/test_n34_source_controller.py",
+      "sha256": "48d265ddac54d4c76115eec333a8fb0af5cc6ed524d19398b1f94c238a2dae40"
+    },
+    {
+      "path": "tests/test_n34_worker_entrypoint.py",
+      "sha256": "83dedc23d0a6cb75186bb452d15246aee017257e9ee6b392dff5d9cb4f86765a"
+    }
+  ],
+  "tests": [
+    {
+      "command": "CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 PYTHONDONTWRITEBYTECODE=1 python -m pytest -q tests/test_n34_production_integration.py tests/test_n34_worker_entrypoint.py tests/test_n34_source_controller.py tests/test_n34_lifecycle.py --basetemp=../production-integration-v1/pytest-final-v5 > ../production-integration-v1/test-final-v5.log 2>&1",
+      "result": "79 passed, 6 pre-existing SyntaxWarnings, 52.85 seconds",
+      "exit_code": 0,
+      "log": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/production-integration-v1/test-final-v5.log",
+        "sha256": "90287434a7eee1aeb3ececfc5445af73a4e5935ab657ba071e06aa995f9361ae"
+      }
+    },
+    {
+      "command": "CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 PYTHONDONTWRITEBYTECODE=1 python -m pytest -q tests/test_n34_source_controller.py tests/test_n34_lifecycle.py --basetemp=../production-integration-v1/pytest-accounting-v6 > ../production-integration-v1/test-accounting-v6.log 2>&1",
+      "result": "55 passed, 4.02 seconds; includes 7 added runtime/cap cases after release-cap refinement",
+      "exit_code": 0,
+      "log": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n34_observed_jaw_approach/production-integration-v1/test-accounting-v6.log",
+        "sha256": "34da53aa0737526f31ce65a3c868e332987da931f0bf3cf9fd6ad95890031a26"
+      }
+    }
+  ],
+  "test_scope": "Previously hash-verified CPU fixture evidence retained; no redundant broad rerun and no native efficacy inference.",
+  "findings": [
+    "Only 15 additive N34 operational/doc/test files; accepted scientific implementation and C0/Q0 profiles remain unchanged.",
+    "Bridge composes external resolved constructor/config anchors before execution and checks both source inventories against pinned Git objects.",
+    "Worker requires generic and independent N34 audit within metered process; parent binds source, process, device, expected manifest and generic telemetry receipts.",
+    "Runner preserves contiguous task-major primaries, charged invalid stops, unknown/unsettled stops and complete-triple futility; no automatic retries or foreign process signalling.",
+    "Public validate_release remains unconditionally closed; document verification alone does not dispatch.",
+    "Controller tests cover fake instances only. Runtime source closure covers every loaded file-backed external module; actual deployed closure and OSC semantics require separate CPU review."
+  ],
+  "blockers": [
+    "All 132 pinned RDT Python/config source files are absent in this isolated checkout; local pinned Git objects exist. No fetch/materialization was performed, and no complete production source freeze was generated.",
+    "No current root-reviewed deployed runtime/source closure or controller-semantics proof was supplied. The CPU fake-controller tests do not certify installed OSC settings, package source/version, actual response, or physical gain.",
+    "Current owning accounting, settlement, historical charge attribution, protected reserve arithmetic and fresh-ID absence require root reconciliation; this executor did not access or mutate owning ledgers/state.",
+    "All30 production expected manifests, actual runtime/provider freeze and detached review/release remain root work. The public N34 runner/worker release boundary is deliberately disabled; a candidate document cannot enable it."
+  ],
+  "ledger_prefixes": {
+    "attempt-ledger.jsonl": {
+      "bytes": 6659252,
+      "rows": 1326,
+      "sha256": "229878bc3a9d99fd596f363835f4ef1ae3c2757b7f34aa43e0aef985de1aa0f2",
+      "prior_prefix_preserved": true
+    },
+    "gpu-healthcheck-ledger.jsonl": {
+      "bytes": 66651,
+      "rows": 66,
+      "sha256": "410294ccdc57a5a448584a8d02b3e9fec3bb424281e34276bd0bc2ef19cce5e7",
+      "prior_prefix_preserved": true
+    }
+  },
+  "gpu_authorized": false,
+  "scientific_promotion": false,
+  "target_met": false
+}

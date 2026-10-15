@@ -1,0 +1,40 @@
+{
+  "base_commit": "813f25bc89a3920149739a2bf957b2e1b3db29c4",
+  "base_ancestor": true,
+  "source_commit": "dcd890474b733743414d2a7711069bb0d2b0337e",
+  "changed_paths": [
+    "scripts/qd_ed_n36_bridge.py",
+    "scripts/qd_ed_n36_engineering.py",
+    "scripts/qd_ed_n36_healthcheck.py",
+    "scripts/qd_ed_n36_release.py",
+    "scripts/qd_ed_n36_report.py",
+    "scripts/qd_ed_n36_runner.py",
+    "scripts/qd_ed_n36_worker.py",
+    "tests/n36_engineering_cpu_fixture.py",
+    "tests/test_n36_engineering.py",
+    "tests/test_n36_engineering_integration.py"
+  ],
+  "operational_files": [
+    "scripts/qd_ed_n36_bridge.py",
+    "scripts/qd_ed_n36_engineering.py",
+    "scripts/qd_ed_n36_healthcheck.py",
+    "scripts/qd_ed_n36_release.py",
+    "scripts/qd_ed_n36_report.py",
+    "scripts/qd_ed_n36_runner.py",
+    "scripts/qd_ed_n36_worker.py",
+    "tests/n36_engineering_cpu_fixture.py",
+    "tests/test_n36_engineering.py",
+    "tests/test_n36_engineering_integration.py"
+  ],
+  "exact_set_equality": true,
+  "source": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001536/dependency-materialization/source.complete-v1.json",
+    "sha256": "409f23e3e54bc757bead582259f6e4d0694f332b54cee28954717f8986a55007"
+  },
+  "scientific_equivalence": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001536/dependency-materialization/scientific-equivalence-v1.json",
+    "sha256": "1fc7c0a4b0bfa315508430d05a8e2db96031149a7c03828dd010408220c50529"
+  },
+  "inventory_files": 1110,
+  "source_and_scientific_record_identical": true
+}

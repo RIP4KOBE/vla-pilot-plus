@@ -1,0 +1,3 @@
+Recorded the scoped controller-binding review; the production semantic check passes. Source and private ledgers remain unchanged.
+
+Next: refresh affected graph references, verify admission, then obtain B5 review. No GPU cohort was dispatched. Validation, formal evaluation and required ablations remain unproven. The operational handoff is saved for driver continuation.

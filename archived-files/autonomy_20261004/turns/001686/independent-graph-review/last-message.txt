@@ -1,0 +1,5 @@
+**PASS_SCOPED.** Independently confirmed all 14 reported passes. Complete graph acceptance remains blocked by pending `ROOT_REVIEWED`; no additional blockers found. Stale `source_commit` metadata does not invalidate current hash-bound provenance.
+
+[Review]( /home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001686/independent-graph-review/review-v1.json) · [SHA256 sidecar](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001686/independent-graph-review/review-v1.sha256)
+
+No root status, readiness certification, or release authority granted.

@@ -1,0 +1,3 @@
+N32R3 controller 1070042 remains live and verified. Task 5 Q0 finished with a valid unsuccessful outcome. Frozen hashes and ledger history are intact; no restart or duplicate dispatch occurred.
+
+Turn 496’s operational summary is recorded. Next: monitor the existing cohort. Validation, formal evaluation, and required ablation evidence remain unresolved.

@@ -1,0 +1,3 @@
+Verified live identities and unchanged owning ledgers. Launched one bounded CPU-only N34R4 recovery executor; no GPU cohort dispatched.
+
+Recorded authority, budget arithmetic, handles, and continuation summary. Next: review its repair and tests before runtime validation. Original validation/formal/ablation goal remains unmet.

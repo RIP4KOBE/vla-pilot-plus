@@ -1,0 +1,5 @@
+Verified live identities, authorization, and preserved ledger history. All 132 pinned RDT files match.
+
+Found four deployed controller attribute mismatches in N34’s audit hook. Recorded the required repair and next step in the owning state/checkpoint. GPU release remains closed; no new charges.
+
+[Operational summary](../autonomy_20261004/turns/000535/operational-summary.md). Original validation/formal/ablation goal remains incomplete.

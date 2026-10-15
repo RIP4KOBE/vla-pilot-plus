@@ -1,0 +1,3 @@
+N32R2 remains active on source `1065f381`; controller `1818171` and worker `2728485` verified. Frozen hashes and ledger continuity pass.
+
+Task0 candidate logs report failure; audit acceptance is pending. Next: review terminal receipts without restarting. Turn 178 summary saved. Validation/formal/ablation completion remains unproven.

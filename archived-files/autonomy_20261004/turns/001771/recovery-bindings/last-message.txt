@@ -1,0 +1,7 @@
+Prepared disabled candidates for `n36_readiness_preparation_recovery_001771`, preserving both aborted lifecycles and all charges.
+
+Static checks passed for source inventory, preparation policy, and 6,912 runtime origins. Completion is blocked by fresh root reconciliation, controller binding review, and deployment of the repaired source.
+
+No source, ledger, or owning-state changes; no measurement.
+
+[Report with hashes and next action](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001771/recovery-bindings/report-v1.json)

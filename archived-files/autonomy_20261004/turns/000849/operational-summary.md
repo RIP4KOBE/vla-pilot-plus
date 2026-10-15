@@ -1,0 +1,11 @@
+Turn849 operational summary
+
+Source 4b390b3e0c6b708572736939749a0fab0fb7ef37; scientific source 1065f38122379a515b60a9a424f574330405b66f unchanged. Driver PID268073/start97715947 remains owner; controller PID1322966/start137471973 is absent, all19 worker handles settled. Prior turn848 exited normally; controller stopped afterward at 2026-10-09T08:19:31Z with cohort_seconds_remaining insufficient. No STOP; authorization ends2026-10-11T11:13:13Z.
+
+Reconciled19 valid terminals, receipt and native audit report hashes/acceptance and all three prior ledger prefixes. No replay of full native audits. Cumulative472 dispatches/69.38354303190809GPUh. R11 consumed4.56916299913887GPUh, leaving1551.0132031000685s of18000s, below1840s admission by288.9867968999315s. No invalid/new reservation from this refusal. All old charges, unknown telemetry, reserves and ledgers preserved.
+
+Scientific disposition: budget-capped partial cohort, no promotion. Six complete triples C0=0/6,Q0=0/6,N34=1/6. Task6 C0 valid failure excluded from matched denominators; task6 Q0/N34 and tasks7-9 unobserved. Upper bound1+4=5 is not numerical futility. Frozen30-valid-cell and>=5/10 gates not passed. Validation/formal/ablation evidence unresolved; goal_complete=false.
+
+Updated owning state/checkpoint under normal operation locks with hash-bound terminal reconciliation; archived both preimages. Retained historical controller identity and marked terminal/no live handles. Closed this exhausted release's automatic-dispatch flag only; standing authorization remains valid. No driver lease acquisition, dispatch, source/plan/scientific-threshold edit or foreign write.
+
+Next bounded step: Assess a separately frozen prospective continuation/cohort budget under standing authorization, preserving 19 outcomes without replay or post-hoc pooling, and unchanged scientific promotion thresholds. Do not restart R11 or modify its frozen 18000-second ceiling. Budget approval is already supplied. Document exact finite arithmetic before adoption; use isolated executor worktree if implementation is needed. Existing cohort freeze stays intact. Prospective statistical interpretation of partial-prefix evidence must be explicit, never silently pooled or portrayed as complete.

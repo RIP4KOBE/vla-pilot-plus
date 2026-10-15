@@ -1,0 +1,5 @@
+N31 continues on GPU7 under frozen source `7428ce8a`; controller, monitor and worker identities verified. Ledger history remains intact.
+
+Three matched triples remain 0/3 for all arms. Task 3 C0 failed; Q0 is running. Turn 28 operational summary saved.
+
+Next: monitor the existing controller and audit terminal evidence. Validation, formal and ablation completion remain unproven.

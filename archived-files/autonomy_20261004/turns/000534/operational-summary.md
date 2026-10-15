@@ -1,0 +1,9 @@
+Turn 534 — 2026-10-08T15:51:28.879063+00:00
+
+Current owning source: c14e1e92870a51b92d70d21e01a0ffaf1a14534b. Scientific N34 source remains 71ffff1a0f70d9874b309db9ef1843c02bf17ebf. Driver PID268073/start97715947 and turn coordinator PID2485714/start133732043 verified on boot2a1fa95f-ab0d-488c-a298-fc488ddd2af7. No active owning GPU controller/worker; N34 executor2437765 and wrapper2437762 absent with prior exit0 reconciled. STOP absent; deadline2026-10-11T11:13:13Z.
+
+Completed: verified handoff/authority, prior turn533 normal exit and retained ledger prefixes; reviewed and adopted the 15-file disabled N34 production integration from d93129b24d09711458975c5964c2127e01442a4f. All integrated files match reviewed hashes. Preserved recorded79-test and55-case targeted CPU evidence without broad repeats. Updated owning state/checkpoint/tree under normal state lock; stale monitor instruction replaced. Public release remains closed. No dispatch, no result replay, no new charges. All442 dispatched attempts and62.81145837588456 GPUh retained.
+
+Next bounded step: Materialize and verify missing pinned RDT files locally without fetching; inspect deployed OSC/controller/wrapper source and freeze external runtime/module closure. Then reconcile finite N34 accounting/fresh IDs, wire reviewed release validation via isolated executor, freeze 30 prospective manifests and detached release. N34 disabled CPU integration adopted; no GPU release or scientific promotion.
+
+Unresolved evidence: deployed runtime/module closure and OSC configuration, pinned RDT materialization, accounting/admission freeze, release wiring and30 prospective external manifests. CPU fixture/controller tests certify no native benefit. Original validation/formal/required-ablation goal remains unevidenced; no completion record created.

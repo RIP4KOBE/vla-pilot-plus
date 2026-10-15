@@ -1,0 +1,7 @@
+Repaired both blockers and committed `52a87af0bf11f95b21ce17aba456dc98944d9774`.
+
+Final CPU run: 22 passed, including 159 corrupted-trace checks. Original failure logs preserved; scientific semantics unchanged.
+
+Disposition: **CPU_REPAIRED_PENDING_INDEPENDENT_REVIEW**. Scientific score: null. No GPU or implementation acceptance claimed.
+
+[Report](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000907/n35-audit-repair/report-v1.md>) · [JSON](</mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/000907/n35-audit-repair/report-v1.json>)

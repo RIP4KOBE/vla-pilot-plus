@@ -1,0 +1,171 @@
+{
+  "accepted_report": {
+    "path": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001317/closure-repair/report-v1.json",
+    "bytes": 31005,
+    "sha256": "639ba4d09d9883e39303cf42540fd240ca67ca21f37bc1d483222637af11d1e1"
+  },
+  "prior_runtime": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001317/closure-repair/runtime.isolated.disabled-v1.json",
+    "sha256": "36ed4d827ca7ab4602a28074d6e09727aaa2564e538d0da631329d164cf61e0f"
+  },
+  "prior_closure": {
+    "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001317/closure-repair/runtime-closure.isolated.disabled-v1.json",
+    "sha256": "47d678d2504f6c9a393106490348c2592ea8bf080fedd33c7a4bb11523dba9f0"
+  },
+  "changes": [
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_accounting.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_accounting.py",
+        "sha256": "796d4135991f3a09302bfd789cbe5fe9d8596c070ea4870f7c4651d5a67f3e5c",
+        "size_bytes": 8021
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_accounting.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_accounting.py",
+        "sha256": "14421411dab3a1042ddbe2989a27ead7bc226d976521c52b38f6aeac7c939e9d",
+        "size_bytes": 8231
+      }
+    },
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_contract.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_contract.py",
+        "sha256": "04045c629a1b54b0f82e174a77536d16bcc1a548f88970ee213ffc1245adff5b",
+        "size_bytes": 14979
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_contract.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_contract.py",
+        "sha256": "ddeeef02b9da9fbfb3db44338ecb9499877f34a286b35a51ce16dfc0a255bc14",
+        "size_bytes": 15105
+      }
+    },
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "sha256": "3c90ab05e35abc8974c8973587513c2c5cc216d7173cbcaaaf4a7bd6550b18d9",
+        "size_bytes": 6158
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "sha256": "e212c027de5e7b53fe52a089e31bb2abc281f9d1334feed1a64f60c67eb9a660",
+        "size_bytes": 7575
+      }
+    },
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_release.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_release.py",
+        "sha256": "4a195b1414d4e75c07fe6ec43a0d0454f8d7f8763076246527eccd674d5fcf81",
+        "size_bytes": 16886
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_release.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_release.py",
+        "sha256": "0ca81fe1eba91bf8fb89047579f1fad8d6c620b8ae59affeb7b6c2b0b2c48ca5",
+        "size_bytes": 19211
+      }
+    },
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "sha256": "258175e47a3d817c6a7c9fc96336eb8e4a06b54aeb896ac3f4fa3d5195bc065c",
+        "size_bytes": 12249
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "sha256": "f6b80e99bb6829edc431288a4151df7779eea333ee86b1fdf1842e9c8e1e3909",
+        "size_bytes": 12769
+      }
+    },
+    {
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36r2_admission.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36r2_admission.py",
+        "sha256": "cbf254f2c040c7530c508a0d4bec14b1e87cfef221534fbcab4303376764f102",
+        "size_bytes": 9880
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36r2_admission.py",
+        "resolved_path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36r2_admission.py",
+        "sha256": "6ef280e56f0fd18472166a1061608e65497e34dc64ba042e986e927da29162ec",
+        "size_bytes": 10100
+      }
+    }
+  ],
+  "module_changes": [
+    {
+      "module": "scripts.qd_ed_n36_accounting",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_accounting.py",
+        "sha256": "796d4135991f3a09302bfd789cbe5fe9d8596c070ea4870f7c4651d5a67f3e5c"
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_accounting.py",
+        "sha256": "14421411dab3a1042ddbe2989a27ead7bc226d976521c52b38f6aeac7c939e9d"
+      }
+    },
+    {
+      "module": "scripts.qd_ed_n36_contract",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_contract.py",
+        "sha256": "04045c629a1b54b0f82e174a77536d16bcc1a548f88970ee213ffc1245adff5b"
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_contract.py",
+        "sha256": "ddeeef02b9da9fbfb3db44338ecb9499877f34a286b35a51ce16dfc0a255bc14"
+      }
+    },
+    {
+      "module": "scripts.qd_ed_n36_healthcheck",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "sha256": "3c90ab05e35abc8974c8973587513c2c5cc216d7173cbcaaaf4a7bd6550b18d9"
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_healthcheck.py",
+        "sha256": "e212c027de5e7b53fe52a089e31bb2abc281f9d1334feed1a64f60c67eb9a660"
+      }
+    },
+    {
+      "module": "scripts.qd_ed_n36_release",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_release.py",
+        "sha256": "4a195b1414d4e75c07fe6ec43a0d0454f8d7f8763076246527eccd674d5fcf81"
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_release.py",
+        "sha256": "0ca81fe1eba91bf8fb89047579f1fad8d6c620b8ae59affeb7b6c2b0b2c48ca5"
+      }
+    },
+    {
+      "module": "scripts.qd_ed_n36_runner",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "sha256": "258175e47a3d817c6a7c9fc96336eb8e4a06b54aeb896ac3f4fa3d5195bc065c"
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36_runner.py",
+        "sha256": "f6b80e99bb6829edc431288a4151df7779eea333ee86b1fdf1842e9c8e1e3909"
+      }
+    },
+    {
+      "module": "scripts.qd_ed_n36r2_admission",
+      "before": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36r2_admission.py",
+        "sha256": "cbf254f2c040c7530c508a0d4bec14b1e87cfef221534fbcab4303376764f102"
+      },
+      "after": {
+        "path": "/mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/variants/n36r3_generated_import_001299/implementation_worktree/scripts/qd_ed_n36r2_admission.py",
+        "sha256": "6ef280e56f0fd18472166a1061608e65497e34dc64ba042e986e927da29162ec"
+      }
+    }
+  ],
+  "inventory_entries_removed": false,
+  "historical_readiness_not_current": true
+}

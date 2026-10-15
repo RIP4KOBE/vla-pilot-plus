@@ -1,0 +1,3 @@
+N32R2 remains live: controller 1818171 and worker 1225567 verified. Frozen source `1065f381` and ledger history are intact.
+
+13 valid cells have zero successes; task 4 Q0 is still running. No restart or duplicate dispatch occurred. Operational summary saved for continued driver monitoring. Validation, formal evaluation, and ablation evidence remain outstanding.

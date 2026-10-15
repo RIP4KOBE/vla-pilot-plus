@@ -1,0 +1,5 @@
+--- a/scripts/qd_ed_n36_engineering_r1.py
++++ b/scripts/qd_ed_n36_engineering_r1.py
+@@ -37 +37 @@
+-SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001694/preparation-accounting-repair/engineering-r1-spec.prospective-disabled-v7.json', 'sha256': 'faa00c491bf16f655bcbd7b15bc1ce5a80f23e351ce8834fa5c47ba923037363'}
++SPECIFICATION = {'path': '/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001723/readiness-recovery-graph/engineering-r1-spec.prospective-disabled-v1.json', 'sha256': 'a561163bbd330467e12ac0bd7f743ff4f1e7ae0dd5e0ccac9590c839ab075094'}

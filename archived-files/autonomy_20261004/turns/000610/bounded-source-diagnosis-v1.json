@@ -1,0 +1,93 @@
+{
+  "schema": "n34-bounded-cpu-source-diagnosis-v1",
+  "scope": "10 committed source files only; no release execution, model or GPU initialization",
+  "samples": [
+    {
+      "kind": "regular",
+      "files": [
+        "scripts/audit_decision_evidence.py",
+        "scripts/audit_gripper_parent_rescue.py",
+        "scripts/eds_qd_autoresearch_runner.py",
+        "scripts/eds_qd_autoresearch_v2_runner.py",
+        "scripts/eds_qd_autoresearch_v3_dev_runner.py"
+      ],
+      "elapsed_seconds": 0.03545056004077196,
+      "git_subprocess_calls": 11,
+      "record": {
+        "commit": "3acfda1adea7b4d9880c81dab7e3882f1587d4d0",
+        "files": [
+          {
+            "path": "scripts/audit_decision_evidence.py",
+            "sha256": "01b2c293677529ebc3bd6201903f4962786104050253d108e194b731a5b47d55"
+          },
+          {
+            "path": "scripts/audit_gripper_parent_rescue.py",
+            "sha256": "546ed6c7579b70fa6e99fb1525f144fb500b57ea9e3694af517434769f09ab68"
+          },
+          {
+            "path": "scripts/eds_qd_autoresearch_runner.py",
+            "sha256": "6ba743a67d220eb38bce10e9748245de9699ba277e7c51db4daf46234bc1f202"
+          },
+          {
+            "path": "scripts/eds_qd_autoresearch_v2_runner.py",
+            "sha256": "799fa07ea33af682f40c7d45cc75a443d94ee4de283d833813eec773a4676626"
+          },
+          {
+            "path": "scripts/eds_qd_autoresearch_v3_dev_runner.py",
+            "sha256": "7a439fa9dcc781440ff0f843a955d1d3532bd6661960379c04eb4a8c6d76b55e"
+          }
+        ],
+        "sha256": "a62b472f0f8396eda42f9030880a5f3e4ca947fdda663ee2a82320e12b105fdf"
+      }
+    },
+    {
+      "kind": "pinned_dependency",
+      "files": [
+        "third_party/lerobot/.github/ISSUE_TEMPLATE/bug-report.yml",
+        "third_party/lerobot/.github/workflows/documentation-upload-pr.yml",
+        "third_party/lerobot/.github/workflows/documentation.yml",
+        "third_party/lerobot/.github/workflows/fast_tests.yml",
+        "third_party/lerobot/.github/workflows/full_tests.yml"
+      ],
+      "elapsed_seconds": 0.07804098189808428,
+      "git_subprocess_calls": 26,
+      "record": {
+        "commit": "3acfda1adea7b4d9880c81dab7e3882f1587d4d0",
+        "files": [
+          {
+            "path": "third_party/lerobot/.github/ISSUE_TEMPLATE/bug-report.yml",
+            "sha256": "57fd3acb1a6388b3bcec89921a071bad155b7f8e2bd23c9e27f7f6c62d68abb8"
+          },
+          {
+            "path": "third_party/lerobot/.github/workflows/documentation-upload-pr.yml",
+            "sha256": "81974cf743546b5ba9b537764685820ab1eb31945849e72121188402ddc91b36"
+          },
+          {
+            "path": "third_party/lerobot/.github/workflows/documentation.yml",
+            "sha256": "e27bff146ebbb84df344ffa7c7f4c25b4856a6fb7dade8ead9616bc1da8673d7"
+          },
+          {
+            "path": "third_party/lerobot/.github/workflows/fast_tests.yml",
+            "sha256": "bc5fda5a630b3b803aa84f15000fa4856a918e1f245e0faf7860abf251165a9c"
+          },
+          {
+            "path": "third_party/lerobot/.github/workflows/full_tests.yml",
+            "sha256": "f51249a1ec2a4c9fc9b485d982bee78936ef201012c915842c5273e91060555a"
+          }
+        ],
+        "sha256": "64dc044b874843ac4ea1776fa14ca6ef14016a23486c74ae680161846c308fb3"
+      }
+    }
+  ],
+  "operational_files": 1314,
+  "scientific_files": 217,
+  "episodes": 30,
+  "release_source_verifications": 31,
+  "release_runtime_verifications": 31,
+  "worker_context_validations_before_start": 3,
+  "nominal_source_file_comparisons_before_start": 146976,
+  "runtime_input_bytes_by_stat": 1106729032,
+  "runtime_module_bytes_by_stat": 665341597,
+  "runtime_modules": 6490,
+  "runtime_inputs": 3291
+}

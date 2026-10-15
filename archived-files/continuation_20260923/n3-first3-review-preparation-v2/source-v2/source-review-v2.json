@@ -1,0 +1,144 @@
+{
+  "schema": "n3-first3-source-review-v2",
+  "science_source_commit_reviewed": "1583bc22d3f04929cf66b965acce0eb2eae4cbac",
+  "source_files": [
+    {
+      "path": "main.py",
+      "sha256": "f9add8568d45ec799e4030b1108f069f4af88bf3b63c62d7f836d59539a427a7",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "sha256": "05d9afca7cea50ea943fd8a32f4cd888c6d37df353ec4f896c51f0c5e2e4a144",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    },
+    {
+      "path": "core/qd_ed.py",
+      "sha256": "5c86385a8271c3311aa715332d1307850b18ec37486f20ac53c19747fe4f207b",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    },
+    {
+      "path": "core/qd_executed_quality.py",
+      "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    },
+    {
+      "path": "core/qd_executed_feedback.py",
+      "sha256": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    },
+    {
+      "path": "core/decision_evidence.py",
+      "sha256": "3af145738e3b22a8bec7484d0c33ba9a81dffbf58335b61682eb0ddf43b3cb8c",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    },
+    {
+      "path": "core/eds_eval_metrics.py",
+      "sha256": "574038725988ad258960af27d83a36ad81898e550888592d775c14b6df4754b2",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    },
+    {
+      "path": "core/keypoint_tracker.py",
+      "sha256": "c60b6f8badb420bf98ae8908cb20b3f51b1c41ffa5df9d3e214f8247f0a2aa66",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    },
+    {
+      "path": "core/env_adapters/libero_adapter.py",
+      "sha256": "f2130791c4c975603d8bab4fad4739374cbbba967df2fa2334ea881b6557d6bf",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    },
+    {
+      "path": "scripts/audit_decision_evidence.py",
+      "sha256": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    },
+    {
+      "path": "experiments/iteration_003_executed_feedback/protocol.md",
+      "sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931",
+      "reviewed_git_commit": "1583bc22d3f04929cf66b965acce0eb2eae4cbac"
+    }
+  ],
+  "metadata_gate_late_binding": {
+    "paths": [
+      "scripts/qd_ed_n3_report.py",
+      "scripts/qd_ed_n3_plan.py"
+    ],
+    "authority": "root read authorization reviewed_metadata_gate_sources exact hashes, after independent review of final modules; no automatic live-source trust",
+    "local_import_closure": "report.plan_contract/summarize_metrics import plan; both top levels stdlib only; plan builder dynamic runner import is not invoked; auditor loader imports torch and stdlib only"
+  },
+  "source_semantics": [
+    {
+      "path": "core/rdt_policy_steer.py",
+      "lines": [
+        5044,
+        5063,
+        5083,
+        5111,
+        6022,
+        6088
+      ],
+      "claim": "Recorded canonical native rewards are the same population_rewards consumed by the subsequent actual initial/iterative archive update."
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "lines": [
+        5373,
+        5390,
+        5585
+      ],
+      "claim": "archive_parent_allocation records returned sixteen slots; parent_allocation records the actual ED source and selected index vector; unique original insertion occurrence is unavailable."
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "lines": [
+        6710,
+        6714,
+        6730,
+        7088
+      ],
+      "claim": "Raw provider vector is separately retained for selected lineage; Stage metadata update uses negative original selected/raw vector, not internal feedback quality."
+    },
+    {
+      "path": "main.py",
+      "lines": [
+        63,
+        1322,
+        2066,
+        2099
+      ],
+      "claim": "Main consumes original normalized reward; optional feedback acknowledgement takes already returned actual observation; normalized Stage arguments are not independently persisted."
+    },
+    {
+      "path": "scripts/audit_decision_evidence.py",
+      "lines": [
+        34,
+        67
+      ],
+      "claim": "Integrity loader verifies indexed bundle bytes and map_location=cpu/weights_only=True; original native audit verifies selected/scoring/origin/raw, actual ACK and predecessor. This tool invokes only integrity loader after original accepted-audit snapshot binding."
+    },
+    {
+      "path": "core/qd_ed.py",
+      "lines": [
+        485,
+        547,
+        553
+      ],
+      "claim": "Archive updates sort within cell; final select_global_best ranks all retained entries by (-reward,fingerprint,cell). Only actual-selected-relative final-pool comparator changes can supply the alternative ordering witness; arbitrary canonical and nonselected-only changes cannot."
+    },
+    {
+      "path": "core/rdt_policy_steer.py",
+      "lines": [
+        5529,
+        6665,
+        6688
+      ],
+      "claim": "Sparse parent indices are identity indices. Final population comes from archive.elite_tensors before select_global_best; selected maps to the uniquely selected archive cell."
+    }
+  ],
+  "prior_cpu_evidence": "Production commit37ee19b targeted N3 and inherited N2/default tests; root integrated targeted120 PASS (overlapping coverage). No new claim of direct logged normalized Stage input.",
+  "actual_episode_payload_reads": 0,
+  "pre_data_refinement": {
+    "superseded_freeze_sha256": "1d219effe23c9f78bfd0e0d27d354e6b9894ffd62db459b789f7a99f42efb054",
+    "reason": "Canonical cross-cell comparison changes need not participate in any quality-dependent ordering consumer; retain descriptively. Activity ordering witness now requires changed actual-selected-relative final-pool reward/tie relationship. No actual episode reads occurred."
+  }
+}

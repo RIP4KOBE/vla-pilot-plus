@@ -1,0 +1,9 @@
+Turn918 — 2026-10-09T12:14:37.591530+00:00
+
+Current source 52a87af0bf11f95b21ce17aba456dc98944d9774; N35 frozen plan/release hashes verified. Handoff, exact user authority, continuation context and original completion contract verified. Prior turn917 exited0 and its actual launch reconciled. Resource isolation ACTIVE/PASS; single assigned GPU7 UUID GPU-48473162-9548-1a19-04aa-ea86c5349187. STOP absent; deadline 2026-10-11T11:13:13Z.
+
+Live controller 2632351/start141061885; worker 2635111/start141072234; boot 2a1fa95f-ab0d-488c-a298-fc488ddd2af7. Driver268073/start97715947 and coordinator2635136/start141072321 remain live. Controller status is a coarse launch-phase record; actual ledger and worker prove first episode n35_dev_t00_c0_20261009 dispatched and running. No cohort terminal result or completed episode recorded at observation. Worker log shows model loading.
+
+Completed: bounded monitoring and PID/boot/start verification; verified historical attempt-ledger prefix e6bb943ec36f4afa13f006d5232912bfc283158a7e09353979591a1bc8ef71d3 (7099066 bytes) preserved. Current ledger 7103531 bytes/1424 rows; retained health ledger recorded. No source/scientific threshold/plan changes, new dispatch, recovery, state mutation or protected result access. Evidence: end-reconciliation-v1.json SHA256 f33922cb3c407581ca3073bf061566c5848826fb18890899473c2a6a03bfbce0.
+
+Next bounded step: monitor existing controller2632351 and worker2635111; do not duplicate or restart. State/checkpoint next_action still contains prelaunch preparation wording, superseded by active_controller and turn917 launch; do not repeat preparation. On terminal result reconcile native outcomes and accounting before any recovery, and apply frozen N35 prospective science gates. N35 efficacy, validation/formal/required ablation evidence and original-goal completion remain unresolved. Driver continues autonomously.

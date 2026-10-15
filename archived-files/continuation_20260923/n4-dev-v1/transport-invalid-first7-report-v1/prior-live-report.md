@@ -1,0 +1,11 @@
+# Independent GPU3/GPU2 execution; N4 Dev continues
+
+Resource isolation is complete and actual simultaneous GPU3/GPU2 execution was verified. N4 owns GPU3, a private 240-attempt/48-GPU-hour budget, state, journals and locks; the GPU2 session owns its private 250-attempt/48-hour budget. Historical charges were partitioned once by output-root ownership, with byte-exact originals archived. Neither study may change the other study's state or preempt its workers. Each runs at most one GPU worker.
+
+N4 first3 (task0 C0/Q0/N4) completed as accepted valid failures. The correctness checkpoint passed: 39 N4 guided decisions, 6,864 candidates and 312 actual actions were audited; 35 executed prefixes differ from the original archive selection. This establishes mechanism activity, not task-success benefit. All original scientific gates remain unchanged.
+
+The original remaining9 cells are running on GPU3, under frozen production source f6a9ab04c0f184bbe2f8c837b33492835bc8fec9. The plan revision adds only the accepted first3 correctness checkpoint; task/profile order, seed/init, runtime and production configuration are unchanged. As of this update task3 C0 also completed as an accepted valid failure, yielding 4/12 completed original cells. No numerical promotion, validation release or formal release exists. The full12 matrix must finish before the N4 scientific decision.
+
+Initial private migration costs were N4 75 attempts +17 health checks /10.65492069855053 GPUh, and GPU2 41 attempts +5 health checks /5.71151713077406 GPUh. These historical charges were preserved; live totals continue in each private journal. Protected validation60/formal40 slots and14h/10h reservations remain.
+
+First3 review: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/first3-complete-report-v1/root-review.json. Current N4 supervisor status: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/continuation_20260923/n4-dev-v1/remaining9-independent-v1/status.json. Simultaneous execution proof: /mnt/data/shared2/hynx/VLA-Pilot++/rdt-qd-ed-final-20260921T093925Z/resource-isolation-20260924-v1/simultaneous-GPU-execution-proof.json. GPU2 scientific outcomes are not imported into this study.

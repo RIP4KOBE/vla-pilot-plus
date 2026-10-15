@@ -1,0 +1,3 @@
+Continuation release validated and adopted; one controller is live, checking admission for the 11 missing cells on GPU7. Scientific rules, prior charges, and protected reserves remain unchanged.
+
+Operational handoff recorded. The local driver continues monitoring; validation, formal evaluation, and required ablations remain outstanding.

@@ -1,0 +1,3 @@
+Recorded the controller binding attestation and operational handoff. Source and ledgers are unchanged; the driver is live, with no active GPU cohort.
+
+Next: refresh affected references and obtain independent B5 review. Validation, formal evaluation and required ablation evidence remain incomplete.

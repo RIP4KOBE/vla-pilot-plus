@@ -1,0 +1,3 @@
+Reconciled live handles and preserved all charges. Diagnosed the missing output-plugin import; the expanded CPU probe passed strict runtime checks.
+
+Recorded state and operational summary. Next: fresh reviewed N34R11 recovery release. No GPU dispatched; validation/formal/ablation completion remains unproven. Driver continuation remains active.

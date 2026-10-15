@@ -1,0 +1,3 @@
+Continued under the verified authorization. The CPU repair executor is running with verified process identity; no GPU cohort was launched.
+
+All 506 attempts and 75.6062 GPU-hours remain recorded. The next step is reviewing the repair and focused tests. Validation, formal evaluation and required ablation evidence remain incomplete. Operational handoff saved for the driver.

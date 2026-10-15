@@ -1,0 +1,7 @@
+Committed `4347951a24b63cdb7f0c8a585591d89f1be778ae`: both callers now pass release-scoped bindings with live parent identity. Validation remains unchanged.
+
+**239 focused CPU tests passed.** No GPU, evaluation, health launch, provider probes, or owning-state writes occurred.
+
+Reports: [JSON](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001405/health-binding-repair/report-v1.json) · [Markdown](/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/eds-qd-autoresearch-libero-swap-ood/research_sessions/rdt-qd-ed-final-20260921T093925Z/autonomy_20261004/turns/001405/health-binding-repair/report-v1.md).
+
+Runtime refresh and independent review remain required. The original goal is not complete.

@@ -1,0 +1,3 @@
+N36’s existing CPU audit-repair executor remains live; identities and unchanged private ledgers verified. No GPU cohort is active or newly dispatched.
+
+Operational summary saved for turn 001178. Next: reconcile the completed repair and obtain independent review. Validation, formal evaluation, and required ablation evidence remain outstanding.

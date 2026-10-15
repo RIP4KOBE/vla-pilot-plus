@@ -1,0 +1,7 @@
+Turn754 operational summary — 2026-10-09T03:46:33.350954+00:00
+
+Current source: 4b390b3e0c6b708572736939749a0fab0fb7ef37; scientific source: 1065f38122379a515b60a9a424f574330405b66f. Active plan/release/launch and bound authorization/context/completion contract hashes verified; state/checkpoint controller records agree.
+Live controller: {'pid': 1322966, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 137471973, 'state': 'S', 'ppid': 12479}. Worker: {'pid': 1512274, 'boot_id': '2a1fa95f-ab0d-488c-a298-fc488ddd2af7', 'start_ticks': 137921297, 'state': 'R', 'ppid': 1322966}. GPU7: 7, GPU-48473162-9548-1a19-04aa-ea86c5349187, 17073 MiB, 0 %. Driver/coordinator identities verified. STOP=False; deadline passed=False; authorization ends 2026-10-11T11:13:13Z.
+Completed work: previous turn completed normally; no abnormal recovery required. Verified ACTIVE/PASS isolation and all three owning ledger prefixes. N34R11 has 5 valid development cells and 0 successes; task1 N34 remains active. No dispatch, replay, signals, source/state/budget edits or new locks acquired.
+Next bounded step: monitor existing controller; reconcile terminal native receipts, matched denominators and cumulative charges before scientific disposition or prospective recovery. Preserve running cohort's frozen source, plan and thresholds.
+Unresolved evidence: development incomplete; validation20, formal10, required matched ablations and hash-bound original-goal completion remain outstanding. Old charges, failures, unknown telemetry and protected reserves preserved.

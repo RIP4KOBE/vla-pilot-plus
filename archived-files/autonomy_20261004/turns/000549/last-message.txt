@@ -1,0 +1,3 @@
+Continued the authorized study. Verified live identities and unchanged ledgers, then launched one isolated CPU executor for N34’s Torch runtime-origin repair.
+
+Source remains `6fdea5f`; GPU dispatch stays gated. Operational summary and continuation records are saved. The existing driver will monitor the executor and review its evidence. The original research goal remains unmet.

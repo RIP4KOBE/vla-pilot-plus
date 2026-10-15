@@ -1,0 +1,3 @@
+Verified authorization, live driver identities, and unchanged ledgers. Placed reviewed source `bd5dd4d` at the deployment path and recorded the prospective readiness repair.
+
+Next: bounded CPU implementation and independent review. No GPU job launched; scientific completion remains unproven. Operational summary saved for driver continuation.

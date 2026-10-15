@@ -1,0 +1,3 @@
+N34R1’s corrected release passed all 30 manifest checks. One controller is live, revalidating before GPU7 admission. Prior charges, protected reserves, and scientific gates remain intact.
+
+Operational handoff recorded. Validation/formal/ablation evidence remains incomplete; no completion claimed.

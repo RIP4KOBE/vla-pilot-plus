@@ -1,0 +1,3 @@
+Reconciled N34’s pre-dispatch failure and repaired its controller wrapper. One replacement controller is running release revalidation; source, plan, thresholds and ledgers remain unchanged.
+
+Operational summary saved. The driver continues monitoring; validation, formal evaluation and ablation evidence remain outstanding.

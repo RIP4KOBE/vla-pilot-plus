@@ -1,0 +1,3 @@
+Verified the existing N34 CPU executor is alive and progressing through integration tests. Ledger prefixes remain unchanged; no duplicate or GPU dispatch occurred.
+
+Recorded turn 528’s operational summary. Next: review completed integration and release evidence. Validation, formal evaluation and required ablations remain unmet.

@@ -1,0 +1,3 @@
+N32R2 remains active under the verified controller; frozen source and ledger history are intact. Two matched development triples have completed with zero successes in each profile.
+
+Turn 221’s operational summary is saved. Next: monitor the existing controller and reconcile terminal evidence. Validation, formal evaluation, and required ablations remain outstanding.

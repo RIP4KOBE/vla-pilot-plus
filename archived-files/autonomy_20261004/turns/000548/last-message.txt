@@ -1,0 +1,3 @@
+Adopted N34’s source-inventory repair as `6fdea5f`; verified 45 passing CPU tests. Ledger and protected reserves remain unchanged.
+
+The existing driver remains active. Next: resolve Torch generated-module provenance before GPU release. Operational handoff saved; validation, formal evaluation, and ablation evidence remain outstanding.

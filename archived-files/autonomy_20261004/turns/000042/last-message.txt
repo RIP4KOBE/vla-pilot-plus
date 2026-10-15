@@ -1,0 +1,3 @@
+N31 remains active on GPU7 under verified controller/worker identities. Four matched triples are complete, all with zero successes; task 4 is running.
+
+Frozen source and ledger history are preserved. Turn 42’s operational summary records continued monitoring as the next step. Validation, formal evaluation and required ablation evidence remain outstanding.

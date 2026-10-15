@@ -1,0 +1,3 @@
+Verified authority, live process identities, and unchanged owning ledgers. Existing N36R1 CPU repair continues; no duplicate or GPU dispatch occurred.
+
+Recorded turn 1209’s operational summary. Next: reconcile the repair’s completion, then independently review it before recovery release. Validation, formal evaluation, and required ablation evidence remain outstanding.
