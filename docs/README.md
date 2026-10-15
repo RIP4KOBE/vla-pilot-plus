@@ -11,6 +11,8 @@
 | ultra 对照、所有尝试与归因边界 | [reasoning-effort-comparison](steering/reasoning-effort-comparison.md) |
 | 主线发布、清理与历史工作区映射 | [整理报告](maintenance/repository-consolidation-20261015.md) |
 | main 清理候选及 Stage/Codex 必要性 | [依赖审查](maintenance/main-scope-and-control-dependencies-20261015.md) |
+| 从 GitHub 查阅历史分支、工作树和未提交源码 | [远端源码索引](maintenance/historical-source-index-20261015.md) |
+| 历史源码发布范围、脱敏与验证 | [发布报告](maintenance/historical-source-publication-20261015.md) |
 
 `00_overview`、`01_specs`、`02_analysis`、`03_evidence`、`04_plans`、`05_runs`、`08_archive` 保存早期研究依据，按原路径保留供历史引用。其旧日期说明、任务计划、绝对路径、模型和预算不是当前开发约束；不将其视为最新运行说明。当前机制与结果以 `research/`、`steering/` 及实际源码/配置为准。历史差异不通过回写旧证据消除。
 

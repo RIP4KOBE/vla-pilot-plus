@@ -1,0 +1,27 @@
+{
+  "schema": "remote_historical_source_verification_v1",
+  "valid": true,
+  "branches_verified": 91,
+  "historical_local_branches_covered": 75,
+  "retired_worktrees_covered": 72,
+  "manifests_verified": 91,
+  "shards_verified": 184,
+  "inventory_entries_verified": 189477,
+  "distinct_content_hashes_verified": 33331,
+  "blob_bytes_read": 736013009,
+  "credential_scan": {
+    "schema": "publication_credential_pattern_scan_v1",
+    "scope": "all objects reachable from the 91 proposed archive heads; blob contents and commit records",
+    "branches": 91,
+    "blobs_scanned": 37688,
+    "blob_bytes_scanned": 1302072482,
+    "valid": true,
+    "private_paths_excluded": true,
+    "signed_queries_removed": true
+  },
+  "original_main_documents_unchanged": true,
+  "scientific_runtime_unchanged": true,
+  "new_gpu_experiments": 0,
+  "redacted_blob_versions": 22,
+  "mapped_commits": 870
+}

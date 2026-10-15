@@ -30,6 +30,7 @@
 - [Research Progress](docs/research/research_progress.md)：当前能力、最可靠 EDS 对照、分协议逐任务结果和下一步验收。
 - [AGENTS.md](AGENTS.md) 与 [CONTRIBUTING.md](CONTRIBUTING.md)：开发规则、检查命令和团队协作。
 - [文档导航](docs/README.md) 与 [仓库整理报告](docs/maintenance/repository-consolidation-20261015.md)：历史材料、分支/工作树归档和发布状态。
+- [GitHub 历史源码索引](docs/maintenance/historical-source-index-20261015.md)：历史分支、工作树未提交源码、stash 与外部源码快照的远端入口；[清理与控制依赖审查](docs/maintenance/main-scope-and-control-dependencies-20261015.md)说明哪些旧功能可退役、为何 Stage/Codex 仍需保留。
 
 项目目标是在冻结 RDT 的推理阶段，以 EDS 为底座引入有用的 quality-diversity 和执行反馈。当前 QD 仅在动作块内维护档案；跨块/跨任务改进以及自动 BD 是待验证研究方向。
 
@@ -85,6 +86,8 @@ VLS 上游方法见 [VLS: Steering Pretrained Robot Policies via Vision-Language
 ## Provenance：来源与本地证据
 
 历史名称与 worktree 映射集中在本节，不作为公共方法或配置入口。2026-10-15清理映射见[归档清单](docs/maintenance/cleanup-inventory-20261015.json)；旧工作区路径保留为静态归档别名，不再用于开发。受测 runtime、后续审计器与最终发布 commit 分别记录；基础设施补丁进入发布版本后，不能把旧 cohort 改称在新版本上运行。
+
+历史源码随后发布为 `codex/archive/20261015/*`，见[发布报告](docs/maintenance/historical-source-publication-20261015.md)。GitHub 副本对凭据样式字符串及签名链接做了脱敏，原提交/文件哈希与发布版本有明确映射；原始科学证据继续保留原字节。新开发统一从 main 派生，不在归档分支继续实验。
 
 | 来源 / 身份 | 范围 |
 | --- | --- |
