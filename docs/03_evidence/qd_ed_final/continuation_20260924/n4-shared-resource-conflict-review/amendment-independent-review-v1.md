@@ -1,0 +1,7 @@
+# Independent resource amendment review
+
+PASS, document review only. Amendment SHA `a08b37836b5a9283118821bb5b6b2b2f2ccf3683bc145a6023f199484e4557dd`. The original execution spec §1 authorizes autonomous prospective planning inside the original budget. Given the root-reported user continuation after the priority question, this explicit current resource record is within that scope; it does not invent a separate numerical-transfer approval. No specific original-task prohibition was found.
+
+The6 baseline+6 development mapping preserves all12 scientific rows. Original completion gives17/100/7 and124 total; four eligible recoveries give17/100/11 and128. With100 protected originals,228<=240. The snapshot leaves8.260041904h unprotected;16 full1840-second windows leave296.150856 seconds for new health costs. All arithmetic and referenced protocol/evidence hashes match. No old costs, caps, scientific gates or external records change.
+
+Before actual admission, commit and bind this amendment in the active resource record and new plan, then recheck the authoritative ledger under the real lease with full1800+40 and all protections. These are existing execution gates, not a new routine user approval. This review does not launch or authorize GPU work. The scientific prerequisite result was not used as a resource criterion. No files outside this review directory, resources, code, tests or GPU were changed/run. See the paired JSON for exact fields.

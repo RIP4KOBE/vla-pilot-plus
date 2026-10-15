@@ -1,0 +1,119 @@
+{
+  "GPU_model_provider_simulator_calls": 0,
+  "actual_episode_payloads_read": false,
+  "budget_basis": "root-supplied pre-N3 79/11.72537440950208h and checkpoint82/12.103862548502638h; first3 included in34/8h; no live ledger read; recheck after completed Dev",
+  "live_dev_source": "bd618b931eb9d8fc2c01b978c4ef220c9bb03889",
+  "memo": {
+    "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n3-runner-20260924/docs/03_evidence/qd_ed_final/continuation_20260923/conditional-n3-evaluation-preparation/memo-v1.md",
+    "sha256": "97e0ac088d87737b874c38a0dd452fa389c8aef9ace39b9646c7a5e3aeff0cd9"
+  },
+  "new_tests_run": false,
+  "old_n2_prototype_source": "ed56611dc45d28dbc59ffa172a810a810360dfc1",
+  "open_decisions": [
+    "N3-specific future protocol and 4/2 recovery ceilings if adopted",
+    "fresh locked seed exposure audit",
+    "exact phase tooling-to-Dev production mapping",
+    "QD-off named profile/report/native audit routing",
+    "post-Dev settled budget feasibility and reviewed promotion"
+  ],
+  "phase_authorized": false,
+  "production_implementation_changes": false,
+  "schema": "n3-conditional-protected-evaluation-source-review-v1",
+  "source_files": [
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/docs/01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md",
+      "sha256": "3a45e53d3b40fa0a40c43ad53a34cfbb8c9fe497dc98a5e178e4c1ef016999ef"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_003_executed_feedback/protocol.md",
+      "sha256": "05c83a8eb3801d4a4c4f41bee28c531505a7767aa56ba482399013068679b931"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/experiments/iteration_003_executed_feedback/accounting-clarification.md",
+      "sha256": "133c8bd746680cb27fc0c8e0bb5f6116ffc9029045bfdd92482c88692b6419ba"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/rdt_policy_steer.py",
+      "sha256": "05d9afca7cea50ea943fd8a32f4cd888c6d37df353ec4f896c51f0c5e2e4a144"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/qd_executed_feedback.py",
+      "sha256": "33d1e38212741ccbf24e150c2b9739cc026ed553925ab7084d9e8b8d32e090ab"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/core/qd_executed_quality.py",
+      "sha256": "d83dbd53e75708f3a6e71cab9c0814dc82a42c68898d53cb370df37d9a8c946b"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_final_runner.py",
+      "sha256": "9d1ab138644510edae3eb0c7d3b13e8d1dbfcdb3fc02bd92e232a67d21f993ea"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_plan.py",
+      "sha256": "ca967ad486092f72b93cd169895b137efdba1411f6a62487a1d21b9e9c557bb1"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_report.py",
+      "sha256": "62b9afbbe6d8909d6414cdc9423237f2815a5274e3f076cfc1b3226d9998a79a"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/qd_ed_n3_supervise.py",
+      "sha256": "e71f3297adea4a05b43bfe2cedd12cf47d849d3a0c5cd55858cbc28da0de0f1f"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/scripts/audit_decision_evidence.py",
+      "sha256": "dcfffa225b16f40cc00ac4bd21eae1d080cc113668dbeabc240d2ccda50fddd6"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/tests/test_rdt_steer.py",
+      "sha256": "628754c3c926255e8c251b3b7856c7b410e85ab1a8578cf8e34f1b6a842c8c10"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/tests/test_qd_executed_feedback.py",
+      "sha256": "1c4f62e17b1440c10fc9ebaeb67a5c2c63b721ad7aaa4ec67657c300d7cb5b82"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-final-20260921T093925Z/tests/test_decision_evidence_audit.py",
+      "sha256": "91eecc40a4260664ab6dfe4ce3321e0022a055a5a6c792b179f8acecf68be48b"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/scripts/qd_ed_n2_evaluation.py",
+      "sha256": "cdb8d3b3068ccff8c62b796f05ba6da2559134c892c4cd566450e42331367889"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/scripts/qd_ed_n2_evaluation_report.py",
+      "sha256": "bfb02ada30d49e01a3300b7146e57393a83d3581afa63c6bd40a207002465ce5"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/scripts/qd_ed_n2_evaluate.py",
+      "sha256": "f6ff7e6d3cacc29f879c8255151b741a2f03675a050af5779666461404f6a45d"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/scripts/qd_ed_final_runner.py",
+      "sha256": "a3a621e17ae61b6af977c60b5e4adcb7706509342fd97fac5954e0a6c61cb6cb"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/scripts/qd_ed_available_gpu_queue.py",
+      "sha256": "5ca5788c8b0dae40e4fb639a61e080d786705bbaa24c61754033e697017e2ab5"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/experiments/iteration_002_executed_quality/runner/future-evaluation/README.md",
+      "sha256": "6cc2a35d44142cd8eb4230a878483cba7b55a8cd39bcf8b673c91a4627dd364f"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/experiments/iteration_002_executed_quality/runner/future-evaluation/protocol-v1.md",
+      "sha256": "75766ff02c4722c25f772e647937fc68cf9a3361129791585430115595f0e8fa"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/experiments/iteration_002_executed_quality/runner/future-evaluation/budget-entry-clarification-v1.md",
+      "sha256": "9b1ccf9932f8fe2bf637d0e2a4674fae866740424ef523d83d665bac8c14c77c"
+    },
+    {
+      "path": "/home/hynx/VLA-Pilot++/.worktrees/exp/rdt-qd-ed-n2-runner-20260923/experiments/iteration_002_executed_quality/runner/future-evaluation/cpu-validation.json",
+      "sha256": "cdaff4f145c12311572d5cad650be0d579b7abd3cbcdba9f772bf34f87da09b3"
+    }
+  ],
+  "state_journal_plan_changes": false,
+  "status": "CONTINGENT_PREPARATION_ONLY",
+  "validation_formal_outcomes_read": false
+}
