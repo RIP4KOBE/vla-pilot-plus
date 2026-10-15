@@ -1,0 +1,88 @@
+{
+  "cem_iters": 10,
+  "episode": 1,
+  "global_step": 64,
+  "population_size": 16,
+  "reward_mode": "normal",
+  "scoring_keypoint_indices": [
+    0
+  ],
+  "selected_idx": 15,
+  "stages": [
+    {
+      "iter_idx": 0,
+      "stage": "initial_before_diversity"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "initial_after_diversity_phase"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "initial_final"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "initial"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "scored"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "resampled"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "renoised"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "after_rollout"
+    },
+    {
+      "iter_idx": 0,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 1,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 2,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 3,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 4,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 5,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 6,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 7,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 8,
+      "stage": "full_process_after_rollout"
+    },
+    {
+      "iter_idx": 9,
+      "stage": "full_process_after_rollout"
+    }
+  ],
+  "suite": "libero_object",
+  "task_id": 0,
+  "use_cem": false
+}

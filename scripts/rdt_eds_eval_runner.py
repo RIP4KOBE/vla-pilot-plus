@@ -61,6 +61,8 @@ P2_GPU_PROBE_FAILURE_LIMIT = 3
 P2_CREDENTIAL_SCAN_MAX_TEXT_BYTES = 128 * 1024**2
 P2_CREDENTIAL_SCAN_CHUNK_BYTES = 64 * 1024
 P2_REQUIRED_MOUNT = Path("/mnt/data/shared2")
+P2_TORCH_HUB_SEED: Path | None = None
+P2_TORCH_HUB_SEED: Path | None = None
 STATUS_CSV = EVIDENCE_ROOT / "rdt_eds_eval_status.csv"
 AGGRESSIVE_RBF_REPORT = "2026-07-09-aggressive-rbf-parameter-sweep.md"
 ROLLOUT_RBF_REPORT = "2026-07-11-rollout-rbf-level3-parameter-sweep.md"
@@ -1221,6 +1223,24 @@ def _p2_fingerprint_from_record(record: dict[str, object]) -> str:
     return hashlib.sha256(_canonical_json(record).encode("utf-8")).hexdigest()
 
 
+def _p2_execution_record_from_bound_job(
+    job: dict[str, object],
+) -> dict[str, object]:
+    """Rebuild current semantics using the immutable identity bound at dispatch."""
+    bound = job.get("execution_record")
+    if not isinstance(bound, dict):
+        return _p2_execution_record(job)
+    git_revision = bound.get("git_revision")
+    code_state_sha256 = bound.get("code_state_sha256")
+    if not isinstance(git_revision, str) or not isinstance(code_state_sha256, str):
+        return _p2_execution_record(job)
+    return _p2_execution_record(
+        job,
+        git_revision=git_revision,
+        code_state_sha256=code_state_sha256,
+    )
+
+
 def _bind_p2_execution_context(
     job: dict[str, object],
     *,
@@ -1255,7 +1275,7 @@ def _bind_p2_execution_context(
 
 
 def _p2_config_fingerprint(job: dict[str, object]) -> str:
-    record = _p2_execution_record(job)
+    record = _p2_execution_record_from_bound_job(job)
     return _p2_fingerprint_from_record(record)
 
 
@@ -1503,6 +1523,9 @@ def _p2_stage_dir(level: object) -> str:
         "p2_adaptive_eds_rbf_pretest": "pretest",
         "p2_adaptive_eds_rbf_stage_a": "stage_a",
         "p2_adaptive_eds_rbf_stage_b": "stage_b",
+        "p2_rollout_clean_tail_phase_a": "phase_a",
+        "p2_rollout_clean_tail_phase_b": "phase_b",
+        "p2_direction_normalized_rbf": "formal",
     }
     try:
         return mapping[str(level)]
@@ -1641,7 +1664,7 @@ def _revalidate_p2_job_storage(job: dict[str, object]) -> Path:
 
 
 def _p2_job_manifest_payload(job: dict[str, object]) -> dict[str, object]:
-    execution_record = _p2_execution_record(job)
+    execution_record = _p2_execution_record_from_bound_job(job)
     fingerprint = _p2_fingerprint_from_record(execution_record)
     resolved_job = {
         key: value
@@ -2120,6 +2143,58 @@ def _p2_gpu_probe(gpu: str) -> tuple[str, str]:
 def _p2_gpu_is_idle(gpu: str) -> bool:
     status, _reason = _p2_gpu_probe(gpu)
     return status == "idle"
+
+
+def _p2_seed_runtime_torch_hub(
+    target_root: Path, *, seed_root: Path | None = None
+) -> None:
+    """Seed isolated runtime caches with the required offline DINOv2 assets."""
+    configured_source = seed_root if seed_root is not None else P2_TORCH_HUB_SEED
+    if configured_source is None:
+        return
+    source = Path(configured_source)
+    repository = source / "facebookresearch_dinov2_main"
+    checkpoint = source / "checkpoints/dinov2_vitb14_pretrain.pth"
+    trusted_list = source / "trusted_list"
+    if not repository.is_dir() or not checkpoint.is_file() or not trusted_list.is_file():
+        raise RuntimeError(f"P2 DINOv2 runtime cache seed is incomplete: {source}")
+    target_root = Path(target_root)
+    target_repository = target_root / repository.name
+    target_checkpoint = target_root / "checkpoints" / checkpoint.name
+    target_trusted_list = target_root / trusted_list.name
+    if not target_repository.is_dir():
+        shutil.copytree(repository, target_repository)
+    target_checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    if not target_checkpoint.is_file():
+        shutil.copy2(checkpoint, target_checkpoint)
+    if not target_trusted_list.is_file():
+        shutil.copy2(trusted_list, target_trusted_list)
+
+
+def _p2_seed_runtime_torch_hub(
+    target_root: Path, *, seed_root: Path | None = None
+) -> None:
+    """Seed isolated shared2 runtime caches with required offline DINOv2 assets."""
+    configured_source = seed_root if seed_root is not None else P2_TORCH_HUB_SEED
+    if configured_source is None:
+        return
+    source = Path(configured_source)
+    repository = source / "facebookresearch_dinov2_main"
+    checkpoint = source / "checkpoints/dinov2_vitb14_pretrain.pth"
+    trusted_list = source / "trusted_list"
+    if not repository.is_dir() or not checkpoint.is_file() or not trusted_list.is_file():
+        raise RuntimeError(f"P2 DINOv2 runtime cache seed is incomplete: {source}")
+    target_root = Path(target_root)
+    target_repository = target_root / repository.name
+    target_checkpoint = target_root / "checkpoints" / checkpoint.name
+    target_trusted_list = target_root / trusted_list.name
+    if not target_repository.is_dir():
+        shutil.copytree(repository, target_repository)
+    target_checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    if not target_checkpoint.is_file():
+        shutil.copy2(checkpoint, target_checkpoint)
+    if not target_trusted_list.is_file():
+        shutil.copy2(trusted_list, target_trusted_list)
 
 
 def _write_p2_gpu_probe_failure(
@@ -2619,6 +2694,11 @@ def _parse_override_assignment(value: str) -> tuple[str, object]:
         parsed_value = yaml.safe_load(raw_value)
     except yaml.YAMLError as exc:
         raise ValueError(f"Hydra override value is invalid YAML: {value!r}") from exc
+    if isinstance(parsed_value, str) and re.fullmatch(
+        r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)[eE][+-]?\d+",
+        parsed_value,
+    ):
+        parsed_value = float(parsed_value)
     return key, parsed_value
 
 
@@ -3882,6 +3962,14 @@ def _p2_stage_query_failures(
     return failures, successful_count
 
 
+def _p2_expected_episode_ids(job: dict[str, object]) -> set[int]:
+    episode_num = int(job["episodes"])
+    episode_start_index = int(job.get("episode_start_index", 0))
+    if episode_num <= 0 or not 0 <= episode_start_index < episode_num:
+        raise ValueError("invalid P2 episode window")
+    return set(range(episode_start_index, episode_num))
+
+
 def _p2_job_validity(job: dict[str, object]) -> dict[str, object]:
     output_dir = _output_dir(job)
     metrics_dir = output_dir / "eds_eval"
@@ -3900,7 +3988,9 @@ def _p2_job_validity(job: dict[str, object]) -> dict[str, object]:
             failures.append(
                 "symlinked output evidence is not allowed: " + ",".join(symlinks)
             )
-    expected_episodes = int(job["episodes"])
+    total_episodes = int(job["episodes"])
+    expected_episode_ids = _p2_expected_episode_ids(job)
+    expected_episodes = len(expected_episode_ids)
     results_path = output_dir / "results.txt"
     try:
         parsed = _parse_results_file(results_path)
@@ -3991,7 +4081,6 @@ def _p2_job_validity(job: dict[str, object]) -> dict[str, object]:
         if serialized_manifest and serialized_manifest != _p2_job_manifest_payload(job):
             failures.append("job manifest payload mismatch")
 
-    expected_episode_ids = set(range(expected_episodes))
     video_count = 0
     for episode_id in sorted(expected_episode_ids):
         episode_dir = output_dir / f"episode_{episode_id + 1}"
@@ -4098,10 +4187,11 @@ def _p2_job_validity(job: dict[str, object]) -> dict[str, object]:
         metrics_dir / "episode_metadata.jsonl", label="episode metadata"
     )
     failures.extend(metadata_jsonl_failures)
-    expected_task_ids = [
+    full_task_ids = [
         int(value)
-        for value in (job.get("task_ids_filter") or list(range(expected_episodes)))
+        for value in (job.get("task_ids_filter") or list(range(total_episodes)))
     ]
+    expected_task_ids = [full_task_ids[value] for value in sorted(expected_episode_ids)]
     metadata_identity_counts: dict[int, int] = {}
     valid_metadata: list[dict[str, object]] = []
     for record_index, record in enumerate(episode_metadata):
@@ -4120,7 +4210,7 @@ def _p2_job_validity(job: dict[str, object]) -> dict[str, object]:
         metadata_identity_counts[episode_id] = (
             metadata_identity_counts.get(episode_id, 0) + 1
         )
-        if task_id != expected_task_ids[episode_id]:
+        if task_id != full_task_ids[episode_id]:
             failures.append(
                 f"episode metadata record {record_index} task_id mismatch"
             )
@@ -7234,6 +7324,32 @@ def level1_commands() -> list[list[str]]:
     ]
 
 
+def _apply_p2_runtime_safeguards(
+    job: dict[str, object], env: dict[str, str]
+) -> dict[str, str]:
+    """Apply explicitly requested P2 process safeguards without changing defaults."""
+    applied: dict[str, str] = {}
+    if "p2_joblib_multiprocessing" in job:
+        enabled = job["p2_joblib_multiprocessing"]
+        if not isinstance(enabled, bool):
+            raise TypeError("p2_joblib_multiprocessing must be a bool when specified")
+        value = "1" if enabled else "0"
+        env["JOBLIB_MULTIPROCESSING"] = value
+        applied["JOBLIB_MULTIPROCESSING"] = value
+    if "p2_render_gpu_index" in job:
+        render_gpu_index = job["p2_render_gpu_index"]
+        if isinstance(render_gpu_index, bool) or not isinstance(render_gpu_index, int):
+            raise TypeError("p2_render_gpu_index must be an integer when specified")
+        if not 0 <= render_gpu_index <= 7:
+            raise ValueError("p2_render_gpu_index must be in [0, 7]")
+        render_gpu = str(render_gpu_index)
+        egl_device_id = _gpu_runtime(render_gpu)["mujoco_egl_device_id"]
+        env["MUJOCO_EGL_DEVICE_ID"] = egl_device_id
+        applied["MUJOCO_EGL_DEVICE_ID"] = egl_device_id
+        applied["P2_RENDER_GPU_INDEX"] = render_gpu
+    return applied
+
+
 def run_job(
     job: dict[str, object],
     gpu: str,
@@ -7265,11 +7381,33 @@ def run_job(
     )
     env = os.environ.copy()
     is_p2 = job.get("level") in P2_LEVELS
+    p2_runtime_safeguards: dict[str, str] = {}
     if is_p2:
         runtime = _gpu_runtime(gpu)
         env["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         env["CUDA_VISIBLE_DEVICES"] = runtime["cuda_visible_devices"]
         env["MUJOCO_EGL_DEVICE_ID"] = runtime["mujoco_egl_device_id"]
+        real_root = Path(job.get("p2_output_real_root", P2_OUTPUT_ROOT))
+        runtime_cache_root = _p2_safe_child_path(
+            real_root,
+            "runtime_cache",
+            _p2_stage_dir(job.get("level")),
+            str(job["label"]),
+        )
+        cache_paths = {
+            "TMPDIR": _p2_safe_child_path(runtime_cache_root, "tmp"),
+            "XDG_CACHE_HOME": _p2_safe_child_path(runtime_cache_root, "xdg"),
+            "MPLCONFIGDIR": _p2_safe_child_path(runtime_cache_root, "matplotlib"),
+            "CUDA_CACHE_PATH": _p2_safe_child_path(runtime_cache_root, "cuda"),
+            "TORCH_EXTENSIONS_DIR": _p2_safe_child_path(runtime_cache_root, "torch_extensions"),
+            "PYTHONPYCACHEPREFIX": _p2_safe_child_path(runtime_cache_root, "pycache"),
+        }
+        for variable, cache_path in cache_paths.items():
+            cache_path.mkdir(parents=True, exist_ok=True)
+            env[variable] = str(cache_path)
+        _p2_seed_runtime_torch_hub(cache_paths["XDG_CACHE_HOME"] / "torch/hub")
+        _p2_seed_runtime_torch_hub(cache_paths["XDG_CACHE_HOME"] / "torch/hub")
+        p2_runtime_safeguards = _apply_p2_runtime_safeguards(job, env)
     else:
         runtime = None
         env["CUDA_VISIBLE_DEVICES"] = str(gpu)
@@ -7306,7 +7444,11 @@ def run_job(
             handle.write(
                 "Runtime: "
                 f"CUDA_VISIBLE_DEVICES={runtime['cuda_visible_devices']} "
-                f"MUJOCO_EGL_DEVICE_ID={runtime['mujoco_egl_device_id']} "
+                f"MUJOCO_EGL_DEVICE_ID={env['MUJOCO_EGL_DEVICE_ID']} "
+                "P2_RENDER_GPU_INDEX="
+                f"{p2_runtime_safeguards.get('P2_RENDER_GPU_INDEX', gpu)} "
+                "JOBLIB_MULTIPROCESSING="
+                f"{p2_runtime_safeguards.get('JOBLIB_MULTIPROCESSING', 'unset')} "
                 f"OPENAI_API_KEY_PRESENT={str(bool(env.get('OPENAI_API_KEY'))).lower()}\n"
             )
         handle.write("Command: " + shlex.join(command) + "\n")

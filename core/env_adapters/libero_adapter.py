@@ -948,6 +948,17 @@ def create_libero_envs(
     return out
 
 
+def _libero_task_index_for_episode(
+    *, episode_index: int, episodes_per_task: int, task_num: int
+) -> int:
+    """Map a global episode index to the same task during full and suffix runs."""
+    if episode_index < 0:
+        raise ValueError("episode_index must be nonnegative")
+    if episodes_per_task <= 0 or task_num <= 0:
+        raise ValueError("episodes_per_task and task_num must be positive")
+    return (episode_index // episodes_per_task) % task_num
+
+
 class LiberoAdapter(BaseEnvAdapter):
     def __init__(self, env: None, env_config: dict, device: str = "cuda"):
         super().__init__(env, env_config, device)
@@ -969,13 +980,18 @@ class LiberoAdapter(BaseEnvAdapter):
         # LIBERO-PRO related attributes
         self.suite_name = env_config["suite_name"]
         self.task_num = len(self._env)
-        self.current_task_idx = 0  # Start with first task
+        self.current_task_idx = 0  # Updated from the global episode index on reset.
 
         # total number of episodes to collect, must divide evenly by the number of tasks for desired suites
         self.total_episodes_num = env_config.get("episode_num", self.task_num)
         assert self.total_episodes_num % self.task_num == 0, f"episode_num ({self.total_episodes_num}) must divide evenly by the number of tasks ({self.task_num})"
         self.episodes_per_task = self.total_episodes_num // self.task_num
-        self.current_episode_idx = -1  # Will be incremented to 0 on first reset
+        episode_start_index = int(env_config.get("episode_start_index", 0))
+        if not 0 <= episode_start_index < self.total_episodes_num:
+            raise ValueError(
+                "episode_start_index must satisfy 0 <= start < episode_num"
+            )
+        self.current_episode_idx = episode_start_index - 1
 
         # Cache for robot state and observations
         self._last_obs = None
@@ -1707,10 +1723,15 @@ class LiberoAdapter(BaseEnvAdapter):
         # Increment episode counter
         self.current_episode_idx += 1
 
-        # Check if we need to switch to next task
-        if self.current_episode_idx > 0 and self.current_episode_idx % self.episodes_per_task == 0:
-            # Move to next task (cycle back to 0 if at end)
-            self.current_task_idx = (self.current_task_idx + 1) % self.task_num
+        # Derive the task from the global episode index so suffix resume starts on
+        # exactly the same task as an uninterrupted run.
+        next_task_idx = _libero_task_index_for_episode(
+            episode_index=self.current_episode_idx,
+            episodes_per_task=self.episodes_per_task,
+            task_num=self.task_num,
+        )
+        if next_task_idx != self.current_task_idx:
+            self.current_task_idx = next_task_idx
             log.info(f"Switching to task {self.current_task_idx} (episode {self.current_episode_idx})")
 
         # Reset episode step counter

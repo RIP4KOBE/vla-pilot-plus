@@ -23,7 +23,11 @@ import numpy as np
 import torch
 from torch import Tensor, nn
 
-from core.eds_eval_metrics import EDSChunkMetrics, EDSIterMetrics
+from core.eds_eval_metrics import (
+    EDSChunkMetrics,
+    EDSIterMetrics,
+    eef_population_geometry_metrics,
+)
 from core.eds_mechanism_trace import EDSMechanismTrace, EDSParticleStage
 from core.env_adapters import BaseEnvAdapter
 from core.fkd_class import FKD
@@ -45,6 +49,7 @@ RDT_GUIDANCE_SIGN = 1.0
 RDT_DIVERSITY_SIGN = -1.0
 EDS_INITIAL_SAMPLING_MODES = {"iid", "rbf_diverse_denoise"}
 EDS_TRUNCATED_ROLLOUT_MODES = {"baseline", "rbf_diverse"}
+EDS_DIVERSITY_DESCRIPTOR_MODES = {"absolute_eef", "direction_normalized_eef"}
 
 
 @dataclass(frozen=True)
@@ -68,12 +73,20 @@ class _EDSConfig:
     initial_diversity_scale: float = 1.0
     initial_diversity_start_ratio: Optional[float] = None
     initial_diversity_fallback: str = "iid"
+    initial_diversity_descriptor_mode: str = "absolute_eef"
     initial_cache_metadata: bool = True
     truncated_rollout_mode: str = "baseline"
     rollout_diversity_scale: float = 1.0
     rollout_diversity_start_ratio: float = 0.8
     rollout_diversity_iters: int | str = 0
     rollout_diversity_skip_final_steps: int = 0
+    rollout_diversity_descriptor_mode: str = "absolute_eef"
+    direction_rbf_direction_weight: float = 0.6
+    direction_rbf_shape_weight: float = 0.3
+    direction_rbf_endpoint_weight: float = 0.1
+    direction_rbf_endpoint_scale_m: float = 0.05
+    direction_rbf_path_epsilon: float = 1.0e-6
+    direction_rbf_distance_epsilon: float = 1.0e-6
     parent_weighting_mode: str = "legacy_temperature"
     selection_ess_target_ratio: float = 0.6
     selection_beta_max: float = 100.0
@@ -143,6 +156,99 @@ def _safe_initial_sampler_float(value) -> Optional[float]:
     except (TypeError, ValueError, OverflowError):
         return None
     return value_f if math.isfinite(value_f) else None
+
+
+def _validate_direction_rbf_config(cfg: Mapping[str, object]) -> dict[str, float]:
+    names = (
+        "direction_rbf_direction_weight",
+        "direction_rbf_shape_weight",
+        "direction_rbf_endpoint_weight",
+        "direction_rbf_endpoint_scale_m",
+        "direction_rbf_path_epsilon",
+        "direction_rbf_distance_epsilon",
+    )
+    values = {name: float(cfg[name]) for name in names}
+    if not all(math.isfinite(value) for value in values.values()):
+        raise ValueError("Direction-RBF parameters must be finite")
+    weights = [values[name] for name in names[:3]]
+    if any(weight < 0.0 for weight in weights) or not math.isclose(
+        sum(weights), 1.0, rel_tol=0.0, abs_tol=1.0e-9
+    ):
+        raise ValueError("Direction-RBF weights must be nonnegative and sum to 1")
+    if any(values[name] <= 0.0 for name in names[3:]):
+        raise ValueError("Direction-RBF endpoint scale and epsilons must be positive")
+    return values
+
+
+def _eds_direction_normalized_descriptor(
+    trajectories: Tensor, *, path_epsilon: float
+) -> dict[str, Tensor]:
+    if trajectories.ndim != 3 or trajectories.shape[-1] < 3:
+        raise ValueError("trajectories must have shape (population, time, >=3)")
+    # CUDA cdist does not implement BF16. Descriptor arithmetic is explicitly
+    # FP32 while autograd still propagates into the original action dtype.
+    xyz = trajectories[..., :3].to(dtype=torch.float32)
+    if not bool(torch.isfinite(xyz).all().item()):
+        raise FloatingPointError("nonfinite Direction-RBF trajectory")
+    steps = xyz[:, 1:] - xyz[:, :-1]
+    path_length = torch.linalg.vector_norm(steps, dim=-1).sum(dim=-1)
+    denominator = path_length + float(path_epsilon)
+    endpoint = xyz[:, -1] - xyz[:, 0]
+    direction = endpoint / denominator.unsqueeze(-1)
+    shape = (xyz[:, 1:] - xyz[:, :1]) / denominator[:, None, None]
+    return {
+        "direction": direction,
+        "shape": shape,
+        "endpoint": endpoint,
+        "path_length": path_length,
+        "zero_path": path_length <= float(path_epsilon),
+    }
+
+
+def _eds_direction_normalized_distance_components(
+    trajectories: Tensor,
+    *,
+    direction_weight: float,
+    shape_weight: float,
+    endpoint_weight: float,
+    endpoint_scale_m: float,
+    path_epsilon: float,
+) -> dict[str, Tensor]:
+    descriptor = _eds_direction_normalized_descriptor(
+        trajectories, path_epsilon=path_epsilon
+    )
+    direction = 0.5 * torch.cdist(
+        descriptor["direction"], descriptor["direction"], p=2
+    )
+    shape_flat = descriptor["shape"].reshape(trajectories.shape[0], -1)
+    horizon = max(int(descriptor["shape"].shape[1]), 1)
+    shape = 0.5 * torch.cdist(shape_flat, shape_flat, p=2) / math.sqrt(horizon)
+    endpoint = torch.tanh(
+        torch.cdist(descriptor["endpoint"], descriptor["endpoint"], p=2)
+        / (float(endpoint_scale_m) + float(path_epsilon))
+    )
+    endpoint = endpoint.clamp_max(
+        torch.nextafter(
+            torch.ones((), dtype=endpoint.dtype, device=endpoint.device),
+            torch.zeros((), dtype=endpoint.dtype, device=endpoint.device),
+        )
+    )
+    composite = (
+        float(direction_weight) * direction
+        + float(shape_weight) * shape
+        + float(endpoint_weight) * endpoint
+    )
+    for value in (direction, shape, endpoint, composite):
+        value.fill_diagonal_(0.0)
+        if not bool(torch.isfinite(value).all().item()):
+            raise FloatingPointError("nonfinite Direction-RBF distance component")
+    return {
+        **descriptor,
+        "pairwise_direction": direction,
+        "pairwise_shape": shape,
+        "pairwise_endpoint": endpoint,
+        "pairwise_composite": composite,
+    }
 
 
 def _safe_initial_sampler_bool(value) -> bool:
@@ -2334,6 +2440,8 @@ class RDTSteer:
             "initial_diversity_fallback_used": False,
             "initial_diversity_fallback_reason": None,
             "initial_sampler_latency_s": None,
+            "initial_diversity_descriptor_mode": cfg.initial_diversity_descriptor_mode,
+            "direction_rbf_evidence_by_step": [],
         }
 
     def _eds_initial_cache_metadata(self, cfg: _EDSConfig, info: dict) -> dict:
@@ -2551,6 +2659,7 @@ class RDTSteer:
         grad_norms: list[float] = []
         grad_failures = 0
         diversity_steps = 0
+        descriptor_evidence_by_step: list[dict[str, object]] = []
 
         for i, t in enumerate(scheduler.timesteps):
             if int(t.item()) <= start_step and diversity_steps > 0 and not recorded_after_diversity:
@@ -2561,7 +2670,12 @@ class RDTSteer:
                 model_output = self._dit(population, t, cond)
 
             if int(t.item()) > start_step:
-                div_grad = self._compute_diversity_gradient(population)
+                div_grad, descriptor_evidence = self._compute_eds_diversity_gradient(
+                    population,
+                    descriptor_mode=cfg.initial_diversity_descriptor_mode,
+                    descriptor_cfg=cfg.__dict__,
+                )
+                descriptor_evidence_by_step.append(descriptor_evidence)
                 if div_grad is None:
                     grad_failures += 1
                     return self._eds_initial_fallback_to_iid(
@@ -2626,6 +2740,7 @@ class RDTSteer:
         info = self._eds_empty_initial_sampler_info(cfg)
         info["initial_diversity_steps"] = diversity_steps
         info["initial_diversity_grad_failure_count"] = grad_failures
+        info["direction_rbf_evidence_by_step"] = descriptor_evidence_by_step
         if grad_norms:
             info["initial_diversity_grad_norm_mean"] = float(sum(grad_norms) / len(grad_norms))
             info["initial_diversity_grad_norm_max"] = float(max(grad_norms))
@@ -3268,6 +3383,9 @@ class RDTSteer:
             "endpoint_spread_after_rollout_rbf_phase": None,
             "endpoint_spread_after_rollout_final": None,
             "rollout_diversity_trace_stages": [],
+            "rollout_rbf_step_indices": [],
+            "rollout_rbf_step_flags": [],
+            "rollout_rbf_final_step_applied": False,
         }
 
     def _eds_rollout_fallback_to_baseline(
@@ -3360,6 +3478,7 @@ class RDTSteer:
         after_rbf_population: Optional[Tensor] = None
         grad_norms: list[float] = []
         steps_applied = 0
+        rbf_step_flags: list[bool] = []
 
         if actual_scale > 0.0 and x_t.shape[0] <= 1:
             return self._eds_rollout_fallback_to_baseline(
@@ -3389,7 +3508,14 @@ class RDTSteer:
                 rollout_timesteps,
                 local_step,
             ):
-                div_grad = self._compute_diversity_gradient(x_t)
+                div_grad, descriptor_evidence = self._compute_eds_diversity_gradient(
+                    x_t,
+                    descriptor_mode=cfg.rollout_diversity_descriptor_mode,
+                    descriptor_cfg=cfg.__dict__,
+                )
+                info.setdefault("direction_rbf_evidence_by_step", []).append(
+                    descriptor_evidence
+                )
                 if div_grad is None:
                     return self._eds_rollout_fallback_to_baseline(
                         reason=f"diversity_gradient_none_at_step={local_step}_t={int(t.item())}",
@@ -3436,6 +3562,8 @@ class RDTSteer:
                 )
                 steps_applied += 1
                 applied_this_step = True
+
+            rbf_step_flags.append(bool(applied_this_step))
 
             if not torch.isfinite(model_output).all():
                 return self._eds_rollout_fallback_to_baseline(
@@ -3490,6 +3618,13 @@ class RDTSteer:
         info["rollout_diversity_enabled"] = steps_applied > 0
         info["rollout_diversity_iters_applied"] = 1 if steps_applied > 0 else 0
         info["rollout_diversity_steps_applied"] = int(steps_applied)
+        info["rollout_rbf_step_flags"] = rbf_step_flags
+        info["rollout_rbf_step_indices"] = [
+            index for index, applied in enumerate(rbf_step_flags) if applied
+        ]
+        info["rollout_rbf_final_step_applied"] = bool(
+            rbf_step_flags and rbf_step_flags[-1]
+        )
         info["rollout_diversity_grad_norms"] = grad_norms
         if grad_norms:
             info["rollout_diversity_grad_norm_mean"] = float(sum(grad_norms) / len(grad_norms))
@@ -3757,6 +3892,9 @@ class RDTSteer:
         info: Mapping,
         cfg: _EDSConfig,
         grad_norms: list[float],
+        *,
+        iter_idx: int,
+        n_trunc_steps: int,
     ) -> None:
         metrics.rollout_diversity_mode = str(
             info.get("rollout_diversity_mode", cfg.truncated_rollout_mode)
@@ -3773,6 +3911,35 @@ class RDTSteer:
             metrics.rollout_diversity_enabled = True
         metrics.rollout_diversity_steps_applied += steps_applied
         metrics.rollout_diversity_iters_applied += iters_applied
+        step_indices = [
+            int(value) for value in (info.get("rollout_rbf_step_indices") or [])
+        ]
+        step_flags = [
+            bool(value) for value in (info.get("rollout_rbf_step_flags") or [])
+        ]
+        metrics.rollout_rbf_steps_by_iter.append(
+            {
+                "iter_idx": int(iter_idx),
+                "n_trunc_steps": int(n_trunc_steps),
+                "step_indices": step_indices,
+                "step_flags": step_flags,
+                "step_count": int(steps_applied),
+                "final_step_rbf_applied": bool(
+                    info.get("rollout_rbf_final_step_applied", False)
+                ),
+                "fallback_used": bool(
+                    info.get("rollout_diversity_fallback_used", False)
+                ),
+            }
+        )
+        direction_evidence = list(info.get("direction_rbf_evidence_by_step") or [])
+        metrics.rollout_direction_rbf_evidence_by_iter.append(direction_evidence)
+        metrics.direction_rbf_zero_gradient_count += sum(
+            item.get("zero_gradient") is True for item in direction_evidence
+        )
+        metrics.direction_rbf_nonfinite_count += sum(
+            int(item.get("nonfinite_count", 0)) for item in direction_evidence
+        )
         for value in info.get("rollout_diversity_grad_norms", []) or []:
             value_f = _safe_initial_sampler_float(value)
             if value_f is not None:
@@ -4362,6 +4529,14 @@ class RDTSteer:
             search_schedule_mode=cfg.search_schedule_mode,
             adaptive_rbf_enabled=adaptive_rbf_enabled,
         )
+        metrics.initial_diversity_descriptor_mode = cfg.initial_diversity_descriptor_mode
+        metrics.rollout_diversity_descriptor_mode = cfg.rollout_diversity_descriptor_mode
+        metrics.direction_rbf_weights = [
+            cfg.direction_rbf_direction_weight,
+            cfg.direction_rbf_shape_weight,
+            cfg.direction_rbf_endpoint_weight,
+        ]
+        metrics.direction_rbf_endpoint_scale_m = cfg.direction_rbf_endpoint_scale_m
         artifact_iters: list[dict] = []
         action_mask = cond["action_mask"]
         trace_enabled = self._eds_pretest_enabled(cfg, global_step)
@@ -4374,6 +4549,17 @@ class RDTSteer:
             metrics,
             cfg,
             initial_sampler_info,
+        )
+        metrics.initial_direction_rbf_evidence_by_step = list(
+            initial_sampler_info.get("direction_rbf_evidence_by_step") or []
+        )
+        metrics.direction_rbf_zero_gradient_count += sum(
+            item.get("zero_gradient") is True
+            for item in metrics.initial_direction_rbf_evidence_by_step
+        )
+        metrics.direction_rbf_nonfinite_count += sum(
+            int(item.get("nonfinite_count", 0))
+            for item in metrics.initial_direction_rbf_evidence_by_step
         )
         population = self._apply_action_mask(population, cond)
         chunk_population_sources = ("fresh",) * int(cfg.population_size)
@@ -4609,6 +4795,7 @@ class RDTSteer:
         selection_trace_iters: list[dict] = []
         adaptive_rollout_trace_iters: list[dict] = []
         anchor_lineage_ids: Optional[Tensor] = None
+        geometry_baseline: dict[str, float | None] | None = None
 
         for i in range(cfg.cem_iters):
             if cfg.search_schedule_mode == "legacy_linear":
@@ -4982,6 +5169,8 @@ class RDTSteer:
                 rollout_info,
                 cfg,
                 rollout_diversity_grad_norms,
+                iter_idx=i,
+                n_trunc_steps=n_trunc_steps,
             )
             if (
                 trace_enabled
@@ -5209,6 +5398,88 @@ class RDTSteer:
                 else:
                     adaptive_stable_lineage_count = 0
             iter_reward_spread = population_rewards.max() - population_rewards.mean()
+            geometry = eef_population_geometry_metrics(
+                self._rdt_sample_to_trajectory_3d(population),
+                selected_idx=iter_best_idx,
+            )
+            if geometry_baseline is None:
+                geometry_baseline = {
+                    key: geometry.get(key)
+                    for key in (
+                        "selected_trajectory_length",
+                        "population_trajectory_length_mean",
+                        "selected_max_step_displacement",
+                        "population_max_step_mean",
+                    )
+                }
+
+            def _expansion_ratio(key: str) -> float | None:
+                value = geometry.get(key)
+                baseline = geometry_baseline.get(key) if geometry_baseline else None
+                if value is None or baseline is None or float(baseline) <= 1e-12:
+                    return None
+                return float(value) / float(baseline)
+
+            selected_length_ratio = _expansion_ratio("selected_trajectory_length")
+            population_length_ratio = _expansion_ratio(
+                "population_trajectory_length_mean"
+            )
+            selected_max_step_ratio = _expansion_ratio(
+                "selected_max_step_displacement"
+            )
+            population_max_step_ratio = _expansion_ratio("population_max_step_mean")
+            rbf_step_record = metrics.rollout_rbf_steps_by_iter[-1]
+            metrics.selected_trajectory_length_by_iter.append(
+                geometry["selected_trajectory_length"]
+            )
+            metrics.population_trajectory_length_mean_by_iter.append(
+                geometry["population_trajectory_length_mean"]
+            )
+            metrics.population_trajectory_length_p90_by_iter.append(
+                geometry["population_trajectory_length_p90"]
+            )
+            metrics.population_trajectory_length_max_by_iter.append(
+                geometry["population_trajectory_length_max"]
+            )
+            metrics.selected_max_step_displacement_by_iter.append(
+                geometry["selected_max_step_displacement"]
+            )
+            metrics.population_max_step_mean_by_iter.append(
+                geometry["population_max_step_mean"]
+            )
+            metrics.population_max_step_p90_by_iter.append(
+                geometry["population_max_step_p90"]
+            )
+            metrics.population_max_step_max_by_iter.append(
+                geometry["population_max_step_max"]
+            )
+            metrics.trajectory_length_expansion_ratio_by_iter.append(
+                {
+                    "selected": selected_length_ratio,
+                    "population_mean": population_length_ratio,
+                }
+            )
+            metrics.max_step_expansion_ratio_by_iter.append(
+                {
+                    "selected": selected_max_step_ratio,
+                    "population_mean": population_max_step_ratio,
+                }
+            )
+            metrics.eef_direction_diversity_by_iter.append(
+                geometry["eef_direction_diversity"]
+            )
+            metrics.endpoint_direction_spread_by_iter.append(
+                geometry["endpoint_direction_spread"]
+            )
+            metrics.direction_metric_valid_count_by_iter.append(
+                {
+                    "eef": int(geometry["eef_direction_valid_count"]),
+                    "endpoint": int(geometry["endpoint_direction_valid_count"]),
+                }
+            )
+            metrics.direction_metric_warnings_by_iter.append(
+                geometry["direction_metric_warning"]
+            )
             metrics.per_iter.append(
                 EDSIterMetrics(
                     iter_idx=i,
@@ -5307,6 +5578,45 @@ class RDTSteer:
                     diversity_band_state=adaptive_iteration_diversity_state,
                     best_lineage_stable=adaptive_iteration_lineage_stable,
                     stable_lineage_count=adaptive_stable_lineage_count,
+                    rollout_rbf_step_indices=list(rbf_step_record["step_indices"]),
+                    rollout_rbf_step_flags=list(rbf_step_record["step_flags"]),
+                    rollout_rbf_step_count=int(rbf_step_record["step_count"]),
+                    rollout_rbf_final_step_applied=bool(
+                        rbf_step_record["final_step_rbf_applied"]
+                    ),
+                    selected_trajectory_length=geometry[
+                        "selected_trajectory_length"
+                    ],
+                    population_trajectory_length_mean=geometry[
+                        "population_trajectory_length_mean"
+                    ],
+                    population_trajectory_length_p90=geometry[
+                        "population_trajectory_length_p90"
+                    ],
+                    population_trajectory_length_max=geometry[
+                        "population_trajectory_length_max"
+                    ],
+                    selected_max_step_displacement=geometry[
+                        "selected_max_step_displacement"
+                    ],
+                    population_max_step_mean=geometry["population_max_step_mean"],
+                    population_max_step_p90=geometry["population_max_step_p90"],
+                    population_max_step_max=geometry["population_max_step_max"],
+                    selected_trajectory_length_expansion_ratio=selected_length_ratio,
+                    population_trajectory_length_expansion_ratio=population_length_ratio,
+                    selected_max_step_expansion_ratio=selected_max_step_ratio,
+                    population_max_step_expansion_ratio=population_max_step_ratio,
+                    eef_direction_diversity=geometry["eef_direction_diversity"],
+                    eef_direction_valid_count=int(
+                        geometry["eef_direction_valid_count"]
+                    ),
+                    endpoint_direction_spread=geometry[
+                        "endpoint_direction_spread"
+                    ],
+                    endpoint_direction_valid_count=int(
+                        geometry["endpoint_direction_valid_count"]
+                    ),
+                    direction_metric_warning=geometry["direction_metric_warning"],
                 )
             )
             last_particle_sources = full_particle_sources
@@ -5319,6 +5629,26 @@ class RDTSteer:
                     "iter_idx": i,
                     "actions": self._decode_visualization_action_candidates(population).detach().cpu(),
                     "scores": population_scores.detach().cpu(),
+                    "mechanism_metrics": {
+                        "selected_trajectory_length": geometry[
+                            "selected_trajectory_length"
+                        ],
+                        "population_trajectory_length_mean": geometry[
+                            "population_trajectory_length_mean"
+                        ],
+                        "selected_max_step_displacement": geometry[
+                            "selected_max_step_displacement"
+                        ],
+                        "population_max_step_mean": geometry[
+                            "population_max_step_mean"
+                        ],
+                        "eef_direction_diversity": geometry[
+                            "eef_direction_diversity"
+                        ],
+                        "endpoint_direction_spread": geometry[
+                            "endpoint_direction_spread"
+                        ],
+                    },
                 }
             )
             metrics.eds_iters_executed = i + 1
@@ -5821,6 +6151,89 @@ class RDTSteer:
             log.warning(f"Diversity gradient failed: {exc}")
             return None
 
+    def _compute_eds_diversity_gradient(
+        self,
+        x_t: Tensor,
+        *,
+        descriptor_mode: str,
+        descriptor_cfg: Mapping[str, object],
+    ) -> tuple[Optional[Tensor], dict[str, object]]:
+        """Dispatch the config-controlled EEF descriptor without mutable scope state."""
+        if descriptor_mode == "absolute_eef":
+            return self._compute_diversity_gradient(x_t), {
+                "descriptor_mode": descriptor_mode,
+                "absolute_fallback_used": False,
+            }
+        if descriptor_mode != "direction_normalized_eef":
+            raise ValueError(f"unsupported diversity descriptor mode: {descriptor_mode}")
+        values = _validate_direction_rbf_config(descriptor_cfg)
+        if x_t.shape[0] < 2 or self._adapter is None:
+            return None, {
+                "descriptor_mode": descriptor_mode,
+                "absolute_fallback_used": False,
+                "zero_gradient": False,
+            }
+        with torch.enable_grad():
+            x_grad = x_t.detach().requires_grad_(True)
+            trajectories = self._rdt_sample_to_trajectory_3d(x_grad)
+            components = _eds_direction_normalized_distance_components(
+                trajectories,
+                direction_weight=values["direction_rbf_direction_weight"],
+                shape_weight=values["direction_rbf_shape_weight"],
+                endpoint_weight=values["direction_rbf_endpoint_weight"],
+                endpoint_scale_m=values["direction_rbf_endpoint_scale_m"],
+                path_epsilon=values["direction_rbf_path_epsilon"],
+            )
+            pairwise = components["pairwise_composite"]
+            mask = ~torch.eye(
+                x_t.shape[0], dtype=torch.bool, device=x_t.device
+            )
+            distance_epsilon = values["direction_rbf_distance_epsilon"]
+            distance = torch.sqrt(pairwise.square() + distance_epsilon**2)
+            potential = ((1.0 / (distance + distance_epsilon)) * mask).sum()
+            if not bool(torch.isfinite(potential).item()):
+                raise FloatingPointError("nonfinite Direction-RBF potential")
+            grad = torch.autograd.grad(
+                potential, x_grad, create_graph=False, allow_unused=False
+            )[0]
+            if not bool(torch.isfinite(grad).all().item()):
+                raise FloatingPointError("nonfinite Direction-RBF gradient")
+            grad_norm = torch.linalg.vector_norm(grad)
+            zero_gradient = bool((grad_norm <= 1.0e-8).item())
+            normalized = grad if zero_gradient else grad / (grad_norm + 1.0e-8)
+            upper = torch.triu_indices(
+                x_t.shape[0], x_t.shape[0], offset=1, device=x_t.device
+            )
+
+            def _values(name: str) -> list[float]:
+                tensor = components[name][upper[0], upper[1]].detach().float().cpu()
+                return [float(value) for value in tensor.tolist()]
+
+            evidence: dict[str, object] = {
+                "descriptor_mode": descriptor_mode,
+                "absolute_fallback_used": False,
+                "zero_path_descriptor_count": int(
+                    components["zero_path"].sum().detach().cpu().item()
+                ),
+                "zero_gradient": zero_gradient,
+                "nonfinite_count": 0,
+                "grad_norm_before_normalization": float(grad_norm.detach().cpu()),
+                "grad_norm_after_mask": float(
+                    torch.linalg.vector_norm(
+                        self._mask_guidance_gradient(normalized)
+                    ).detach().cpu()
+                ),
+                "pairwise_direction": _values("pairwise_direction"),
+                "pairwise_shape": _values("pairwise_shape"),
+                "pairwise_endpoint": _values("pairwise_endpoint"),
+                "pairwise_composite": _values("pairwise_composite"),
+                "path_lengths": [
+                    float(value)
+                    for value in components["path_length"].detach().float().cpu().tolist()
+                ],
+            }
+            return normalized, evidence
+
     def _compute_keypoint_gradient(
         self,
         x_t: Tensor,
@@ -5932,6 +6345,9 @@ class RDTSteer:
                 else float(cfg.get("initial_diversity_start_ratio"))
             ),
             initial_diversity_fallback=str(cfg.get("initial_diversity_fallback", "iid")),
+            initial_diversity_descriptor_mode=str(
+                cfg.get("initial_diversity_descriptor_mode", "absolute_eef")
+            ),
             initial_cache_metadata=_parse_eds_bool(
                 cfg.get("initial_cache_metadata", True), "initial_cache_metadata"
             ),
@@ -5945,6 +6361,27 @@ class RDTSteer:
             ),
             rollout_diversity_skip_final_steps=int(
                 cfg.get("rollout_diversity_skip_final_steps", 0)
+            ),
+            rollout_diversity_descriptor_mode=str(
+                cfg.get("rollout_diversity_descriptor_mode", "absolute_eef")
+            ),
+            direction_rbf_direction_weight=float(
+                cfg.get("direction_rbf_direction_weight", 0.6)
+            ),
+            direction_rbf_shape_weight=float(
+                cfg.get("direction_rbf_shape_weight", 0.3)
+            ),
+            direction_rbf_endpoint_weight=float(
+                cfg.get("direction_rbf_endpoint_weight", 0.1)
+            ),
+            direction_rbf_endpoint_scale_m=float(
+                cfg.get("direction_rbf_endpoint_scale_m", 0.05)
+            ),
+            direction_rbf_path_epsilon=float(
+                cfg.get("direction_rbf_path_epsilon", 1.0e-6)
+            ),
+            direction_rbf_distance_epsilon=float(
+                cfg.get("direction_rbf_distance_epsilon", 1.0e-6)
             ),
             parent_weighting_mode=str(
                 cfg.get("parent_weighting_mode", "legacy_temperature")
@@ -6196,6 +6633,15 @@ class RDTSteer:
             )
         if resolved.use_cem and resolved.num_elites <= 0:
             raise ValueError("EDS num_elites must be positive when use_cem=true")
+        for field_name in (
+            "initial_diversity_descriptor_mode",
+            "rollout_diversity_descriptor_mode",
+        ):
+            if getattr(resolved, field_name) not in EDS_DIVERSITY_DESCRIPTOR_MODES:
+                raise ValueError(
+                    f"{field_name} must be one of {sorted(EDS_DIVERSITY_DESCRIPTOR_MODES)}"
+                )
+        _validate_direction_rbf_config(resolved.__dict__)
         return resolved
 
     def _adaptive_scale_for_scheduler_t(

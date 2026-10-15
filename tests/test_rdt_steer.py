@@ -3576,6 +3576,99 @@ def test_eds_rollout_rbf_applies_when_renoise_tmax_is_one(
     assert info["rollout_diversity_steps_applied"] == 1
 
 
+def test_eds_rollout_clean_tail_skips_last_step_without_fallback(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    from core.rdt_policy_steer import _EDSConfig
+
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    calls = []
+
+    def fake_diversity(x_t):
+        calls.append(tuple(x_t.shape))
+        return torch.zeros_like(x_t)
+
+    monkeypatch.setattr(stub_steer, "_compute_diversity_gradient", fake_diversity)
+    cfg = _EDSConfig(
+        population_size=3,
+        truncated_rollout_mode="rbf_diverse",
+        rollout_diversity_start_ratio=0.6,
+        rollout_diversity_iters="all",
+        rollout_diversity_skip_final_steps=1,
+    )
+
+    _population, _costs, info = stub_steer._eds_rollout_reference(
+        cond=cond,
+        action_mask=cond["action_mask"],
+        noisy_action=torch.zeros(3, 64, 128),
+        keypoints=torch.zeros(1, 3),
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        n_trunc_steps=2,
+        cfg=cfg,
+        iter_idx=0,
+    )
+
+    assert calls == [(3, 64, 128)]
+    assert info["rollout_rbf_step_indices"] == [0]
+    assert info["rollout_rbf_step_flags"] == [True, False]
+    assert info["rollout_rbf_final_step_applied"] is False
+    assert info["rollout_diversity_fallback_used"] is False
+
+
+def test_eds_rollout_clean_tail_ntrunc_one_has_zero_rbf_steps_and_no_fallback(
+    stub_steer,
+    stub_adapter,
+    monkeypatch,
+):
+    from core.rdt_policy_steer import _EDSConfig
+
+    stub_steer.post_init(
+        adapter=stub_adapter,
+        postprocessor=lambda x: x,
+        sample_batch_size=3,
+        policy_config={"action_chunk_horizon": 4},
+    )
+    cond = _rollout_cond(stub_steer)
+    calls = []
+    monkeypatch.setattr(
+        stub_steer,
+        "_compute_diversity_gradient",
+        lambda x_t: calls.append(tuple(x_t.shape)) or torch.zeros_like(x_t),
+    )
+
+    _population, _costs, info = stub_steer._eds_rollout_reference(
+        cond=cond,
+        action_mask=cond["action_mask"],
+        noisy_action=torch.zeros(3, 64, 128),
+        keypoints=torch.zeros(1, 3),
+        guidance_fns=[lambda keypoints, traj: traj[..., 0].sum()],
+        n_trunc_steps=1,
+        cfg=_EDSConfig(
+            population_size=3,
+            truncated_rollout_mode="rbf_diverse",
+            rollout_diversity_start_ratio=0.6,
+            rollout_diversity_iters="all",
+            rollout_diversity_skip_final_steps=1,
+        ),
+        iter_idx=0,
+    )
+
+    assert calls == []
+    assert info["rollout_diversity_steps_applied"] == 0
+    assert info["rollout_rbf_step_indices"] == []
+    assert info["rollout_rbf_step_flags"] == [False]
+    assert info["rollout_rbf_final_step_applied"] is False
+    assert info["rollout_diversity_fallback_used"] is False
+
+
 def test_eds_rollout_rbf_warns_and_fallbacks_to_baseline(
     stub_steer,
     stub_adapter,

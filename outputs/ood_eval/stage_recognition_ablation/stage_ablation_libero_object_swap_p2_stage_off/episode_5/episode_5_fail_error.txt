@@ -1,0 +1,1 @@
+Episode failed due to execution error: Expected robot0_gripper_qpos values within raw qpos range [-0.04245, 0.05185]; values=[0.035461992025375366, -0.045861903578042984]

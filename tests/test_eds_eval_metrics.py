@@ -3,6 +3,7 @@ import math
 import sys
 from pathlib import Path
 
+import pytest
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -11,10 +12,103 @@ from core.eds_eval_metrics import (
     EDSChunkMetrics,
     EDSIterMetrics,
     append_jsonl,
+    direction_rbf_evidence_summary,
+    eef_population_geometry_metrics,
     read_jsonl,
     summarize_latency,
     wilson_ci,
 )
+
+
+def test_direction_rbf_evidence_summary_reports_components_correlations_and_counts():
+    summary = direction_rbf_evidence_summary(
+        [
+            [
+                {
+                    "descriptor_mode": "direction_normalized_eef",
+                    "pairwise_direction": [0.1, 0.2, 0.3],
+                    "pairwise_shape": [0.4, 0.5, 0.6],
+                    "pairwise_endpoint": [0.7, 0.8, 0.9],
+                    "pairwise_composite": [0.25, 0.35, 0.45],
+                    "path_lengths": [1.0, 2.0, 4.0],
+                    "zero_path_descriptor_count": 0,
+                    "zero_gradient": False,
+                    "nonfinite_count": 0,
+                    "grad_norm_before_normalization": 3.0,
+                    "grad_norm_after_mask": 0.75,
+                }
+            ]
+        ],
+        weights=[0.6, 0.3, 0.1],
+    )
+
+    assert summary["direction_rbf_pairwise_direction_mean_by_iter"] == pytest.approx([0.2])
+    assert summary["direction_rbf_pairwise_shape_max_by_iter"] == pytest.approx([0.6])
+    assert summary["direction_rbf_pairwise_endpoint_p90_by_iter"][0] == pytest.approx(0.88)
+    assert summary["direction_rbf_weighted_component_fraction_by_iter"][0] == pytest.approx(
+        {"direction": 0.34285714285714286, "shape": 0.42857142857142855, "endpoint": 0.22857142857142856}
+    )
+    assert summary["direction_rbf_distance_path_length_delta_correlation_by_iter"][0]["valid_pair_count"] == 3
+    assert summary["direction_rbf_distance_direction_correlation_by_iter"][0]["value"] == pytest.approx(1.0)
+    assert summary["direction_rbf_zero_gradient_count"] == 0
+    assert summary["direction_rbf_nonfinite_count"] == 0
+    assert summary["direction_rbf_grad_norm_after_mask_by_iter"] == [0.75]
+
+
+def test_direction_rbf_evidence_summary_uses_null_warning_for_zero_variance():
+    summary = direction_rbf_evidence_summary(
+        [[{
+            "descriptor_mode": "direction_normalized_eef",
+            "pairwise_direction": [0.2, 0.2, 0.2],
+            "pairwise_shape": [0.1, 0.1, 0.1],
+            "pairwise_endpoint": [0.5, 0.5, 0.5],
+            "pairwise_composite": [0.2, 0.2, 0.2],
+            "path_lengths": [1.0, 1.0, 1.0],
+            "zero_path_descriptor_count": 0,
+            "zero_gradient": False,
+            "nonfinite_count": 0,
+            "grad_norm_before_normalization": 1.0,
+            "grad_norm_after_mask": 1.0,
+        }]],
+        weights=[0.6, 0.3, 0.1],
+    )
+
+    correlation = summary["direction_rbf_distance_path_length_delta_correlation_by_iter"][0]
+    assert correlation["value"] is None
+    assert correlation["valid_pair_count"] == 3
+    assert correlation["warning"] == "zero_variance"
+
+
+def test_eef_population_geometry_metrics_tracks_lengths_steps_and_directions():
+    trajectories = torch.tensor(
+        [
+            [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [2.0, 0.0, 0.0]],
+            [[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 2.0, 0.0]],
+            [[0.0, 0.0, 0.0], [-1.0, 0.0, 0.0], [-2.0, 0.0, 0.0]],
+        ]
+    )
+
+    result = eef_population_geometry_metrics(trajectories, selected_idx=1)
+
+    assert result["selected_trajectory_length"] == 2.0
+    assert result["population_trajectory_length_mean"] == 2.0
+    assert result["selected_max_step_displacement"] == 1.0
+    assert result["population_max_step_mean"] == 1.0
+    assert result["eef_direction_valid_count"] == 3
+    assert result["eef_direction_diversity"] > 0.0
+    assert result["endpoint_direction_valid_count"] == 3
+    assert result["endpoint_direction_spread"] > 0.0
+
+
+def test_eef_population_geometry_metrics_marks_zero_direction_as_invalid():
+    result = eef_population_geometry_metrics(
+        torch.zeros(2, 4, 3), selected_idx=0
+    )
+
+    assert result["eef_direction_diversity"] is None
+    assert result["endpoint_direction_spread"] is None
+    assert result["eef_direction_valid_count"] == 0
+    assert result["direction_metric_warning"] == "no_valid_direction_samples"
 
 
 def test_eds_chunk_metrics_serializes_nested_iter_metrics():

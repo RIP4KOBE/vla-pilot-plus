@@ -7,6 +7,7 @@ from typing import Any, Iterable
 
 import cv2
 import imageio.v2 as imageio
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
@@ -154,6 +155,52 @@ def _iter_artifacts(items: Iterable[dict[str, Any]], max_iters: int) -> Iterable
         yield item
 
 
+def _save_mechanism_metric_curves(
+    path: Path,
+    per_iter: list[dict[str, Any]],
+) -> bool:
+    rows = [
+        (int(item["iter_idx"]), item.get("mechanism_metrics", {}))
+        for item in per_iter
+        if isinstance(item, dict) and isinstance(item.get("mechanism_metrics"), dict)
+    ]
+    if not rows:
+        return False
+    series = (
+        ("selected_trajectory_length", "selected length"),
+        ("population_trajectory_length_mean", "population length mean"),
+        ("selected_max_step_displacement", "selected max-step"),
+        ("population_max_step_mean", "population max-step mean"),
+        ("eef_direction_diversity", "EEF direction diversity"),
+        ("endpoint_direction_spread", "endpoint direction spread"),
+    )
+    figure, axes = plt.subplots(3, 1, figsize=(8, 10), sharex=True)
+    groups = (series[:2], series[2:4], series[4:])
+    for axis, group in zip(axes, groups):
+        for key, label in group:
+            xs = []
+            ys = []
+            for iter_idx, metrics in rows:
+                value = metrics.get(key)
+                if value is None:
+                    continue
+                value_f = float(value)
+                if not np.isfinite(value_f):
+                    continue
+                xs.append(iter_idx)
+                ys.append(value_f)
+            if xs:
+                axis.plot(xs, ys, marker="o", label=label)
+        axis.grid(True, alpha=0.3)
+        axis.legend(loc="best")
+    axes[-1].set_xlabel("EDS iteration")
+    figure.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure.savefig(path, dpi=160)
+    plt.close(figure)
+    return True
+
+
 def save_eds_qualitative_artifacts(
     output_dir: str | Path,
     adapter,
@@ -221,5 +268,12 @@ def save_eds_qualitative_artifacts(
         path = output_root / f"population_cloud_iter_{iter_idx:03d}.png"
         save_image(path, draw_population_cloud(adapter, population))
         saved.append(str(path))
+
+    mechanism_curve_path = output_root / "mechanism_metric_curves.png"
+    if _save_mechanism_metric_curves(
+        mechanism_curve_path,
+        list(_iter_artifacts(artifacts.get("per_iter", []), max_iters)),
+    ):
+        saved.append(str(mechanism_curve_path))
 
     return saved

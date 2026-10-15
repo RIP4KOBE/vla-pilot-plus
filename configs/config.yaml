@@ -25,6 +25,8 @@ seed: 0
 # ============================================================
 main:
   episode_num: 10  # if using libero, need to be divisible by the number of tasks in the suite(i.e. libero_goal_task has 10 tasks, so episode_num should be divisible by 10)
+  episode_start_index: 0
+  episode_seed_schedule: null
   max_episode_steps: 240        # Max steps per episode (calvin.yaml references this via interpolation)
   output_dir: ${hydra:run.dir}
   cached_functions_dir: null
@@ -74,6 +76,7 @@ main:
     save_initial_cache: false
     save_ed_cache: false
     initial_sampling_mode: iid
+    initial_diversity_descriptor_mode: absolute_eef
     initial_diversity_scale: 1.0
     initial_diversity_start_ratio: null
     initial_diversity_fallback: iid
@@ -83,6 +86,13 @@ main:
     rollout_diversity_start_ratio: 0.8
     rollout_diversity_iters: 0
     rollout_diversity_skip_final_steps: 0
+    rollout_diversity_descriptor_mode: absolute_eef
+    direction_rbf_direction_weight: 0.6
+    direction_rbf_shape_weight: 0.3
+    direction_rbf_endpoint_weight: 0.1
+    direction_rbf_endpoint_scale_m: 0.05
+    direction_rbf_path_epsilon: 1.0e-6
+    direction_rbf_distance_epsilon: 1.0e-6
     parent_weighting_mode: legacy_temperature
     selection_ess_target_ratio: 0.6
     selection_beta_max: 100.0
