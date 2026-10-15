@@ -4,9 +4,6 @@
 [submodule "third_party/calvin"]
 	path = third_party/calvin
 	url = https://github.com/RIP4KOBE/calvin.git
-[submodule "sam3"]
-	path = sam3
-	url = https://github.com/facebookresearch/sam3.git
 [submodule "third_party/rdt"]
 	path = third_party/rdt
 	url = https://github.com/RIP4KOBE/RoboticsDiffusionTransformer.git

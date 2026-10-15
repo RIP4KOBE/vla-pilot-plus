@@ -31,6 +31,7 @@
 - [AGENTS.md](AGENTS.md) 与 [CONTRIBUTING.md](CONTRIBUTING.md)：开发规则、检查命令和团队协作。
 - [文档导航](docs/README.md) 与 [仓库整理报告](docs/maintenance/repository-consolidation-20261015.md)：历史材料、分支/工作树归档和发布状态。
 - [GitHub 历史源码索引](docs/maintenance/historical-source-index-20261015.md)：历史分支、工作树未提交源码、stash 与外部源码快照的远端入口；[清理与控制依赖审查](docs/maintenance/main-scope-and-control-dependencies-20261015.md)说明哪些旧功能可退役、为何 Stage/Codex 仍需保留。
+- [VLS 在线控制比较与非核心清理](docs/maintenance/vls-control-and-noncore-cleanup-20261015.md)：上游与当前闭环的区别、99 个远端分支的来源、已删除/归档文件及恢复索引；`core` 本轮未改动。
 
 项目目标是在冻结 RDT 的推理阶段，以 EDS 为底座引入有用的 quality-diversity 和执行反馈。当前 QD 仅在动作块内维护档案；跨块/跨任务改进以及自动 BD 是待验证研究方向。
 
@@ -39,6 +40,8 @@
 远端 `main` 已包含验收框架。新合作者先 clone，再按下列安装与资产流程准备环境；普通 clone 不包含模型和完整原始实验归档。
 
 先完成[安装与资产准备](docs/steering/installation.md)：创建独立环境，单独安装并登录 Codex CLI，取得与清单匹配的模型/DINO 资产，再生成 `configs/local.yaml`。**目前没有配置公开的精确资产包**；RDT checkpoint与固定DINO源码需由维护者交付并通过清单验证，仅 clone 仓库不足以在线运行。模型内容与实际加载路径校验是 configure、preflight 和真实 launcher 的必经步骤。
+
+根目录 `environment.yml`、`requirements.txt`、`run.sh`、`setup.sh` 保留旧后端兼容用途，未重新验收；当前三模式统一使用 `*-steering*` 安装配方和下方公共 launcher。旧安装脚本中的 Poe 提示不适用于当前 Codex 协议。
 
 以下命令在仓库根目录、已激活的环境中执行。选择一个方法，使用新的输出目录；其余方法只需替换 `--method` 和目录名。
 

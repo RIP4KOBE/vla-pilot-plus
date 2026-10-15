@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-15",
+  "base_commit": "b6455655f47fd3c6326721d8d1a238782b2c4f4a",
+  "core_tracked_files_byte_identical": 43,
+  "core_python_files_byte_identical": 43,
+  "protected_paths_unchanged": [
+    "main.py",
+    "core/",
+    "configs/",
+    "vlm_query/",
+    "patches/",
+    "tests/"
+  ],
+  "three_method_resolved_configs_identical": true,
+  "cli_print_config": {
+    "vls": {
+      "parsed": true,
+      "episode_num": 10,
+      "stage_controller": "online",
+      "reward_backend": "codex_cli"
+    },
+    "eds": {
+      "parsed": true,
+      "episode_num": 10,
+      "stage_controller": "online",
+      "reward_backend": "codex_cli"
+    },
+    "eds_qd": {
+      "parsed": true,
+      "episode_num": 10,
+      "stage_controller": "online",
+      "reward_backend": "codex_cli"
+    }
+  },
+  "cli_validation_note": "Initial CLI check with nonexistent /assets fixture directories rejected as expected by load_local; repeated with existing local.yaml. Preview does not verify model/GPU/API.",
+  "source_manifest_delta": {
+    "removed": [
+      "utils/hydra_plugins/__init__.py",
+      "utils/hydra_plugins/task_searchpath.py",
+      "utils/plot_results.py"
+    ],
+    "added": [],
+    "changed": []
+  },
+  "valid_submodule_paths": [
+    "third_party/calvin",
+    "third_party/lerobot",
+    "third_party/rdt"
+  ],
+  "handoff_sha256": "50b89906a7ef268d6174f95fa81db853976b1e8e710d8083d8290335221a2ee1",
+  "remote_branch_counts": {
+    "main": 1,
+    "preexisting_non_main": 7,
+    "former_worktrees": 72,
+    "branches_without_worktree": 4,
+    "stash_snapshots": 2,
+    "supplemental_snapshots": 13,
+    "total": 99
+  },
+  "cpu_tests": {
+    "files": [
+      "tests/test_steering_runner.py",
+      "tests/test_steering_asset_admission.py"
+    ],
+    "passed": 114,
+    "failed": 0,
+    "seconds": 8.62,
+    "python": "/mnt/data/shared2/hynx/steering-integration-envs/clean-20261013-01/env/bin/python"
+  },
+  "no_core_changes": true,
+  "no_gpu_or_online_experiment": true,
+  "preexisting_change_excluded": "CLAUDE.md deletion",
+  "documentation_links": {
+    "files": [
+      "README.md",
+      "docs/README.md",
+      "docs/maintenance/vls-control-and-noncore-cleanup-20261015.md"
+    ],
+    "checked": 77,
+    "missing": [],
+    "historical_handoff_internal_links": "Preserved historical original bytes; old absolute machine links not revalidated as current instructions."
+  },
+  "archived_branch_remote_tip_matches": 91,
+  "git_diff_check": "passed"
+}

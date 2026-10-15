@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-15",
+  "base_commit": "b6455655f47fd3c6326721d8d1a238782b2c4f4a",
+  "preexisting_change": "CLAUDE.md deleted; excluded from cleanup commit",
+  "files": [
+    {
+      "path": "NOTES.md",
+      "action": "delete",
+      "sha256": "a111f789c4d2a9d2caa0355d62bac8ef6e9c98a0937f6eba613c1c606f940a82",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/NOTES.md"
+    },
+    {
+      "path": "HANDOFF.md",
+      "action": "archive",
+      "sha256": "50b89906a7ef268d6174f95fa81db853976b1e8e710d8083d8290335221a2ee1",
+      "archive_path": "docs/08_archive/HANDOFF-20260915.md",
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/HANDOFF.md"
+    },
+    {
+      "path": "environment.yml",
+      "action": "retain_legacy_compatibility",
+      "sha256": "d08464e836dcd0e88026d2393724149a6bad7862f8d4a61659b0e4d5c30dc2f6",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/environment.yml"
+    },
+    {
+      "path": "requirements.txt",
+      "action": "retain_legacy_compatibility",
+      "sha256": "e4d0e90f4ee5fe081dac7e2e1418e8aba067b9bbc188ae5e953ff6811e9e8f10",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/requirements.txt"
+    },
+    {
+      "path": "run.sh",
+      "action": "retain_legacy_compatibility",
+      "sha256": "476744a08c3b9ce2ee9b10ae84c37d5a718d8114787a17d0d35c021908531806",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/run.sh"
+    },
+    {
+      "path": "setup.sh",
+      "action": "retain_legacy_compatibility",
+      "sha256": "591e52d1032fd2b3fbf655cbace5d9f3e955e84cd4ae36f176ed0f380e545eda",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/setup.sh"
+    },
+    {
+      "path": "scripts/run_libero_suites.sh",
+      "action": "retain_legacy_compatibility",
+      "sha256": "46cf6c559b4df9fa5c1946f3bd64dfb21241b2bab2fcf883edc98f67d90a8d87",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/scripts/run_libero_suites.sh"
+    },
+    {
+      "path": "utils/plot_results.py",
+      "action": "delete",
+      "sha256": "3c8c26e719aa8742a07a134875b3dfcf0d0b2c1dedc277a8e694de0945787c90",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/utils/plot_results.py"
+    },
+    {
+      "path": "utils/hydra_plugins/task_searchpath.py",
+      "action": "delete",
+      "sha256": "32aa364739836f11f48299bd3e49a59a89a1baa4512f3a6f0bc962496739d218",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/utils/hydra_plugins/task_searchpath.py"
+    },
+    {
+      "path": "utils/hydra_plugins/__init__.py",
+      "action": "delete",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/utils/hydra_plugins/__init__.py"
+    },
+    {
+      "path": "ablations/door_left_k10.yaml",
+      "action": "delete",
+      "sha256": "9121ce21a34450f99cae66a140c4a7c501c8e0cb9db04ca87104d0ae7a1f35dc",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/ablations/door_left_k10.yaml"
+    },
+    {
+      "path": "ablations/door_left_no_fkd.yaml",
+      "action": "delete",
+      "sha256": "5f87e15d5003da28055c555ec8f505441ef78ea2a4c62d27ec83e27a8b047a32",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/ablations/door_left_no_fkd.yaml"
+    },
+    {
+      "path": "ablations/door_left_no_gradient.yaml",
+      "action": "delete",
+      "sha256": "a410e09fedc1d162dd8218de48a9a6688a1640eecca554bbe5c4f7005a135c8d",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/ablations/door_left_no_gradient.yaml"
+    },
+    {
+      "path": "ablations/door_left_no_rbf.yaml",
+      "action": "delete",
+      "sha256": "cecbae79dfb684c2b5f5724aa761284b92773a4f9795f68206e60c475baab0f8",
+      "archive_path": null,
+      "restore_url": "https://github.com/RIP4KOBE/vla-pilot-plus/blob/b6455655f47fd3c6326721d8d1a238782b2c4f4a/ablations/door_left_no_rbf.yaml"
+    }
+  ]
+}
