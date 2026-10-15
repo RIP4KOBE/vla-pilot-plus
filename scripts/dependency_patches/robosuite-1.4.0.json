@@ -1,0 +1,20 @@
+{
+  "schema": "steering_dependency_compat_v1",
+  "distribution": "robosuite",
+  "version": "1.4.0",
+  "files": {
+    "utils/binding_utils.py": {
+      "upstream_sha256": "f5c8aada3bc85d3e66b9c4719c62892f0a32e4ea3489f66cc9abcaa170282c04",
+      "patched_sha256": "8a1d052ceaffdc273b7643fe3f49d727c7f5f1f9061abecbab51bd631d113131",
+      "patch": "robosuite-binding.patch",
+      "patch_sha256": "89816ff1ed895e650ce2113cae99767bf9ad5d7fd3d071ce96af59e6e7c24837"
+    },
+    "renderers/context/egl_context.py": {
+      "upstream_sha256": "fd5d6d8e4978477d0333f33315224e520245ebbedb5c27e50b0e13543893ffc1",
+      "patched_sha256": "fc021027eb1d4917c71a30463ac0b1333baa907cfda5587b40e016c6f88ad31a",
+      "patch": "robosuite-egl.patch",
+      "patch_sha256": "17725f107d8e53cd5b3a742a23940ce8078d646184c958715175c73e9e107175"
+    }
+  },
+  "purpose": "Explicitly reproduce the two compatibility-modified Robosuite files used by the accepted online environment. No model, physics parameters, control thresholds, or search changes."
+}

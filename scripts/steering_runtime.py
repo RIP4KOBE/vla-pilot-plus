@@ -137,7 +137,7 @@ def source_manifest():
     paths = [ROOT / 'main.py']
     for folder in ('core', 'utils', 'vlm_query', 'scripts', 'configs'):
         paths.extend(p for p in (ROOT / folder).rglob('*')
-                     if p.is_file() and p.suffix in ('.py', '.yaml', '.txt', '.json')
+                     if p.is_file() and p.suffix in ('.py', '.yaml', '.txt', '.json', '.patch')
                      and '__pycache__' not in p.parts and p.name not in ('local.yaml',))
     return {str(p.relative_to(ROOT)): digest(p) for p in sorted(set(paths))}
 
@@ -168,6 +168,8 @@ def git_commit():
 def dependency_manifest(local):
     """Record actual assets and imported dependency revisions before loading CUDA."""
     import importlib.metadata
+    from scripts.steering_dependency_compat import verify_runtime_compat
+    runtime_compatibility = verify_runtime_compat()
     from scripts.prepare_steering_assets import verify_libero, verify_rng, verify_libero_paths
     from scripts.steering_model_assets import verify_model_assets
     packages = {}
@@ -209,6 +211,7 @@ print(json.dumps(result))
                                        env=env, text=True)
     imported_packages = json.loads(imported.splitlines()[-1])
     return {'python': sys.version, 'packages': packages, 'submodules': submodules,
+            'runtime_compatibility': runtime_compatibility,
             'imported_packages': imported_packages,
             'package_scope': 'distribution metadata and CPU-imported module entrypoints; not a full dependency tree hash',
             'codex_cli': subprocess.check_output(['codex', '--version'], text=True).strip(),

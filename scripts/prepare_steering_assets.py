@@ -230,6 +230,8 @@ def configure(args) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser("install-runtime-compat", help="Install exact pinned Robosuite compatibility patches")
+    commands.add_parser("verify-runtime-compat", help="Check installed Robosuite compatibility hashes")
     rng = commands.add_parser("verify-rng", help="Hash-check the twenty packaged RNG files; no Torch import")
     rng.add_argument("--root", type=Path, default=ROOT / "tests/fixtures/steering_rng")
     install = commands.add_parser("install-libero", help="Fetch pinned LIBERO or copy an already verified local tree")
@@ -250,7 +252,10 @@ def main() -> None:
     config.add_argument("--report", type=Path)
     config.add_argument("--replace-config", action="store_true", help="Replace only the two explicitly named config files/report")
     args = parser.parse_args()
-    if args.command == "verify-rng":
+    if args.command in ("install-runtime-compat", "verify-runtime-compat"):
+        from scripts.steering_dependency_compat import install_runtime_compat, verify_runtime_compat
+        result = install_runtime_compat() if args.command == "install-runtime-compat" else verify_runtime_compat()
+    elif args.command == "verify-rng":
         result = verify_rng(args.root)
     elif args.command == "verify-libero":
         result = verify_libero(args.root)

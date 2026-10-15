@@ -320,6 +320,10 @@ def prepare_v2_cohort(cohort, monkeypatch, method='eds'):
         'scripts/steering_runtime.py','scripts/steering_worker.py','scripts/run_steering.py',
         'scripts/steering_model_assets.py','scripts/steering_model_assets_manifest.json',
         'scripts/steering_assets_manifest.json','scripts/prepare_steering_assets.py','core/episode_rng_hooks.py','core/rdt_policy_steer.py','core/qd_ed.py','core/fkd_class.py']
+    required.extend(['scripts/steering_dependency_compat.py',
+        'scripts/dependency_patches/robosuite-1.4.0.json',
+        'scripts/dependency_patches/robosuite-binding.patch',
+        'scripts/dependency_patches/robosuite-egl.patch'])
     for name in required:
         target=folder/'source'/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/name,target)
     source={name:steering_runtime.digest(folder/'source'/name) for name in required}
@@ -339,6 +343,10 @@ def prepare_v2_cohort(cohort, monkeypatch, method='eds'):
             bindings={k:str(Path(machine()['libero_root'])/'libero/libero'/v) for k,v in
                 (('benchmark_root',''),('assets','assets'),('bddl_files','bddl_files'),('init_states','init_files'))}),
         rng=dict(valid=True,fixture_count=20,sha256=cfg['main']['episode_rng_fixture_manifest_sha256']))
+    compat=json.loads((ROOT/'scripts/dependency_patches/robosuite-1.4.0.json').read_text())
+    env['runtime_compatibility']=dict(valid=True,distribution='robosuite',version='1.4.0',
+        root='/synthetic/robosuite',manifest_sha256=source['scripts/dependency_patches/robosuite-1.4.0.json'],
+        files={name:row['patched_sha256'] for name,row in compat['files'].items()})
     write_json(folder/'environment.json',env)
     (folder/'local-config.yaml').write_text(yaml.safe_dump(machine()))
     manifest=dict(schema='steering_cohort_v2',method=method,tasks=[0,1],seeds=[44,235],

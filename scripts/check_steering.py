@@ -40,6 +40,8 @@ def main():
         report['libero'] = verify_libero(Path(local['libero_root']))
         report['libero_paths'] = verify_libero_paths(local)
         report['rng'] = verify_rng(ROOT / 'tests/fixtures/steering_rng')
+        from scripts.steering_dependency_compat import verify_runtime_compat
+        report['runtime_compatibility'] = verify_runtime_compat()
         atomic_json(destination / 'report.json', report)
         if args.api:
             from PIL import Image

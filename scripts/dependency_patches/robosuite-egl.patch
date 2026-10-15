@@ -1,0 +1,48 @@
+--- a/renderers/context/egl_context.py
++++ b/renderers/context/egl_context.py
+@@ -113,7 +113,7 @@
+         del max_width, max_height  # unused
+         num_configs = ctypes.c_long()
+         config_size = 1
+-        config = EGL.EGLConfig()
++        configs = (EGL.EGLConfig * config_size)()
+         EGL.eglReleaseThread()
+         global EGL_DISPLAY
+         if EGL_DISPLAY is None:
+@@ -126,12 +126,13 @@
+                     "required for creating a headless rendering context."
+                 )
+             atexit.register(EGL.eglTerminate, EGL_DISPLAY)
+-        EGL.eglChooseConfig(EGL_DISPLAY, EGL_ATTRIBUTES, ctypes.byref(config), config_size, num_configs)
++        EGL.eglChooseConfig(EGL_DISPLAY, EGL_ATTRIBUTES, configs, config_size, num_configs)
+         if num_configs.value < 1:
+             raise RuntimeError(
+                 "EGL failed to find a framebuffer configuration that matches the "
+                 "desired attributes: {}".format(EGL_ATTRIBUTES)
+             )
++        config = configs[0]
+         EGL.eglBindAPI(EGL.EGL_OPENGL_API)
+         self._context = EGL.eglCreateContext(EGL_DISPLAY, config, EGL.EGL_NO_CONTEXT, None)
+         if not self._context:
+@@ -144,11 +145,16 @@
+     def free(self):
+         """Frees resources associated with this context."""
+         if self._context:
+-            current_context = EGL.eglGetCurrentContext()
+-            if current_context and self._context.address == current_context.address:
+-                EGL.eglMakeCurrent(EGL_DISPLAY, EGL.EGL_NO_SURFACE, EGL.EGL_NO_SURFACE, EGL.EGL_NO_CONTEXT)
+-            EGL.eglDestroyContext(EGL_DISPLAY, self._context)
+-            EGL.eglReleaseThread()
++            try:
++                current_context = EGL.eglGetCurrentContext()
++                if current_context and self._context.address == current_context.address:
++                    EGL.eglMakeCurrent(EGL_DISPLAY, EGL.EGL_NO_SURFACE, EGL.EGL_NO_SURFACE, EGL.EGL_NO_CONTEXT)
++                EGL.eglDestroyContext(EGL_DISPLAY, self._context)
++                EGL.eglReleaseThread()
++            except Exception:
++                # atexit terminates the EGL display before __del__ finalizers run,
++                # so these calls fail with EGL_NOT_INITIALIZED — safe to ignore.
++                pass
+         self._context = None
+ 
+     def __del__(self):

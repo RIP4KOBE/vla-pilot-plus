@@ -89,6 +89,33 @@ def protocol_config(folder, manifest, actual):
     return expected
 
 
+def runtime_compatibility_checks(folder, manifest, environment):
+    """Bind new dependency receipts to frozen patches, preserving older cohorts."""
+    recipe = 'scripts/dependency_patches/robosuite-1.4.0.json'
+    source = manifest.get('source_sha256', {})
+    runtime = folder / 'source/scripts/steering_runtime.py'
+    required = (recipe in source or 'runtime_compatibility' in environment or
+                (runtime.is_file() and b'from scripts.steering_dependency_compat import' in runtime.read_bytes()))
+    if not required:
+        return {}  # Historical receipts did not attest internal dependency patches.
+    try:
+        expected = read_json(folder / 'source' / recipe)
+        receipt = environment.get('runtime_compatibility', {})
+        patches = all(
+            digest(folder / 'source/scripts/dependency_patches' / row['patch'])
+            == row['patch_sha256']
+            == source.get('scripts/dependency_patches/' + row['patch'])
+            for row in expected['files'].values())
+        valid = (receipt.get('valid') is True and receipt.get('version') == expected['version']
+                 and receipt.get('distribution') == expected['distribution']
+                 and receipt.get('manifest_sha256') == digest(folder / 'source' / recipe) == source.get(recipe)
+                 and receipt.get('files') == {p: row['patched_sha256'] for p, row in expected['files'].items()}
+                 and patches)
+    except (OSError, KeyError, ValueError, TypeError):
+        valid = False
+    return {'runtime_dependency_compatibility': bool(valid)}
+
+
 def asset_checks(folder, manifest, config):
     """Cross-check frozen preflight attestations; do not reread 50 GB of weights."""
     environment = read_json(folder / 'environment.json')
@@ -110,7 +137,7 @@ def asset_checks(folder, manifest, config):
                 'text_encoder_weight': str(Path(policy['text_encoder']) / 'pytorch_model.bin'),
                 'vision_encoder_weight': str(Path(policy['vision_encoder']) / 'model.safetensors')}
     imported = environment.get('imported_packages', {})
-    return {
+    checks = {
         'local_config_snapshot_hash': digest(folder/'local-config.yaml') == manifest.get('local_config_sha256'),
         'device_binding': type(local.get('gpu')) is int and type(local.get('egl_device_id')) is int
             and local['gpu'] >= 0 and local['egl_device_id'] >= 0
@@ -145,6 +172,8 @@ def asset_checks(folder, manifest, config):
             and environment['rng'].get('fixture_count') == 20
             and environment['rng'].get('sha256') == config['main'].get('episode_rng_fixture_manifest_sha256'),
     }
+    checks.update(runtime_compatibility_checks(folder, manifest, environment))
+    return checks
 
 
 def audit_vls_chunk(metric, config):
