@@ -1,0 +1,36 @@
+--- a/dinov2/layers/swiglu_ffn.py
++++ b/dinov2/layers/swiglu_ffn.py
+@@ -36,20 +36,22 @@
+ 
+ XFORMERS_ENABLED = os.environ.get("XFORMERS_DISABLED") is None
+ try:
+-    if XFORMERS_ENABLED:
+-        from xformers.ops import SwiGLU
++   if XFORMERS_ENABLED:
++      from xformers.ops import SwiGLU
+ 
+-        XFORMERS_AVAILABLE = True
+-        warnings.warn("xFormers is available (SwiGLU)")
+-    else:
+-        warnings.warn("xFormers is disabled (SwiGLU)")
+-        raise ImportError
++      XFORMERS_AVAILABLE = True
++      warnings.warn("xFormers is available (SwiGLU)")
++   else:
++      warnings.warn("xFormers is disabled (SwiGLU)")
++      raise ImportError
+ except ImportError:
+-    SwiGLU = SwiGLUFFN
+-    XFORMERS_AVAILABLE = False
++   SwiGLU = SwiGLUFFN
++   XFORMERS_AVAILABLE = False
+ 
+-    warnings.warn("xFormers is not available (SwiGLU)")
+-
++   warnings.warn("xFormers is not available (SwiGLU)")
++# XFORMERS_AVAILABLE = False
++# SwiGLU = SwiGLUFFN 
++# warnings.warn("xFormers is explicitly disabled to avoid version conflicts. Using native SwiGLUFFN instead.")
+ 
+ class SwiGLUFFNFused(SwiGLU):
+     def __init__(

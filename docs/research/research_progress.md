@@ -1,6 +1,6 @@
 # Research Progress
 
-最近核对：2026-10-16（Asia/Shanghai）。本文概述项目当前能力、证据边界和开发优先级。研究动机与假设见 [Research Proposal](research_proposal.md)，使用方式见 [README](../../README.md)，完整配置、逐任务结果和受测源码身份见对应实验报告。
+最近核对：2026-10-16（UTC）。本文概述项目当前能力、证据边界和开发优先级。研究动机与假设见 [Research Proposal](research_proposal.md)，使用方式见 [README](../../README.md)，完整配置、逐任务结果和受测源码身份见对应实验报告。
 
 ## 当前状态
 
@@ -8,7 +8,7 @@ VLS、EDS 和 EDS+QD 已进入共享的 RDT 推理与评测框架。**EDS（含 
 
 当前研究重点是解释行为分区、父代质量与实际操作效果之间的关系，再进行可归因的 QD 改进。跨动作块适应、跨任务学习和 recursive self-improvement 尚未完成验收。
 
-新合作者安装验收已完成：从干净 clone 和新 Python 环境得到 VLS 1/10、EDS 3/10、EDS+QD 0/10；30 个主回合全部有效，没有回合级基础设施错误或未完成任务。安装中发现的 Robosuite 隐式兼容修改现已纳入显式安装与哈希核验。模型仍需维护者提供；本轮公共 LIBERO 下载失败后使用了校验复制路径。覆盖范围见[安装与评测验收报告](../steering/onboarding-validation.md)。
+新合作者安装验收已完成：从干净 clone 和新 Python 环境得到 VLS 1/10、EDS 3/10、EDS+QD 0/10；30 个主回合全部有效，没有回合级基础设施错误或未完成任务。安装中发现的 Robosuite 隐式兼容修改现已纳入显式安装与哈希核验。该次验收使用本机校验资产，公共 LIBERO 下载失败后使用了校验复制路径。随后已完成模型公开来源核验，见[模型下载与身份](../steering/model-assets.md)。覆盖范围见[安装与评测验收报告](../steering/onboarding-validation.md)。
 
 ## 目标与实现状态
 
@@ -16,7 +16,7 @@ VLS、EDS 和 EDS+QD 已进入共享的 RDT 推理与评测框架。**EDS（含 
 
 | Proposal 目标 | 当前状态 | 已有证据 | 尚缺什么 |
 | --- | --- | --- | --- |
-| 共同 steering 框架 | 已实现、测试并在线验收 | 公共 launcher/worker、三种 profile、完整 cohort 审计 | 新机器仍需固定模型/任务资产 |
+| 共同 steering 框架 | RDT 三模式与 π0.5 VLS 已实现、测试并在各自协议在线验收 | 公共控制/执行、独立模型适配与完整 cohort 审计 | 跨模型同 benchmark 对照；π0.5 EDS/QD 尚未支持 |
 | EDS 对照 | 已实现、测试并在线验收 | low、ultra 与新环境 ultra 均 3/10，成功任务均 3、8、9 | 多 seed 稳定性、等计算预算及更广泛泛化 |
 | RQ1：动作块内 QD | 已实现、测试、机制与运行有效性已验收 | BD/网格/精英/父代/最终选择日志及独立重建 | 成功率收益：low 1/10、ultra 0/10，不支持优势 |
 | RQ2：操作相关 BD | 默认 XY 已验收；执行意图等可选代码存在 | `qd_descriptor`、`execution_intent_descriptor`、相关 CPU 测试 | 默认以外配置在共同协议的有效完整对照 |
@@ -35,6 +35,8 @@ VLS、EDS 和 EDS+QD 已进入共享的 RDT 推理与评测框架。**EDS（含 
 | `eds_qd` | 共用 EDS；4×4 target-relative endpoint XY archive，每格 1 精英，sparse 父代；最终取 archive 全局最好 | 机制真实生效、完整运行、独立档案与父代证据；没有性能优势验收 |
 
 当前 profile 不使用跨块 archive。几何投影不是候选分支仿真；RBF 不是 Gaussian kernel；reward 可评分不等于可用于 VLS 梯度。完整公式和模块边界见[架构合同](../steering/architecture.md)。
+
+π0.5 + VLS 已通过独立的标准 LIBERO Object 十任务在线验收：**9/10**，10/10 回合有效，没有回合级基础设施错误或未完成任务。它复用共同 Stage/reward/执行框架，保留模型自身的预处理、动作生成和进度归一化；π0.5 EDS/EDS+QD 尚未支持。[协议、逐任务结果与视频索引](../steering/pi05-evaluation.md)单独记录其证据。该成绩来自每任务一个固定 seed 的 LIBERO 适配模型，不与 RDT ObjectSwap OOD 直接比较，也不证明相对于无引导 π0.5 的收益。
 
 ## 已验证结果
 
@@ -64,13 +66,13 @@ VLS、EDS 和 EDS+QD 已进入共享的 RDT 推理与评测框架。**EDS（含 
 | Stage / reward | 每任务 fresh 生成内容；当前观测在线 Stage；候选 reward 本地评分 |
 | 证据 | 固定受测提交、源码/配置/资产哈希；完整任务记录、捕获、视频和审计 |
 
-精确参数以[公共协议](../../configs/evaluation/libero_object_swap.yaml)、[方法配置](../../configs/steering/eds.yaml)和[架构说明](../steering/architecture.md)为准。资产获取和设备配置见[安装说明](../steering/installation.md)。尚无完整公共模型包；新使用者需要取得匹配资产。固定模型请求名也不能保证在线服务长期输出相同，3/10 是已观察结果而非每次运行的保证。
+精确参数以[公共协议](../../configs/evaluation/libero_object_swap.yaml)、[方法配置](../../configs/steering/eds.yaml)和[架构说明](../steering/architecture.md)为准。资产获取和设备配置见[安装说明](../steering/installation.md)。RDT、π0.5 和编码器的公开固定版本已与本地资产核对；[模型来源和下载](../steering/model-assets.md)列出所需文件。PaliGemma tokenizer 需要使用者获得访问许可。固定模型请求名也不能保证在线服务长期输出相同，3/10 是已观察结果而非每次运行的保证。
 
 ## 下一步开发
 
 | 优先级 | 对应 RQ | 工作 | 完成标准 |
 | --- | --- | --- | --- |
-| P0 | 全部 | 维护已验收 EDS 对照，补齐可交付的模型/任务资产获取方式 | 已完成新环境三模式验收；后续资产分发能按清单核验，不依赖维护者隐式路径 |
+| P0 | 全部 | 维护已验收 EDS 对照及公开固定模型/任务资产获取方式 | 已完成新环境三模式验收与公开模型身份核验；继续保持入口、下载与哈希清单一致 |
 | P1 | RQ1/RQ3 | 用现有轨迹分析 QD 失败：质量下降、稀疏选择、archive 输出与 Stage 时序 | 可复查的任务/动作块定位；至少一个单变量假设；不再只看 archive occupancy |
 | P2 | RQ1/RQ3 | EDS vs 全局精英保留 vs QD；质量锚点/稀疏父代独立消融 | EDS 关闭 QD 的行为回归保持；机制张量与审计一致；完整共同协议在线对照 |
 | P3 | RQ2 | 固定 reward/Stage，比较 XY 与执行相关 BD；检查投影/实际动作偏差 | 清楚定义单位、可控性、质量和覆盖；有效多样性及任务指标有证据 |

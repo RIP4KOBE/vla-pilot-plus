@@ -169,3 +169,12 @@ Stage 继续为 EDS 使用可评分能力检查，只为 VLS 增加确定性 CPU
 离线合同审计不重新执行保存的 reward 代码或模型回复，也不独立重演模拟器。动作证据证明后处理命令向 adapter 的传递；模拟器内部控制缩放属于另一个边界。QD 的 candidate stream 可重建记录的 archive 更新，父代 tensor 校验只覆盖实际保存的迭代，不能推广到未记录路径。完整有效 cohort、机制正确和任务成功分别报告。
 
 运行目录、有效性口径与验收后接入的生命周期/归档功能统一见[运行与审计](evaluation.md)。
+
+
+## π0.5 + VLS adapter
+
+π0.5 uses the same `Main`, LIBERO adapter, online Codex clients and Stage/reward controller, with `core/pi05_steer.py` providing flow-matching action generation. Its public checkpoint contains the vision/language and action-expert weights; the checkpoint's pre/postprocessors supply state and action normalization, and a separately fixed local PaliGemma tokenizer supplies language inputs.
+
+The π0.5 runner binds standard `libero_object`, ten flow steps, twenty particles and ten executed actions per block. It uses the existing gradient-reward normalization for Stage feedback, rather than RDT's selected-candidate reward computation. The diversity term follows its existing trajectory-distance repulsion; the legacy MCMC argument does not execute MCMC. FKD scores actual integer Euler steps and sorts terminal particles before candidate 0 is executed. Padded latent dimensions are removed before robot-action normalization.
+
+This adapter is not an EDS or QD implementation. Its separate [protocol and evidence](pi05-evaluation.md) must not be interpreted as a controlled comparison against RDT ObjectSwap results. Shared controller changes require RDT regressions; π0.5-only model/normalizer corrections do not redefine the accepted RDT parameters.

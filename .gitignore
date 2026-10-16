@@ -110,3 +110,6 @@ third_party/Libero_RDT/
 third_party/libero_pro/
 .libero_config/
 configs/local.yaml
+
+# Machine-only model configurations (outside frozen runtime source).
+.local/

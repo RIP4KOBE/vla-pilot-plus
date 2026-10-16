@@ -20,8 +20,11 @@ def main():
         manifest = json.loads((config_path.parent / 'manifest.json').read_text())
         if digest(config_path) != manifest['config_sha256'] or not source_unchanged(manifest['source_sha256']):
             raise RuntimeError('Frozen config or runtime source changed before worker start')
-        if manifest.get('schema') == 'steering_cohort_v2':
-            from scripts.steering_runtime import load_local
+        if manifest.get('schema') in ('steering_cohort_v2', 'pi05_vls_cohort_v1'):
+            if manifest['schema'] == 'pi05_vls_cohort_v1':
+                from scripts.pi05_runtime import load_local
+            else:
+                from scripts.steering_runtime import load_local
             from scripts.prepare_steering_assets import verify_libero_paths
             local_path = config_path.parent / 'local-config.yaml'
             if digest(local_path) != manifest['local_config_sha256']:

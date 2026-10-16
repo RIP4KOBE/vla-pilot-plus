@@ -11,13 +11,18 @@
 
 </div>
 
-VLA-Pilot++ is a research framework for steering frozen robot policies at inference time. It brings **VLS**, **EDS**, and **EDS with Quality-Diversity (EDS+QD)** into a shared RDT execution and evaluation pipeline.
+VLA-Pilot++ is a research framework for steering frozen robot policies at inference time. It brings **VLS**, **EDS**, and **EDS with Quality-Diversity (EDS+QD)** into a shared RDT execution and evaluation pipeline, with a π0.5 adapter for VLS.
 
 The research goal is to make inference-time search more diverse and adaptable through behavioral archives and execution feedback. The current implementation supports action-chunk QD archives; persistent learning across chunks or tasks remains a research direction. See the [Research Proposal](docs/research/research_proposal.md) and [Research Progress](docs/research/research_progress.md).
 
 ## Overview
 
-All three methods share model loading, observation and action adapters, online Stage control, reward contracts, and evaluation tools. The supported evaluation protocol is **RDT + LIBERO ObjectSwap OOD**.
+The RDT methods share model loading, observation and action adapters, online Stage control, reward contracts, and evaluation tools. π0.5 + VLS reuses the control framework with its own policy adapter and standard LIBERO evaluation. These benchmarks are reported separately.
+
+| Model | VLS | EDS | EDS+QD | Evaluation scope |
+| --- | --- | --- | --- | --- |
+| RDT | Implemented and accepted | Implemented and accepted | Implemented and accepted; no demonstrated advantage | LIBERO ObjectSwap OOD |
+| π0.5 | Implemented and accepted under the ten-task protocol | Not supported | Not supported | Standard LIBERO Object |
 
 | Method | Configuration | Steering mechanism |
 | --- | --- | --- |
@@ -42,86 +47,76 @@ At task initialization, Codex generates fresh object identity, stage description
 
 ## Installation
 
-The supported platform is Linux x86_64 with an NVIDIA GPU, a compatible driver, Conda, Git with Git LFS, a C compiler, and Linux input headers. The reference Python stack uses Python 3.12.12 and PyTorch 2.7.1 with CUDA 12.6. Validation uses NVIDIA H200 NVL GPUs with driver 580.65.06; a minimum GPU memory requirement has not been established. The [installation guide](docs/steering/installation.md) documents host requirements, exact assets, cache placement, and troubleshooting.
-
-Run the following in a new checkout. Create a **new** environment; do not install over an existing research environment.
+Use Linux x86_64, an NVIDIA GPU, Conda, Git/Git LFS, `patch`, a C compiler and Linux input headers. Validation uses Python 3.12.12, PyTorch 2.7.1+cu126 and H200 NVL. Other GPUs and minimum VRAM are not yet validated. Install in a **new environment**:
 
 ```bash
 git clone --depth 1 --single-branch --branch main --no-tags https://github.com/RIP4KOBE/vla-pilot-plus.git
 cd vla-pilot-plus
 git submodule update --init --depth 1 third_party/rdt third_party/lerobot
-
 conda env create --prefix "$PWD/.venv" --file environment-steering.yml
 conda activate "$PWD/.venv"
-export PYTHONNOUSERSITE=1
-export PYTHONDONTWRITEBYTECODE=1
-export PYTHON_DOTENV_DISABLED=1
+export PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 PYTHON_DOTENV_DISABLED=1
 unset PYTHONPATH PYTHONHOME
-export PIP_CONFIG_FILE=/dev/null
-export PIP_INDEX_URL=https://pypi.org/simple
+export PIP_CONFIG_FILE=/dev/null PIP_INDEX_URL=https://pypi.org/simple
 unset PIP_EXTRA_INDEX_URL
-
 python -m pip install -r requirements-steering.txt
 python scripts/prepare_steering_assets.py install-runtime-compat
 python scripts/prepare_steering_assets.py verify-runtime-compat
 python scripts/prepare_steering_assets.py install-libero
 python scripts/prepare_steering_assets.py verify-libero
 python scripts/prepare_steering_assets.py verify-rng
-python -m pip install --no-deps --no-build-isolation \
-  -e third_party/libero_pro -e third_party/lerobot
-
-# Both OpenCV distributions share cv2 files: install the headless variant last.
+python -m pip install --no-deps --no-build-isolation -e third_party/libero_pro -e third_party/lerobot
 python -m pip install --force-reinstall --no-deps opencv-python-headless==4.12.0.88
 python -m pip check
 python -c "import cv2.version as v; assert v.headless; print(v.opencv_version, v.headless)"
 ```
 
-If the public LIBERO download fails, obtain the matching source/asset bundle from the maintainers and use `python scripts/prepare_steering_assets.py install-libero --source /path/to/verified-libero-tree` in place of the download command. The installer verifies and copies the files into this checkout; it does not import from the supplied directory. Record this alternative source in the run report.
+The same pinned recipe supports both backends. Keep development environments separate to protect accepted experiments. [Installation](docs/steering/installation.md) provides the complete ordered guide; [troubleshooting](docs/steering/installation-troubleshooting.md) explains compatibility patches and download-cache recovery.
 
-`conda activate` requires Conda shell initialization. In a script, first source the `etc/profile.d/conda.sh` file from your Conda installation. Place environments and download caches on a disk with sufficient space; the installation guide gives a separate-prefix example.
+### Download models
 
-### Models and online access
+| Used by | Required public assets |
+| --- | --- |
+| RDT: VLS / EDS / EDS+QD | [RDT-1B-LIBERO-Object EMA](https://huggingface.co/TJ-chen/RDT-1B-LIBERO-Object/tree/45f425cfc22108fdf9043dd55b3bb440018db12d), [T5 XXL](https://huggingface.co/google/t5-v1_1-xxl/tree/3db67ab1af984cf10548a73467f0e5bca2aaaeb2), [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384/tree/9fdffc58afc957d1a03a25b10dba0329ab15c2a3) |
+| π0.5: VLS | [π0.5 LIBERO checkpoint](https://huggingface.co/lerobot/pi05_libero_finetuned_v044/tree/dbf8a3f794a9c4297b44f40b752712f50073d945), [PaliGemma tokenizer](https://huggingface.co/google/paligemma-3b-pt-224/tree/35e4f46485b4d07967e7e9935bc3786aad50687c) |
+| Both | [DINOv2](https://github.com/facebookresearch/dinov2/tree/7b187bd4df8efce2cbcbbb67bd01532c19bf4c9c) perception source/weights; fixed LIBERO assets installed above |
 
-**Exact model assets are not currently distributed as a public download.** Obtain the matching RDT checkpoint, T5/SigLIP snapshots, and DINO source/weights from the maintainers. [Asset requirements](docs/steering/installation.md#固定模型与源码资产) and the [hash manifest](scripts/steering_model_assets_manifest.json) define the required files. Cloning alone does not provide a runnable model.
-
-Install [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) separately, make it available on `PATH`, and sign in using your own account. The evaluated CLI version is **0.156.1**. Existing valid login can be reused; new users complete the interactive login themselves.
+These exact checkpoints match the local tested assets. π0.5 uses the model selected by [upstream VLS](https://github.com/Vision-Language-Steering/code/blob/b6e87edc217a2a7682caadba285677fc79eb6f81/configs/policy.yaml). The downloader pins revisions, fetches only required files and verifies hashes:
 
 ```bash
-command -v codex
+STEERING_ASSETS=/absolute/path/on/large-disk/vla-assets
+python scripts/prepare_public_models.py download --model rdt --directory "$STEERING_ASSETS"
+# For PI05: obtain Google's PaliGemma access, then authenticate yourself.
+hf auth login
+python scripts/prepare_public_models.py download --model pi05 --directory "$STEERING_ASSETS"
+```
+
+Download only the model you plan to run. π0.5 includes its visual/language weights; it does not need separate T5, SigLIP or PaliGemma weights. See [exact revisions, directory layout, access requirements and verification scope](docs/steering/model-assets.md). No private model bundle is required; gated tokenizer access remains the user's responsibility.
+
+### Configure paths and online access
+
+Install [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) separately and authenticate with your own account. The validated online condition is **Codex CLI 0.156.1 / `gpt-6-astra` / `ultra`**, with no provider fallback. Keep credentials out of Git and machine configuration.
+
+```bash
 codex --version
 codex login status
-# Only if not already signed in:
-# codex login
-# Headless alternative: codex login --device-auth
-```
-
-The active protocol is **Codex CLI / `gpt-6-astra` / `ultra`**, with no provider fallback. Account/model access is checked by the API preflight below; login status alone does not establish it. See [official authentication instructions](https://learn.chatgpt.com/docs/auth). Keep credentials out of Git and machine YAML files.
-
-### Machine configuration
-
-Replace the asset paths and device identifiers below. GPU and EGL enumeration are independent: verify their device mapping as described in the installation guide. `configure` checks the fixed assets and writes an ignored local configuration; it does not download model weights.
-
-```bash
-STEERING_GPU=REPLACE_WITH_ASSIGNED_GPU
-# Read egl_device_id from this identity-based mapping report.
+# If needed: codex login
+# Authorized headless alternative: codex login --device-auth
+STEERING_GPU=4  # Replace with an assigned idle GPU.
 python scripts/list_steering_devices.py --gpu "$STEERING_GPU"
-STEERING_EGL=REPLACE_WITH_VERIFIED_EGL_INDEX
+STEERING_EGL=6  # Replace with egl_device_id from the mapping report.
+mkdir -p .local
 python scripts/prepare_steering_assets.py configure \
-  --rdt-checkpoint /path/to/rdt \
-  --text-encoder /path/to/t5/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2 \
-  --vision-encoder /path/to/siglip/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3 \
-  --torch-home /path/to/torch-cache \
-  --gpu "$STEERING_GPU" --egl-device-id "$STEERING_EGL" \
-  --output configs/local.yaml
-
-# Asset checks only: no GPU or online request.
-python scripts/check_steering.py --local-config configs/local.yaml \
-  --output-dir outputs/preflight-assets-001
-
-# Explicit GPU/render and real Codex image request.
-python scripts/check_steering.py --local-config configs/local.yaml \
-  --output-dir outputs/preflight-online-001 --gpu --api
+  --rdt-checkpoint "$STEERING_ASSETS/rdt_checkpoint" \
+  --text-encoder "$STEERING_ASSETS/text_encoder" \
+  --vision-encoder "$STEERING_ASSETS/vision_encoder" \
+  --torch-home "$STEERING_ASSETS/torch_home" \
+  --gpu "$STEERING_GPU" --egl-device-id "$STEERING_EGL" --output .local/rdt.yaml
+python scripts/check_steering.py --local-config .local/rdt.yaml \
+  --output-dir outputs/rdt-preflight-001 --gpu --api
 ```
+
+This is the RDT configuration path. For π0.5-only setup, use its configuration and preflight below. CUDA and EGL indices need not match; the preflight validates the selected device. Machine files under `.local/` are ignored. Each preflight or real run requires a new output directory.
 
 <a id="开始使用"></a>
 
@@ -134,11 +129,11 @@ Use the activated environment and run from the repository root. Every real run r
 These commands resolve configuration without loading models, running simulation, or making API requests. They do not establish environment readiness.
 
 ```bash
-python scripts/run_steering.py --method vls --local-config configs/local.yaml \
+python scripts/run_steering.py --method vls --local-config .local/rdt.yaml \
   --output-dir outputs/vls-preview --print-config
-python scripts/run_steering.py --method eds --local-config configs/local.yaml \
+python scripts/run_steering.py --method eds --local-config .local/rdt.yaml \
   --output-dir outputs/eds-preview --print-config
-python scripts/run_steering.py --method eds_qd --local-config configs/local.yaml \
+python scripts/run_steering.py --method eds_qd --local-config .local/rdt.yaml \
   --output-dir outputs/eds-qd-preview --print-config
 ```
 
@@ -147,11 +142,11 @@ python scripts/run_steering.py --method eds_qd --local-config configs/local.yaml
 Each command performs a real online rollout of task 0. Run them sequentially on the configured GPU. These are optional installation/debugging checks and cannot be combined with other runs to form a ten-task result.
 
 ```bash
-python scripts/run_steering.py --method vls --local-config configs/local.yaml \
+python scripts/run_steering.py --method vls --local-config .local/rdt.yaml \
   --output-dir outputs/vls-task0-001 --tasks 0
-python scripts/run_steering.py --method eds --local-config configs/local.yaml \
+python scripts/run_steering.py --method eds --local-config .local/rdt.yaml \
   --output-dir outputs/eds-task0-001 --tasks 0
-python scripts/run_steering.py --method eds_qd --local-config configs/local.yaml \
+python scripts/run_steering.py --method eds_qd --local-config .local/rdt.yaml \
   --output-dir outputs/eds-qd-task0-001 --tasks 0
 ```
 
@@ -160,11 +155,11 @@ python scripts/run_steering.py --method eds_qd --local-config configs/local.yaml
 Each command runs **all ten fixed ObjectSwap tasks** and the validity audit. Run sequentially on one GPU, or use separate verified local configurations and idle GPUs for parallel runs. Keep source, dependencies, assets, and configuration fixed during evaluation.
 
 ```bash
-python scripts/evaluate_steering.py --method vls --local-config configs/local.yaml \
+python scripts/evaluate_steering.py --method vls --local-config .local/rdt.yaml \
   --output-dir outputs/vls-full10-001
-python scripts/evaluate_steering.py --method eds --local-config configs/local.yaml \
+python scripts/evaluate_steering.py --method eds --local-config .local/rdt.yaml \
   --output-dir outputs/eds-full10-001
-python scripts/evaluate_steering.py --method eds_qd --local-config configs/local.yaml \
+python scripts/evaluate_steering.py --method eds_qd --local-config .local/rdt.yaml \
   --output-dir outputs/eds-qd-full10-001
 ```
 
@@ -180,9 +175,34 @@ python scripts/audit_steering.py outputs/eds-qd-full10-001 --no-write
 
 Use `progress.json` and `console.log` for live progress; use `audit.json` for the final success count, completion count, and validity. A valid task failure is different from an infrastructure error. Metrics are under `output/evaluation/`, Stage requests under `output/captured_stage_inputs/`, and videos under `output/episode_*/`. The manifest records the actual evidence paths and source identity. See [evaluation and evidence handling](docs/steering/evaluation.md) and the [clean-install validation report](docs/steering/onboarding-validation.md).
 
+### π0.5 + VLS
+
+This path evaluates **standard LIBERO Object**, under this repository's Codex Stage/reward protocol. It is separate from the RDT ObjectSwap OOD evaluation and is not a strict reproduction of upstream VLS scores. EDS and EDS+QD are not implemented for π0.5.
+
+```bash
+python scripts/prepare_public_models.py configure-pi05 --directory "$STEERING_ASSETS" \
+  --gpu "$STEERING_GPU" --egl-device-id "$STEERING_EGL" --output .local/pi05.yaml
+# Asset/dependency/device preflight; no model, API request or episode.
+python scripts/run_pi05.py --local-config .local/pi05.yaml \
+  --output-dir outputs/pi05-preflight-001 --preflight
+# Configuration preview only.
+python scripts/run_pi05.py --local-config .local/pi05.yaml \
+  --output-dir outputs/pi05-preview --print-config
+# Real task-0 diagnostic: model loading, rendering, online access and VLS.
+python scripts/run_pi05.py --local-config .local/pi05.yaml \
+  --output-dir outputs/pi05-task0-001 --tasks 0
+# Complete ten-task online evaluation; diagnostic excluded.
+python scripts/run_pi05.py --local-config .local/pi05.yaml \
+  --output-dir outputs/pi05-full10-001
+# Read-only evidence audit.
+python scripts/audit_pi05.py outputs/pi05-full10-001
+```
+
+The launcher freezes source, assets and configuration, records progress, and audits the result. PI05-specific gradient/FKD metrics are in `output/evaluation/pi05_metrics.jsonl`; videos and online captures use the same layout as RDT. See [PI05 protocol and results](docs/steering/pi05-evaluation.md).
+
 ## Results
 
-Recorded **LIBERO ObjectSwap OOD** results, with one fixed seed per task:
+Recorded **RDT / LIBERO ObjectSwap OOD** results, with one fixed seed per task:
 
 | Method | Reference / low | Reference / ultra | Clean install / ultra |
 | --- | ---: | ---: | ---: |
@@ -193,6 +213,10 @@ Recorded **LIBERO ObjectSwap OOD** results, with one fixed seed per task:
 Each column is a separate valid 30-episode comparison using Codex. The clean-install evaluation completed on October 16, 2026, using a fresh clone and a new Python environment: all 30 episodes passed validity checks, with no episode-level infrastructure errors or unfinished episodes. Its task-level success outcomes match the reference ultra evaluation. Matching task outcomes does not establish identical trajectories or future service outputs.
 
 The ultra protocol also changes transport recovery settings relative to low, so this is not a controlled estimate of reasoning-effort effects. Method compute budgets differ. These results do not establish a QD advantage or statistical superiority. See the [clean-install validation](docs/steering/onboarding-validation.md), [low results](docs/steering/results.md), [ultra reference](docs/steering/reasoning-effort-comparison.md), and [source provenance](docs/steering/provenance.md) for task-level outcomes, installation coverage, compute, and evidence identities.
+
+**π0.5 + VLS / standard LIBERO Object:** **9/10** (90%), with one fixed seed per task, Codex / ultra, fresh task content and online Stage. All ten episodes passed the validity audit; there were no episode-level infrastructure errors or unfinished episodes. Task failures: 4. See [the complete protocol, task results and videos](docs/steering/pi05-evaluation.md).
+
+This is a separate benchmark using a LIBERO-adapted checkpoint, not a direct comparison with RDT ObjectSwap OOD or a reproduction of the upstream multi-trial score. No unguided PI05 control was run, so this result alone does not establish a steering gain.
 
 ## Development
 
@@ -215,6 +239,7 @@ The CPU command disables GPU visibility and `.env` loading; it is not a general 
 | --- | --- |
 | `main.py`, `core/env_adapters/` | Episode loop, observation/action conversion, execution feedback |
 | `core/rdt_policy_steer.py` | Shared RDT inference and VLS/EDS search |
+| `core/pi05_steer.py` | Strict π0.5 loading, guided flow sampling and effective FKD |
 | `core/qd_ed.py` | Behavioral descriptors, archives, elites, and parents |
 | `core/stage/` | Scene observations, Stage decisions, grasp/carry consistency, recovery |
 | `core/online/` | Codex transport, invocation policy, request capture |
@@ -229,7 +254,7 @@ Historical research branches are organized by the local source-directory names. 
 ## Documentation
 
 - **Research:** [Proposal](docs/research/research_proposal.md) · [Progress and next steps](docs/research/research_progress.md)
-- **Usage:** [Installation](docs/steering/installation.md) · [Architecture](docs/steering/architecture.md) · [Evaluation](docs/steering/evaluation.md)
+- **Usage:** [Installation](docs/steering/installation.md) · [Models](docs/steering/model-assets.md) · [Architecture](docs/steering/architecture.md) · [Evaluation](docs/steering/evaluation.md)
 - **Collaboration:** [Contributing](CONTRIBUTING.md) · [Agent guidance](AGENTS.md)
 - **History:** [Research branches and tags](docs/maintenance/branch-index.md) · [All documentation](docs/README.md)
 

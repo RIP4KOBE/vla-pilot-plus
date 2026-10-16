@@ -1,0 +1,358 @@
+{
+  "verified_at": "2026-10-16",
+  "hf_files": [
+    {
+      "root": "rdt_checkpoint",
+      "path": "config.json",
+      "bytes": 919,
+      "local_sha256": "3482cc79b3268ccfca9d8cc9b8e32f3925dc71c3bd60f5e6dfcaa564aecde835",
+      "remote_hash": "991a315447769938714a6f88a49cd2403e84f71c",
+      "match": true,
+      "repo": "TJ-chen/RDT-1B-LIBERO-Object",
+      "revision": "45f425cfc22108fdf9043dd55b3bb440018db12d"
+    },
+    {
+      "root": "rdt_checkpoint",
+      "path": "ema/model.safetensors",
+      "bytes": 2456705456,
+      "local_sha256": "b4e3631db326689297cd2f0b02d32ade9dc6ee9ae09c03171add64b80e86aaa1",
+      "remote_hash": "b4e3631db326689297cd2f0b02d32ade9dc6ee9ae09c03171add64b80e86aaa1",
+      "match": true,
+      "repo": "TJ-chen/RDT-1B-LIBERO-Object",
+      "revision": "45f425cfc22108fdf9043dd55b3bb440018db12d"
+    },
+    {
+      "root": "text_encoder",
+      "path": "config.json",
+      "bytes": 593,
+      "local_sha256": "a58c2192a7166501ad2382c3d7ca3d694a1259b71a23a1925887e5afe7adcbd8",
+      "remote_hash": "5a439fe1a8c4a05c6b1e4bf6a11821b497bf0136",
+      "match": true,
+      "repo": "google/t5-v1_1-xxl",
+      "revision": "3db67ab1af984cf10548a73467f0e5bca2aaaeb2"
+    },
+    {
+      "root": "text_encoder",
+      "path": "pytorch_model.bin",
+      "bytes": 44541587809,
+      "local_sha256": "c8407a9ae21075667be98f84f4c93e8a7bfc772a352cd2e6998f5916f7181db8",
+      "remote_hash": "c8407a9ae21075667be98f84f4c93e8a7bfc772a352cd2e6998f5916f7181db8",
+      "match": true,
+      "repo": "google/t5-v1_1-xxl",
+      "revision": "3db67ab1af984cf10548a73467f0e5bca2aaaeb2"
+    },
+    {
+      "root": "text_encoder",
+      "path": "special_tokens_map.json",
+      "bytes": 1786,
+      "local_sha256": "4720c0fddbe4c5991334f85ad7073d9bd0a294a8ba4641a2f8dab614ca825949",
+      "remote_hash": "881bdbffc06e471924ecea57f962bc5f8e2a9f21",
+      "match": true,
+      "repo": "google/t5-v1_1-xxl",
+      "revision": "3db67ab1af984cf10548a73467f0e5bca2aaaeb2"
+    },
+    {
+      "root": "text_encoder",
+      "path": "spiece.model",
+      "bytes": 791656,
+      "local_sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+      "remote_hash": "4e28ff6ebdf584f5372d9de68867399142435d9a",
+      "match": true,
+      "repo": "google/t5-v1_1-xxl",
+      "revision": "3db67ab1af984cf10548a73467f0e5bca2aaaeb2"
+    },
+    {
+      "root": "text_encoder",
+      "path": "tokenizer_config.json",
+      "bytes": 1857,
+      "local_sha256": "b971dce1d2805c2a66da8657156e7114a30501c6ba602fc947c8bf607a3ead2d",
+      "remote_hash": "b114c318caf72f6e89ea92e0755c41327a453198",
+      "match": true,
+      "repo": "google/t5-v1_1-xxl",
+      "revision": "3db67ab1af984cf10548a73467f0e5bca2aaaeb2"
+    },
+    {
+      "root": "vision_encoder",
+      "path": "config.json",
+      "bytes": 576,
+      "local_sha256": "adc04928d8fd19a61822584fe0cf2e813e5ebac17f3e49fb1ea096860ae6457b",
+      "remote_hash": "a513b447f6b05f640f9980d25f4d8a5cff6cd25d",
+      "match": true,
+      "repo": "google/siglip-so400m-patch14-384",
+      "revision": "9fdffc58afc957d1a03a25b10dba0329ab15c2a3"
+    },
+    {
+      "root": "vision_encoder",
+      "path": "model.safetensors",
+      "bytes": 3511950624,
+      "local_sha256": "ea2abad2b7f8a9c1aa5e49a244d5d57ffa71c56f720c94bc5d240ef4d6e1d94a",
+      "remote_hash": "ea2abad2b7f8a9c1aa5e49a244d5d57ffa71c56f720c94bc5d240ef4d6e1d94a",
+      "match": true,
+      "repo": "google/siglip-so400m-patch14-384",
+      "revision": "9fdffc58afc957d1a03a25b10dba0329ab15c2a3"
+    },
+    {
+      "root": "vision_encoder",
+      "path": "preprocessor_config.json",
+      "bytes": 368,
+      "local_sha256": "f59da2f87c3cd079bd4f8f3037e81b277c60c498e279a8020331f67a5a3157e8",
+      "remote_hash": "051261b5a784a2e7e5f93de1f86d170d69a9efd9",
+      "match": true,
+      "repo": "google/siglip-so400m-patch14-384",
+      "revision": "9fdffc58afc957d1a03a25b10dba0329ab15c2a3"
+    },
+    {
+      "root": "pi05_checkpoint",
+      "path": "config.json",
+      "bytes": 2170,
+      "local_sha256": "2f6d4b96b032593e1de65b391ee7252a70227bff398ef1b94658fea17818142f",
+      "remote_hash": "397b620ba756caa4eadc424f6b0a39298fae6e7d",
+      "match": true,
+      "repo": "lerobot/pi05_libero_finetuned_v044",
+      "revision": "dbf8a3f794a9c4297b44f40b752712f50073d945"
+    },
+    {
+      "root": "pi05_checkpoint",
+      "path": "model.safetensors",
+      "bytes": 7473096344,
+      "local_sha256": "877b3ec1130548b69af7f8aeef3ec9d3fc7738040f0b9beb490857ec970997ae",
+      "remote_hash": "877b3ec1130548b69af7f8aeef3ec9d3fc7738040f0b9beb490857ec970997ae",
+      "match": true,
+      "repo": "lerobot/pi05_libero_finetuned_v044",
+      "revision": "dbf8a3f794a9c4297b44f40b752712f50073d945"
+    },
+    {
+      "root": "pi05_checkpoint",
+      "path": "policy_postprocessor.json",
+      "bytes": 660,
+      "local_sha256": "37d719a6584600988e6c343306d2eaee0575109f235ad500313577f73e47e8a1",
+      "remote_hash": "c635dfa3c8b821e91d3ae7e67b31d64e92035990",
+      "match": true,
+      "repo": "lerobot/pi05_libero_finetuned_v044",
+      "revision": "dbf8a3f794a9c4297b44f40b752712f50073d945"
+    },
+    {
+      "root": "pi05_checkpoint",
+      "path": "policy_postprocessor_step_0_unnormalizer_processor.safetensors",
+      "bytes": 7668,
+      "local_sha256": "a002c0df7f79c5b169c5a899ad151d4ea1bed246c7d82bd93ed1556558d517a9",
+      "remote_hash": "a002c0df7f79c5b169c5a899ad151d4ea1bed246c7d82bd93ed1556558d517a9",
+      "match": true,
+      "repo": "lerobot/pi05_libero_finetuned_v044",
+      "revision": "dbf8a3f794a9c4297b44f40b752712f50073d945"
+    },
+    {
+      "root": "pi05_checkpoint",
+      "path": "policy_preprocessor.json",
+      "bytes": 1903,
+      "local_sha256": "3d669ffc18d0364536735d8203076dcc69d3a6523aa5956ccaada3f9e1e6b748",
+      "remote_hash": "64b91cf3a0877e6c8704c0bc97b12e25366c9ea9",
+      "match": true,
+      "repo": "lerobot/pi05_libero_finetuned_v044",
+      "revision": "dbf8a3f794a9c4297b44f40b752712f50073d945"
+    },
+    {
+      "root": "pi05_checkpoint",
+      "path": "policy_preprocessor_step_2_normalizer_processor.safetensors",
+      "bytes": 7668,
+      "local_sha256": "a002c0df7f79c5b169c5a899ad151d4ea1bed246c7d82bd93ed1556558d517a9",
+      "remote_hash": "a002c0df7f79c5b169c5a899ad151d4ea1bed246c7d82bd93ed1556558d517a9",
+      "match": true,
+      "repo": "lerobot/pi05_libero_finetuned_v044",
+      "revision": "dbf8a3f794a9c4297b44f40b752712f50073d945"
+    },
+    {
+      "root": "pi05_tokenizer",
+      "path": "config.json",
+      "bytes": 1027,
+      "local_sha256": "e00c72cdff16296bf1229c3267b99f5247d8c740cae84336866338d64fa7918f",
+      "remote_hash": "b89393ba09b432265173f688b8a41a2c3c9e3e4c",
+      "match": true,
+      "repo": "google/paligemma-3b-pt-224",
+      "revision": "35e4f46485b4d07967e7e9935bc3786aad50687c"
+    },
+    {
+      "root": "pi05_tokenizer",
+      "path": "added_tokens.json",
+      "bytes": 24,
+      "local_sha256": "7d0bad90030d638a4bf89a82e91206e25f1fbe0012f14bca21666a64b643bc49",
+      "remote_hash": "ff9246e420971b10c510b39a0de289132c2bf23f",
+      "match": true,
+      "repo": "google/paligemma-3b-pt-224",
+      "revision": "35e4f46485b4d07967e7e9935bc3786aad50687c"
+    },
+    {
+      "root": "pi05_tokenizer",
+      "path": "tokenizer.json",
+      "bytes": 17549604,
+      "local_sha256": "ef6773c135b77b834de1d13c75a4c98ab7a3684ffd602d1831e1f1bf5467c563",
+      "remote_hash": "ef6773c135b77b834de1d13c75a4c98ab7a3684ffd602d1831e1f1bf5467c563",
+      "match": true,
+      "repo": "google/paligemma-3b-pt-224",
+      "revision": "35e4f46485b4d07967e7e9935bc3786aad50687c"
+    },
+    {
+      "root": "pi05_tokenizer",
+      "path": "tokenizer.model",
+      "bytes": 4264023,
+      "local_sha256": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+      "remote_hash": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+      "match": true,
+      "repo": "google/paligemma-3b-pt-224",
+      "revision": "35e4f46485b4d07967e7e9935bc3786aad50687c"
+    },
+    {
+      "root": "pi05_tokenizer",
+      "path": "tokenizer_config.json",
+      "bytes": 39968,
+      "local_sha256": "3259402b1d1802e02417d7bff75a889ec61d359d15be6050a957b307c48edbbe",
+      "remote_hash": "960dcec0bccc6e594d865eceb63c8078e164cfb2",
+      "match": true,
+      "repo": "google/paligemma-3b-pt-224",
+      "revision": "35e4f46485b4d07967e7e9935bc3786aad50687c"
+    },
+    {
+      "root": "pi05_tokenizer",
+      "path": "special_tokens_map.json",
+      "bytes": 607,
+      "local_sha256": "5ef37093ae4236587b6e8266acb815b46e2db8ce656c66552bfa574d32880405",
+      "remote_hash": "0c18fdd94629ea652e2ef36ed9a422474ad0a8e8",
+      "match": true,
+      "repo": "google/paligemma-3b-pt-224",
+      "revision": "35e4f46485b4d07967e7e9935bc3786aad50687c"
+    }
+  ],
+  "download_probes": [
+    {
+      "root": "rdt_checkpoint",
+      "path": "config.json",
+      "url": "https://huggingface.co/TJ-chen/RDT-1B-LIBERO-Object/resolve/45f425cfc22108fdf9043dd55b3bb440018db12d/config.json",
+      "status": 200,
+      "read_bytes": 919,
+      "scope": "complete file",
+      "content_range": null,
+      "matches_manifest": true
+    },
+    {
+      "root": "rdt_checkpoint",
+      "path": "ema/model.safetensors",
+      "url": "https://huggingface.co/TJ-chen/RDT-1B-LIBERO-Object/resolve/45f425cfc22108fdf9043dd55b3bb440018db12d/ema/model.safetensors",
+      "status": 206,
+      "read_bytes": 1024,
+      "scope": "download prefix",
+      "content_range": "bytes 0-1023/2456705456"
+    },
+    {
+      "root": "text_encoder",
+      "path": "config.json",
+      "url": "https://huggingface.co/google/t5-v1_1-xxl/resolve/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/config.json",
+      "status": 200,
+      "read_bytes": 593,
+      "scope": "complete file",
+      "content_range": null,
+      "matches_manifest": true
+    },
+    {
+      "root": "text_encoder",
+      "path": "pytorch_model.bin",
+      "url": "https://huggingface.co/google/t5-v1_1-xxl/resolve/3db67ab1af984cf10548a73467f0e5bca2aaaeb2/pytorch_model.bin",
+      "status": 206,
+      "read_bytes": 1024,
+      "scope": "download prefix",
+      "content_range": "bytes 0-1023/44541587809"
+    },
+    {
+      "root": "vision_encoder",
+      "path": "config.json",
+      "url": "https://huggingface.co/google/siglip-so400m-patch14-384/resolve/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/config.json",
+      "status": 200,
+      "read_bytes": 576,
+      "scope": "complete file",
+      "content_range": null,
+      "matches_manifest": true
+    },
+    {
+      "root": "vision_encoder",
+      "path": "model.safetensors",
+      "url": "https://huggingface.co/google/siglip-so400m-patch14-384/resolve/9fdffc58afc957d1a03a25b10dba0329ab15c2a3/model.safetensors",
+      "status": 206,
+      "read_bytes": 1024,
+      "scope": "download prefix",
+      "content_range": "bytes 0-1023/3511950624"
+    },
+    {
+      "root": "pi05_checkpoint",
+      "path": "config.json",
+      "url": "https://huggingface.co/lerobot/pi05_libero_finetuned_v044/resolve/dbf8a3f794a9c4297b44f40b752712f50073d945/config.json",
+      "status": 200,
+      "read_bytes": 2170,
+      "scope": "complete file",
+      "content_range": null,
+      "matches_manifest": true
+    },
+    {
+      "root": "pi05_checkpoint",
+      "path": "model.safetensors",
+      "url": "https://huggingface.co/lerobot/pi05_libero_finetuned_v044/resolve/dbf8a3f794a9c4297b44f40b752712f50073d945/model.safetensors",
+      "status": 206,
+      "read_bytes": 1024,
+      "scope": "download prefix",
+      "content_range": "bytes 0-1023/7473096344"
+    },
+    {
+      "root": "pi05_tokenizer",
+      "path": "config.json",
+      "url": "https://huggingface.co/google/paligemma-3b-pt-224/resolve/35e4f46485b4d07967e7e9935bc3786aad50687c/config.json",
+      "status": 401,
+      "scope": "anonymous request denied"
+    }
+  ],
+  "dino": {
+    "revision": "7b187bd4df8efce2cbcbbb67bd01532c19bf4c9c",
+    "archive_sha256": "3593b11bbb5a0949a258b607aff80d01bcf574874f873b8255f0bd8045aa6ee7",
+    "weight": {
+      "bytes": 346378731,
+      "sha256": "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73",
+      "url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vitb14/dinov2_vitb14_pretrain.pth"
+    },
+    "source_files": 203,
+    "upstream_files_matching_without_patch": 202,
+    "patch_sha256": "b01787fb03e254685e9185a843e5849488f3f5378211b7152f53f1fa39e73686",
+    "licenses": [
+      {
+        "path": "LICENSE",
+        "bytes": 11359,
+        "sha256": "600cc67cc4cb2f5ea317dcfc687ad1c74dc4bec8782bbe9db0afd83513b935b7",
+        "url": "https://raw.githubusercontent.com/facebookresearch/dinov2/7b187bd4df8efce2cbcbbb67bd01532c19bf4c9c/LICENSE"
+      },
+      {
+        "path": "dinov2/thirdparty/CLIP/LICENSE",
+        "bytes": 1063,
+        "sha256": "893951b3bf94db8df1b13e05da5cdeb499400960e4d44a3962a8b33ed0b4f28e",
+        "url": "https://raw.githubusercontent.com/facebookresearch/dinov2/7b187bd4df8efce2cbcbbb67bd01532c19bf4c9c/dinov2/thirdparty/CLIP/LICENSE"
+      }
+    ]
+  },
+  "source_metadata_sha256": {
+    "public-assets-completion.json": "f519a31ac5a330c6d245c77c5312f31ad3042ac71da1fdc7feedba4938cce5db",
+    "public-download-probes.json": "48025ab99b8009473fedb9b9fda74e6f291dfa46b9691aeb1fab9ec5d2757d57",
+    "rdt-model.json": "c20831b2e6b8ba73993cd1f94d50cd27741ef4807815906a453d5715160a1009",
+    "dinov2-commit.json": "8d514590738b315c8e13a194e5e3527039f8ed13a81ae7a7263d5db97460aa95",
+    "upstream-vls-files.json": "38d0b72484a93411a804ccd65bb4c30b99a519afa7ceb3d303d26d03646bd35c",
+    "pi05-model.json": "a60597b04661796d771fddef03e5ff91053d828eaee76ba7c049b884d282649e",
+    "source-retries.json": "3ee3dd4a264476ff097e9d0cde4d67ced7693304486a1e453a9aed87eed92bb9",
+    "t5-model.json": "0084a42a202a736b16e1fac72c0d8cb90c96f4283bfb39bfb58d5660cd9fc323",
+    "local-public-comparison.json": "b3a1b9ddae4d3af235cb0c486cb0d6e8c0cc9d13b0e9f2c52799809f5fc00783",
+    "paligemma-model.json": "956b42dcc390ab81e6e93406e48ef148cb5a0e6d9b4cb0527e838d6947a4a45b",
+    "siglip-model.json": "a7f8c237487ad1af84d42242f1d604cfee5faedd1958504c5f74a6cd8015abd7",
+    "source-discovery.json": "599e39660f94c180d76c11d708e0a9bf47c991329454a77bc8e80ac23ef8c7da",
+    "upstream-vls-commit.json": "1d028f2f0449608143c48f65e1f736923d234816acf8bc7ebd3c52850ea986a5"
+  },
+  "public_libero_install": {
+    "valid": true,
+    "files_verified": 2308,
+    "upstream_commit": "eafdb809426b13153aa1e4c42d6601844217dfec",
+    "manifest_sha256": "8b6fa91960398a25af011c2fa9458f910ad4aa4599b45a853b04d743cac7711c",
+    "log_sha256": "32e794c36f2806b94798913febbf507a1f2481e1a0ade2a0f33070cbdf562250"
+  }
+}

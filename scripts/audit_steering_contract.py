@@ -550,7 +550,16 @@ def audit_run(run_dir, task=0, model="gpt-6-astra", effort="low", archive_suppor
           and all(math.isfinite(v) for v in r['raw_action'])
           and r.get('reason') == 'policy_gripper_passthrough' for r in actions))
     steps = [r['global_step'] for r in actions]
-    check('gripper_already_binary_before_adapter', bool(actions) and all(r['raw_action'][-1] in (-1,1) for r in actions))
+    pi05_continuous = (manifest.get('schema') == 'pi05_vls_cohort_v1'
+                       and config.get('policy', {}).get('type') == 'pi05')
+    if pi05_continuous:
+        # PI05 unnormalizes a continuous gripper command; the existing LIBERO
+        # adapter thresholds it at its input boundary. RDT is binary earlier.
+        check('pi05_finite_gripper_before_adapter', bool(actions) and all(
+            len(r.get('raw_action', [])) == 7 and math.isfinite(r['raw_action'][-1]) for r in actions))
+        facts['gripper_contract'] = 'continuous PI05 command; fixed LIBERO adapter binarizes before simulator'
+    else:
+        check('gripper_already_binary_before_adapter', bool(actions) and all(r['raw_action'][-1] in (-1,1) for r in actions))
     check('action_step_prefix_contiguous', steps == list(range(len(steps))))
     exited_steps = [r['global_step'] for r in rows['phase_timing']
                     if r.get('episode') == episode_index and r.get('name') == 'adapter_step'

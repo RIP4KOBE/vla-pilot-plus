@@ -22,3 +22,7 @@
 2026-10-15 将用户原有的四份未跟踪文档按原字节纳入版本管理：[HANDOFF](08_archive/HANDOFF-20260915.md)（随后原字节移入历史归档）、[旧执行指令](01_specs/2026-09-21-rdt-qd-ed-autoresearch-execution-prompt.md)、[旧实验计划](01_specs/2026-09-22-rdt-qd-ed-object-swap-next-round-experiment-plan.md)、[旧 VLS 链路分析](02_analysis/vls_guidance/2026-06-05-rdt-guided-denoise-loop-vls-steering-analysis.md)。它们只描述各自日期的历史状态；其中旧入口、预算和“尚未合入 main”等结论不覆盖当前 Progress。原文中的机器路径按历史归档索引追溯，不保证在新 clone 中可直接访问。
 
 新合作者安装与三模式实测：[验收报告](steering/onboarding-validation.md)。
+
+- [Public model assets](steering/model-assets.md): exact public revisions, downloads and identity evidence.
+- [π0.5 + VLS](steering/pi05-evaluation.md): separate standard LIBERO protocol and results.
+- [Installation troubleshooting](steering/installation-troubleshooting.md): compatibility and download recovery.

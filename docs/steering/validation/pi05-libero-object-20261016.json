@@ -1,0 +1,701 @@
+{
+  "schema": "pi05-libero-object-validation-v1",
+  "date": "2026-10-16",
+  "runtime_commit": "6d713b28908e58f460c1be18a4c0f51bc9fa270c",
+  "benchmark": "standard LIBERO Object",
+  "policy": "pi05",
+  "method": "vls",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "ultra",
+  "codex_cli": "0.156.1",
+  "evidence_root": ".worktrees/exp/repository-maintenance-20261015/public-models-pi05-20261016/full10-01",
+  "audit_valid": true,
+  "successes": 9,
+  "completed": 10,
+  "planned": 10,
+  "infrastructure_errors": 0,
+  "unfinished": 0,
+  "started_at": "2026-10-16T05:21:00.815521+00:00",
+  "finished_at": "2026-10-16T06:46:00.701567+00:00",
+  "wall_clock_seconds": 5099.886046,
+  "status": {
+    "state": "finished",
+    "started_at": "2026-10-16T05:21:00.815521+00:00",
+    "launcher_pid": 1020754,
+    "run_dir": "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/public-models-pi05-20261016/full10-01",
+    "planned": 10,
+    "pid": 1021299,
+    "argv": [
+      "/tmp/vla-public-models-20261016/env/bin/python",
+      "/home/hynx/lizhuo/VLA-Pilot++/scripts/steering_worker.py",
+      "/home/hynx/lizhuo/VLA-Pilot++/.worktrees/exp/repository-maintenance-20261015/public-models-pi05-20261016/full10-01/resolved-config.yaml"
+    ],
+    "exit_code": 0,
+    "completed_at": "2026-10-16T06:46:00.701567+00:00",
+    "source_unchanged": true
+  },
+  "source_unchanged": true,
+  "source_sha256": {
+    "configs/backend/calvin.yaml": "74130d42c7a5a4bca8636a60a7a03ffe3b3cd6cbb2aa803235ae4b74ce687665",
+    "configs/backend/libero.yaml": "1e747960e79ebcef8f4d54b19da6ad925dd71d43f3ccd93873e0499debc18222",
+    "configs/config.yaml": "be98e1127a93b30864c0f42832ba71adc11b115c34b1e2e0f748e2f3cb5bd55a",
+    "configs/env/calvin.yaml": "287ea346ebe3c2fffb0df49cc1c0bf3ab47762228f55d68c6343e444ad622a52",
+    "configs/env/libero.yaml": "4474215d819b9162515ba626edfcc982a1337de1c37b4ae1d382bd7d3357810d",
+    "configs/evaluation/libero_object_pi05.yaml": "d1c1e360f675299e46a7a879ed2bce3d3ff883fad5bd37bbfa48215c833a2521",
+    "configs/evaluation/libero_object_swap.yaml": "a66daba00f19614ad5f39a44cf7d12b28d7a8305fec8206c2ec230ecc6c020e6",
+    "configs/local.example.yaml": "36c117a378ff1123fb68b1459a13da48c1bd87c36d2a8c88c3f0a2c1a25a99e2",
+    "configs/perception.yaml": "0b1619b51775c82f5dbbbe70223d37ab64881362494a45b5ed91429ff7af1fae",
+    "configs/policy.yaml": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6",
+    "configs/stage_controller/contact.yaml": "2d89604824d7b75cbaec43040033961ed4449b41cb1fde433d3e1c6e187328d1",
+    "configs/stage_controller/evidence.yaml": "bb61c48c3f432ad2e769c4ef28fa3e7fadc9454347d5d0c44690c3d9b2c94bfe",
+    "configs/stage_controller/grasp.yaml": "325b846fbc1f82e705f6e37832dfa744a52d83feaf019b3b9c6bf871ab485351",
+    "configs/stage_controller/online.yaml": "c0d374dbdfcffce82cb281377939ca791bfb7da6a443337f566246a36a1bc183",
+    "configs/steering/eds.yaml": "3fa1e02d9031dfed6326699f1181c4e5e2598b630bd5d11fb555cf982096f24b",
+    "configs/steering/eds_qd.yaml": "09dc2a6b1249572f66a190b308d14c95afcdc9876fa2579f5c665f2817450ad2",
+    "configs/steering/vls.yaml": "55971085c07cc5e6043d3f28beb3d68bd7fded0bb5132f95030df8c8e8658300",
+    "configs/task/button_off.yaml": "6b31a90a0b1696644147b4df3cf2d9fbb25aa07dd22e67e8d5320bb0fe52b608",
+    "configs/task/button_on.yaml": "e397f307001936521e7609a61b99bb17ffa5ddb73aa48fc23dca3694146311e2",
+    "configs/task/calvin/button_off.yaml": "fe79a6925887d401c4dda61cae6c6ac13c02389ae0ea9d4d24e72fda36c7fe40",
+    "configs/task/calvin/button_on.yaml": "4fd77723a61c7948b7f80ede28e57926a3e2629b6642701615328f03abb8c9e1",
+    "configs/task/calvin/door_left.yaml": "9165e2871beed7d47ccb3de111ebc0327dccdbdfbc1909206d56185b0bfdef6e",
+    "configs/task/calvin/door_right.yaml": "3266aabf73e33e0a7ded04379040e57964114b5b40caa9568da10e39c1a2642b",
+    "configs/task/calvin/drawer_close.yaml": "346e4d70188455e0d2ffc4bc4bf35f36b6ee26bd8aedc2c927990523f94abe73",
+    "configs/task/calvin/drawer_open.yaml": "aa178953f0b70686befbf24ef046dd356ff8e744272f862dfbc032b4fb860d9e",
+    "configs/task/calvin/push_blue.yaml": "54219c9c44176166ba10dc8c4f61d3f1842e500666fc291b23b09d79df090816",
+    "configs/task/door_left.yaml": "a5c621a2c1ceca9858968b739cbd0c9f4bbfe4dcdf51512e9c562853c83802e0",
+    "configs/task/door_right.yaml": "5f21b19f1c970fe4019fc1fe28d369052a35a03f4f8626979af7dd9029121cd7",
+    "configs/task/drawer_close.yaml": "e5b659f5fc7c85a07757986b06ceaf60589d3205a76dcebea4cbf7b5f92038a4",
+    "configs/task/drawer_open.yaml": "dc7cdc04463345991ea25b3383d5d6d0bae82646cb74e48f7734a93771d5848c",
+    "configs/task/push_blue.yaml": "3fbb1c2649e4ac894415b6d0f05d114951cdc49e376d87d18f7ba0ce7bc93643",
+    "core/__init__.py": "233696e00a1ada9a70a50c11160a96884d223df0e7b92aa7ba8bc8a61503efe6",
+    "core/diagnostics/__init__.py": "14239b38c3245814d368784e23c8b792cb1a3d23807c44ec7d4cd845329b0600",
+    "core/diagnostics/stage_replay.py": "cfc6e12def4354795756dedbf920ba2b376e00506a992f60af90269f6796edd4",
+    "core/diffusion_policy_steer.py": "97f0ee3b9159461e15f6b58ea2bd95119a5514872025b4c99594ec6b71815eaa",
+    "core/eds_eval_metrics.py": "0e07c57167dd92c07a31395f6ebba0b56d0f65bc62f4fb1e4d5fb30549fd6ae0",
+    "core/eds_mechanism_trace.py": "312087f5c354f81a820f2acb8419c6380e96805de79f1789c5c7ff23a8fcabf3",
+    "core/env_adapters/__init__.py": "790830ee3d9a8a6a0c59a114fbc77fb50bc158d05e13ff9e2e634ad7f370d9c4",
+    "core/env_adapters/base_adapter.py": "a5bb4f9e06f458fc38e6cc7486e6c6d268fc67bfaf6fd9f84f90514236144de8",
+    "core/env_adapters/calvin_adapter.py": "396957c62660edddf9704a24cbef15d9cf5f2bbb4da39ee4b9123c4d240a0541",
+    "core/env_adapters/libero_adapter.py": "a07b659498635c54147c2c2b559213166d34b513ca432e68a41491cfb08cd54c",
+    "core/episode_rng_fixture.py": "50a1b0c942215819ee2bea76993e12ba68990d3b0cf98c120b15dd52bb319db7",
+    "core/episode_rng_hooks.py": "2fd9bed3865c7ee50e851b91ac6088d126ed09f8b0277bd33d3d39a4389fd773",
+    "core/fkd_class.py": "d4349b98f3eb47b30481b0010a03eeed3508e0d7d79af18f970a5ecfa3288ff1",
+    "core/gemini_grounder.py": "2dbf76e2fa822d9f32af60fb7e5bfecaffb9a38f6aed13299636a50e0964bba9",
+    "core/keypoint_detector.py": "5fa108f01168ecb1f2433bc53f093701e0079fa6cf35abf910ec0347075d055e",
+    "core/keypoint_tracker.py": "292d63964b90405769118bda0e1acc9666f8ae076f41abbb7df8e5bf8abc6f45",
+    "core/online/__init__.py": "f7b64046d9f14d78be040b14a339c2245994e0c896f2ab1de0f4e8239edf2173",
+    "core/online/capture.py": "478dc996fc13561ee9d58afbe764c3a60ecc13a0ed4be85e26e17d85fca4a5a5",
+    "core/online/codex.py": "d1dceeeb70e78491144a7e161470fb6c968d70a740884dedd002d4ad9c626a57",
+    "core/online/policy.py": "c210670f417a0a67399dcccdadc9792637b176f0cccee427abc4aa09e9285af4",
+    "core/pi05_steer.py": "6dae3124412971b6d6744d45df34feb3de4511c6630c168b4d2f9d98d62614eb",
+    "core/policy_observation_sampling.py": "c7e93e81541c34dd45e22dffc43a24d428d043a56c0dd6766bfd286e2ff07f4d",
+    "core/qd_ed.py": "4415ea7f16029e2fa2e7528c1f7065ba673b7a5a512723bfa9611f992298daa4",
+    "core/rdt_libero_action_converter.py": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+    "core/rdt_libero_obs_processor.py": "5b6f3857be13254e1d2266270f57199578dbc4066566265b147d91cc30bb2d14",
+    "core/rdt_policy_steer.py": "d330d9a2c432ace2176a167dbcc04b64c3e05eed515e63e20249afaf857e2645",
+    "core/sam3_segmenter.py": "e3f3cdd5a970b738ffcf17c7fd765041195d1b9f40a1d2b3809c1459cb5dce81",
+    "core/sam_segmenter.py": "c4e243d22adf3becfaa1f94f33e9ff05c1e2962899de4e11a656d2ffb16cb8bf",
+    "core/stage/__init__.py": "b584340579a8ec953fd87c716ec7f57a306632b994696317668db3d3a4fb1c55",
+    "core/stage/carry.py": "743ae7366901f85af2747e1cfd5c7334d8d039daefab2cbb6529557eba55f60b",
+    "core/stage/contract.py": "6b61fe392183557ba0890a97f7154227467021e19adbccf94c4ae73cd0dd82c1",
+    "core/stage/controller.py": "f7b3460af7a842112be94d63df3aa3787d5b872771f7b4cf605a2d94358a8513",
+    "core/stage/grasp.py": "9d67a10bd6785bfa4db19f3a965a8c18eb50a5d7205402d097638422d680d570",
+    "core/stage/observation.py": "b1c37db1019e9cc178f6a93e0e3915cc13a382b89a05f7ea91a45ab864251278",
+    "core/stage/recovery.py": "cffbc458094f7f8827b38a9f983bb0271021593f28e8871bfb7bfb3d02b261a2",
+    "core/target_distance_reward.py": "96d6a90bb80af997cf538ba5dd56a9cea8bac6c57f5659c5210b496cd9a3318c",
+    "main.py": "b217fe9cfb54f1dae65e30e3666c79728389cabcc52c7e652845a196ac356cd0",
+    "scripts/audit_pi05.py": "5c4857f19005506e9d1280d0423f468be51f10e36d32e0d2828978a3dc166ba7",
+    "scripts/audit_qd_mechanism.py": "1a11ec87d1c2f542fb5f948ccdaf6cb32ca93d330f2911e3b3afad10c8a225fd",
+    "scripts/audit_steering.py": "b06f9a98730d111013360c7f1b8f3de69c9dab848fdefe6855c12c332f15f53f",
+    "scripts/audit_steering_contract.py": "38da47c3af9c920c84536ab61badd9a99b23f2f16ab32776ce82607476ff11af",
+    "scripts/check_steering.py": "f12cc73c5012f8fd4bb52b0ffe289177f87bb93b14854691cf7a14051a8085f6",
+    "scripts/codex_only_runtime.py": "b4ee53dc60508ee93cbf7a622b20d70ccf0d57431d1a5e61672b4967a36afd1c",
+    "scripts/dependency_patches/dinov2-source.patch": "b01787fb03e254685e9185a843e5849488f3f5378211b7152f53f1fa39e73686",
+    "scripts/dependency_patches/robosuite-1.4.0.json": "f2433c90793e6f83a7a5539cad512a1e6ed286ac89089ad30c3cf7abccd77deb",
+    "scripts/dependency_patches/robosuite-binding.patch": "89816ff1ed895e650ce2113cae99767bf9ad5d7fd3d071ce96af59e6e7c24837",
+    "scripts/dependency_patches/robosuite-egl.patch": "17725f107d8e53cd5b3a742a23940ce8078d646184c958715175c73e9e107175",
+    "scripts/evaluate_steering.py": "23fae23f07a2f8a3d3c4ebe096861e1e01288c135e8bfbf3c7a1e0bd67754e69",
+    "scripts/list_steering_devices.py": "3c59c5149f5f22833c71d3071c27ba87a4902edcecbbb16515ca3bcde36621d0",
+    "scripts/pi05_runtime.py": "c795e0493bfecb79098e47c0ed28e9db7544264ba471810733381c3f458f4031",
+    "scripts/prepare_public_models.py": "fde9aab2d587cf445ac92b0b5b395eb811ed382d52f03d8fd5a1120374d0850b",
+    "scripts/prepare_steering_archive.py": "fa598868e76b59124a6045397807071d24db347e3216b982a1342bbfeb30234b",
+    "scripts/prepare_steering_assets.py": "6c642b91584bca28af98da460a92c3f1b31b809cd931c424a9266e0d29a2c178",
+    "scripts/public_model_sources.json": "4ee5bcaf3e0e1fc701a93c4f17092054f3c6fc290159e0adfcb8425c885e9e04",
+    "scripts/run_pi05.py": "e48a37992987578a5f591be2dfe0f84d22122a3973896b6539fe97035cc3269c",
+    "scripts/run_steering.py": "99ddb659d498da091268565c3ccc275eb75ba777a1634447a6e338510141a18e",
+    "scripts/steering_archive.py": "07795820853660ffd5ea4cd0c21421df4eecf072c11c6575871e4c8ccd4d8518",
+    "scripts/steering_assets_manifest.json": "8b6fa91960398a25af011c2fa9458f910ad4aa4599b45a853b04d743cac7711c",
+    "scripts/steering_dependency_compat.py": "be4c5e2c1e6abe29e79337a1c442c2a26625ee9de157052c1c121c67875c35d6",
+    "scripts/steering_libero.patch": "9f562f5292335a744a499a81dd94e72bbb780c471a62156327aef20605de5213",
+    "scripts/steering_model_assets.py": "38c357a62ed0e4200005c372619974e1be8085402e124fb9de2fe284f20bb2d9",
+    "scripts/steering_model_assets_manifest.json": "6d3ce95f99b6cd315289c2252bc1b684227874d4fbf3055133f6aeffa1d2f65b",
+    "scripts/steering_process.py": "69f4b6200d4186cbf7ece5f923c75f33d1a9653a575bbdae9e15f7d9a355f78b",
+    "scripts/steering_runtime.py": "9e6481191e8aec7d54d69ab2090862fa99f90b697d9fea7968323769a6160ec8",
+    "scripts/steering_source_layout.py": "415ef888e66f5ce3f7d9e78942bf3ec0d717831c64ea9af9151b1af3bdc6328f",
+    "scripts/steering_transport_audit.py": "96e69926db05be8c00cc31e30422d7c3b55fa9731a0f0c1e975f6017b18c57db",
+    "scripts/steering_worker.py": "85c2c5251299715506ae6b475bd6f94686a829f1456f681fe3a7c2e00e71f506",
+    "utils/__init__.py": "debd228bdc6164ea3f2fc49e0ef8aa891754e7748fe91ac21e8ef74b6a72a49f",
+    "utils/config_utils.py": "d9f2a7665db2ee15f882be442eed791c0300607d2b62c12dfbe8651253c18af5",
+    "utils/cuda_egl_guard.py": "8d6689c11a208a0c85e5db7a5778b0eaf9a5c5efecfa17d7dc9d0f09f603ee94",
+    "utils/eds_eval_vis.py": "d155d2b2e6e72bd877899c1fdc6f0e57d847ea63d68b55a74a0606c90ab86676",
+    "utils/eds_mechanism_pretest_vis.py": "a9ccf922bc717f955375455d56cc55f9ac49a439690461de453f2dc1b20af8fc",
+    "utils/guidance_utils.py": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82",
+    "utils/keypoint_utils.py": "fb7730f5dbe6ba72584f9d7204d2578be225dc69655c7c26006a8be9a92d3c1f",
+    "utils/logging_utils.py": "ad614d71030403937d8699544f9985f1909c8cc4402c43e2c9b16b39f263c2c3",
+    "utils/mujoco_phase_diagnostics.py": "cdf75645bd958a3cff1fbf78acada4c804a6f663a6aab27224fbd5cfdf7cffac",
+    "utils/render_lifetime_diagnostics.py": "f25c8ba222f2682a701b6b1b15bae58d5b6cac519658b5c73e7be3850244e865",
+    "utils/vis_utils.py": "6e256ca29aabcb8ffeb852e56c732ec56885394bb8e4e8ca2fd0957e989289b8",
+    "vlm_query/guidance_template.txt": "ac7a53e64f82e735b295682347cc4775da7c611715798e0d79f8a6fe34cb11c5",
+    "vlm_query/guidance_template_calvin.txt": "b29b7554b27207269f572a40a4d51f7498d36e3eca4effb94349e32ebce8caee",
+    "vlm_query/guidance_template_libero.txt": "0a11498ed5317170bff8e8cd3909c508ea810e4fa9f006555ef37a50f4459c54",
+    "vlm_query/segmentation_planning_template.txt": "975e6905b66e749e351f2282a73e5f30eeee6735643622f74808b2379a938d30",
+    "vlm_query/stage_observation_v1.txt": "14ea3cf594ed358a399d3c49c96f599885072e381b3b02dff520b9b42ec5e3c0",
+    "vlm_query/stage_template.txt": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b",
+    "vlm_query/target_distance/guidance_template.txt": "ac7a53e64f82e735b295682347cc4775da7c611715798e0d79f8a6fe34cb11c5",
+    "vlm_query/target_distance/guidance_template_libero.txt": "0c98461b3dd126caeed82d0c53cdec63ba40a7a45c3be958cb169a672c8570e7",
+    "vlm_query/target_distance/segmentation_planning_template.txt": "975e6905b66e749e351f2282a73e5f30eeee6735643622f74808b2379a938d30",
+    "vlm_query/target_distance/stage_template.txt": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b",
+    "vlm_query/vlm_agent.py": "27ce2761c6ec79bf35c2c26c88ecde4f8dfa9ede4d9ad94ddda3a08895e144ae"
+  },
+  "evidence_sha256": {
+    "manifest.json": "46d2075aa8849370f9663be6fa3dbb21f1ed91502c96ee41e5cf4750d5d01639",
+    "resolved-config.yaml": "2096dde36562a5f4a903af90798717a34be94f8806241367870f5cb1f966ec8a",
+    "local-config.yaml": "02b6420b5ee6261e6863b037b6e3e4e7fb0622b034484d9c21b1bcd5bca706c5",
+    "environment.json": "56970abc0fe65375c7874b41e20287702e414492625704d56f366d148c7de44a",
+    "status.json": "a80dadc3547eb41a8d69cea3270c2e5577478740f64da49ff21e60701311f627",
+    "audit.json": "bc3b81fc439076b4215a2865b8ccc9ce996b62d5b39a0fbc3eec7a3600407598",
+    "console.log": "5094ec61c8758d3200b7ee76ed25aeede1cfdc9dab77fdabea5de48e5ce19fd2",
+    "output/results.txt": "9e5a4c2738e146d33f34955e6e3b288ec35136d58092c0f7d006f622403cc923",
+    "output/evaluation/episode_compute.jsonl": "ed5db138330e8675ba409f40ed5629e7f9828ec09213cbee6c3c7794573531b3",
+    "output/evaluation/pi05_metrics.jsonl": "e4727ff0b935d4795fe8c84d51d03018d85a58e8e7a93449312c37d88be35713",
+    "output/evaluation/stage_events.jsonl": "1dcb2ec24bcbcf90ce9855d8d61a40baeb4f26db36cc4a02d9aeff8bf3a8e2ec"
+  },
+  "artifact_index": {
+    "path": ".worktrees/exp/repository-maintenance-20261015/public-models-pi05-20261016/full10-01-artifacts.json",
+    "sha256": "9bf4924476474e1a5d9f91f8721acf9aa8efc2efdd4f75e24edc728e6030f680",
+    "files": 865
+  },
+  "totals": {
+    "model_forward_calls": 1800,
+    "model_batch_rows": 36000,
+    "guided_chunks": 49,
+    "unguided_chunks": 131,
+    "reward_gradient_calls": 392,
+    "rbf_gradient_calls": 98,
+    "provider_logical_call_attempts": 95,
+    "provider_failed_calls": 0,
+    "provider_input_tokens": 937022,
+    "provider_cached_input_tokens": 386688,
+    "provider_output_tokens": 54482,
+    "provider_reasoning_output_tokens": 46657,
+    "provider_call_latency_s": 4800.045752482489
+  },
+  "tasks": [
+    {
+      "task_id": 0,
+      "task": "pick_up_the_alphabet_soup_and_place_it_in_the_basket",
+      "seed": 44,
+      "success": true,
+      "valid": true,
+      "infrastructure_error": false,
+      "unfinished": false,
+      "environment_steps": 121,
+      "chunks": 13,
+      "stage_visual_queries": 5,
+      "identity_generations": 1,
+      "fkd_score_opportunities": 9,
+      "fkd_resamples": 3,
+      "fkd_ess_skips": 6,
+      "compute": {
+        "model_forward_calls": 130,
+        "model_batch_rows": 2600,
+        "guided_chunks": 3,
+        "unguided_chunks": 10,
+        "reward_gradient_calls": 24,
+        "rbf_gradient_calls": 6,
+        "provider_logical_call_attempts": 7,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 69436,
+        "provider_cached_input_tokens": 13568,
+        "provider_output_tokens": 3789,
+        "provider_reasoning_output_tokens": 3154,
+        "provider_call_latency_s": 290.2970881103538
+      },
+      "contract_summary": {
+        "pass": 303
+      },
+      "videos": [
+        {
+          "path": "output/episode_1/episode_1_success_agentview.mp4",
+          "sha256": "a3bfc0711606e69a6f4b68951bb04f75cb9cc72d6271d229fda2688b77d4aa4f",
+          "bytes": 1133893,
+          "decoded_frames": 121,
+          "frame_shape": [
+            640,
+            640,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": 1,
+      "task": "pick_up_the_cream_cheese_and_place_it_in_the_basket",
+      "seed": 235,
+      "success": true,
+      "valid": true,
+      "infrastructure_error": false,
+      "unfinished": false,
+      "environment_steps": 111,
+      "chunks": 12,
+      "stage_visual_queries": 5,
+      "identity_generations": 1,
+      "fkd_score_opportunities": 9,
+      "fkd_resamples": 3,
+      "fkd_ess_skips": 6,
+      "compute": {
+        "model_forward_calls": 120,
+        "model_batch_rows": 2400,
+        "guided_chunks": 3,
+        "unguided_chunks": 9,
+        "reward_gradient_calls": 24,
+        "rbf_gradient_calls": 6,
+        "provider_logical_call_attempts": 7,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 69383,
+        "provider_cached_input_tokens": 27136,
+        "provider_output_tokens": 4256,
+        "provider_reasoning_output_tokens": 3608,
+        "provider_call_latency_s": 339.8796803499572
+      },
+      "contract_summary": {
+        "pass": 303
+      },
+      "videos": [
+        {
+          "path": "output/episode_2/episode_2_success_agentview.mp4",
+          "sha256": "792059bf2e1c01e08b4709a1c6dffc616a1fc0e7b7048716619043bfa1bf1bd2",
+          "bytes": 1133304,
+          "decoded_frames": 111,
+          "frame_shape": [
+            640,
+            640,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": 2,
+      "task": "pick_up_the_salad_dressing_and_place_it_in_the_basket",
+      "seed": 43,
+      "success": true,
+      "valid": true,
+      "infrastructure_error": false,
+      "unfinished": false,
+      "environment_steps": 99,
+      "chunks": 10,
+      "stage_visual_queries": 3,
+      "identity_generations": 1,
+      "fkd_score_opportunities": 9,
+      "fkd_resamples": 3,
+      "fkd_ess_skips": 6,
+      "compute": {
+        "model_forward_calls": 100,
+        "model_batch_rows": 2000,
+        "guided_chunks": 3,
+        "unguided_chunks": 7,
+        "reward_gradient_calls": 24,
+        "rbf_gradient_calls": 6,
+        "provider_logical_call_attempts": 5,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 50189,
+        "provider_cached_input_tokens": 0,
+        "provider_output_tokens": 1975,
+        "provider_reasoning_output_tokens": 1456,
+        "provider_call_latency_s": 195.93456246820278
+      },
+      "contract_summary": {
+        "pass": 217
+      },
+      "videos": [
+        {
+          "path": "output/episode_3/episode_3_success_agentview.mp4",
+          "sha256": "05e80340c4730cfa2b2b1fe5680b95a25898fe610e17fd51aba10d93240e1a25",
+          "bytes": 999425,
+          "decoded_frames": 99,
+          "frame_shape": [
+            640,
+            640,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": 3,
+      "task": "pick_up_the_bbq_sauce_and_place_it_in_the_basket",
+      "seed": 546,
+      "success": true,
+      "valid": true,
+      "infrastructure_error": false,
+      "unfinished": false,
+      "environment_steps": 108,
+      "chunks": 11,
+      "stage_visual_queries": 4,
+      "identity_generations": 1,
+      "fkd_score_opportunities": 9,
+      "fkd_resamples": 3,
+      "fkd_ess_skips": 6,
+      "compute": {
+        "model_forward_calls": 110,
+        "model_batch_rows": 2200,
+        "guided_chunks": 3,
+        "unguided_chunks": 8,
+        "reward_gradient_calls": 24,
+        "rbf_gradient_calls": 6,
+        "provider_logical_call_attempts": 6,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 59930,
+        "provider_cached_input_tokens": 27136,
+        "provider_output_tokens": 3776,
+        "provider_reasoning_output_tokens": 3189,
+        "provider_call_latency_s": 253.16358309891075
+      },
+      "contract_summary": {
+        "pass": 260
+      },
+      "videos": [
+        {
+          "path": "output/episode_4/episode_4_success_agentview.mp4",
+          "sha256": "2b1a74749ca11250da3c0a2a4d3c264959df88d1117ed82c81a6c7e58781ad2b",
+          "bytes": 1082685,
+          "decoded_frames": 108,
+          "frame_shape": [
+            640,
+            640,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": 4,
+      "task": "pick_up_the_ketchup_and_place_it_in_the_basket",
+      "seed": 6,
+      "success": false,
+      "valid": true,
+      "infrastructure_error": false,
+      "unfinished": false,
+      "environment_steps": 720,
+      "chunks": 72,
+      "stage_visual_queries": 32,
+      "identity_generations": 1,
+      "fkd_score_opportunities": 57,
+      "fkd_resamples": 19,
+      "fkd_ess_skips": 38,
+      "compute": {
+        "model_forward_calls": 720,
+        "model_batch_rows": 14400,
+        "guided_chunks": 19,
+        "unguided_chunks": 53,
+        "reward_gradient_calls": 152,
+        "rbf_gradient_calls": 38,
+        "provider_logical_call_attempts": 34,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 331014,
+        "provider_cached_input_tokens": 135680,
+        "provider_output_tokens": 19972,
+        "provider_reasoning_output_tokens": 17782,
+        "provider_call_latency_s": 1735.1949564421084
+      },
+      "contract_summary": {
+        "pass": 1464
+      },
+      "videos": [
+        {
+          "path": "output/episode_5/episode_5_fail_agentview.mp4",
+          "sha256": "59a58ba98802bbfad1e281798d350f95e1513bb39d17d1c03930a05d479a905b",
+          "bytes": 5706622,
+          "decoded_frames": 720,
+          "frame_shape": [
+            640,
+            640,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": 5,
+      "task": "pick_up_the_tomato_sauce_and_place_it_in_the_basket",
+      "seed": 621,
+      "success": true,
+      "valid": true,
+      "infrastructure_error": false,
+      "unfinished": false,
+      "environment_steps": 101,
+      "chunks": 11,
+      "stage_visual_queries": 5,
+      "identity_generations": 1,
+      "fkd_score_opportunities": 9,
+      "fkd_resamples": 3,
+      "fkd_ess_skips": 6,
+      "compute": {
+        "model_forward_calls": 110,
+        "model_batch_rows": 2200,
+        "guided_chunks": 3,
+        "unguided_chunks": 8,
+        "reward_gradient_calls": 24,
+        "rbf_gradient_calls": 6,
+        "provider_logical_call_attempts": 7,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 69554,
+        "provider_cached_input_tokens": 27136,
+        "provider_output_tokens": 4289,
+        "provider_reasoning_output_tokens": 3648,
+        "provider_call_latency_s": 409.9892576248385
+      },
+      "contract_summary": {
+        "pass": 303
+      },
+      "videos": [
+        {
+          "path": "output/episode_6/episode_6_success_agentview.mp4",
+          "sha256": "337418a288aa6570b4584741233feb09c9d11698abfd70c5c12847b083c67e7b",
+          "bytes": 1127180,
+          "decoded_frames": 101,
+          "frame_shape": [
+            640,
+            640,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": 6,
+      "task": "pick_up_the_butter_and_place_it_in_the_basket",
+      "seed": 197,
+      "success": true,
+      "valid": true,
+      "infrastructure_error": false,
+      "unfinished": false,
+      "environment_steps": 126,
+      "chunks": 13,
+      "stage_visual_queries": 4,
+      "identity_generations": 1,
+      "fkd_score_opportunities": 9,
+      "fkd_resamples": 3,
+      "fkd_ess_skips": 6,
+      "compute": {
+        "model_forward_calls": 130,
+        "model_batch_rows": 2600,
+        "guided_chunks": 3,
+        "unguided_chunks": 10,
+        "reward_gradient_calls": 24,
+        "rbf_gradient_calls": 6,
+        "provider_logical_call_attempts": 6,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 59775,
+        "provider_cached_input_tokens": 33920,
+        "provider_output_tokens": 2980,
+        "provider_reasoning_output_tokens": 2420,
+        "provider_call_latency_s": 313.53686058917083
+      },
+      "contract_summary": {
+        "pass": 260
+      },
+      "videos": [
+        {
+          "path": "output/episode_7/episode_7_success_agentview.mp4",
+          "sha256": "e4c08f46c133ff7e9f5ed702348954fe9e087e838dc84f57967dcfbf1d7c0302",
+          "bytes": 1199559,
+          "decoded_frames": 126,
+          "frame_shape": [
+            640,
+            640,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": 7,
+      "task": "pick_up_the_milk_and_place_it_in_the_basket",
+      "seed": 87,
+      "success": true,
+      "valid": true,
+      "infrastructure_error": false,
+      "unfinished": false,
+      "environment_steps": 137,
+      "chunks": 14,
+      "stage_visual_queries": 6,
+      "identity_generations": 1,
+      "fkd_score_opportunities": 15,
+      "fkd_resamples": 5,
+      "fkd_ess_skips": 10,
+      "compute": {
+        "model_forward_calls": 140,
+        "model_batch_rows": 2800,
+        "guided_chunks": 5,
+        "unguided_chunks": 9,
+        "reward_gradient_calls": 40,
+        "rbf_gradient_calls": 10,
+        "provider_logical_call_attempts": 8,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 79080,
+        "provider_cached_input_tokens": 40704,
+        "provider_output_tokens": 4437,
+        "provider_reasoning_output_tokens": 3744,
+        "provider_call_latency_s": 440.3562886856962
+      },
+      "contract_summary": {
+        "pass": 346
+      },
+      "videos": [
+        {
+          "path": "output/episode_8/episode_8_success_agentview.mp4",
+          "sha256": "2b29b06746f7381071d366ef60c87aa2a81341cf3b9069e22bda0f8420f40287",
+          "bytes": 1487904,
+          "decoded_frames": 137,
+          "frame_shape": [
+            640,
+            640,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": 8,
+      "task": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket",
+      "seed": 151,
+      "success": true,
+      "valid": true,
+      "infrastructure_error": false,
+      "unfinished": false,
+      "environment_steps": 125,
+      "chunks": 13,
+      "stage_visual_queries": 6,
+      "identity_generations": 1,
+      "fkd_score_opportunities": 9,
+      "fkd_resamples": 3,
+      "fkd_ess_skips": 6,
+      "compute": {
+        "model_forward_calls": 130,
+        "model_batch_rows": 2600,
+        "guided_chunks": 3,
+        "unguided_chunks": 10,
+        "reward_gradient_calls": 24,
+        "rbf_gradient_calls": 6,
+        "provider_logical_call_attempts": 8,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 79115,
+        "provider_cached_input_tokens": 33920,
+        "provider_output_tokens": 5258,
+        "provider_reasoning_output_tokens": 4547,
+        "provider_call_latency_s": 480.678801625967
+      },
+      "contract_summary": {
+        "pass": 346
+      },
+      "videos": [
+        {
+          "path": "output/episode_9/episode_9_success_agentview.mp4",
+          "sha256": "2c0bf5d9d91b8581cdf420545f7277b9a3d546f614d090f998397a7bf826c8b8",
+          "bytes": 1152838,
+          "decoded_frames": 125,
+          "frame_shape": [
+            640,
+            640,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": 9,
+      "task": "pick_up_the_orange_juice_and_place_it_in_the_basket",
+      "seed": 548,
+      "success": true,
+      "valid": true,
+      "infrastructure_error": false,
+      "unfinished": false,
+      "environment_steps": 103,
+      "chunks": 11,
+      "stage_visual_queries": 5,
+      "identity_generations": 1,
+      "fkd_score_opportunities": 12,
+      "fkd_resamples": 4,
+      "fkd_ess_skips": 8,
+      "compute": {
+        "model_forward_calls": 110,
+        "model_batch_rows": 2200,
+        "guided_chunks": 4,
+        "unguided_chunks": 7,
+        "reward_gradient_calls": 32,
+        "rbf_gradient_calls": 8,
+        "provider_logical_call_attempts": 7,
+        "provider_failed_calls": 0,
+        "provider_input_tokens": 69546,
+        "provider_cached_input_tokens": 47488,
+        "provider_output_tokens": 3750,
+        "provider_reasoning_output_tokens": 3109,
+        "provider_call_latency_s": 341.0146734872833
+      },
+      "contract_summary": {
+        "pass": 303
+      },
+      "videos": [
+        {
+          "path": "output/episode_10/episode_10_success_agentview.mp4",
+          "sha256": "3e134c15c57a340952e3bf720815e14954eab9665d8e29cf64d46adfe1d52868",
+          "bytes": 1075049,
+          "decoded_frames": 103,
+          "frame_shape": [
+            640,
+            640,
+            3
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "One fixed seed per task; no statistical or upstream-score reproduction claim.",
+    "Standard LIBERO Object differs from the RDT ObjectSwap OOD benchmark.",
+    "No unguided PI05 control; this run does not isolate steering gain.",
+    "Model, prompt and service settings are fixed requests, not a guarantee of future online outputs.",
+    "Codex logical call counters are recorded; underlying HTTP retry counts are unavailable.",
+    "Runtime counters and strict-load receipts are attestations, not independent trajectory replay."
+  ],
+  "environment_summary": {
+    "python": "3.12.12 | packaged by conda-forge | (main, Jan 26 2026, 23:51:32) [GCC 14.3.0]",
+    "packages": {
+      "torch": "2.7.1+cu126",
+      "transformers": "4.53.3",
+      "lerobot": "0.4.2",
+      "numpy": "2.2.6",
+      "mujoco": "3.7.0",
+      "robosuite": "1.4.0"
+    },
+    "lerobot_commit": "715debf6c1723a28f1a57d4274a8c4ec35b6a417",
+    "codex_cli": "codex-cli 0.156.1",
+    "libero": {
+      "valid": true,
+      "files_verified": 2308,
+      "upstream_commit": "eafdb809426b13153aa1e4c42d6601844217dfec",
+      "manifest_sha256": "8b6fa91960398a25af011c2fa9458f910ad4aa4599b45a853b04d743cac7711c"
+    }
+  },
+  "audit_check_counts": {
+    "cohort": 90,
+    "task_contract": 4105
+  },
+  "setup_evidence_index": {
+    "path": ".worktrees/exp/repository-maintenance-20261015/public-models-pi05-20261016/setup-evidence/index-final.json",
+    "sha256": "0be67965b282a4009f30562e84e6c4c97415ddf40a914bb8557da086395dab85",
+    "files": 92
+  }
+}

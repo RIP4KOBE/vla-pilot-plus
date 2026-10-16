@@ -1,0 +1,16 @@
+# PI05 + VLS on standard LIBERO Object, under this repository's online contract.
+# Applied after libero_object_swap.yaml + steering/vls.yaml; unchanged shared
+# Stage/reward settings are inherited. This is not an upstream-score reproduction.
+backend:
+  libero:
+    suite_name: libero_object
+    auto_apply_perturbations: false
+    strict_perturbations: false
+main:
+  max_episode_steps: 720
+  episode_policy_rng_mode: per_seed_v1
+  episode_rng_fixture_manifest: null
+  episode_rng_fixture_manifest_sha256: null
+  execution_horizon_far: 10
+policy:
+  type: pi05

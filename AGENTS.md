@@ -15,16 +15,17 @@
 | `scripts/list_steering_devices.py` | NVIDIA/CUDA UUID 与 EGL 编号映射；实际 render 仍由预检核验 |
 | `scripts/audit_steering.py` / `audit_qd_mechanism.py` | cohort 有效性、合同与机制重建 |
 | `configs/evaluation/`、`configs/steering/` | 科学协议及方法差异 |
-| `configs/local.yaml`（ignored） | 路径、GPU/EGL；不放凭据 |
+| `.local/*.yaml` 或 `configs/local.yaml`（ignored） | 路径、GPU/EGL；不放凭据 |
 | `main.py`、`core/env_adapters/` | 观测、动作转换与执行/反馈 |
 | `core/rdt_policy_steer.py` | 共用 RDT、VLS/EDS 搜索与候选选择 |
+| `core/pi05_steer.py`、`scripts/run_pi05.py` / `audit_pi05.py` | π0.5 + VLS；独立标准 LIBERO Object 协议与验收 |
 | `core/qd_ed.py` | descriptor、档案、精英与父代 |
 | `core/stage/`、`core/online/` | Stage 控制、视觉事实、Codex 请求与捕获 |
 | `core/diagnostics/` | 显式离线 Stage 回放；不能计入在线成绩 |
 | `core/target_distance_reward.py`、`vlm_query/target_distance/` | reward 合同与受控提示词 |
 | `tests/`、`docs/steering/`、`docs/research/` | 回归、验收证据、研究方向/进展 |
 
-公共方法名为 VLS/`vls`、EDS/`eds`、EDS+QD/`eds_qd`。QD 扩展 EDS 的档案/父代过程，不复制全套推理代码。旧安装配方和 shell 入口已退役；使用 `*-steering*` 配方及公共 launcher。其他 policy/backend 源码暂留兼容，尚不属于当前验收范围。
+公共方法名为 VLS/`vls`、EDS/`eds`、EDS+QD/`eds_qd`。QD 扩展 EDS 的档案/父代过程，不复制全套推理代码。旧安装配方和 shell 入口已退役；使用 `*-steering*` 配方及公共 launcher。π0.5 + VLS 已在标准 LIBERO Object 十任务协议验收（9/10，10/10 有效），不可与 RDT ObjectSwap OOD 直接排名；π0.5 EDS/QD 尚未支持。其他 policy/backend 源码暂留兼容，尚不属于当前验收范围。
 
 ## 科学行为与实验有效性
 
@@ -56,7 +57,7 @@ python scripts/audit_steering.py /path/to/completed-run --no-write
 
 配置预览不验证模型/GPU/API；CPU 命令不等于网络隔离。必要时按 [CONTRIBUTING](CONTRIBUTING.md) 完成相关负例/回归。完整在线命令和搬迁后审计在[评测文档](docs/steering/evaluation.md)。
 
-记录 runtime commit、source/config/asset hash、环境、任务/seed、在线捕获、逐任务结果、审计器身份、日志与视频位置。原始 evidence 不改字节；移动后新增映射/support/审计报告。大型模型和产物放外部归档，Git 只保存必要小型报告、配置、索引与 fixtures。没有公共模型包时明确说明，不声称 clone 即可复现。
+记录 runtime commit、source/config/asset hash、环境、任务/seed、在线捕获、逐任务结果、审计器身份、日志与视频位置。原始 evidence 不改字节；移动后新增映射/support/审计报告。大型模型和产物放外部归档，Git 只保存必要小型报告、配置、索引与 fixtures。公开固定模型与必要编码器通过 `scripts/prepare_public_models.py` 下载并核验；PaliGemma tokenizer 需要使用者获得访问许可。见 `docs/steering/model-assets.md`；不声称仅 clone 即可复现。
 
 `.worktrees/exp/` 中的历史别名与归档只作证据来源，不作为新开发入口，不修改封存数据。不要因路径名称包含旧版本号而重命名哈希固定的刺激、source/capture blob。历史版本映射在 README provenance 和维护报告。
 
