@@ -13,7 +13,7 @@
 
 VLA-Pilot++ is a research framework for steering frozen robot policies at inference time. It brings **VLS**, **EDS**, and **EDS with Quality-Diversity (EDS+QD)** into a shared RDT execution and evaluation pipeline, with a π0.5 adapter for VLS.
 
-The research goal is to make inference-time search more diverse and adaptable through behavioral archives and execution feedback. The current implementation supports action-chunk QD archives; persistent learning across chunks or tasks remains a research direction. See the [Research Proposal](docs/research/research_proposal.md) and [Research Progress](docs/research/research_progress.md).
+The research goal is to preserve high-quality behavioral alternatives for changing user preferences, environment constraints, and risks through quality-diversity search and execution feedback. The current implementation supports action-chunk QD archives; persistent learning across chunks or tasks remains a research direction. See the [Research Proposal](docs/research/research_proposal.md) and [Research Progress](docs/research/research_progress.md).
 
 ## Overview
 
@@ -255,7 +255,7 @@ Historical research branches are organized by the local source-directory names. 
 
 - **Research:** [Proposal](docs/research/research_proposal.md) · [Progress and next steps](docs/research/research_progress.md)
 - **Usage:** [Installation](docs/steering/installation.md) · [Models](docs/steering/model-assets.md) · [Architecture](docs/steering/architecture.md) · [Evaluation](docs/steering/evaluation.md)
-- **Collaboration:** [Contributing](CONTRIBUTING.md) · [Agent guidance](AGENTS.md)
+- **Code and collaboration:** [Project Overview](docs/project_overview.md) · [Contributing](CONTRIBUTING.md) · [Agent guidance](AGENTS.md)
 - **History:** [Research branches and tags](docs/maintenance/branch-index.md) · [All documentation](docs/README.md)
 
 The research and detailed engineering guides are currently written primarily in Chinese.

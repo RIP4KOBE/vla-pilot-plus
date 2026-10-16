@@ -1,73 +1,78 @@
 # VLA-Pilot++ 开发指导
 
-## 目的与权威入口
+## 项目目标与阅读顺序
 
-研究冻结 VLA/RDT 的 inference-time steering，在 EDS 基础上引入 quality-diversity，探索有用的行为多样性和执行反馈驱动的改进。先读 [Proposal](docs/research/research_proposal.md)、[Progress](docs/research/research_progress.md)，运行与安装读 [README](README.md)。本文件为仓库统一 agent 指导。
+研究冻结 VLA 的 inference-time steering：在完成主要任务的同时，利用 quality-diversity（QD）保留多种高质量行为，以适应用户偏好、环境约束与风险变化。EDS 是搜索基础，EDS+QD 扩展行为档案、精英和父代；VLS 是共同框架中的对照。跨执行策略演化及向 VLA 蒸馏是未来 Agentic recursive self-improvement（RSI）路线。
 
-当前已验收：VLS、EDS、EDS+QD 共同框架；ObjectSwap OOD low 成绩依次 1/10、3/10、1/10，ultra 及新环境独立复测均为 1/10、3/10、0/10。不同协议与评测组分开报告；[新环境验收](docs/steering/onboarding-validation.md)记录安装范围与限制。当前最可靠对照为含 RBF 的 EDS；QD 尚未证明优势。默认 archive 每动作块重建，不能宣称跨块/跨任务学习或 recursive self-improvement 已实现并验收。
+1. [Proposal](docs/research/research_proposal.md)：研究动机、方法思想、假设和 Future Work；不放实现流水。
+2. [Progress](docs/research/research_progress.md)：主线实现、有效结果、缺失能力和下一步验收。
+3. [Project Overview](docs/project_overview.md)：目录、代码职责、数据流与贡献入口。
+4. [README](README.md)、[CONTRIBUTING](CONTRIBUTING.md)：安装运行与协作；本文件是统一 agent 指导。
 
-## 目录与入口
+当前 RDT 三模式已完成共同框架验收。EDS（含 RBF）是最可靠研发对照；QD 已实现并通过机制/完整运行审计，但尚未证明性能优势。具体模型、benchmark、low/ultra 及独立评测结果以 Progress 分组记录为准。默认每动作块重建 archive，不能宣称持久 QD、跨任务学习、偏好适应或 RSI 已经实现并验收。
 
-| 路径 | 职责 |
+π0.5 + VLS 已在标准 LIBERO Object 完成独立十任务验收（9/10，10/10 有效）；不能与 RDT ObjectSwap 直接排名，也不能据此证明相对无引导 π0.5 的增益。π0.5 EDS/QD 尚未支持。
+
+## 主要入口与扩展边界
+
+| 入口 | 职责 |
 | --- | --- |
-| `scripts/run_steering.py` / `evaluate_steering.py` | 三模式公共 launcher，冻结、进度与运行审计 |
-| `scripts/check_steering.py` / `prepare_steering_assets.py` | 预检、固定资产、显式依赖兼容补丁与机器配置 |
-| `scripts/list_steering_devices.py` | NVIDIA/CUDA UUID 与 EGL 编号映射；实际 render 仍由预检核验 |
-| `scripts/audit_steering.py` / `audit_qd_mechanism.py` | cohort 有效性、合同与机制重建 |
-| `configs/evaluation/`、`configs/steering/` | 科学协议及方法差异 |
-| `.local/*.yaml` 或 `configs/local.yaml`（ignored） | 路径、GPU/EGL；不放凭据 |
-| `main.py`、`core/env_adapters/` | 观测、动作转换与执行/反馈 |
-| `core/rdt_policy_steer.py` | 共用 RDT、VLS/EDS 搜索与候选选择 |
-| `core/pi05_steer.py`、`scripts/run_pi05.py` / `audit_pi05.py` | π0.5 + VLS；独立标准 LIBERO Object 协议与验收 |
-| `core/qd_ed.py` | descriptor、档案、精英与父代 |
-| `core/stage/`、`core/online/` | Stage 控制、视觉事实、Codex 请求与捕获 |
-| `core/diagnostics/` | 显式离线 Stage 回放；不能计入在线成绩 |
-| `core/target_distance_reward.py`、`vlm_query/target_distance/` | reward 合同与受控提示词 |
-| `tests/`、`docs/steering/`、`docs/research/` | 回归、验收证据、研究方向/进展 |
+| `scripts/run_steering.py`、`scripts/evaluate_steering.py` | 三模式公共启动、冻结、进度与审计 |
+| `configs/evaluation/`、`configs/steering/` | 共同科学协议与 `vls`、`eds`、`eds_qd` profile |
+| `main.py`、`core/env_adapters/` | 任务准备、观测、动作执行与反馈 |
+| `core/rdt_policy_steer.py`、`core/qd_ed.py` | 共用 RDT/VLS/EDS 搜索；描述符、档案、精英、父代 |
+| `core/pi05_steer.py`、`scripts/run_pi05.py`、`scripts/audit_pi05.py` | π0.5 VLS 的独立模型适配、标准 LIBERO 协议与审计 |
+| `core/stage/`、`core/online/` | 控制决策、视觉事实与 Codex 请求/捕获 |
+| `vlm_query/`、`core/target_distance_reward.py` | 任务内容生成、提示词与本地 reward 合同 |
+| `scripts/check_steering.py`、`scripts/prepare_steering_assets.py` | 预检、固定资产、显式依赖兼容与机器配置 |
+| `scripts/prepare_public_models.py`、`scripts/public_model_sources.json` | 固定公开模型来源、下载/核验与 π0.5 配置；访问许可由使用者取得 |
+| `scripts/audit_steering.py`、`scripts/audit_qd_mechanism.py` | 完整运行有效性与独立机制重建 |
+| `tests/`、`docs/steering/` | 行为参考、CPU 回归、验收与证据索引 |
 
-公共方法名为 VLS/`vls`、EDS/`eds`、EDS+QD/`eds_qd`。QD 扩展 EDS 的档案/父代过程，不复制全套推理代码。旧安装配方和 shell 入口已退役；使用 `*-steering*` 配方及公共 launcher。π0.5 + VLS 已在标准 LIBERO Object 十任务协议验收（9/10，10/10 有效），不可与 RDT ObjectSwap OOD 直接排名；π0.5 EDS/QD 尚未支持。其他 policy/backend 源码暂留兼容，尚不属于当前验收范围。
+QD 复用 EDS 搜索，不复制整套推理代码。开发描述符、档案、父代与反馈时保留关闭 archive 的 `eds` 对照；新选项显式配置，不顺手重写默认 reference。兼容 backend、可选 memory/anchor/secondary 等接口不自动继承默认验收。仅按文件名或近期是否调用，不能认定模块无用；例如 Codex 仍复用 `gemini_grounder.py` 的基类和工具。
 
-## 科学行为与实验有效性
+## 科学条件与实验有效性
 
-- 开发 QD 时保留 `eds` 关闭 archive 的对照；新增选项显式配置，默认行为和 reference 不顺手重写。
-- 模型/依赖、输入/预处理、初始化/RNG、提示词/Stage/reward、候选投影、动作切片/夹爪/执行长度、评分运算顺序/dtype、RBF、父代/精英/archive、缓存或服务参数的变化都可能改变科学条件。登记新配置、解释影响并验证；旧成绩不证明修改后的行为。
-- 默认 ObjectSwap 十任务和 seed/prepare-rollout RNG fixtures 固定。任务子集、seed 与 episode ordinal 不是可互换的身份；不要用单任务补跑拼接完整 cohort。
-- 当前在线协议为 Codex CLI / `gpt-6-astra` / `ultra`，身份/reward 每任务 fresh，Stage 使用当前观测在线评估。reward 候选评分在本地。没有 Poe 或静默 provider fallback；模型/effort/transport 修改需明确登记。
-- replay/缓存可用于离线诊断，不能计入 fresh 在线成绩。服务端输入 token 缓存与本地回复回放分开记录。
-- 环境 success、机制有效性和基础设施状态分开报告。保留合法失败、服务错误和未完成运行；不得挑选成功回合、放松 gate 或修改原始 receipt 来“恢复成绩”。
-- 默认方法计算预算不同，报告真实模型 calls/batch rows、评分/梯度、在线请求/重试与墙钟时间。不要把等待时间写成 GPU 活跃小时。
-- 运行期间固定源码、依赖、资产与配置，使用新 run ID。已有目录不覆盖；中断后先核对状态再决定如何继续，保留独立尝试记录。
-- 使用已分配且空闲 GPU，核对 GPU/EGL 映射、进程与锁。当前用户授权所有可用 GPU，不限 GPU2；不终止其他项目任务。不要从已废弃历史方案引入预算上限或重复审批。
+- 模型/依赖、输入/预处理、初始化/RNG、提示词/Stage/reward、投影、动作切片/夹爪/执行长度、评分顺序/dtype、RBF、父代/精英/archive、缓存或服务参数的变化都可能改变科学条件。登记影响并验证，旧成绩不能证明新实现。
+- 当前 RDT ObjectSwap 协议固定十任务、seed 与 prepare/rollout RNG fixtures。任务子集、seed 和 episode ordinal 不可互换；单任务诊断不得拼接为完整 cohort。
+- 当前在线主协议是 Codex CLI / `gpt-6-astra` / `ultra`：任务身份、阶段和 reward fresh 生成；Stage 按触发条件评估当前观测；候选 reward/梯度在本地计算。不使用 Poe 或静默 provider 回退。模型、effort、transport 改动单独登记。
+- `core/diagnostics/` 的 replay/缓存仅用于离线诊断。服务端输入 token 缓存与本地回复回放分开记录；不能将回放列入 fresh 在线成绩。
+- 环境成功、机制有效性和基础设施状态分开报告。保留合法失败、错误和未完成运行；不挑成功回合、不放松 gate、不改原始 receipt 来恢复数值。
+- 预测 reward、档案占用率与实际执行收益不同。未执行候选没有真实成功标签；块内搜索、跨执行适应和多轮 RSI 分开表述。QD 收益需排除普通精英保留、更多计算/记忆/重试等解释。
+- 方法默认计算量不同，报告实际模型 calls/batch rows、评分/梯度、在线调用/重试和墙钟时间；等待时间不是 GPU 活跃小时。冻结运行时源码、依赖、资产和配置，使用新 run ID；中断后核对状态，避免重复或覆盖。
+- 使用已授权且空闲的 GPU，核对 GPU/EGL 映射、进程与锁。当前用户授权所有可用 GPU，不限 GPU2；不终止其他项目任务。不得从历史方案恢复旧预算上限或重复审批。
 
-## 检查与证据
+## 检查、产物与证据
 
-新环境按安装文档执行 `install-runtime-compat` 和 `verify-runtime-compat`，显式恢复固定 Robosuite 兼容文件。预检/launcher 会检查哈希，原始依赖版本号和 `pip check` 不能替代该核验；不要靠手改旧环境完成安装。
+文档/无引用文件清理检查链接、引用和证据；路径/launcher/归档改动运行相应 CPU 回归；模型、搜索、Stage/reward 或动作等科学变更需要行为检查及明确登记的在线验收。纯文档不重跑 GPU 实验。
 
-按改动范围验证：文档/无引用文件清理检查链接、引用和证据；路径/launcher/归档改动运行相关 CPU 回归；搜索/Stage/动作等科学变更需要行为回归和明确登记的在线验收。无需为纯文档重跑 GPU 实验。
+在安装指南配置的环境、仓库根目录执行：
 
 ```bash
-# 在按安装文档配置的 Python 环境、仓库根目录执行。
-python scripts/run_steering.py --method eds --local-config configs/local.yaml \
+# 仅配置预览，不验证模型、GPU 或在线服务。
+python scripts/run_steering.py --method eds --local-config .local/rdt.yaml \
   --output-dir outputs/config-preview --print-config
+# CPU 回归；不是通用网络隔离。
 env -u VLA_CODEX_ONLY CUDA_VISIBLE_DEVICES='' PYTHON_DOTENV_DISABLED=1 \
   PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 \
   python -m pytest tests -q --disable-warnings -p no:cacheprovider
+# 将路径替换为实际已完成运行目录；只读审计。
 python scripts/audit_steering.py /path/to/completed-run --no-write
 ```
 
-配置预览不验证模型/GPU/API；CPU 命令不等于网络隔离。必要时按 [CONTRIBUTING](CONTRIBUTING.md) 完成相关负例/回归。完整在线命令和搬迁后审计在[评测文档](docs/steering/evaluation.md)。
+新环境按安装指南执行 `install-runtime-compat` 和 `verify-runtime-compat`，显式恢复固定 Robosuite 兼容文件；依赖版本号或 `pip check` 不能替代文件哈希核验，不靠旧环境手工补丁完成安装。机器路径/GPU 配置按 README 放 ignored `.local/`；`configs/local.yaml` 仍可用，凭据不入 Git。
 
-记录 runtime commit、source/config/asset hash、环境、任务/seed、在线捕获、逐任务结果、审计器身份、日志与视频位置。原始 evidence 不改字节；移动后新增映射/support/审计报告。大型模型和产物放外部归档，Git 只保存必要小型报告、配置、索引与 fixtures。公开固定模型与必要编码器通过 `scripts/prepare_public_models.py` 下载并核验；PaliGemma tokenizer 需要使用者获得访问许可。见 `docs/steering/model-assets.md`；不声称仅 clone 即可复现。
+每个实验记录研究问题、runtime commit、source/config/asset hash、环境、任务/seed、服务条件、尝试/纳入规则、逐任务结果、计算量、日志/视频与审计器身份。大型模型和产物放现有外部归档；Git 保留必要小型报告、配置、索引和 fixtures。明确公开获取与本机验证的实际范围，不声称 clone 自动包含所有资产。
 
-`.worktrees/exp/` 中的历史别名与归档只作证据来源，不作为新开发入口，不修改封存数据。不要因路径名称包含旧版本号而重命名哈希固定的刺激、source/capture blob。历史版本映射在 README provenance 和维护报告。
+原始 evidence 保持字节和哈希；搬迁通过新增映射/support 与重审记录追溯。`.worktrees/exp/` 中历史别名/归档仅作证据，不修改封存数据，不重命名哈希固定的 source/capture/刺激文件。不能让当前运行从旧工作树隐式导入。历史名称与提交映射见 [provenance](docs/steering/provenance.md)。
 
 ## 协作与文档维护
 
-先检查 git 状态和现有进程，保护用户未提交内容；从最新 main 创建 `codex/<topic>` 功能分支。提交应聚焦、可审核，PR 说明问题、最终行为、科学影响、验证与限制。普通 push，不强推共享历史；提交/推送按当前用户授权及仓库流程，不自动继承一次性发布任务的未来授权。
+先核对 Git 状态、远端和活动任务，保护既有未提交内容与冻结源码。通常从最新 main 派生 `codex/<topic>` 功能分支；明确授权的主线文档任务按用户范围执行。多人共享同一目录时先协调写入与分支切换，不能为整理中断他人实验。
 
-新工作树仅在任务需要且有授权时使用；本轮整理不新建工作树。删除前确认独有提交、dirty 文件、ignored 产物、符号链接与活动任务，可靠归档并验证后再清理。保留其他合作者工作，不重置来消除冲突。
+提交应聚焦、可审核；PR 说明问题、最终行为、科学影响、验证与限制。普通 push，不强推或覆盖共享历史。提交/推送依当前用户授权及流程，不自动继承一次性发布任务的未来授权。新工作树仅在需要且获授权时使用；文档整理不新建工作树。删除前确认独有成果、dirty/ignored 文件、链接和活动进程，并可靠归档核验，不重置来消除冲突。
 
-每次机制合入或完整实验完成更新 Progress；假设/路线变化更新 Proposal 并标明证据。研究设想、可选未验收接口与默认已验收功能分开写。具体状态以仓库和报告为准，不只依据聊天记录。
+机制合入或完整实验完成更新 Progress；假设/路线变化更新 Proposal；目录/接口变化更新 Overview；入口和验证流程变化同步 README/AGENTS。研究设想、可选未验收接口与已验收默认能力分开写，以当前源码和报告为准，不仅依赖聊天记录。
 
 ## 技能与代理政策
 

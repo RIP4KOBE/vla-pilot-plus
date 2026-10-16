@@ -1,9 +1,11 @@
 # 文档导航
 
-从[研究提案](research/research_proposal.md)理解目标，从[研究进度](research/research_progress.md)了解已完成内容和下一步；开发约束见根目录 [AGENTS.md](../AGENTS.md)。
+推荐阅读顺序：[Research Proposal](research/research_proposal.md) 理解研究动机与假设 → [Research Progress](research/research_progress.md) 了解当前能力、结果和下一步 → [Project Overview](project_overview.md) 定位代码与贡献入口 → [AGENTS.md](../AGENTS.md) 核对开发规则。
 
 | 用途 | 权威入口 |
 | --- | --- |
+| 当前项目结构、数据流与主要源码职责 | [Project Overview](project_overview.md) |
+| 本轮研究文档的 Notion 来源、缺口与主线核验 | [来源与核验记录](maintenance/research-documentation-20261016.md) |
 | 安装、模型/任务资产与 Codex 接入 | [installation](steering/installation.md) |
 | 三模式机制、公式、Stage/reward 合同 | [architecture](steering/architecture.md) |
 | 运行、结果判读、审计与归档 | [evaluation](steering/evaluation.md) |

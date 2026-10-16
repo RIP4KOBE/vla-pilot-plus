@@ -1,101 +1,113 @@
 # Research Progress
 
-最近核对：2026-10-16（UTC）。本文概述项目当前能力、证据边界和开发优先级。研究动机与假设见 [Research Proposal](research_proposal.md)，使用方式见 [README](../../README.md)，完整配置、逐任务结果和受测源码身份见对应实验报告。
+最近核对：2026-10-16（Asia/Shanghai）。本文回答当前主线完成了什么、证据支持到哪里，以及接下来如何验证 [Research Proposal](research_proposal.md) 的研究主张。代码职责和贡献入口见 [Project Overview](../project_overview.md)。受核对提交与来源映射集中在[主线核验记录](../maintenance/research-documentation-20261016.md)，不在正文维护版本流水。
 
-## 当前状态
+## 当前研究阶段
 
-VLS、EDS 和 EDS+QD 已进入共享的 RDT 推理与评测框架。**EDS（含 RBF）是当前最可靠的研发对照**：历史两套已验收 ObjectSwap 协议及本轮干净环境复测均取得 3/10。EDS+QD 的档案和父代机制已经运行并通过审计，但尚未证明成功率优势。
+**EDS 已形成可靠的研发对照；项目正在从已实现的 EDS+QD 原型，推进到“证明有用的多样性”的研究阶段。** RDT 上的 VLS、EDS、EDS+QD 已进入共同控制与评测框架。EDS（含 RBF）在已记录的 low、ultra 和独立新环境 ultra 三组 ObjectSwap OOD 评测中均取得 3/10；它是这些协议范围内最值得保留的对照，不是每次在线运行的保证。
 
-当前研究重点是解释行为分区、父代质量与实际操作效果之间的关系，再进行可归因的 QD 改进。跨动作块适应、跨任务学习和 recursive self-improvement 尚未完成验收。
+EDS+QD 已实现行为描述、档案、精英维护、父代选择和档案输出，并完成机制审计及完整在线评测。但现有结果不支持 QD 优于 EDS，也没有证明能满足不同用户偏好、改善约束满足或提高恢复效率。**“机制可运行且结果有效”与“研究假设成立”是两种不同结论。**
 
-新合作者安装验收已完成：从干净 clone 和新 Python 环境得到 VLS 1/10、EDS 3/10、EDS+QD 0/10；30 个主回合全部有效，没有回合级基础设施错误或未完成任务。安装中发现的 Robosuite 隐式兼容修改现已纳入显式安装与哈希核验。该次验收使用本机校验资产，公共 LIBERO 下载失败后使用了校验复制路径。随后已完成模型公开来源核验，见[模型下载与身份](../steering/model-assets.md)。覆盖范围见[安装与评测验收报告](../steering/onboarding-validation.md)。
+当前默认档案每动作块重建；跨执行的策略记忆、跨任务适应、多轮 Agentic RSI 以及 VLA 权重蒸馏均未获得主线验收。在线 Stage 控制闭环不等于系统已经学会持续自我改进。
 
-## 目标与实现状态
+最新主线还纳入了 **π0.5 + VLS 在标准 LIBERO Object 上的独立验收：9/10**。这是另一模型与 benchmark 的运行验证，不能与 RDT ObjectSwap 的 3/10 排名，也不能据此宣称 VLS 相对无引导 π0.5 有增益。
 
-“已实现”表示存在代码；“已测试”表示有相应检查；“已验收”限定在报告声明的协议、源码和任务范围内。可选接口不自动继承默认配置的成绩。
+## 研究目标与实现对应
 
-| Proposal 目标 | 当前状态 | 已有证据 | 尚缺什么 |
-| --- | --- | --- | --- |
-| 共同 steering 框架 | RDT 三模式与 π0.5 VLS 已实现、测试并在各自协议在线验收 | 公共控制/执行、独立模型适配与完整 cohort 审计 | 跨模型同 benchmark 对照；π0.5 EDS/QD 尚未支持 |
-| EDS 对照 | 已实现、测试并在线验收 | low、ultra 与新环境 ultra 均 3/10，成功任务均 3、8、9 | 多 seed 稳定性、等计算预算及更广泛泛化 |
-| RQ1：动作块内 QD | 已实现、测试、机制与运行有效性已验收 | BD/网格/精英/父代/最终选择日志及独立重建 | 成功率收益：low 1/10、ultra 0/10，不支持优势 |
-| RQ2：操作相关 BD | 默认 XY 已验收；执行意图等可选代码存在 | `qd_descriptor`、`execution_intent_descriptor`、相关 CPU 测试 | 默认以外配置在共同协议的有效完整对照 |
-| RQ3：质量与多样性平衡 | sparse 父代已验收；其他选项有代码/单测 | `allocate_parent_slots`、全局质量 anchor/secondary 等接口 | 每项独立消融和计算量一致的因果证据 |
-| RQ4：跨块执行反馈 | 部分 warm-start/状态接口存在，默认关闭 | `EDSChunkMemory`、`warm_start_mix`，默认 `fresh` | 持久 QD、有效性/过期/反馈更新的完整在线验收 |
-| RQ5：MLLM 自动 BD | 研究设想 | Notion 章节标题和 Proposal 路线 | 生成合同、实现与未见任务验证 |
-| Recursive self-improving | 尚未证明 | 仅有块内搜索与在线 Stage 闭环 | 跨执行经验带来可重复收益，排除预算/重试/服务混杂 |
+“已实现”指有代码，“已测试”指有工程或机制检查，“已验收”限定在明确源码、配置和任务范围内。可选接口不能继承默认配置的成绩。
 
+| Proposal 目标 | main 当前实现与状态 | 验证证据 | 缺失能力 | 下一步验收 |
+| --- | --- | --- | --- | --- |
+| 冻结 VLA 的共同 steering 框架 | RDT 三模式及 π0.5 VLS 已在各自协议验收；共享控制、执行和部分审计，保留模型适配差异 | [RDT 三模式实测](../steering/onboarding-validation.md)、[π0.5 验收](../steering/pi05-evaluation.md) | 跨模型同 benchmark 对照；π0.5 EDS/QD 尚未支持 | 每个新增组合按自己的协议验证，不沿用 RDT 成绩 |
+| EDS 搜索基础 | RBF 初始采样与截断去噪、按 reward 选父代；已验收 | [架构合同](../steering/architecture.md)、[EDS 行为参考](../../tests/fixtures/steering_eds_golden/README.md) | 多 seed 稳定性、等计算对照 | 保留关闭 QD 的 EDS 行为；登记并完成配对对照 |
+| RQ1：高质量行为解集 | 默认二维描述符、网格精英、稀疏父代、档案输出；已实现、机制与运行有效性已验收 | [QD 独立审计](../../scripts/audit_qd_mechanism.py)、三组结果报告 | 已执行行为的互补性与性能增益 | 对照普通全局精英、同容量随机库，并核对实际执行效果 |
+| RQ2：偏好与约束适应 | 当前主协议使用目标距离 reward 和固定 Stage 控制；没有完整多偏好/多约束评测 | [共同协议](../../configs/evaluation/libero_object_swap.yaml) | 明确的额外要求、独立约束指标与条件选择 | 同一主任务切换要求，验证质量合格且行为不同的选择 |
+| RQ3：鲁棒性与高效恢复 | 有失败接触复查、抓持/携带一致性控制；不是 QD 驱动的恢复策略库 | [Stage 机制](../steering/architecture.md#stage-进度与接触门控) | 备选行为跨执行有效性与预算匹配的恢复实验 | 保持控制器不变，比较恢复成功率、交互次数和搜索成本 |
+| RQ4：可迁移描述与评价 | 默认 target-relative endpoint XY；执行意图等可选接口有代码/测试 | [QD 模块](../../core/qd_ed.py)、[相关测试](../../tests/test_qd_ed_archive.py) | 描述符与真实行为的对应、未见情境验证 | 固定 reward 与搜索条件，进行描述符消融 |
+| Future Work A：外部策略与经验演化 | 有可选种群 warm-start 接口，默认关闭；不是持久策略档案 | [搜索模块](../../core/rdt_policy_steer.py) | 情境匹配、过期/重评、真实反馈归因、跨轮评估 | 先验证跨块，再进行至少两轮冻结评估及记忆对照 |
+| Future Work B：多样经验蒸馏 | 尚无本项目已验收的采集—训练—独立评测闭环 | 当前验收范围仅推理与执行 | 合格数据集、行为条件、更新目标及遗忘检查 | 在路线 A 和数据质量成立后，先单次受控更新，再检验多轮收益 |
 
-## 三种模式
+## 主线方法与模型范围
 
-| 模式 | 默认机制 | 已验收范围 |
+| 模式 | 当前默认机制 | 状态与边界 |
 | --- | --- | --- |
-| `vls` | 20 候选；guide=80、diversity=10；5 步去噪，正常 guided 块 1 次 RBF + 4 次 reward 梯度；自适应 FKD 可因 ESS 跳过 | 完整 online 十任务；实际控制、梯度/FKD与选择证据 |
-| `eds` | 16 候选，初始 5 步 + 10 轮截断去噪，reward 父代重采样；RBF scale=20；最终取末代最好 | 完整 online 十任务；独立 EDS reference 与动作/Stage 合同 |
-| `eds_qd` | 共用 EDS；4×4 target-relative endpoint XY archive，每格 1 精英，sparse 父代；最终取 archive 全局最好 | 机制真实生效、完整运行、独立档案与父代证据；没有性能优势验收 |
+| RDT + VLS | 20 候选；reward 梯度、RBF 多样性和自适应 FKD | 完整在线验收；FKD 因 ESS 充足而不重采样是合法行为 |
+| RDT + EDS | 16 候选；5 步初始去噪与 10 轮截断去噪；reward 父代重采样；RBF scale=20；末代最好候选输出 | 完整在线验收；当前研发对照；reward 无需可微，但 RBF 仍使用自动微分 |
+| RDT + EDS+QD | 复用 EDS；目标相对末端 XY、4×4 网格、每格一个精英、稀疏优先父代；档案全局最好输出 | 完整运行与机制验收；没有证明性能优势；不是 Pareto 档案或跨块记忆 |
+| π0.5 + VLS | 严格权重加载、20 粒子、10 步流采样、reward/RBF 梯度、按实际 Euler 步执行 FKD | 标准 LIBERO Object 十任务已验收；不是 RDT 数值协议或上游成绩复现 |
+| π0.5 + EDS / EDS+QD | 尚未支持 | 本轮 π0.5 VLS 结果不能外推到 EDS/QD |
+| diffusion policy / CALVIN | 保留模型与环境兼容源码 | 不由上述两类验收证明；新增适配须单独出具报告 |
 
-当前 profile 不使用跨块 archive。几何投影不是候选分支仿真；RBF 不是 Gaussian kernel；reward 可评分不等于可用于 VLS 梯度。完整公式和模块边界见[架构合同](../steering/architecture.md)。
+EDS+QD 与 EDS 的区别同时涉及父代分配和最终候选保留。后续需加入普通全局精英对照，不能把所有差异都归因于行为多样性。可选质量锚点、secondary lane、执行意图描述符、warm-start 和自适应调度，均不等于默认协议已验证的能力。
 
-π0.5 + VLS 已通过独立的标准 LIBERO Object 十任务在线验收：**9/10**，10/10 回合有效，没有回合级基础设施错误或未完成任务。它复用共同 Stage/reward/执行框架，保留模型自身的预处理、动作生成和进度归一化；π0.5 EDS/EDS+QD 尚未支持。[协议、逐任务结果与视频索引](../steering/pi05-evaluation.md)单独记录其证据。该成绩来自每任务一个固定 seed 的 LIBERO 适配模型，不与 RDT ObjectSwap OOD 直接比较，也不证明相对于无引导 π0.5 的收益。
+## 有效结果：RDT × LIBERO ObjectSwap OOD
 
-## 已验证结果
+以下均为每任务一个规定 seed、task 0–9 的完整在线组。它们不是标准 LIBERO 成绩，也不能用来评价 π0.5。
 
-固定 LIBERO ObjectSwap OOD 十任务，每任务一个规定 seed。下表记录三组独立评测，涉及 low 和 ultra 两套协议；每个方法均完成十任务。
-
-| 在线协议 | VLS | EDS | EDS+QD | 证据 |
+| Codex 在线条件 | VLS | EDS | EDS+QD | 完整证据 |
 | --- | ---: | ---: | ---: | --- |
-| Codex / low | 1/10 | 3/10 | 1/10 | [逐任务结果与有效性](../steering/results.md) |
-| Codex / ultra | 1/10 | 3/10 | 0/10 | [逐任务结果与对照限制](../steering/reasoning-effort-comparison.md) |
-| Codex / ultra，新环境复测 | 1/10 | 3/10 | 0/10 | [安装、逐任务结果与计算量](../steering/onboarding-validation.md) |
+| low，历史主线验收 | 1/10 | 3/10 | 1/10 | [结果与逐任务记录](../steering/results.md) |
+| ultra，独立评测 | 1/10 | 3/10 | 0/10 | [协议、结果与限制](../steering/reasoning-effort-comparison.md) |
+| ultra，干净 clone 与新环境 | 1/10 | 3/10 | 0/10 | [安装及在线验收](../steering/onboarding-validation.md) |
 
-当前默认使用 ultra。两套协议还存在传输恢复参数差异，不能把结果差异唯一归因于推理强度。方法计算量也不同；一次十任务评测不证明统计显著性或普遍泛化。
+新环境组 30 个主回合全部有效：VLS 成功 task 3；EDS 成功 task 3、8、9；EDS+QD 没有成功任务。其余均为环境任务失败；回合级基础设施错误、无效和未完成数量均为 0。请求级传输重试仍有发生，不应写成服务从未出错。逐任务种子、日志、视频和原始记录索引均在对应报告。
 
-新环境与历史 ultra 的逐任务成功/失败一致：VLS 成功 task 3，EDS 成功 task 3、8、9，EDS+QD 无成功任务。任务编号从 0 开始。它支持安装和运行链路恢复到可验收状态，不证明在线输出或完整轨迹逐字节一致。运行中有按原协议恢复的请求级传输重试；不把回合有效误写为在线服务从未出错。
+这些结果支持共同框架能够在新环境运行，且 QD 机制确实参与了搜索。它们不支持 QD 优势、完整轨迹逐字节一致或统计显著性。low 与 ultra 同时存在传输恢复参数差异，不能把成绩差异唯一归因于推理强度；各方法计算量也不同。
 
-中断、服务错误、早期迁移、其他 provider 和回复回放实验保存在原报告及[追溯索引](../steering/provenance.md)，不混入上表。后续结果按独立 cohort 追加，保留合法任务失败；基础设施错误和未完成运行单独报告。
+其他 provider、旧缓存条件、回复回放、诊断子集和中断尝试保留在[追溯索引](../steering/provenance.md)，不混入上表。固定回复回放有助于排查源码差异，不能替代 fresh 在线评测。
 
-## 保留 EDS 对照的条件
+## 有效结果：π0.5 × 标准 LIBERO Object
 
-| 条件 | 当前协议 |
+| 方法与在线条件 | 成功率 | 有效性 | 证据 |
+| --- | ---: | --- | --- |
+| π0.5 + VLS，Codex / ultra，fresh 在线 | **9/10（90%）** | 10/10 有效；1 个环境失败；回合级基础设施错误、无效与未完成均为 0 | [完整协议与逐任务结果](../steering/pi05-evaluation.md)、[精简证据](../steering/validation/pi05-libero-object-20261016.json) |
+
+task 4（ketchup）达到固定步数上限，其余 task 0–9 均成功。单任务成功诊断不计入正式分母；此前两次工程错误诊断保留为无效尝试。原始日志、在线捕获和十个视频的路径/哈希见报告。
+
+本协议使用 LIBERO 适配的公开 π0.5 checkpoint，每任务一个规定 seed、官方初始化、`per_seed_v1` RNG、每块执行 10 个动作、最多 720 步；不恢复 RDT ObjectSwap 的 RNG fixtures。任务身份/阶段/reward fresh 生成、Stage 在线、候选评分本地执行。π0.5 保留内部梯度 reward 归一化的 Stage 反馈，RDT 使用自己的所选候选反馈合同。
+
+这证明已登记的 π0.5 + VLS 工程链路可运行且本组结果有效，不证明上游多回合成绩被严格复现、ObjectSwap OOD 泛化或 VLS 本身的收益。本轮没有无引导 π0.5 对照。最新模型适配保留了 RDT 科学路径，完成相关 CPU 回归及既有三组 RDT 十任务的只读重审；该重审不是新的 RDT 在线实验。
+
+## EDS 对照的复现条件
+
+| 条件 | 已验收范围 |
 | --- | --- |
-| 模型与依赖 | 固定 RDT EMA、T5、SigLIP、DINO 资产及 steering 安装配方；逐文件校验 |
-| 任务与初始化 | ObjectSwap task 0–9、规定 seed、prepare/rollout 两个时点的 RNG fixtures |
-| 执行 | 每块执行 8 个动作，仿真控制频率 20 Hz，最多 720 执行步；固定动作与夹爪转换；不代表墙钟实时运行 |
-| 搜索 | `configs/steering/eds.yaml`：16 候选、10 轮、RBF、reward 父代重采样，QD 关闭 |
-| 在线服务 | Codex CLI / `gpt-6-astra` / `ultra`；固定超时与重试策略，无 provider 回退 |
-| Stage / reward | 每任务 fresh 生成内容；当前观测在线 Stage；候选 reward 本地评分 |
-| 证据 | 固定受测提交、源码/配置/资产哈希；完整任务记录、捕获、视频和审计 |
+| 模型与依赖 | 固定 RDT EMA、T5、SigLIP、DINO；匹配资产哈希及显式依赖兼容文件 |
+| 任务与初始化 | ObjectSwap task 0–9；规定 seed；prepare/rollout 两个边界的 RNG fixtures |
+| 执行 | 前 8 个动作、20 Hz 仿真控制频率、最多 720 个环境执行步；固定动作及夹爪转换 |
+| 搜索 | 16 候选、10 轮、RBF 初始/截断采样、按 reward 选父代；QD 关闭、每块 fresh |
+| 在线内容 | Codex CLI / `gpt-6-astra` / `ultra`；身份、阶段和 reward 每任务 fresh；Stage 根据当前观测在线查询 |
+| 本地评分 | 生成后的 reward 在本地对候选评分；固定时间切片、dtype、运算顺序与能力门控 |
+| 完整性 | 固定受测源码、配置、依赖与资产；新输出目录、完整 cohort、合法失败保留、独立审计 |
 
-精确参数以[公共协议](../../configs/evaluation/libero_object_swap.yaml)、[方法配置](../../configs/steering/eds.yaml)和[架构说明](../steering/architecture.md)为准。资产获取和设备配置见[安装说明](../steering/installation.md)。RDT、π0.5 和编码器的公开固定版本已与本地资产核对；[模型来源和下载](../steering/model-assets.md)列出所需文件。PaliGemma tokenizer 需要使用者获得访问许可。固定模型请求名也不能保证在线服务长期输出相同，3/10 是已观察结果而非每次运行的保证。
+准确参数以[共同协议](../../configs/evaluation/libero_object_swap.yaml)、[EDS profile](../../configs/steering/eds.yaml)和[架构合同](../steering/architecture.md)为准；安装见[安装指南](../steering/installation.md)。RDT、π0.5、编码器与 DINO 的固定公开来源现已核验，详见[模型来源与身份](../steering/model-assets.md)。PaliGemma tokenizer 仍需要使用者自己的访问许可；大权重的公共范围下载探针与已有本机文件哈希核验，不等于全部文件重新下载。保留新环境验收与后续公开来源核验各自的覆盖范围。
 
-## 下一步开发
+Stage/reward、源码和模型请求名固定，仍不能保证远端服务长期给出相同响应。3/10 是这些完整实验中观察到的成绩，不应作为通过调参或替换失败回合强行恢复的验收口径。
 
-| 优先级 | 对应 RQ | 工作 | 完成标准 |
-| --- | --- | --- | --- |
-| P0 | 全部 | 维护已验收 EDS 对照及公开固定模型/任务资产获取方式 | 已完成新环境三模式验收与公开模型身份核验；继续保持入口、下载与哈希清单一致 |
-| P1 | RQ1/RQ3 | 用现有轨迹分析 QD 失败：质量下降、稀疏选择、archive 输出与 Stage 时序 | 可复查的任务/动作块定位；至少一个单变量假设；不再只看 archive occupancy |
-| P2 | RQ1/RQ3 | EDS vs 全局精英保留 vs QD；质量锚点/稀疏父代独立消融 | EDS 关闭 QD 的行为回归保持；机制张量与审计一致；完整共同协议在线对照 |
-| P3 | RQ2 | 固定 reward/Stage，比较 XY 与执行相关 BD；检查投影/实际动作偏差 | 清楚定义单位、可控性、质量和覆盖；有效多样性及任务指标有证据 |
-| P4 | RQ4 | 有状态复用和执行反馈更新 | reset/过期/Stage 边界测试；fresh 与持久版本多 seed 对照，排除额外预算优势 |
-| P5 | RQ5 | 受约束自动 BD 与跨任务研究 | 生成合同、独立评测划分、未见任务证据；再讨论递归自我改进 |
+## 下一步开发优先级
 
-单轮 5/10 可以作为阶段信号，不能直接宣称方法稳定优于 3/10。在线服务变化与搜索改动应分开控制；不要在同次实验同时更换 reward、Stage、descriptor 和父代策略。
-
-## 贡献入口
-
-| 要改什么 | 入口 | 最小验证方向 |
+| 优先级 | 工作与对应研究问题 | 可审核的完成条件 |
 | --- | --- | --- |
-| BD、cell、精英、父代 | `core/qd_ed.py`、`configs/steering/eds_qd.yaml` | 有限值/边界/平手/分配守恒、实际父代和最终输出 |
-| 搜索接入 | `core/rdt_policy_steer.py` | EDS reference 不变；QD 分支实际使用档案，评分/RNG/调用数可审计 |
-| 执行反馈 | `main.py`、`core/env_adapters/libero_adapter.py`、`core/eds_eval_metrics.py` | 区分预测与实测；动作后处理、时序、reset 和观测权限 |
-| Stage/reward（另立科学条件） | `core/stage/controller.py`、`target_distance_reward.py`、`vlm_query/target_distance/` | 门控/失败复查/评分能力一致；新协议在线验收 |
-| 评测/归档 | `scripts/run_steering.py`、`steering_runtime.py`、`audit_steering.py`、`steering_archive.py` | 配置冻结、进程所有权、无效运行区分、搬迁后只读重审 |
+| P0 | 保留 EDS 对照及已核验的公开模型/安装入口 | 维持固定来源、哈希和命令一致；明确授权下载范围；新改动不悄然改变 EDS，新增组合单独验收 |
+| P1 | 解释 QD 的质量与行为问题（RQ1/RQ4） | 从已有轨迹定位父代质量、描述符覆盖与实际动作的关系；形成单变量、可反驳假设 |
+| P2 | 拆分精英保留和 QD 的贡献（RQ1） | EDS、全局精英、同容量候选库、QD 的明确资源对照；机制和完整在线结果均有效 |
+| P3 | 验证部署价值（RQ2/RQ3/RQ4） | 同主任务的额外要求和独立指标；描述符/父代消融；报告约束合格的成功、实际行为覆盖与恢复成本 |
+| P4 | 路线 A：情境条件化策略记忆 | 状态对齐、reset/过期/重评、执行反馈归因；普通记忆与 QD 的同容量同预算对照；多轮独立评估 |
+| P5 | 路线 B：多样经验蒸馏 | 可追溯数据、训练/评测隔离、同数据量和算力对照；检查覆盖、遗忘及更新后搜索效益 |
 
+ObjectSwap 十任务 ≥5/10 可保留为局部研发目标，不能代替多偏好、多约束研究，也不能单凭一次达到该数值宣称稳定优于 EDS。先验证单块多样性的价值，再研究跨执行记忆，最后开展权重更新；避免同时改 reward、Stage、描述符和父代而无法归因。
 
-新贡献从 main 派生功能分支，保留 EDS 关闭 QD 的行为对照。运行与变更范围匹配的回归；影响科学条件时登记新协议并补足完整在线验收。具体检查与协作规则见 [CONTRIBUTING](../../CONTRIBUTING.md) 和 [AGENTS](../../AGENTS.md)。
+## 已知限制与开放问题
 
-## 更新规则
+- 当前候选几何是近似动作投影，不是分支动力学仿真；距离 reward 不完整表达抓持、碰撞或放置稳定性。
+- 当前框架依赖仿真机器人状态、目标几何、关键点跟踪和带标记图像，不是纯 RGB 的真实机器人部署证明。
+- 档案覆盖高不代表可执行行为丰富；默认 XY 描述符是否与任务有关、稀疏选择是否损害质量，需要实证解释。
+- 在线控制包含身份记忆和失败复查，但没有证据证明 QD 档案参与了跨执行的策略恢复。
+- 十任务单 seed 的统计范围有限；还缺少重复在线组、更多 seed、未见要求及等资源比较。
+- 尚无独立评价支持自动生成描述符、持久策略演化、跨任务学习或 RSI。部分扩展接口的存在不能补足这类证据。
 
-机制合入、协议改变或完整评测结束后更新本文，说明能力变化、有效结果和下一步。研究假设变化同步更新 Proposal。
+## 合作者与维护
 
-每次结果报告应记录：研究问题、受测提交、配置与资产身份、服务条件、任务与 seed、纳入规则、逐任务结果、有效性、计算量、日志/视频位置及限制。详细提交、工作树和历史映射放入[追溯索引](../steering/provenance.md)，不在本文维护开发流水。原始实验记录不可因文档整理而重写。
+先按 [Overview](../project_overview.md#从哪里开始贡献) 找到描述符、档案、父代、执行反馈或模型适配的入口；检查规则见 [AGENTS](../../AGENTS.md) 与 [CONTRIBUTING](../../CONTRIBUTING.md)。研究设想放 Proposal，能力与结果放本文，精确配置/哈希/视频与失败尝试放独立报告。
+
+机制合入、协议变化或完整实验结束时更新本文。每次更新至少说明：对应研究问题、能力状态变化、独立结果组、证据链接、科学条件变化、限制及下一步验收。保留原始结果；不通过改写旧报告让历史状态看起来一致。
