@@ -1,0 +1,197 @@
+# VLS Main Configuration
+#
+# Usage:
+#   python main.py                                                    # Default calvin
+#   python main.py backend.calvin.target_behavior=drawer_open         # CALVIN task
+#   python main.py backend=libero backend.libero.suite_name=libero_goal # LIBERO
+#   python main.py main.episode_num=50                                # Override params
+
+defaults:
+  - backend: libero              # Environment (calvin/libero/realworld)
+  - env: null                    # Alias: env=calvin swaps backend to calvin
+  - task: null                   # Optional task override (e.g. task=drawer_open)
+  - perception               # Perception modules
+  - policy                   # Policy config
+  - _self_
+
+# ============================================================
+# Global Settings
+# ============================================================
+device: cuda
+seed: 0
+
+# ============================================================
+# Main Experiment Settings
+# ============================================================
+main:
+  episode_num: 10  # if using libero, need to be divisible by the number of tasks in the suite(i.e. libero_goal_task has 10 tasks, so episode_num should be divisible by 10)
+  # Formal evaluation overrides. Null preserves the normal stochastic loop.
+  init_state_id: null
+  env_seed: null
+  policy_seed: null
+  # Formal audit sets this true so invalid episodes exit nonzero and never
+  # become ordinary task failures or verifier labels.
+  fail_on_episode_error: false
+  max_episode_steps: 240        # Max steps per episode (calvin.yaml references this via interpolation)
+  output_dir: ${hydra:run.dir}
+  cached_functions_dir: null
+  visualize_trajectory: true
+  debug_draw_trajectory: true
+  render: true
+  
+  # Steering parameters
+  use_guidance: true
+  planner_steering_enabled: false  # No online account candidate/stage/guidance calls; post-hoc and slow loop stay on
+  use_vlm_stage_recognition: true  # Inactive while planner_steering_enabled=false
+  initialization_posthoc_only: false  # Initialization controller only; never enable this to disable the formal Planner
+  guidance_code_generation_attempts: 3  # Bounded AST/shape repair, not robot retries
+  vlm_query_limit: 50  # Max VLM queries per episode
+  use_diversity: true
+  sample_batch_size: 40
+  guide_scale: 80.0  # Effective v44+VLS baseline value (LIBERO previously overrode 40 to 80)
+  guide_scale_max: 80.0
+  diversity_scale_max: 20.0
+  diversity_scale: 10.0
+  start_ratio: null
+  MCMC_steps: 4
+
+  sigmoid_k: 25.0
+  sigmoid_x0: 0.75
+  
+  # FKD (Feynman-Kac Diffusion)
+  use_fkd: true
+  fkd:
+    potential_type: max
+    lmbda: 10.0
+    adaptive_resampling: true
+    resample_frequency: 5
+
+# ============================================================
+# Experiment Tracking
+# ============================================================
+experiment:
+  name: ${backend.backend}
+  tags:
+    - ${backend.backend}
+
+# ============================================================
+# Black-box Steering Trajectory Mode Gate (opt-in)
+# ============================================================
+mode_gate:
+  enabled: false
+  schema_version: candidate-gate-v3
+  sample_count: 40
+  chunk_horizon: 10
+  stagnation_window: 3
+  retry_budget: 50
+  # Production routes use the head's two-logit argmax; no epsilon overrides.
+  exploration_epsilon: 0.0
+  controller_mode: fixed_budget_50
+  require_learned_verifier: false  # Formal driver sets true; 50 is a cap, never a quota.
+  require_complete_rollout_before_expansion: false  # Formal: finish one native task rollout first.
+  label_version: fixed_budget_50-v2
+  # Non-empty only for explicitly named baseline experiments. These values
+  # never enter registry active.json or production deployment revisions.
+  baseline_kind: ""
+  baseline_budget: 50
+  baseline_minimum_candidates: 2
+  baseline_threshold: 0.5
+  baseline_expansion_rate: 0.0
+  baseline_seed: 20260825
+  baseline_opportunity_bank: ""
+  max_rounds: 50
+  seed: ${seed}
+  verifier_workers: 4
+  planner_model: gpt-6-astra
+  planner_timeout_seconds: 1205.0
+  planner_max_retries: 2
+  planner_max_provider_calls: 10000
+  planner_call_ledger: /shared/hengyil6/vls/self_improve/fixed_budget_50/factual_planner_calls.jsonl
+  planner_prompt_version: candidate-scorer-v4
+  planner_reasoning_effort: ultra
+  verifier_model: candidate-binary-v3
+  verifier_thinking_level: medium
+  factual_provider_call_limit: 10000
+  counterfactual_provider_call_limit: 5000
+  total_provider_call_limit: 15000
+  counterfactual_initial_branches: 16
+  counterfactual_max_branches: 32
+  posterior_confidence: 0.95
+  decision_boundary: 0.5
+  suggested_train_contexts: 500
+  suggested_calibration_contexts: 100
+  suggested_test_contexts: 200
+  output_subdir: mode_gate
+  theta0_checkpoint: /shared/hengyil6/vls/models/pi05_libero_finetuned_v044
+  registry_root: /shared/hengyil6/vls/self_improve/registry
+  incident_root: /shared/hengyil6/vls/self_improve/incidents
+  snapshot_root: /shared/hengyil6/vls/self_improve/snapshots
+  slow_loop_root: /shared/hengyil6/vls/self_improve/slow_loop
+  # Explicit opt-in only; no timers/background jobs are started by default.
+  auto_start_expansion_worker: false
+  teleop_operator: human
+  teleop_port: 8765
+  teleop_max_steps: 3000
+  retry_schedule:
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+    - [1.0, 1.0]
+
+# ============================================================
+# Hydra Settings
+# ============================================================
+hydra:
+  run:
+    dir: outputs/${experiment.name}/${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: outputs/${experiment.name}/multirun/${now:%Y-%m-%d_%H-%M-%S}
+    subdir: ${hydra.job.num}
+  job:
+    chdir: false

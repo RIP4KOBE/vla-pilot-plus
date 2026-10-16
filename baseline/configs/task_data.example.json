@@ -1,0 +1,13 @@
+{
+  "schema_version": "baseline-task-data-v1",
+  "tasks": [
+    {
+      "task_key": "COPY_EXACT_TASK_KEY_FROM_BASELINE_PLAN",
+      "split": "demo_online_pool",
+      "init_state_ids": ["COPY_STATES_FROM_THIS_TASK_DEMO_ONLINE_POOL"],
+      "repo_id": "local/my_libero_pro_demonstrations",
+      "root": "/absolute/path/to/local/lerobot/dataset",
+      "episodes": [0, 1, 2]
+    }
+  ]
+}

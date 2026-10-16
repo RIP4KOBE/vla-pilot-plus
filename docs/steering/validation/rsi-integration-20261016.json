@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-16",
+  "base_main": "dc3868e0c57143368e68f609e3385afd1a13d88a",
+  "pr_head": "dfaf9be76c0c0e8762dc7e0ebfcc3493b6b8dbf8",
+  "branch": "codex/agentic-rsi",
+  "pr_url": "https://github.com/RIP4KOBE/vla-pilot-plus/pull/2",
+  "rsi_lerobot": {
+    "repository": "https://github.com/Treeeplanter/lerobot",
+    "revision": "910e5c6e4b22ae2c5173373133899a5e287ac322",
+    "installation": "separate RSI Python environment; keep main submodule unchanged"
+  },
+  "protected_main_files": 49,
+  "tested_source_manifest_sha256": "f0406a58edd8a75621392781de32045299c77116fed99e472dd0b43c3e30022d",
+  "tested_source_files": 266,
+  "scope": "CPU integration; no GPU, online Planner, training or promotion acceptance",
+  "environment": "separate .local/rsi-validation-env venv with inherited validated steering dependencies and isolated pinned LeRobot; not from-zero",
+  "main_tests": {
+    "passed": 1474,
+    "skipped": 3,
+    "elapsed_seconds": 140.61
+  },
+  "rsi_tests": {
+    "passed": 747,
+    "skipped": 24,
+    "elapsed_seconds": 47.05,
+    "skip_groups": {
+      "uncommitted_historical_campaign": 20,
+      "historical_baseline_evidence": 1,
+      "full_160_task_assets": 1,
+      "mujoco_3_1_6": 1,
+      "real_simulator_opt_in": 1
+    }
+  },
+  "entry_checks": [
+    "scripts/self_improve.py --help",
+    "scripts/run_full_experiment.py --help",
+    "python -m rsi.main --cfg job"
+  ],
+  "artifact_directory": "outputs/reviews/agentic-rsi-20261016",
+  "evidence_sha256": {
+    "rsi-async-isolated.log": "23dbf4079d56286d8fd6be310668018ca2e76a9150fd0886bac0fc9c517f1e50",
+    "rsi-cli-final.log": "269613a449c7aa36a29f4333a575213c64fc45d5d9d4b1bd7d3ff6447fba5204",
+    "rsi-cli-help.log": "269613a449c7aa36a29f4333a575213c64fc45d5d9d4b1bd7d3ff6447fba5204",
+    "rsi-collect.log": "fbc329d4d9bb37829fa22288a86dec4445451808761c7ac1df4dc1005f49d965",
+    "rsi-config-final.log": "cf6b5f8e53df4a335bf78dd337eb9764a67726787d4c5e2147db42a504e58830",
+    "rsi-config-preview.log": "af59adcd8bc37537459c110b066115c0c3a7b52172d1934bb7be15605553ed11",
+    "rsi-driver-final.log": "fda4adeb3521acaa4cffb5916a120c62eecec7b47db8d6f17612c56fe9819248",
+    "rsi-lerobot-install.log": "d9bf6d331ce48f1631a27b1925e963e43b64c91520cb1e6a3fa2f823673421bb",
+    "rsi-main-regression.log": "5621a9ef676470a1243e91937c41c78773a8e1faaf5716ef878480bba20b7765",
+    "rsi-pip-freeze.txt": "d4dbac9f0460567237d1fef4b7ffffabfaf3511d57ab259f6cae245dc9b7c3eb",
+    "rsi-pr2-files.json": "61515058465efe402028006e6fc7fc2c4cecbbcf126d783fb307dc8f4305fcaa",
+    "rsi-runtime-map.json": "ffd385f35477174b8681426ec710f2aaca7f6cf7c8eae88f15483e683942ba40",
+    "rsi-test-dependencies.log": "d4d82b79bad840436a09f890132a12c5ff9a84d623d157616d8f80d558187f97",
+    "rsi-tests-001.log": "26018830a7a0f4ccc472bda7d44aae0c33371cb3bda8be8c8d04436991767928",
+    "rsi-tests-002.log": "e051018c5a0b1ee943626d7cc343dd006504aaf6d136f4586600e8592bbcb20e",
+    "rsi-tests-003.log": "8b7c37399e162e02f4168d4eede6e4f91ef2d4a81670eada7198347eedd449ec",
+    "rsi-tests-004.log": "b2c187ab97c3a7f77d84d09d1ca3ff2588ec89502fc0734e680dd1c1f44edd0a",
+    "rsi-tests-005.log": "471959c248fb7d419ea56e20ea949d5edb77c284ac6bf12a2815e2a91a49c409",
+    "rsi-tests-final.log": "adf46c7e9cbbc429f74cc2f29968fde098bf00fc61b43a5f5aa38cf9973f5bbb",
+    "rsi-whitespace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tested-source-manifest.json": "f0406a58edd8a75621392781de32045299c77116fed99e472dd0b43c3e30022d"
+  }
+}

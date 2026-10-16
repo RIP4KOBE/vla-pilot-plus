@@ -1,0 +1,12 @@
+{
+  "schema_version": "codex-top-level-planner-v1",
+  "auth_mode": "chatgpt",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "ultra",
+  "planner_thread_id": "01a0893c-15b0-7203-881c-de3c5bcee058",
+  "queue_root": "/shared/hengyil6/vls/self_improve/fixed_budget_50/env_position20_20260914/planner_queue",
+  "timeout_seconds": 1200,
+  "training_monitoring": "server_event_only",
+  "idle_model_polling": false,
+  "experiment_output": "/shared/hengyil6/vls/self_improve/fixed_budget_50/env_position20_20260914"
+}

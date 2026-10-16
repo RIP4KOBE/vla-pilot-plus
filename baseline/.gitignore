@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.locks/
+.pytest_cache/
+.coverage
+test-results/
+runs/
+*.partial

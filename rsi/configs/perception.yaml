@@ -1,0 +1,72 @@
+# @package perception
+# Perception Modules Configuration
+
+# ============================================================
+# Keypoint Detector
+# ============================================================
+keypoint_detector:
+  num_candidates_per_mask: 5
+  min_dist_bt_keypoints: 0.05
+  max_mask_ratio: 0.5
+  device: ${device}
+  seed: ${seed}
+  
+  # Workspace bounds for filtering
+  bounds_min: [-1.0, -0.75, -0.1]
+  bounds_max: [1.00, 0.75, 1.2]
+  
+  # Feature extractor: dinov3_vitb16, dinov3_vitl16, dinov2_vits14, dinov2_vitb14, etc.
+  # dinov3 models require gated HF access; use dinov2 unless access is granted.
+  feature_extractor: dinov2_vitb14
+  # Formal hgpu1 runs are offline and fail closed if either frozen asset is
+  # missing.  Never let torch.hub download mutable code or weights mid-episode.
+  dinov2_repo_path: /shared/hengyil6/vls/cache/torch/hub/facebookresearch_dinov2_main
+  dinov2_weights_path: /shared/hengyil6/vls/cache/torch/hub/checkpoints/dinov2_vitb14_pretrain.pth
+
+# ============================================================
+# VLM Agent (for guidance generation)
+# ============================================================
+vlm_agent:
+  base_url: null            # Reads OPENAI_BASE_URL env var; set in .env
+  model: gpt-4o
+  api_key: null             # Reads OPENAI_API_KEY env var; set in .env
+  temperature: 1.0
+  max_completion_tokens: 2000
+  query_template_dir: rsi/vlm_query/
+
+# ============================================================
+# SAM3 Segmentation (optional, disabled by default)
+# ============================================================
+sam3:
+  enabled: false            # SAM3 can't detect small objects well
+
+# ============================================================
+# Account planner grounding (legacy config section name)
+# ============================================================
+gemini_grounding:
+  enabled: true
+  api_key: null             # Unused: native Codex account task, no API credentials
+  model: gpt-6-astra
+  thinking_level: ultra
+  max_provider_calls: ${mode_gate.factual_provider_call_limit}
+  call_ledger_path: ${mode_gate.planner_call_ledger}
+  
+  # Default objects to detect (overridden per task)
+  default_objects:
+    - drawer handle
+    - sliding handle
+    - slider handle
+    - black switch
+    - red cube
+    - blue cube
+    - pink cube
+
+# ============================================================
+# Account planner stage recognition (legacy config section name)
+# ============================================================
+gemini:
+  api_key: null             # Unused: native Codex account task, no API credentials
+  model: gpt-6-astra
+  thinking_level: ultra
+  max_provider_calls: ${mode_gate.factual_provider_call_limit}
+  call_ledger_path: ${mode_gate.planner_call_ledger}
