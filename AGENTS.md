@@ -4,14 +4,15 @@
 
 研究冻结 VLA/RDT 的 inference-time steering，在 EDS 基础上引入 quality-diversity，探索有用的行为多样性和执行反馈驱动的改进。先读 [Proposal](docs/research/research_proposal.md)、[Progress](docs/research/research_progress.md)，运行与安装读 [README](README.md)。本文件为仓库统一 agent 指导。
 
-当前已验收：VLS、EDS、EDS+QD 共同框架；ObjectSwap OOD low 成绩依次 1/10、3/10、1/10，最终 ultra 为 1/10、3/10、0/10。两种协议分开报告。当前最可靠对照为含 RBF 的 EDS；QD 尚未证明优势。默认 archive 每动作块重建，不能宣称跨块/跨任务学习或 recursive self-improvement 已实现并验收。
+当前已验收：VLS、EDS、EDS+QD 共同框架；ObjectSwap OOD low 成绩依次 1/10、3/10、1/10，ultra 及新环境独立复测均为 1/10、3/10、0/10。不同协议与评测组分开报告；[新环境验收](docs/steering/onboarding-validation.md)记录安装范围与限制。当前最可靠对照为含 RBF 的 EDS；QD 尚未证明优势。默认 archive 每动作块重建，不能宣称跨块/跨任务学习或 recursive self-improvement 已实现并验收。
 
 ## 目录与入口
 
 | 路径 | 职责 |
 | --- | --- |
 | `scripts/run_steering.py` / `evaluate_steering.py` | 三模式公共 launcher，冻结、进度与运行审计 |
-| `scripts/check_steering.py` / `prepare_steering_assets.py` | 预检、固定资产与机器配置 |
+| `scripts/check_steering.py` / `prepare_steering_assets.py` | 预检、固定资产、显式依赖兼容补丁与机器配置 |
+| `scripts/list_steering_devices.py` | NVIDIA/CUDA UUID 与 EGL 编号映射；实际 render 仍由预检核验 |
 | `scripts/audit_steering.py` / `audit_qd_mechanism.py` | cohort 有效性、合同与机制重建 |
 | `configs/evaluation/`、`configs/steering/` | 科学协议及方法差异 |
 | `configs/local.yaml`（ignored） | 路径、GPU/EGL；不放凭据 |
@@ -38,6 +39,8 @@
 - 使用已分配且空闲 GPU，核对 GPU/EGL 映射、进程与锁。当前用户授权所有可用 GPU，不限 GPU2；不终止其他项目任务。不要从已废弃历史方案引入预算上限或重复审批。
 
 ## 检查与证据
+
+新环境按安装文档执行 `install-runtime-compat` 和 `verify-runtime-compat`，显式恢复固定 Robosuite 兼容文件。预检/launcher 会检查哈希，原始依赖版本号和 `pip check` 不能替代该核验；不要靠手改旧环境完成安装。
 
 按改动范围验证：文档/无引用文件清理检查链接、引用和证据；路径/launcher/归档改动运行相关 CPU 回归；搜索/Stage/动作等科学变更需要行为回归和明确登记的在线验收。无需为纯文档重跑 GPU 实验。
 
