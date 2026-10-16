@@ -40,6 +40,8 @@ def main():
         report['libero'] = verify_libero(Path(local['libero_root']))
         report['libero_paths'] = verify_libero_paths(local)
         report['rng'] = verify_rng(ROOT / 'tests/fixtures/steering_rng')
+        from scripts.steering_dependency_compat import verify_runtime_compat
+        report['runtime_compatibility'] = verify_runtime_compat()
         atomic_json(destination / 'report.json', report)
         if args.api:
             from PIL import Image
@@ -64,6 +66,11 @@ def main():
             if not report['api']['valid']:
                 raise RuntimeError('Codex image probe returned an unexpected answer')
         if args.gpu:
+            from scripts.list_steering_devices import device_mapping, current_render_device_handle
+            mapping = device_mapping(int(local['gpu']))
+            report['device_mapping'] = mapping
+            if mapping['egl_device_id'] != int(local['egl_device_id']):
+                raise RuntimeError('Configured EGL device does not match the requested GPU')
             import torch
             if not torch.cuda.is_available():
                 raise RuntimeError('CUDA unavailable')
@@ -84,6 +91,11 @@ def main():
                 obs = environment.reset()
                 report['render'] = {'libero_module': libero.__file__, 'task': task.name,
                                     'image_shape': list(obs['agentview_image'].shape)}
+                handle = current_render_device_handle()
+                expected = mapping['egl_devices'][mapping['egl_device_id']]['handle']
+                report['render']['device_matches_requested_gpu'] = handle == expected
+                if handle != expected:
+                    raise RuntimeError('Actual render display does not match the requested GPU')
             finally:
                 environment.close()
         report.update(status='pass', completed_at=utc())

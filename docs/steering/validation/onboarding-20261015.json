@@ -1,0 +1,1070 @@
+{
+  "schema": "steering_onboarding_validation_v1",
+  "at": "2026-10-16T03:20:31.206577+00:00",
+  "tested_commit": "ef74b02be6e9430e861ae6d1980a4b2641e4c716",
+  "state": "complete_valid",
+  "diagnostics": {
+    "vls": {
+      "valid": true,
+      "completed": 1,
+      "successes": 0,
+      "excluded_from_primary_score": true,
+      "audit_sha256": "517a065a07b110dc7fc8d8f75ac1d1356d5ef700eb101a034248ee8618041720",
+      "run_relative_path": "runs/vls-task0-001"
+    },
+    "eds": {
+      "valid": true,
+      "completed": 1,
+      "successes": 0,
+      "excluded_from_primary_score": true,
+      "audit_sha256": "400d8ac45db8d6e884c6d0f06f9c647971b1f6e91c00569e13e5d04b48bb23bf",
+      "run_relative_path": "runs/eds-task0-001"
+    },
+    "eds_qd": {
+      "valid": true,
+      "completed": 1,
+      "successes": 0,
+      "excluded_from_primary_score": true,
+      "audit_sha256": "de1ad68194d80b0679b53b4b7fe7df965e78109ac8af0a1fb7f100fdd7c70b85",
+      "run_relative_path": "runs/eds-qd-task0-001"
+    }
+  },
+  "cohorts": {
+    "vls": {
+      "phase_timings": {
+        "initial_policy_observation": {
+          "completed_calls": 10,
+          "seconds": 0.02079654228873551
+        },
+        "chunk_keypoints_stage": {
+          "completed_calls": 826,
+          "seconds": 14558.569225559011
+        },
+        "select_action_fresh": {
+          "completed_calls": 826,
+          "seconds": 337.35113611794077
+        },
+        "diagnostic_artifacts": {
+          "completed_calls": 826,
+          "seconds": 0.11038296576589346
+        },
+        "debug_visualization_overlay": {
+          "completed_calls": 6602,
+          "seconds": 39.29913690080866
+        },
+        "video_add_frame": {
+          "completed_calls": 6602,
+          "seconds": 0.3595332696568221
+        },
+        "adapter_step": {
+          "completed_calls": 6602,
+          "seconds": 115.81858534133062
+        },
+        "policy_observation": {
+          "completed_calls": 6602,
+          "seconds": 29.310020440723747
+        },
+        "select_action_cached": {
+          "completed_calls": 5776,
+          "seconds": 1.3373967774678022
+        }
+      },
+      "phase_timing_scope": "Recorded wall-clock phase durations, not GPU active time; Stage phase includes keypoint processing and online waiting.",
+      "method_audit": {
+        "valid": true,
+        "chunks": 382,
+        "failed_chunks": 0,
+        "path": null,
+        "sha256": "25106db9d745c3ad2265239c61e8b158a6e9f0afbcbf7aada156ad39cfffc9ff",
+        "hash_encoding": "canonical_json",
+        "written": false
+      },
+      "valid": true,
+      "successes": 1,
+      "completed": 10,
+      "infrastructure_error_episodes": 0,
+      "invalid_or_unfinished": 0,
+      "success_task_ids": [
+        3
+      ],
+      "stage_queries": 378,
+      "tasks": [
+        {
+          "task_id": 0,
+          "episode": 1,
+          "seed": 44,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_1/episode_1_fail_agentview.mp4",
+              "sha256": "a663458244612c302729fac905107c20be014438888d9fefdc84107b55856660"
+            }
+          ]
+        },
+        {
+          "task_id": 1,
+          "episode": 2,
+          "seed": 235,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_2/episode_2_fail_agentview.mp4",
+              "sha256": "4f44a0308cc41d4aee5f4bcfda732f268413e565e9b6a0b908128cf6d08f716e"
+            }
+          ]
+        },
+        {
+          "task_id": 2,
+          "episode": 3,
+          "seed": 43,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_3/episode_3_fail_agentview.mp4",
+              "sha256": "40704119e9ebd43324876a0ff4692b2c270b180ea0f48a4079c7486c9384efda"
+            }
+          ]
+        },
+        {
+          "task_id": 3,
+          "episode": 4,
+          "seed": 546,
+          "success": true,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_4/episode_4_success_agentview.mp4",
+              "sha256": "ecd8d5b8284ac654bb9effee805bda1cfd957f21207db00416011aecccf1d207"
+            }
+          ]
+        },
+        {
+          "task_id": 4,
+          "episode": 5,
+          "seed": 6,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_5/episode_5_fail_agentview.mp4",
+              "sha256": "7ee6e3d44b61cfb46dda0a4edb3b13a86c9d5af48f615eaf992424e5dcb0a48c"
+            }
+          ]
+        },
+        {
+          "task_id": 5,
+          "episode": 6,
+          "seed": 621,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_6/episode_6_fail_agentview.mp4",
+              "sha256": "237ad543ee26b6deb5122cd5350043e756c2c2c3535181688edc160f10437637"
+            }
+          ]
+        },
+        {
+          "task_id": 6,
+          "episode": 7,
+          "seed": 197,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_7/episode_7_fail_agentview.mp4",
+              "sha256": "98de35a354b913a32e82c3968ab725fa54b0075c1a3c1a6d0cdb915c9d65023c"
+            }
+          ]
+        },
+        {
+          "task_id": 7,
+          "episode": 8,
+          "seed": 87,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_8/episode_8_fail_agentview.mp4",
+              "sha256": "7722a217dfa40e09088e8cd692e7880c15cf83c86bee92251095a19a62fa5006"
+            }
+          ]
+        },
+        {
+          "task_id": 8,
+          "episode": 9,
+          "seed": 151,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_9/episode_9_fail_agentview.mp4",
+              "sha256": "830b7eab6a3ccffa738d6f47e9882bd963f3458ed206c95ba1ef7dd023736b40"
+            }
+          ]
+        },
+        {
+          "task_id": 9,
+          "episode": 10,
+          "seed": 548,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_10/episode_10_fail_agentview.mp4",
+              "sha256": "95d8b11ba87dccf674da3d5ed60bbeb0765a56a6c53a15b82a3e4336a52e3849"
+            }
+          ]
+        }
+      ],
+      "physical_gpu": 5,
+      "egl_device_id": 7,
+      "model": "gpt-6-astra",
+      "reasoning_effort": "ultra",
+      "sha256": {
+        "manifest.json": "fd421f80b3641d8858615a8d6d52bde5475225aee8d4622f8c61bd17cadcdde9",
+        "environment.json": "de40860ede369aeb95da06079ee921266e2a6d0b683e4a70ded1aa7cab5b9e09",
+        "resolved-config.yaml": "0d9d076d174757884dd402404839fa4fa06dac9c4f835c025f5e9a0ae0760e36",
+        "local-config.yaml": "112d7631eecadadcd9476ff690ed87a4001dcf477de4510264ce0a95afe5edeb",
+        "audit.json": "8519579244339ec76362dd99991c7d06ac9fc40f4fa6a65b973ced6c6c9c1d52",
+        "status.json": "8c7cba273ccf088ebc78fc598447c135ea5561278ee44afe28be1c91f054117d"
+      },
+      "readonly_audit_sha256": "195ffba56954755f1f4c1b4d9b98957fd0acaaf2ab9c1fb1cf192836178160f4",
+      "started_at": "2026-10-15T15:29:09.852426+00:00",
+      "completed_at": "2026-10-15T19:49:55.932647+00:00",
+      "run_relative_path": "runs/vls-full10-001",
+      "historical_ultra_task_success_matches": true,
+      "wall_seconds": 15646.080221,
+      "full_audit_check_count": 44
+    },
+    "eds": {
+      "phase_timings": {
+        "initial_policy_observation": {
+          "completed_calls": 10,
+          "seconds": 0.01992789120413363
+        },
+        "chunk_keypoints_stage": {
+          "completed_calls": 699,
+          "seconds": 12011.686988333706
+        },
+        "select_action_fresh": {
+          "completed_calls": 699,
+          "seconds": 646.0310326572508
+        },
+        "diagnostic_artifacts": {
+          "completed_calls": 699,
+          "seconds": 269.43919650209136
+        },
+        "debug_visualization_overlay": {
+          "completed_calls": 5585,
+          "seconds": 27.081305989064276
+        },
+        "video_add_frame": {
+          "completed_calls": 5585,
+          "seconds": 0.3242026309017092
+        },
+        "adapter_step": {
+          "completed_calls": 5585,
+          "seconds": 102.89043222530745
+        },
+        "policy_observation": {
+          "completed_calls": 5585,
+          "seconds": 30.321982150897384
+        },
+        "select_action_cached": {
+          "completed_calls": 4886,
+          "seconds": 1.0932735404931009
+        }
+      },
+      "phase_timing_scope": "Recorded wall-clock phase durations, not GPU active time; Stage phase includes keypoint processing and online waiting.",
+      "method_audit": {
+        "valid": true,
+        "chunks": 221,
+        "failed_chunks": 0,
+        "path": null,
+        "sha256": "7bef4a1cd85125bc6228aec4a056b53cde6cfd3f92f1475a9119089a5c5ca1b4",
+        "hash_encoding": "canonical_json",
+        "written": false
+      },
+      "valid": true,
+      "successes": 3,
+      "completed": 10,
+      "infrastructure_error_episodes": 0,
+      "invalid_or_unfinished": 0,
+      "success_task_ids": [
+        3,
+        8,
+        9
+      ],
+      "stage_queries": 310,
+      "tasks": [
+        {
+          "task_id": 0,
+          "episode": 1,
+          "seed": 44,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_1/episode_1_fail_agentview.mp4",
+              "sha256": "1069b9eb9c246510480ba0beefa6a1aab1d24b3554918b8fc3c9e2150f2b707b"
+            }
+          ]
+        },
+        {
+          "task_id": 1,
+          "episode": 2,
+          "seed": 235,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_2/episode_2_fail_agentview.mp4",
+              "sha256": "1524df9dcaa09c4cd67b820625458bcaa1707146f13801c91fb6ad98dcc8b999"
+            }
+          ]
+        },
+        {
+          "task_id": 2,
+          "episode": 3,
+          "seed": 43,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_3/episode_3_fail_agentview.mp4",
+              "sha256": "61eca1fb6ec89b4018027282219512db5737ed393d4b93ee30bdaff31694f4c7"
+            }
+          ]
+        },
+        {
+          "task_id": 3,
+          "episode": 4,
+          "seed": 546,
+          "success": true,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_4/episode_4_success_agentview.mp4",
+              "sha256": "1072a9139c26c22a493020c7e53cee78d3badc32e2c16898c643dd6d1eed97f1"
+            }
+          ]
+        },
+        {
+          "task_id": 4,
+          "episode": 5,
+          "seed": 6,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_5/episode_5_fail_agentview.mp4",
+              "sha256": "ace3e62e7f77137af5b9c4be2452a1b8e9209e79821a656eafafa08cb1a26a0f"
+            }
+          ]
+        },
+        {
+          "task_id": 5,
+          "episode": 6,
+          "seed": 621,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_6/episode_6_fail_agentview.mp4",
+              "sha256": "efc1d8221e6111c3014378ba2b5f41a7b088e484d4e47b962af1ebaa2a643b1b"
+            }
+          ]
+        },
+        {
+          "task_id": 6,
+          "episode": 7,
+          "seed": 197,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_7/episode_7_fail_agentview.mp4",
+              "sha256": "131a91b45d2d3267205a2bd28e6986128e7460ee81a21564172cebe24fa49d5d"
+            }
+          ]
+        },
+        {
+          "task_id": 7,
+          "episode": 8,
+          "seed": 87,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_8/episode_8_fail_agentview.mp4",
+              "sha256": "f5edaef67552551d01b8d9c688a494aebef2ede48fd85e2198b02e21cd43b27f"
+            }
+          ]
+        },
+        {
+          "task_id": 8,
+          "episode": 9,
+          "seed": 151,
+          "success": true,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_9/episode_9_success_agentview.mp4",
+              "sha256": "301e17b5542ab83e01b2bfaa8528bf7ccf79d51128c61aaf71e94a7c07811392"
+            }
+          ]
+        },
+        {
+          "task_id": 9,
+          "episode": 10,
+          "seed": 548,
+          "success": true,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_10/episode_10_success_agentview.mp4",
+              "sha256": "6fa584eab743e8188d520606074fdd672c05adfda8ce35889cad099fd5b07d1e"
+            }
+          ]
+        }
+      ],
+      "physical_gpu": 4,
+      "egl_device_id": 6,
+      "model": "gpt-6-astra",
+      "reasoning_effort": "ultra",
+      "sha256": {
+        "manifest.json": "b7928816e27e5b08169e6636ff042a777e65a194d4e4cc1da94cb23867eb2e28",
+        "environment.json": "de40860ede369aeb95da06079ee921266e2a6d0b683e4a70ded1aa7cab5b9e09",
+        "resolved-config.yaml": "a4934714cfcc08037a71e43610893f4f01d2933f4ae6dbadbe6c6ad532d8567e",
+        "local-config.yaml": "080e8d0cf5de5b513443f612a3d26c8e0315cde41dfe0f65ef354320ebdf4b15",
+        "audit.json": "74767d23ba144796befb753880a974d3c1be958c44b7601425a1023508d6b46f",
+        "status.json": "344f4d335f262e6a6e428c2a31d56bc8ec0fae7ffe345c5576ad174f52233a5d"
+      },
+      "readonly_audit_sha256": "2c79b43d480933332fc69cf0c131558d08f56ae55eb822afc9c8f30b9bdac07a",
+      "started_at": "2026-10-15T15:31:26.858575+00:00",
+      "completed_at": "2026-10-15T19:19:10.256274+00:00",
+      "run_relative_path": "runs/eds-full10-001",
+      "historical_ultra_task_success_matches": true,
+      "wall_seconds": 13663.397699,
+      "full_audit_check_count": 43
+    },
+    "eds_qd": {
+      "phase_timings": {
+        "initial_policy_observation": {
+          "completed_calls": 10,
+          "seconds": 0.02137489872984588
+        },
+        "chunk_keypoints_stage": {
+          "completed_calls": 900,
+          "seconds": 15014.186470476445
+        },
+        "select_action_fresh": {
+          "completed_calls": 900,
+          "seconds": 847.4472756062169
+        },
+        "diagnostic_artifacts": {
+          "completed_calls": 900,
+          "seconds": 309.2383862421848
+        },
+        "debug_visualization_overlay": {
+          "completed_calls": 7200,
+          "seconds": 34.6791034466587
+        },
+        "video_add_frame": {
+          "completed_calls": 7200,
+          "seconds": 0.402298416942358
+        },
+        "adapter_step": {
+          "completed_calls": 7200,
+          "seconds": 132.33270790521055
+        },
+        "policy_observation": {
+          "completed_calls": 7200,
+          "seconds": 38.93536801752634
+        },
+        "select_action_cached": {
+          "completed_calls": 6300,
+          "seconds": 1.420999662252143
+        }
+      },
+      "phase_timing_scope": "Recorded wall-clock phase durations, not GPU active time; Stage phase includes keypoint processing and online waiting.",
+      "method_audit": {
+        "valid": true,
+        "chunks": 279,
+        "failed_chunks": 0,
+        "path": null,
+        "sha256": "ad0cf8894ed3423b2b0817f9c380830cd17f32cbad3824c1dc0ced3235689367",
+        "hash_encoding": "canonical_json",
+        "written": false
+      },
+      "valid": true,
+      "successes": 0,
+      "completed": 10,
+      "infrastructure_error_episodes": 0,
+      "invalid_or_unfinished": 0,
+      "success_task_ids": [],
+      "stage_queries": 410,
+      "tasks": [
+        {
+          "task_id": 0,
+          "episode": 1,
+          "seed": 44,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_1/episode_1_fail_agentview.mp4",
+              "sha256": "13e78533f6bd0a99ad971284b08e619ddf77f0067c08d7c393e226756afc4ecf"
+            }
+          ]
+        },
+        {
+          "task_id": 1,
+          "episode": 2,
+          "seed": 235,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_2/episode_2_fail_agentview.mp4",
+              "sha256": "4a7cf84fdad5f08413207649c1047f680a37b0e357d164cfa4f125c5a8b77b11"
+            }
+          ]
+        },
+        {
+          "task_id": 2,
+          "episode": 3,
+          "seed": 43,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_3/episode_3_fail_agentview.mp4",
+              "sha256": "641a71126be605864437d9eaa0171161162dd42418e0641ad969d1e406320646"
+            }
+          ]
+        },
+        {
+          "task_id": 3,
+          "episode": 4,
+          "seed": 546,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_4/episode_4_fail_agentview.mp4",
+              "sha256": "9b1cef0d9b5d122863c9ac1d162d7511a25ccd5c27a8320293ae15e36cf11487"
+            }
+          ]
+        },
+        {
+          "task_id": 4,
+          "episode": 5,
+          "seed": 6,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_5/episode_5_fail_agentview.mp4",
+              "sha256": "2418c47155bfa4f802a25466e4653daff9e5cfe70865515774c4c21150361305"
+            }
+          ]
+        },
+        {
+          "task_id": 5,
+          "episode": 6,
+          "seed": 621,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_6/episode_6_fail_agentview.mp4",
+              "sha256": "2e483fa41ac12d2f5b9128276b02d6d3f4c45d21512518713d73354118df9735"
+            }
+          ]
+        },
+        {
+          "task_id": 6,
+          "episode": 7,
+          "seed": 197,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_7/episode_7_fail_agentview.mp4",
+              "sha256": "c168846f096a745f2aca3522e463e7d9067a56e4028beabe0c4342a9dc230338"
+            }
+          ]
+        },
+        {
+          "task_id": 7,
+          "episode": 8,
+          "seed": 87,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_8/episode_8_fail_agentview.mp4",
+              "sha256": "2fafe280f0ce09b5a68996eb8f8cc4714045d22d68a95a2cd69fadfa39922355"
+            }
+          ]
+        },
+        {
+          "task_id": 8,
+          "episode": 9,
+          "seed": 151,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_9/episode_9_fail_agentview.mp4",
+              "sha256": "96886a0ebb855bb4126d2e30c1666a8909f644cfba6c5b1b894dbaf2b6f6a069"
+            }
+          ]
+        },
+        {
+          "task_id": 9,
+          "episode": 10,
+          "seed": 548,
+          "success": false,
+          "valid": true,
+          "videos": [
+            {
+              "relative_path": "output/episode_10/episode_10_fail_agentview.mp4",
+              "sha256": "f608a8d99ce1b254ad93f727496ed46f83ab53015b21182da3b8794b93d21338"
+            }
+          ]
+        }
+      ],
+      "physical_gpu": 6,
+      "egl_device_id": 5,
+      "model": "gpt-6-astra",
+      "reasoning_effort": "ultra",
+      "sha256": {
+        "manifest.json": "99a4885e9ddab7f1172b7698b727e2af3b690b8729f63a1a017aed76cd7eb1bc",
+        "environment.json": "de40860ede369aeb95da06079ee921266e2a6d0b683e4a70ded1aa7cab5b9e09",
+        "resolved-config.yaml": "87ace436e6ae20e90a51418357247ec7be363dc9990dbfd8222e2a2a02538122",
+        "local-config.yaml": "5a2774d4ebc3f066ea9b864448dc105d1051cec04a96d62bf4b9576963971e2c",
+        "audit.json": "69509af5e74b97896f7b198151e32d7c94a6fdf72dadea39dbbce748cc8427c8",
+        "status.json": "28d6bd3e11e44947444d992d28dc92f03546861c0a1d1c80087b99569e8fc5af"
+      },
+      "readonly_audit_sha256": "4953487d059924697a1689682f18c2ccf8ba0587a71f6d9455e76329e3732306",
+      "started_at": "2026-10-15T15:34:03.710773+00:00",
+      "completed_at": "2026-10-15T20:15:54.088368+00:00",
+      "run_relative_path": "runs/eds-qd-full10-001",
+      "historical_ultra_task_success_matches": true,
+      "wall_seconds": 16910.377595,
+      "full_audit_check_count": 43
+    }
+  },
+  "primary_episodes": 30,
+  "source_files": 113,
+  "video_files": 30,
+  "all_cohorts_valid": true,
+  "date_local": "2026-10-16",
+  "timezone": "Asia/Shanghai",
+  "timestamps": "ISO timestamps ending +00:00 are UTC",
+  "archive_relative_root": ".worktrees/exp/repository-maintenance-20261015/onboarding-20261015",
+  "benchmark": "LIBERO ObjectSwap OOD",
+  "provider": "codex_cli",
+  "auth_scope": "Existing CLI 0.156.1 and ChatGPT login reused; account enrollment and CLI installation not re-executed.",
+  "protocol": "gpt-6-astra / ultra; fresh task generation, online Stage, local reward scoring; no response replay",
+  "compute": {
+    "vls": {
+      "episodes": 10,
+      "totals": {
+        "model_forward_calls": 4130,
+        "model_batch_rows": 40420,
+        "reward_calls": 24448,
+        "reward_evaluations": 53480,
+        "reward_scoring_batches": 1146,
+        "rbf_gradient_calls": 382,
+        "rbf_gradient_batch_rows": 7640,
+        "guided_chunks": 382,
+        "unguided_chunks": 444,
+        "provider_logical_call_attempts": 420,
+        "provider_failed_calls": 0,
+        "provider_completed_turns": 398,
+        "provider_usage_complete_calls": 398,
+        "provider_input_tokens": 3875064,
+        "provider_cached_input_tokens": 2408320,
+        "provider_output_tokens": 221130,
+        "provider_reasoning_output_tokens": 194226,
+        "provider_call_latency_s": 14731.984804419335,
+        "guidance_codex_logical_call_attempts": 10,
+        "stage_codex_logical_call_attempts": 410
+      },
+      "http_attempts": null,
+      "http_retries": null,
+      "token_usage_complete": false,
+      "tasks_with_incomplete_token_usage": [
+        5,
+        6
+      ],
+      "source_sha256": "b3d4c4392727492c4d22f6d9522539f8ab4a9fb38ef60e43ca0b98951fb29768",
+      "scope": "Per-episode counters summed once; failed logical calls may overlap transport completions. Token counts are observed subtotals, not complete totals. HTTP retries unavailable.",
+      "recovered_stage_transport_attempts": 22,
+      "recovered_guidance_transport_attempts": 0,
+      "recovered_requests_observed": 21,
+      "transport_attempt_errors": {
+        "codex_expected_one_completed_turn": 21,
+        "codex_transport_failure": 1
+      },
+      "counter_field_note": "provider_logical_call_attempts increments per physical CLI invocation, including application transport retries. HTTP attempts inside CLI are not observable. provider_failed_calls counts failed final responses, not recovered attempts.",
+      "vls_reward_gradient": {
+        "attempted": 1528,
+        "applied": 1528,
+        "zero": 0,
+        "exception": 0,
+        "nonfinite": 0,
+        "unavailable": 0
+      }
+    },
+    "eds": {
+      "episodes": 10,
+      "totals": {
+        "model_forward_calls": 7031,
+        "model_batch_rows": 76646,
+        "reward_calls": 56576,
+        "reward_evaluations": 56576,
+        "reward_scoring_batches": 3536,
+        "rbf_gradient_calls": 4199,
+        "rbf_gradient_batch_rows": 67184,
+        "guided_chunks": 221,
+        "unguided_chunks": 478,
+        "provider_logical_call_attempts": 353,
+        "provider_failed_calls": 0,
+        "provider_completed_turns": 330,
+        "provider_usage_complete_calls": 330,
+        "provider_input_tokens": 3215964,
+        "provider_cached_input_tokens": 2075904,
+        "provider_output_tokens": 162173,
+        "provider_reasoning_output_tokens": 139687,
+        "provider_call_latency_s": 12270.746661238838,
+        "guidance_codex_logical_call_attempts": 11,
+        "stage_codex_logical_call_attempts": 342
+      },
+      "http_attempts": null,
+      "http_retries": null,
+      "token_usage_complete": false,
+      "tasks_with_incomplete_token_usage": [
+        5,
+        6,
+        7
+      ],
+      "source_sha256": "bc4cc27b75f3fa4c5763b52113bf93296a4e2c5b992af6e40689248594178d7a",
+      "scope": "Per-episode counters summed once; failed logical calls may overlap transport completions. Token counts are observed subtotals, not complete totals. HTTP retries unavailable.",
+      "recovered_stage_transport_attempts": 22,
+      "recovered_guidance_transport_attempts": 1,
+      "recovered_requests_observed": 22,
+      "transport_attempt_errors": {
+        "codex_transport_failure": 1,
+        "codex_expected_one_completed_turn": 22
+      },
+      "counter_field_note": "provider_logical_call_attempts increments per physical CLI invocation, including application transport retries. HTTP attempts inside CLI are not observable. provider_failed_calls counts failed final responses, not recovered attempts."
+    },
+    "eds_qd": {
+      "episodes": 10,
+      "totals": {
+        "model_forward_calls": 8964,
+        "model_batch_rows": 96849,
+        "reward_calls": 71424,
+        "reward_evaluations": 71424,
+        "reward_scoring_batches": 4464,
+        "rbf_gradient_calls": 5301,
+        "rbf_gradient_batch_rows": 84816,
+        "guided_chunks": 279,
+        "unguided_chunks": 621,
+        "provider_logical_call_attempts": 451,
+        "provider_failed_calls": 0,
+        "provider_completed_turns": 430,
+        "provider_usage_complete_calls": 430,
+        "provider_input_tokens": 4184711,
+        "provider_cached_input_tokens": 2679680,
+        "provider_output_tokens": 243760,
+        "provider_reasoning_output_tokens": 214815,
+        "provider_call_latency_s": 15171.537373376545,
+        "guidance_codex_logical_call_attempts": 10,
+        "stage_codex_logical_call_attempts": 441
+      },
+      "http_attempts": null,
+      "http_retries": null,
+      "token_usage_complete": false,
+      "tasks_with_incomplete_token_usage": [
+        4,
+        5
+      ],
+      "source_sha256": "e208f48ee6c5c171cd2742a74db36bbf7f6e02a51b9277df9fae422f138d71d2",
+      "scope": "Per-episode counters summed once; failed logical calls may overlap transport completions. Token counts are observed subtotals, not complete totals. HTTP retries unavailable.",
+      "recovered_stage_transport_attempts": 21,
+      "recovered_guidance_transport_attempts": 0,
+      "recovered_requests_observed": 19,
+      "transport_attempt_errors": {
+        "codex_expected_one_completed_turn": 21
+      },
+      "counter_field_note": "provider_logical_call_attempts increments per physical CLI invocation, including application transport retries. HTTP attempts inside CLI are not observable. provider_failed_calls counts failed final responses, not recovered attempts."
+    }
+  },
+  "cpu": {
+    "passed": 1464,
+    "skipped": 3,
+    "warnings": 1,
+    "seconds": 145.05,
+    "skip_scope": "Three pre/post migration dual-source checks skip self-comparison after integration."
+  },
+  "installation_limits": [
+    "Host OS, driver, Conda, compiler, Git/LFS and Codex installation were existing prerequisites.",
+    "Download caches were reused; Python environment and installed packages were rebuilt.",
+    "Public LIBERO download failed twice with TLS errors; documented hash-verified source-copy path passed.",
+    "Exact model assets were supplied locally and hash-verified; no complete public model download was tested.",
+    "Codex internal HTTP attempts/retries are not observable; token statistics omit incomplete attempts.",
+    "A fresh online cohort can vary even with the requested model and effort fixed.",
+    "Imported package entrypoint hashes do not prove identity of every installed dependency file."
+  ],
+  "source_sha256": {
+    "configs/backend/calvin.yaml": "74130d42c7a5a4bca8636a60a7a03ffe3b3cd6cbb2aa803235ae4b74ce687665",
+    "configs/backend/libero.yaml": "1e747960e79ebcef8f4d54b19da6ad925dd71d43f3ccd93873e0499debc18222",
+    "configs/config.yaml": "be98e1127a93b30864c0f42832ba71adc11b115c34b1e2e0f748e2f3cb5bd55a",
+    "configs/env/calvin.yaml": "287ea346ebe3c2fffb0df49cc1c0bf3ab47762228f55d68c6343e444ad622a52",
+    "configs/env/libero.yaml": "4474215d819b9162515ba626edfcc982a1337de1c37b4ae1d382bd7d3357810d",
+    "configs/evaluation/libero_object_swap.yaml": "a66daba00f19614ad5f39a44cf7d12b28d7a8305fec8206c2ec230ecc6c020e6",
+    "configs/local.example.yaml": "36c117a378ff1123fb68b1459a13da48c1bd87c36d2a8c88c3f0a2c1a25a99e2",
+    "configs/perception.yaml": "0b1619b51775c82f5dbbbe70223d37ab64881362494a45b5ed91429ff7af1fae",
+    "configs/policy.yaml": "44a1164f421121edafc47e9880eb0ad97be98732669365f931e0b226bc831cf6",
+    "configs/stage_controller/contact.yaml": "2d89604824d7b75cbaec43040033961ed4449b41cb1fde433d3e1c6e187328d1",
+    "configs/stage_controller/evidence.yaml": "bb61c48c3f432ad2e769c4ef28fa3e7fadc9454347d5d0c44690c3d9b2c94bfe",
+    "configs/stage_controller/grasp.yaml": "325b846fbc1f82e705f6e37832dfa744a52d83feaf019b3b9c6bf871ab485351",
+    "configs/stage_controller/online.yaml": "c0d374dbdfcffce82cb281377939ca791bfb7da6a443337f566246a36a1bc183",
+    "configs/steering/eds.yaml": "3fa1e02d9031dfed6326699f1181c4e5e2598b630bd5d11fb555cf982096f24b",
+    "configs/steering/eds_qd.yaml": "09dc2a6b1249572f66a190b308d14c95afcdc9876fa2579f5c665f2817450ad2",
+    "configs/steering/vls.yaml": "55971085c07cc5e6043d3f28beb3d68bd7fded0bb5132f95030df8c8e8658300",
+    "configs/task/button_off.yaml": "6b31a90a0b1696644147b4df3cf2d9fbb25aa07dd22e67e8d5320bb0fe52b608",
+    "configs/task/button_on.yaml": "e397f307001936521e7609a61b99bb17ffa5ddb73aa48fc23dca3694146311e2",
+    "configs/task/calvin/button_off.yaml": "fe79a6925887d401c4dda61cae6c6ac13c02389ae0ea9d4d24e72fda36c7fe40",
+    "configs/task/calvin/button_on.yaml": "4fd77723a61c7948b7f80ede28e57926a3e2629b6642701615328f03abb8c9e1",
+    "configs/task/calvin/door_left.yaml": "9165e2871beed7d47ccb3de111ebc0327dccdbdfbc1909206d56185b0bfdef6e",
+    "configs/task/calvin/door_right.yaml": "3266aabf73e33e0a7ded04379040e57964114b5b40caa9568da10e39c1a2642b",
+    "configs/task/calvin/drawer_close.yaml": "346e4d70188455e0d2ffc4bc4bf35f36b6ee26bd8aedc2c927990523f94abe73",
+    "configs/task/calvin/drawer_open.yaml": "aa178953f0b70686befbf24ef046dd356ff8e744272f862dfbc032b4fb860d9e",
+    "configs/task/calvin/push_blue.yaml": "54219c9c44176166ba10dc8c4f61d3f1842e500666fc291b23b09d79df090816",
+    "configs/task/door_left.yaml": "a5c621a2c1ceca9858968b739cbd0c9f4bbfe4dcdf51512e9c562853c83802e0",
+    "configs/task/door_right.yaml": "5f21b19f1c970fe4019fc1fe28d369052a35a03f4f8626979af7dd9029121cd7",
+    "configs/task/drawer_close.yaml": "e5b659f5fc7c85a07757986b06ceaf60589d3205a76dcebea4cbf7b5f92038a4",
+    "configs/task/drawer_open.yaml": "dc7cdc04463345991ea25b3383d5d6d0bae82646cb74e48f7734a93771d5848c",
+    "configs/task/push_blue.yaml": "3fbb1c2649e4ac894415b6d0f05d114951cdc49e376d87d18f7ba0ce7bc93643",
+    "core/__init__.py": "233696e00a1ada9a70a50c11160a96884d223df0e7b92aa7ba8bc8a61503efe6",
+    "core/diagnostics/__init__.py": "14239b38c3245814d368784e23c8b792cb1a3d23807c44ec7d4cd845329b0600",
+    "core/diagnostics/stage_replay.py": "cfc6e12def4354795756dedbf920ba2b376e00506a992f60af90269f6796edd4",
+    "core/diffusion_policy_steer.py": "97f0ee3b9159461e15f6b58ea2bd95119a5514872025b4c99594ec6b71815eaa",
+    "core/eds_eval_metrics.py": "0e07c57167dd92c07a31395f6ebba0b56d0f65bc62f4fb1e4d5fb30549fd6ae0",
+    "core/eds_mechanism_trace.py": "312087f5c354f81a820f2acb8419c6380e96805de79f1789c5c7ff23a8fcabf3",
+    "core/env_adapters/__init__.py": "790830ee3d9a8a6a0c59a114fbc77fb50bc158d05e13ff9e2e634ad7f370d9c4",
+    "core/env_adapters/base_adapter.py": "a5bb4f9e06f458fc38e6cc7486e6c6d268fc67bfaf6fd9f84f90514236144de8",
+    "core/env_adapters/calvin_adapter.py": "396957c62660edddf9704a24cbef15d9cf5f2bbb4da39ee4b9123c4d240a0541",
+    "core/env_adapters/libero_adapter.py": "a07b659498635c54147c2c2b559213166d34b513ca432e68a41491cfb08cd54c",
+    "core/episode_rng_fixture.py": "50a1b0c942215819ee2bea76993e12ba68990d3b0cf98c120b15dd52bb319db7",
+    "core/episode_rng_hooks.py": "2fd9bed3865c7ee50e851b91ac6088d126ed09f8b0277bd33d3d39a4389fd773",
+    "core/fkd_class.py": "d4349b98f3eb47b30481b0010a03eeed3508e0d7d79af18f970a5ecfa3288ff1",
+    "core/gemini_grounder.py": "2dbf76e2fa822d9f32af60fb7e5bfecaffb9a38f6aed13299636a50e0964bba9",
+    "core/keypoint_detector.py": "5fa108f01168ecb1f2433bc53f093701e0079fa6cf35abf910ec0347075d055e",
+    "core/keypoint_tracker.py": "292d63964b90405769118bda0e1acc9666f8ae076f41abbb7df8e5bf8abc6f45",
+    "core/online/__init__.py": "f7b64046d9f14d78be040b14a339c2245994e0c896f2ab1de0f4e8239edf2173",
+    "core/online/capture.py": "478dc996fc13561ee9d58afbe764c3a60ecc13a0ed4be85e26e17d85fca4a5a5",
+    "core/online/codex.py": "d1dceeeb70e78491144a7e161470fb6c968d70a740884dedd002d4ad9c626a57",
+    "core/online/policy.py": "c210670f417a0a67399dcccdadc9792637b176f0cccee427abc4aa09e9285af4",
+    "core/pi05_steer.py": "ed9146d92bf09af1b1ec99774bd8042c70869ba2246c98ff04d23961ed83e962",
+    "core/policy_observation_sampling.py": "c7e93e81541c34dd45e22dffc43a24d428d043a56c0dd6766bfd286e2ff07f4d",
+    "core/qd_ed.py": "4415ea7f16029e2fa2e7528c1f7065ba673b7a5a512723bfa9611f992298daa4",
+    "core/rdt_libero_action_converter.py": "5e880cce86acc2aea77077cbe2dee708ac23cec79c172cb6738f79d693e6d82d",
+    "core/rdt_libero_obs_processor.py": "5b6f3857be13254e1d2266270f57199578dbc4066566265b147d91cc30bb2d14",
+    "core/rdt_policy_steer.py": "d330d9a2c432ace2176a167dbcc04b64c3e05eed515e63e20249afaf857e2645",
+    "core/sam3_segmenter.py": "e3f3cdd5a970b738ffcf17c7fd765041195d1b9f40a1d2b3809c1459cb5dce81",
+    "core/sam_segmenter.py": "c4e243d22adf3becfaa1f94f33e9ff05c1e2962899de4e11a656d2ffb16cb8bf",
+    "core/stage/__init__.py": "b584340579a8ec953fd87c716ec7f57a306632b994696317668db3d3a4fb1c55",
+    "core/stage/carry.py": "743ae7366901f85af2747e1cfd5c7334d8d039daefab2cbb6529557eba55f60b",
+    "core/stage/contract.py": "6b61fe392183557ba0890a97f7154227467021e19adbccf94c4ae73cd0dd82c1",
+    "core/stage/controller.py": "f7b3460af7a842112be94d63df3aa3787d5b872771f7b4cf605a2d94358a8513",
+    "core/stage/grasp.py": "9d67a10bd6785bfa4db19f3a965a8c18eb50a5d7205402d097638422d680d570",
+    "core/stage/observation.py": "b1c37db1019e9cc178f6a93e0e3915cc13a382b89a05f7ea91a45ab864251278",
+    "core/stage/recovery.py": "cffbc458094f7f8827b38a9f983bb0271021593f28e8871bfb7bfb3d02b261a2",
+    "core/target_distance_reward.py": "96d6a90bb80af997cf538ba5dd56a9cea8bac6c57f5659c5210b496cd9a3318c",
+    "main.py": "5f039b53691b6f2cbbfcc843d603e4465b37aae4087a293f1341569ae1800aa8",
+    "scripts/audit_qd_mechanism.py": "1a11ec87d1c2f542fb5f948ccdaf6cb32ca93d330f2911e3b3afad10c8a225fd",
+    "scripts/audit_steering.py": "b06f9a98730d111013360c7f1b8f3de69c9dab848fdefe6855c12c332f15f53f",
+    "scripts/audit_steering_contract.py": "cd13ff5120944e3d933c1ea239d8909e7c03fe59c50877cdf3d41f1620162415",
+    "scripts/check_steering.py": "f12cc73c5012f8fd4bb52b0ffe289177f87bb93b14854691cf7a14051a8085f6",
+    "scripts/codex_only_runtime.py": "b4ee53dc60508ee93cbf7a622b20d70ccf0d57431d1a5e61672b4967a36afd1c",
+    "scripts/dependency_patches/robosuite-1.4.0.json": "f2433c90793e6f83a7a5539cad512a1e6ed286ac89089ad30c3cf7abccd77deb",
+    "scripts/dependency_patches/robosuite-binding.patch": "89816ff1ed895e650ce2113cae99767bf9ad5d7fd3d071ce96af59e6e7c24837",
+    "scripts/dependency_patches/robosuite-egl.patch": "17725f107d8e53cd5b3a742a23940ce8078d646184c958715175c73e9e107175",
+    "scripts/evaluate_steering.py": "23fae23f07a2f8a3d3c4ebe096861e1e01288c135e8bfbf3c7a1e0bd67754e69",
+    "scripts/list_steering_devices.py": "3c59c5149f5f22833c71d3071c27ba87a4902edcecbbb16515ca3bcde36621d0",
+    "scripts/prepare_steering_archive.py": "fa598868e76b59124a6045397807071d24db347e3216b982a1342bbfeb30234b",
+    "scripts/prepare_steering_assets.py": "6c642b91584bca28af98da460a92c3f1b31b809cd931c424a9266e0d29a2c178",
+    "scripts/run_steering.py": "99ddb659d498da091268565c3ccc275eb75ba777a1634447a6e338510141a18e",
+    "scripts/steering_archive.py": "d40aed9db6884a7a87afb19fcea525f3c27decfecf5b2474b0c18e9f8563865c",
+    "scripts/steering_assets_manifest.json": "8b6fa91960398a25af011c2fa9458f910ad4aa4599b45a853b04d743cac7711c",
+    "scripts/steering_dependency_compat.py": "be4c5e2c1e6abe29e79337a1c442c2a26625ee9de157052c1c121c67875c35d6",
+    "scripts/steering_libero.patch": "9f562f5292335a744a499a81dd94e72bbb780c471a62156327aef20605de5213",
+    "scripts/steering_model_assets.py": "38c357a62ed0e4200005c372619974e1be8085402e124fb9de2fe284f20bb2d9",
+    "scripts/steering_model_assets_manifest.json": "6d3ce95f99b6cd315289c2252bc1b684227874d4fbf3055133f6aeffa1d2f65b",
+    "scripts/steering_process.py": "69f4b6200d4186cbf7ece5f923c75f33d1a9653a575bbdae9e15f7d9a355f78b",
+    "scripts/steering_runtime.py": "9e6481191e8aec7d54d69ab2090862fa99f90b697d9fea7968323769a6160ec8",
+    "scripts/steering_source_layout.py": "415ef888e66f5ce3f7d9e78942bf3ec0d717831c64ea9af9151b1af3bdc6328f",
+    "scripts/steering_transport_audit.py": "96e69926db05be8c00cc31e30422d7c3b55fa9731a0f0c1e975f6017b18c57db",
+    "scripts/steering_worker.py": "2d6269571b61cddaefc0db53524801ca7ae8fb9f9fc747889b05aa4f6239354b",
+    "utils/__init__.py": "debd228bdc6164ea3f2fc49e0ef8aa891754e7748fe91ac21e8ef74b6a72a49f",
+    "utils/config_utils.py": "d9f2a7665db2ee15f882be442eed791c0300607d2b62c12dfbe8651253c18af5",
+    "utils/cuda_egl_guard.py": "8d6689c11a208a0c85e5db7a5778b0eaf9a5c5efecfa17d7dc9d0f09f603ee94",
+    "utils/eds_eval_vis.py": "d155d2b2e6e72bd877899c1fdc6f0e57d847ea63d68b55a74a0606c90ab86676",
+    "utils/eds_mechanism_pretest_vis.py": "a9ccf922bc717f955375455d56cc55f9ac49a439690461de453f2dc1b20af8fc",
+    "utils/guidance_utils.py": "b0fe9d6d5fc014143f5877918de9bd0986b1688b4a6a90980847b7d15cab0c82",
+    "utils/keypoint_utils.py": "fb7730f5dbe6ba72584f9d7204d2578be225dc69655c7c26006a8be9a92d3c1f",
+    "utils/logging_utils.py": "ad614d71030403937d8699544f9985f1909c8cc4402c43e2c9b16b39f263c2c3",
+    "utils/mujoco_phase_diagnostics.py": "cdf75645bd958a3cff1fbf78acada4c804a6f663a6aab27224fbd5cfdf7cffac",
+    "utils/render_lifetime_diagnostics.py": "f25c8ba222f2682a701b6b1b15bae58d5b6cac519658b5c73e7be3850244e865",
+    "utils/vis_utils.py": "6e256ca29aabcb8ffeb852e56c732ec56885394bb8e4e8ca2fd0957e989289b8",
+    "vlm_query/guidance_template.txt": "ac7a53e64f82e735b295682347cc4775da7c611715798e0d79f8a6fe34cb11c5",
+    "vlm_query/guidance_template_calvin.txt": "b29b7554b27207269f572a40a4d51f7498d36e3eca4effb94349e32ebce8caee",
+    "vlm_query/guidance_template_libero.txt": "0a11498ed5317170bff8e8cd3909c508ea810e4fa9f006555ef37a50f4459c54",
+    "vlm_query/segmentation_planning_template.txt": "975e6905b66e749e351f2282a73e5f30eeee6735643622f74808b2379a938d30",
+    "vlm_query/stage_observation_v1.txt": "14ea3cf594ed358a399d3c49c96f599885072e381b3b02dff520b9b42ec5e3c0",
+    "vlm_query/stage_template.txt": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b",
+    "vlm_query/target_distance/guidance_template.txt": "ac7a53e64f82e735b295682347cc4775da7c611715798e0d79f8a6fe34cb11c5",
+    "vlm_query/target_distance/guidance_template_libero.txt": "0c98461b3dd126caeed82d0c53cdec63ba40a7a45c3be958cb169a672c8570e7",
+    "vlm_query/target_distance/segmentation_planning_template.txt": "975e6905b66e749e351f2282a73e5f30eeee6735643622f74808b2379a938d30",
+    "vlm_query/target_distance/stage_template.txt": "758d71a441496074410428b005a068a18b6d92273b9278c1181334cf9e67005b",
+    "vlm_query/vlm_agent.py": "27ce2761c6ec79bf35c2c26c88ecde4f8dfa9ede4d9ad94ddda3a08895e144ae"
+  },
+  "installation_evidence": {
+    "relative_archive": ".worktrees/exp/repository-maintenance-20261015/onboarding-20261015/validation-final-20261016",
+    "manifest_sha256": "c633f846ae4b724673f3502a6534433aec68f7b026dd8e337713d9dd9ea2fae1",
+    "verified_files": 120,
+    "commands_recorded": 66
+  },
+  "document_checks": {
+    "files": [
+      "README.md",
+      "AGENTS.md",
+      "docs/README.md",
+      "docs/research/research_proposal.md",
+      "docs/research/research_progress.md",
+      "docs/steering/installation.md",
+      "docs/steering/onboarding-validation.md",
+      "docs/steering/provenance.md"
+    ],
+    "local_links_checked": 140,
+    "broken_links": [],
+    "shell_syntax": [
+      {
+        "file": "README.md",
+        "block": 1,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "README.md",
+        "block": 2,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "README.md",
+        "block": 3,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "README.md",
+        "block": 4,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "README.md",
+        "block": 5,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "README.md",
+        "block": 6,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "README.md",
+        "block": 7,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "README.md",
+        "block": 8,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "AGENTS.md",
+        "block": 1,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "docs/steering/installation.md",
+        "block": 1,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "docs/steering/installation.md",
+        "block": 2,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "docs/steering/installation.md",
+        "block": 3,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "docs/steering/installation.md",
+        "block": 4,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "file": "docs/steering/installation.md",
+        "block": 5,
+        "exit_code": 0,
+        "stderr": ""
+      }
+    ],
+    "dependency_recipe": [
+      {
+        "file": "environment-steering.yml",
+        "effective_content_equal": true
+      },
+      {
+        "file": "requirements-steering.txt",
+        "effective_content_equal": true
+      },
+      {
+        "file": "constraints-steering.txt",
+        "effective_content_equal": true
+      },
+      {
+        "file": "requirements-steering-lerobot-base.txt",
+        "effective_content_equal": true
+      }
+    ],
+    "runtime_files_checked": 113,
+    "runtime_mismatch": [],
+    "scope": "Local link existence and Bash parsing are distinct from the recorded command execution and complete online evaluations."
+  }
+}

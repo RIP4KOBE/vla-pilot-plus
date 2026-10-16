@@ -1,0 +1,22 @@
+--- a/utils/binding_utils.py
++++ b/utils/binding_utils.py
+@@ -30,9 +30,7 @@
+ if CUDA_VISIBLE_DEVICES != "":
+     MUJOCO_EGL_DEVICE_ID = os.environ.get("MUJOCO_EGL_DEVICE_ID", None)
+     if MUJOCO_EGL_DEVICE_ID is not None:
+-        assert MUJOCO_EGL_DEVICE_ID.isdigit() and (
+-            MUJOCO_EGL_DEVICE_ID in CUDA_VISIBLE_DEVICES
+-        ), "MUJOCO_EGL_DEVICE_ID needs to be set to one of the device id specified in CUDA_VISIBLE_DEVICES"
++        assert MUJOCO_EGL_DEVICE_ID.isdigit(), "MUJOCO_EGL_DEVICE_ID needs to be an integer EGL device id"
+ 
+ if macros.MUJOCO_GPU_RENDERING and os.environ.get("MUJOCO_GL", None) not in ["osmesa", "glx"]:
+     # If gpu rendering is specified in macros, then we enforce gpu
+@@ -172,7 +170,7 @@
+ 
+         ret_img = rgb_img
+         if segmentation:
+-            seg_img = rgb_img[:, :, 0] + rgb_img[:, :, 1] * (2**8) + rgb_img[:, :, 2] * (2**16)
++            seg_img = rgb_img[:, :, 0].astype(np.int64) + rgb_img[:, :, 1].astype(np.int64) * (2**8) + rgb_img[:, :, 2].astype(np.int64) * (2**16)
+             seg_img[seg_img >= (self.scn.ngeom + 1)] = 0
+             seg_ids = np.full((self.scn.ngeom + 1, 2), fill_value=-1, dtype=np.int32)
+ 

@@ -1,7 +1,12 @@
 # Source and evaluation provenance
 
-Historical runtime identities and maintainer-local evidence from the pre-layout release. These are not new online results for the reorganized source. Current module paths are documented in [architecture](architecture.md); historical branch navigation is in the [branch index](../maintenance/branch-index.md).
-：来源与本地证据
+Runtime identities and evidence are recorded separately for each evaluation. Current module paths are documented in [architecture](architecture.md); historical branch navigation is in the [branch index](../maintenance/branch-index.md).
+
+## Clean-environment evaluation
+
+The collaborator installation and evaluation uses runtime commit `ef74b02be6e9430e861ae6d1980a4b2641e4c716`, transferred through Git into a fresh clone originally obtained from remote main at `6c1e6557c6d0f34f644e711ad4afbfd0df92c290`. It uses a new Python environment and explicit, hash-verified Robosuite compatibility patches. All three ten-task cohorts completed: VLS 1/10, EDS 3/10, EDS+QD 0/10, with 30/30 valid episodes. Installation attempts, coverage, task outcomes, hashes, and the delivery-source comparison are recorded in the [onboarding validation report](onboarding-validation.md) and [compact evidence](validation/onboarding-20261015.json). Final documentation and dependency-recipe comments do not change the 113 frozen runtime files or effective dependency requirements. Historical scores below remain separate measurements.
+
+## 历史来源与本地证据
 
 历史名称与 worktree 映射集中在本节，不作为公共方法或配置入口。2026-10-15清理映射见[归档清单](../../docs/maintenance/cleanup-inventory-20261015.json)；旧工作区路径保留为静态归档别名，不再用于开发。受测 runtime、后续审计器与最终发布 commit 分别记录；基础设施补丁进入发布版本后，不能把旧 cohort 改称在新版本上运行。
 

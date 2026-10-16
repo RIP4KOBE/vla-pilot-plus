@@ -1,6 +1,7 @@
 # Linux x86_64 / Python 3.12.12 steering dependencies, validated 2026-10-13.
-# The isolated final environment passed real processor/import/config checks and
-# 1118 CPU tests at the migration source revision; GPU/API/inference were not run.
+# Installation and real execution validation: docs/steering/onboarding-validation.md.
+# After pip installation, apply the explicit Robosuite compatibility patches with
+# python scripts/prepare_steering_assets.py install-runtime-compat.
 # Version lines preserve the validated 62 direct inputs. The final recipe includes
 # future==1.0.0, discovered through a real BDDL import after the initial install.
 # Install into a NEW environment, without mixing in retired legacy dependency recipes.

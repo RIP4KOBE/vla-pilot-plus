@@ -27,7 +27,7 @@ All three methods share model loading, observation and action adapters, online S
 
 ```mermaid
 flowchart LR
-    O[Instruction and observation] --> A[Online identity and reward generation]
+    O[Instruction and observation] -->|Task initialization| A[Fresh identity, stages and reward generation]
     A --> R[Local reward functions]
     O --> S[Online visual facts]
     S --> C[Stage controller]
@@ -38,71 +38,161 @@ flowchart LR
     E --> L[Logs, videos and validity audit]
 ```
 
-Online services generate task-specific content and evaluate the current scene. Candidate rewards and gradients are computed locally. Stage decisions combine visual facts with robot observations; task success is determined by the environment. The [architecture guide](docs/steering/architecture.md) describes the exact contracts and simulator information used.
+At task initialization, Codex generates fresh object identity, stage descriptions, and reward functions. During rollout, Stage queries evaluate current images at the configured triggers; candidate rewards and gradients are computed locally using the generated functions. Stage decisions combine visual facts with robot observations, and task success is determined by the environment. The [architecture guide](docs/steering/architecture.md) describes the exact contracts and simulator information used.
 
 ## Installation
 
-The validated environment uses Linux x86_64, Python 3.12.12, and PyTorch 2.7.1 with CUDA 12.6.
+The supported platform is Linux x86_64 with an NVIDIA GPU, a compatible driver, Conda, Git with Git LFS, a C compiler, and Linux input headers. The reference Python stack uses Python 3.12.12 and PyTorch 2.7.1 with CUDA 12.6. Validation uses NVIDIA H200 NVL GPUs with driver 580.65.06; a minimum GPU memory requirement has not been established. The [installation guide](docs/steering/installation.md) documents host requirements, exact assets, cache placement, and troubleshooting.
+
+Run the following in a new checkout. Create a **new** environment; do not install over an existing research environment.
 
 ```bash
-git clone https://github.com/RIP4KOBE/vla-pilot-plus.git
+git clone --depth 1 --single-branch --branch main --no-tags https://github.com/RIP4KOBE/vla-pilot-plus.git
 cd vla-pilot-plus
-git submodule update --init third_party/rdt third_party/lerobot
+git submodule update --init --depth 1 third_party/rdt third_party/lerobot
+
+conda env create --prefix "$PWD/.venv" --file environment-steering.yml
+conda activate "$PWD/.venv"
+export PYTHONNOUSERSITE=1
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHON_DOTENV_DISABLED=1
+unset PYTHONPATH PYTHONHOME
+export PIP_CONFIG_FILE=/dev/null
+export PIP_INDEX_URL=https://pypi.org/simple
+unset PIP_EXTRA_INDEX_URL
+
+python -m pip install -r requirements-steering.txt
+python scripts/prepare_steering_assets.py install-runtime-compat
+python scripts/prepare_steering_assets.py verify-runtime-compat
+python scripts/prepare_steering_assets.py install-libero
+python scripts/prepare_steering_assets.py verify-libero
+python scripts/prepare_steering_assets.py verify-rng
+python -m pip install --no-deps --no-build-isolation \
+  -e third_party/libero_pro -e third_party/lerobot
+
+# Both OpenCV distributions share cv2 files: install the headless variant last.
+python -m pip install --force-reinstall --no-deps opencv-python-headless==4.12.0.88
+python -m pip check
+python -c "import cv2.version as v; assert v.headless; print(v.opencv_version, v.headless)"
 ```
 
-Follow the [installation and asset preparation guide](docs/steering/installation.md) to:
+If the public LIBERO download fails, obtain the matching source/asset bundle from the maintainers and use `python scripts/prepare_steering_assets.py install-libero --source /path/to/verified-libero-tree` in place of the download command. The installer verifies and copies the files into this checkout; it does not import from the supplied directory. Record this alternative source in the run report.
 
-1. Create a fresh environment with `environment-steering.yml` and install `requirements-steering.txt`.
-2. Install the pinned LIBERO source and register the local dependencies.
-3. Obtain and verify the RDT checkpoint, text/vision encoders, DINO files, and fixed task assets.
-4. Configure your Codex CLI login and generate the ignored `configs/local.yaml` for local paths and GPU/EGL devices.
+`conda activate` requires Conda shell initialization. In a script, first source the `etc/profile.d/conda.sh` file from your Conda installation. Place environments and download caches on a disk with sufficient space; the installation guide gives a separate-prefix example.
 
-**Exact model assets and complete experiment recordings are not currently distributed as a public download.** Obtain the matching assets from the maintainers and verify them with the provided manifests. Cloning this repository alone does not provide a runnable model. Credentials and machine configuration must remain outside version control.
+### Models and online access
 
-The active online protocol uses **Codex CLI / `gpt-6-astra` / `ultra`**, with no provider fallback. Dependency pins, the evaluated CLI version, and setup verification are documented in the installation guide. Retired legacy installation scripts are available through Git history.
+**Exact model assets are not currently distributed as a public download.** Obtain the matching RDT checkpoint, T5/SigLIP snapshots, and DINO source/weights from the maintainers. [Asset requirements](docs/steering/installation.md#固定模型与源码资产) and the [hash manifest](scripts/steering_model_assets_manifest.json) define the required files. Cloning alone does not provide a runnable model.
+
+Install [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) separately, make it available on `PATH`, and sign in using your own account. The evaluated CLI version is **0.156.1**. Existing valid login can be reused; new users complete the interactive login themselves.
+
+```bash
+command -v codex
+codex --version
+codex login status
+# Only if not already signed in:
+# codex login
+# Headless alternative: codex login --device-auth
+```
+
+The active protocol is **Codex CLI / `gpt-6-astra` / `ultra`**, with no provider fallback. Account/model access is checked by the API preflight below; login status alone does not establish it. See [official authentication instructions](https://learn.chatgpt.com/docs/auth). Keep credentials out of Git and machine YAML files.
+
+### Machine configuration
+
+Replace the asset paths and device identifiers below. GPU and EGL enumeration are independent: verify their device mapping as described in the installation guide. `configure` checks the fixed assets and writes an ignored local configuration; it does not download model weights.
+
+```bash
+STEERING_GPU=REPLACE_WITH_ASSIGNED_GPU
+# Read egl_device_id from this identity-based mapping report.
+python scripts/list_steering_devices.py --gpu "$STEERING_GPU"
+STEERING_EGL=REPLACE_WITH_VERIFIED_EGL_INDEX
+python scripts/prepare_steering_assets.py configure \
+  --rdt-checkpoint /path/to/rdt \
+  --text-encoder /path/to/t5/snapshots/3db67ab1af984cf10548a73467f0e5bca2aaaeb2 \
+  --vision-encoder /path/to/siglip/snapshots/9fdffc58afc957d1a03a25b10dba0329ab15c2a3 \
+  --torch-home /path/to/torch-cache \
+  --gpu "$STEERING_GPU" --egl-device-id "$STEERING_EGL" \
+  --output configs/local.yaml
+
+# Asset checks only: no GPU or online request.
+python scripts/check_steering.py --local-config configs/local.yaml \
+  --output-dir outputs/preflight-assets-001
+
+# Explicit GPU/render and real Codex image request.
+python scripts/check_steering.py --local-config configs/local.yaml \
+  --output-dir outputs/preflight-online-001 --gpu --api
+```
 
 <a id="开始使用"></a>
 
 ## Quick Start
 
-Run these commands from the repository root after completing installation and creating `configs/local.yaml`.
+Use the activated environment and run from the repository root. Every real run requires a **new output directory**. The commands below use the same scientific protocol and differ only by steering method.
+
+### Configuration previews
+
+These commands resolve configuration without loading models, running simulation, or making API requests. They do not establish environment readiness.
 
 ```bash
-# Preview the complete configuration without running a model or calling the API.
-python scripts/run_steering.py --method eds \
-  --local-config configs/local.yaml \
+python scripts/run_steering.py --method vls --local-config configs/local.yaml \
+  --output-dir outputs/vls-preview --print-config
+python scripts/run_steering.py --method eds --local-config configs/local.yaml \
   --output-dir outputs/eds-preview --print-config
-
-# Verify assets, the selected GPU/EGL mapping, and online access.
-python scripts/check_steering.py --local-config configs/local.yaml \
-  --output-dir outputs/preflight-001 --gpu --api
-
-# Run all ten fixed ObjectSwap tasks and the validity audit.
-python scripts/evaluate_steering.py --method eds \
-  --local-config configs/local.yaml \
-  --output-dir outputs/eds-full10-001
-
-# Reinspect a completed run without modifying its evidence.
-python scripts/audit_steering.py outputs/eds-full10-001 --no-write
+python scripts/run_steering.py --method eds_qd --local-config configs/local.yaml \
+  --output-dir outputs/eds-qd-preview --print-config
 ```
 
-Switch `--method` to `vls` or `eds_qd` and choose a fresh output directory for each run. Use `scripts/run_steering.py --tasks 0` only for a separately recorded diagnostic; a task subset is not a ten-task cohort. Keep source, assets, configuration, and prompts fixed during a run.
+### Single-task diagnostics
 
-Each run records source/configuration hashes, environment information, online requests, task outcomes, and videos. Metrics are normally under `output/evaluation/` and videos under `output/episode_*/`; the run manifest is authoritative. See [evaluation and evidence handling](docs/steering/evaluation.md).
+Each command performs a real online rollout of task 0. Run them sequentially on the configured GPU. These are optional installation/debugging checks and cannot be combined with other runs to form a ten-task result.
+
+```bash
+python scripts/run_steering.py --method vls --local-config configs/local.yaml \
+  --output-dir outputs/vls-task0-001 --tasks 0
+python scripts/run_steering.py --method eds --local-config configs/local.yaml \
+  --output-dir outputs/eds-task0-001 --tasks 0
+python scripts/run_steering.py --method eds_qd --local-config configs/local.yaml \
+  --output-dir outputs/eds-qd-task0-001 --tasks 0
+```
+
+### Full evaluation
+
+Each command runs **all ten fixed ObjectSwap tasks** and the validity audit. Run sequentially on one GPU, or use separate verified local configurations and idle GPUs for parallel runs. Keep source, dependencies, assets, and configuration fixed during evaluation.
+
+```bash
+python scripts/evaluate_steering.py --method vls --local-config configs/local.yaml \
+  --output-dir outputs/vls-full10-001
+python scripts/evaluate_steering.py --method eds --local-config configs/local.yaml \
+  --output-dir outputs/eds-full10-001
+python scripts/evaluate_steering.py --method eds_qd --local-config configs/local.yaml \
+  --output-dir outputs/eds-qd-full10-001
+```
+
+### Inspect results
+
+Read-only audits can be repeated without overwriting original evidence:
+
+```bash
+python scripts/audit_steering.py outputs/vls-full10-001 --no-write
+python scripts/audit_steering.py outputs/eds-full10-001 --no-write
+python scripts/audit_steering.py outputs/eds-qd-full10-001 --no-write
+```
+
+Use `progress.json` and `console.log` for live progress; use `audit.json` for the final success count, completion count, and validity. A valid task failure is different from an infrastructure error. Metrics are under `output/evaluation/`, Stage requests under `output/captured_stage_inputs/`, and videos under `output/episode_*/`. The manifest records the actual evidence paths and source identity. See [evaluation and evidence handling](docs/steering/evaluation.md) and the [clean-install validation report](docs/steering/onboarding-validation.md).
 
 ## Results
 
 Recorded **LIBERO ObjectSwap OOD** results, with one fixed seed per task:
 
-| Method | Codex / low | Codex / ultra |
-| --- | ---: | ---: |
-| VLS | 1 / 10 | 1 / 10 |
-| EDS | **3 / 10** | **3 / 10** |
-| EDS+QD | 1 / 10 | 0 / 10 |
+| Method | Reference / low | Reference / ultra | Clean install / ultra |
+| --- | ---: | ---: | ---: |
+| VLS | 1 / 10 | 1 / 10 | 1 / 10 |
+| EDS | **3 / 10** | **3 / 10** | **3 / 10** |
+| EDS+QD | 1 / 10 | 0 / 10 | 0 / 10 |
 
-Each column is a separate valid 30-episode comparison. The ultra protocol also changes transport recovery settings, so this is not a controlled estimate of reasoning-effort effects. Method compute budgets differ. These results do not establish a QD advantage or statistical superiority.
+Each column is a separate valid 30-episode comparison using Codex. The clean-install evaluation completed on October 16, 2026, using a fresh clone and a new Python environment: all 30 episodes passed validity checks, with no episode-level infrastructure errors or unfinished episodes. Its task-level success outcomes match the reference ultra evaluation. Matching task outcomes does not establish identical trajectories or future service outputs.
 
-Results belong to the recorded runtime commits; code organization changes are checked separately and do not constitute new online measurements. See the [low results](docs/steering/results.md), [ultra comparison](docs/steering/reasoning-effort-comparison.md), and [source provenance](docs/steering/provenance.md) for task-level outcomes, configuration, limitations, and evidence identities.
+The ultra protocol also changes transport recovery settings relative to low, so this is not a controlled estimate of reasoning-effort effects. Method compute budgets differ. These results do not establish a QD advantage or statistical superiority. See the [clean-install validation](docs/steering/onboarding-validation.md), [low results](docs/steering/results.md), [ultra reference](docs/steering/reasoning-effort-comparison.md), and [source provenance](docs/steering/provenance.md) for task-level outcomes, installation coverage, compute, and evidence identities.
 
 ## Development
 
