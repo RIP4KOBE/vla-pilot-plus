@@ -129,6 +129,14 @@ class PI05PolicySteer(PI05Policy):
     def reset_stage(self):
         """Reset stage-specific state (call when stage changes)."""
         self._stage_init_reward = None
+
+    def reset_eds_chunk_memory(self, reason="guidance_change"):
+        """Shared-controller compatibility hook: PI05 has no EDS chunk memory.
+
+        A guidance toggle must preserve the current stage's reward reference.
+        Semantic stage changes use reset_stage instead.
+        """
+        return None
     
     def get_normalized_reward(self) -> float:
         """Get last normalized reward (0=start, 1=reached target)."""

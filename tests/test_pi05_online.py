@@ -133,3 +133,22 @@ def test_download_never_overwrites_existing_different_model(tmp_path,monkeypatch
     with pytest.raises(ValueError,match='identity mismatch'):
         assets.download(SimpleNamespace(model='rdt',directory=tmp_path))
     assert p.read_text()=='wrong'
+
+
+def test_pi05_guidance_toggle_preserves_reward_reference_in_real_controller(policy_class):
+    import importlib.util
+    import core.stage.controller as controller
+    path=Path(__file__).with_name('test_stage_evidence.py')
+    spec=importlib.util.spec_from_file_location('pi05_stage_fixture',path)
+    fixture=importlib.util.module_from_spec(spec);spec.loader.exec_module(fixture)
+    runner=fixture.fake_runner([fixture.outside()])
+    runner.config['stage_preserve_reward_reference_on_guidance_toggle']=True
+    policy=policy_class.__new__(policy_class);torch.nn.Module.__init__(policy)
+    policy._stage_init_reward=-.123
+    policy._last_normalized_reward=.75
+    runner.policy.reset_eds_chunk_memory=policy.reset_eds_chunk_memory
+    state=fixture.state(use_guidance=False)
+    controller.update_stage(runner,state,-1.)
+    assert state['use_guidance'] and not runner.events[-1]['reward_reference_reset']
+    assert policy._stage_init_reward==-.123 and policy._last_normalized_reward==.75
+    policy.reset_stage();assert policy._stage_init_reward is None
