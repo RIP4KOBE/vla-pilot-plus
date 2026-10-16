@@ -61,11 +61,17 @@ def install_dino(torch_home, recipe):
                     name=row['path'][len(prefix):]
                     target=tree/name;target.parent.mkdir(parents=True,exist_ok=True)
                     target.write_bytes(z.read('dinov2-'+recipe['revision']+'/'+name))
+                for row in recipe['licenses']:
+                    target=tree/row['path'];target.parent.mkdir(parents=True,exist_ok=True)
+                    target.write_bytes(z.read('dinov2-'+recipe['revision']+'/'+row['path']))
             subprocess.run(['patch','--batch','--fuzz=0','-p1','-i',str(patch)],cwd=tree,check=True)
             for row in expected:
                 prefix='hub/facebookresearch_dinov2_main/'
                 if row['path'].startswith(prefix):checked(tree/row['path'][len(prefix):],row)
             dest.parent.mkdir(parents=True,exist_ok=True);tree.rename(dest)
+    for row in recipe['licenses']:
+        download_file(row['url'],dest/row['path'],row['sha256'])
+        checked(dest/row['path'],row)
     weight=recipe['weight']
     download_file(weight['url'],torch_home/'hub/checkpoints/dinov2_vitb14_pretrain.pth',weight['sha256'])
     for row in expected:checked(torch_home/row['path'],row)

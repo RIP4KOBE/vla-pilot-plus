@@ -153,6 +153,20 @@
       "bytes": 346378731,
       "sha256": "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73",
       "url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vitb14/dinov2_vitb14_pretrain.pth"
-    }
+    },
+    "licenses": [
+      {
+        "path": "LICENSE",
+        "bytes": 11359,
+        "sha256": "600cc67cc4cb2f5ea317dcfc687ad1c74dc4bec8782bbe9db0afd83513b935b7",
+        "url": "https://raw.githubusercontent.com/facebookresearch/dinov2/7b187bd4df8efce2cbcbbb67bd01532c19bf4c9c/LICENSE"
+      },
+      {
+        "path": "dinov2/thirdparty/CLIP/LICENSE",
+        "bytes": 1063,
+        "sha256": "893951b3bf94db8df1b13e05da5cdeb499400960e4d44a3962a8b33ed0b4f28e",
+        "url": "https://raw.githubusercontent.com/facebookresearch/dinov2/7b187bd4df8efce2cbcbbb67bd01532c19bf4c9c/dinov2/thirdparty/CLIP/LICENSE"
+      }
+    ]
   }
 }
