@@ -47,7 +47,7 @@ def execution_identity(folder, manifest=None, config=None):
     schema = manifest.get('schema')
     if schema == 'steering_cohort_v1':
         expected_job_id = output.name
-    elif schema == 'steering_cohort_v2':
+    elif schema in ('steering_cohort_v2', 'pi05_vls_cohort_v1'):
         expected_job_id = original.name
     else:
         raise ValueError('Unsupported original cohort schema')
@@ -67,6 +67,10 @@ def expected_assets(folder, manifest=None, config=None):
         raise ValueError('Frozen asset manifest hash mismatch')
     task_hash = read_json(asset_file)['files'][TASK_MAP]
     if isinstance(task_hash, dict): task_hash = task_hash['sha256']
+    if manifest.get('schema') == 'pi05_vls_cohort_v1':
+        if config['main'].get('episode_rng_fixture_manifest') is not None:
+            raise ValueError('PI05 protocol does not restore RDT RNG fixtures')
+        return {'task_map': task_hash}, {'task_map': Path(environment['libero']['root'])/TASK_MAP}
     rng_hash = config['main']['episode_rng_fixture_manifest_sha256']
     if environment['rng']['sha256'] != rng_hash:
         raise ValueError('Recorded RNG/config hash mismatch')

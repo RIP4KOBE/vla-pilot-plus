@@ -680,6 +680,10 @@ class Main:
             preprocessor_overrides = {
                 "device_processor": {"device": str(self.policy.config.device)},
             }
+            if policy_type == 'pi05' and type_config.get('tokenizer_path'):
+                preprocessor_overrides['tokenizer_processor'] = {
+                    'tokenizer_name': str(type_config['tokenizer_path']),
+                }
             self.policy_preprocessor, self.policy_postprocessor = make_pre_post_processors(
                 policy_cfg=self.policy.config,
                 pretrained_path=pretrained_path,

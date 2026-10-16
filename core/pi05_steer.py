@@ -10,6 +10,9 @@ to add steering capabilities.
 from collections import deque
 from collections.abc import Callable
 from typing import List, Optional, Union
+from pathlib import Path
+import json
+import math
 import numpy as np
 import torch
 from torch import Tensor
@@ -30,6 +33,43 @@ class PI05PolicySteer(PI05Policy):
     """
     
     name = "pi05_steer"
+
+    @classmethod
+    def from_pretrained(cls, pretrained_name_or_path, **kwargs):
+        """Load a complete local checkpoint, failing on missing or incompatible weights.
+
+        The pinned upstream PI05 loader catches loading errors and can return an
+        uninitialized model. Evaluation must never accept that fallback. Eager
+        inference avoids an unrecorded compiler cache in this baseline.
+        """
+        from lerobot.configs.policies import PreTrainedConfig
+        from safetensors.torch import load_file
+        from safetensors import safe_open
+        path = Path(pretrained_name_or_path).expanduser().resolve()
+        if not path.is_dir() or not (path / "model.safetensors").is_file():
+            raise ValueError("PI05 requires a verified local checkpoint directory")
+        if kwargs:
+            raise ValueError(f"Unsupported PI05 checkpoint overrides: {sorted(kwargs)}")
+        config = PreTrainedConfig.from_pretrained(str(path), local_files_only=True)
+        config.compile_model = False
+        model = cls(config)
+        state = load_file(str(path / "model.safetensors"), device="cpu")
+        # safetensors omits shared storage. Restore only aliases declared by the
+        # file AND tied to the same actual Parameter in this architecture.
+        parameters = dict(model.named_parameters(remove_duplicate=False))
+        with safe_open(path / "model.safetensors", framework="pt") as file:
+            aliases = file.metadata() or {}
+        restored = {}
+        for target in model.state_dict().keys() - state.keys():
+            source = aliases.get(target)
+            if source in state and target in parameters and parameters[target] is parameters.get(source):
+                state[target] = state[source]
+                restored[target] = source
+        model.load_state_dict(state, strict=True)
+        model._checkpoint_load = dict(strict=True, keys=len(state), compile_model=False,
+                                      checkpoint=str(path), restored_tied_aliases=restored)
+        del state
+        return model
     
     def __init__(self, config):
         super().__init__(config)
@@ -41,6 +81,27 @@ class PI05PolicySteer(PI05Policy):
         self._stage_init_reward = None
         self._last_normalized_reward = 0.0
         self._last_scale = 0.0
+        self._reset_compute()
+        self._metrics_path = None
+        denoise = self.model.denoise_step
+
+        def counted_denoise(*args, **kwargs):
+            samples = kwargs.get("x_t", args[2] if len(args) > 2 else None)
+            self._episode_compute["model_forward_calls"] += 1
+            self._episode_compute["model_batch_rows"] += int(samples.shape[0])
+            return denoise(*args, **kwargs)
+
+        self.model.denoise_step = counted_denoise
+
+    def _reset_compute(self):
+        self._episode_compute = dict(model_forward_calls=0, model_batch_rows=0,
+                                     guided_chunks=0, unguided_chunks=0,
+                                     reward_gradient_calls=0, rbf_gradient_calls=0)
+        self._chunk_index = 0
+
+    def get_episode_compute_counters(self):
+        """Velocity-model calls and input batch rows; not RDT DiT counters."""
+        return dict(self._episode_compute)
     
     def post_init(
         self,
@@ -55,6 +116,7 @@ class PI05PolicySteer(PI05Policy):
         self._sample_batch_size = sample_batch_size
         self._inference_steps = policy_config['num_inference_steps']
         self._action_chunk_horizon = policy_config['action_chunk_horizon']
+        self._metrics_path = policy_config.get('metrics_path')
     
     def reset(self):
         """Reset policy state for new episode."""
@@ -62,6 +124,7 @@ class PI05PolicySteer(PI05Policy):
         self._stage_init_reward = None
         self._last_normalized_reward = 0.0
         self._last_scale = 0.0
+        self._reset_compute()
     
     def reset_stage(self):
         """Reset stage-specific state (call when stage changes)."""
@@ -108,7 +171,19 @@ class PI05PolicySteer(PI05Policy):
         # on CUDA 11.8 which doesn't handle the mismatch implicitly.
         with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
             if generate_new_chunk:
+                self._chunk_metrics = dict(
+                    schema="pi05_vls_chunk_v1", chunk_id=self._chunk_index,
+                    task_id=int(self._adapter.get_task_info()['task_id']),
+                    global_step=int(global_step), stage=int(current_stage),
+                    guidance=bool(use_guidance and guidance_fns),
+                    reward_gradient_attempts=0, reward_gradient_applied=0,
+                    reward_gradient_unavailable=0, rbf_gradient_attempts=0,
+                    rbf_gradient_applied=0, fkd=None,
+                    checkpoint_load=dict(getattr(self, '_checkpoint_load', {})),
+                )
+                before = self.get_episode_compute_counters()
                 if use_guidance and guidance_fns:
+                    self._episode_compute['guided_chunks'] += 1
                     action_chunk = self._sample_actions_guided(
                         batch=batch,
                         keypoints=keypoints,
@@ -126,9 +201,28 @@ class PI05PolicySteer(PI05Policy):
                         sigmoid_x0=sigmoid_x0,
                     )
                 else:
+                    self._episode_compute['unguided_chunks'] += 1
                     action_chunk = self.predict_action_chunk(batch)
 
                 self._cached_action_chunk = action_chunk
+                self._chunk_metrics.update(
+                    sample_batch_size=int(action_chunk.shape[0]),
+                    returned_horizon=int(action_chunk.shape[1]),
+                    execution_horizon=int(self._action_chunk_horizon),
+                    executed_candidate_index=0,
+                    finite=bool(torch.isfinite(action_chunk).all()),
+                    compute_delta={k: v-before[k] for k,v in self._episode_compute.items()},
+                    stage_reward_source="pi05_gradient_reward_normalization",
+                    stage_reward=float(self._last_normalized_reward),
+                )
+                if not self._chunk_metrics['finite']:
+                    raise RuntimeError("Nonfinite PI05 action chunk")
+                if self._metrics_path:
+                    path = Path(self._metrics_path)
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    with path.open('a') as file:
+                        file.write(json.dumps(self._chunk_metrics, sort_keys=True) + '\n')
+                self._chunk_index += 1
             else:
                 action_chunk = self._cached_action_chunk
 
@@ -286,6 +380,8 @@ class PI05PolicySteer(PI05Policy):
             step_idx += 1
 
         # Use the final reward of the first chunk as baseline for normalization
+        if fkd is not None:
+            self._chunk_metrics['fkd'] = fkd.get_diagnostics()
         if reward_history and self._stage_init_reward is None:
             final_reward = reward_history[-1][1]  # Last step's reward
             self._stage_init_reward = final_reward
@@ -304,14 +400,14 @@ class PI05PolicySteer(PI05Policy):
             traj = self._sample_to_trajectory_3d(x0_preds)[:, 1:self._action_chunk_horizon, :3]
             rewards = []
             for b in range(traj.shape[0]):
-                try:
-                    if isinstance(guidance_fn, list):
-                        r = sum(fn(keypoints_tensor, traj[b:b+1]) for fn in guidance_fn)
-                    else:
-                        r = guidance_fn(keypoints_tensor, traj[b:b+1])
-                    rewards.append(float(r.item()) if hasattr(r, 'item') else float(r))
-                except Exception:
-                    rewards.append(0.0)
+                if isinstance(guidance_fn, list):
+                    r = sum(fn(keypoints_tensor, traj[b:b+1]) for fn in guidance_fn)
+                else:
+                    r = guidance_fn(keypoints_tensor, traj[b:b+1])
+                value = float(r.item()) if hasattr(r, 'item') else float(r)
+                if not math.isfinite(value):
+                    raise RuntimeError("Nonfinite PI05 FKD reward")
+                rewards.append(value)
             return torch.tensor(rewards, device=device, dtype=torch.float32)
         
         return FKD(
@@ -320,12 +416,15 @@ class PI05PolicySteer(PI05Policy):
             num_particles=bsize,
             adaptive_resampling=fkd_config.get('adaptive_resampling', True),
             resample_frequency=fkd_config.get('resample_frequency', 5),
-            resampling_t_start=int(start_time * num_steps),
-            resampling_t_end=num_steps,
-            timesteps=torch.linspace(1.0, 0.0, num_steps + 1, device=device),
+            # resample() receives integer step_idx, not the flow time in [0, 1].
+            # Keep one unique scheduler ID for every actual Euler step.
+            resampling_t_start=max(0, math.ceil((1.0-start_time)*num_steps-1e-6)),
+            resampling_t_end=num_steps-1,
+            timesteps=torch.arange(num_steps, device=device),
             reward_fn=reward_fn,
             reward_min_value=float('-inf'),
             device=device,
+            record_diagnostics=True,
         )
 
     def _sample_to_trajectory_3d(self, sample: Tensor) -> Tensor:
@@ -372,6 +471,9 @@ class PI05PolicySteer(PI05Policy):
         if not guidance_fn or self._adapter is None:
             return None, 0.0
 
+        self._episode_compute['reward_gradient_calls'] += 1
+        self._chunk_metrics['reward_gradient_attempts'] += 1
+
         try:
             with torch.enable_grad():
                 sample_grad = sample.detach().requires_grad_(True)
@@ -387,6 +489,7 @@ class PI05PolicySteer(PI05Policy):
                     reward = guidance_fn(keypoints_tensor, traj_input)
                 
                 if reward is None or not reward.requires_grad:
+                    self._chunk_metrics['reward_gradient_unavailable'] += 1
                     return None, 0.0
                 
                 if reward.dim() > 0:
@@ -400,19 +503,23 @@ class PI05PolicySteer(PI05Policy):
                 
                 if verbose:
                     log.info(f"Reward: {reward_value:.4f}")
+
+                if not torch.isfinite(normalized_grad).all():
+                    raise RuntimeError("Nonfinite PI05 reward gradient")
+                self._chunk_metrics['reward_gradient_applied'] += 1
                 
                 return normalized_grad, reward_value
         except Exception as e:
-            if verbose or not hasattr(self, '_guidance_error_logged'):
-                log.warning(f"Guidance function error: {e}")
-                self._guidance_error_logged = True
-            return None, 0.0
+            raise RuntimeError("PI05 reward gradient failed; refusing silent unguided fallback") from e
 
     def _compute_diversity_gradient(self, sample: Tensor, verbose: bool = False) -> Optional[Tensor]:
         """Compute RBF diversity gradient."""
         batch_size = sample.shape[0]
         if batch_size < 2 or self._adapter is None:
             return None
+
+        self._episode_compute['rbf_gradient_calls'] += 1
+        self._chunk_metrics['rbf_gradient_attempts'] += 1
 
         with torch.enable_grad():
             sample_grad = sample.detach().requires_grad_(True)
@@ -429,5 +536,9 @@ class PI05PolicySteer(PI05Policy):
             grad_norm = torch.norm(grad)
             # Normalize to unit norm for stability
             normalized_grad = grad / (grad_norm + 1e-8) if grad_norm > 1e-8 else grad
+
+            if not torch.isfinite(normalized_grad).all():
+                raise RuntimeError("Nonfinite PI05 diversity gradient")
+            self._chunk_metrics['rbf_gradient_applied'] += 1
 
             return normalized_grad
