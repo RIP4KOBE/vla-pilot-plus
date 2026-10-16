@@ -253,7 +253,7 @@ Historical research branches are organized by the local source-directory names. 
 
 ## Documentation
 
-- **Research:** [Proposal](docs/research/research_proposal.md) · [Progress and next steps](docs/research/research_progress.md)
+- **Research:** [Proposal](docs/research/research_proposal.md) · [Progress and next steps](docs/research/research_progress.md) · [EDS reproduction and QD development workflow](docs/research/eds-qd-development-workflow.md)
 - **Usage:** [Installation](docs/steering/installation.md) · [Models](docs/steering/model-assets.md) · [Architecture](docs/steering/architecture.md) · [Evaluation](docs/steering/evaluation.md)
 - **Code and collaboration:** [Project Overview](docs/project_overview.md) · [Contributing](CONTRIBUTING.md) · [Agent guidance](AGENTS.md)
 - **History:** [Research branches and tags](docs/maintenance/branch-index.md) · [All documentation](docs/README.md)
@@ -266,11 +266,40 @@ Runtime commits, historical worktrees, immutable evidence, and naming migrations
 
 ## Acknowledgments and Citation
 
-VLA-Pilot++ builds on [VLS](https://github.com/Vision-Language-Steering/code) and [Robotics Diffusion Transformer](https://github.com/thu-ml/RoboticsDiffusionTransformer), with evaluation based on LIBERO and the pinned ObjectSwap assets. The RDT adaptation, EDS/QD mechanisms, and current online control protocol are defined by this repository; its results should not be attributed to the upstream VLS evaluation.
+VLA-Pilot++ extends the evolutionary diffusion steering direction of **VLA-Pilot (EDS)** and builds on the **VLS** codebase. These are distinct foundations: VLA-Pilot motivates inference-time evolutionary search, while VLS provides vision-language reward guidance and the original policy/control infrastructure. This repository adapts these ideas to a shared RDT steering framework and studies quality-diversity extensions.
 
-When using the upstream VLS method, cite:
+| Foundation | Paper and resources |
+| --- | --- |
+| **VLA-Pilot / EDS** — Li et al. | [Towards Deploying VLA without Fine-Tuning: Plug-and-Play Inference-Time VLA Policy Steering via Embodied Evolutionary Diffusion](https://arxiv.org/abs/2511.14178) · [Project](https://rip4kobe.github.io/vla-pilot/) |
+| **VLS** — Liu et al. | [VLS: Steering Pretrained Robot Policies via Vision-Language Models](https://arxiv.org/abs/2602.03973) · [Code](https://github.com/Vision-Language-Steering/code) |
+
+We also build on [Robotics Diffusion Transformer](https://github.com/thu-ml/RoboticsDiffusionTransformer), with evaluation based on LIBERO and the pinned ObjectSwap assets. The current RDT adaptation, RBF/EDS settings, QD implementation and online control protocol are specific to this repository. Its results are not the upstream papers' reported results.
+
+### Quality-diversity reading and resources
+
+The following reading path connects the project's QD tutorial and human–robot interaction research themes to primary publications. These are research references, not claims that all listed algorithms are implemented here.
+
+| Work | Relevance to steering research |
+| --- | --- |
+| Mouret & Clune, [Illuminating search spaces by mapping elites](https://arxiv.org/abs/1504.04909), 2015 | MAP-Elites: separate task quality from behavior descriptors and retain an elite in each niche. |
+| Chatzilygeroudis et al., [Quality-Diversity Optimization: a novel branch of stochastic optimization](https://arxiv.org/abs/2012.04322) | Survey of repertoire search, descriptors, selection and robotics applications. |
+| Fontaine et al., [Covariance Matrix Adaptation for the Rapid Illumination of Behavior Space](https://arxiv.org/abs/1912.02400), GECCO 2020 | CMA-ME: adapt search operators while maintaining a diverse archive. |
+| Fontaine & Nikolaidis, [Differentiable Quality Diversity](https://arxiv.org/abs/2106.03894), NeurIPS 2021 | Study how objective and measure gradients can guide archive search. |
+
+For implementation and teaching material, see the [QD community tutorials](https://quality-diversity.github.io/tutorials), [pyribs documentation](https://docs.pyribs.org/en/latest/) and Stefanos Nikolaidis's seminar [Towards Robust Human-Robot Interaction: A Quality Diversity Approach](https://robotics.cornell.edu/seminars/fall-2022/stefanos-nikolaidis/). The seminar concerns diverse scenario generation; adapting that idea to VLA action search remains a research question. The current default EDS+QD archive is local to an action block and has not demonstrated an advantage over EDS on the accepted ObjectSwap protocol.
+
+### Citation
+
+Please cite the relevant upstream methods when using them. The VLA-Pilot entry below identifies its public preprint; it is not a publication record for VLA-Pilot++.
 
 ```bibtex
+@article{li2025towards,
+  title={Towards Deploying VLA without Fine-Tuning: Plug-and-Play Inference-Time VLA Policy Steering via Embodied Evolutionary Diffusion},
+  author={Li, Zhuo and Liu, Junjia and Dong, Zhipeng and Teng, Tao and Rouxel, Quentin and Caldwell, Darwin and Chen, Fei},
+  journal={arXiv preprint arXiv:2511.14178},
+  year={2025}
+}
+
 @article{liu2026vls,
   title   = {VLS: Steering Pretrained Robot Policies via Vision-Language Models},
   author  = {Shuo Liu and Ishneet Sukhvinder Singh and Yiqing Xu and Jiafei Duan and Ranjay Krishna},
