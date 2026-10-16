@@ -1,6 +1,6 @@
 # Research Progress
 
-最近核对：2026-10-16（Asia/Shanghai）。本文回答当前主线完成了什么、证据支持到哪里，以及接下来如何验证 [Research Proposal](research_proposal.md) 的研究主张。代码职责和贡献入口见 [Project Overview](../project_overview.md)。受核对提交与来源映射集中在[主线核验记录](../maintenance/research-documentation-20261016.md)，不在正文维护版本流水。
+本文回答当前主线完成了什么、证据支持到哪里，以及接下来如何验证 [Research Proposal](research_proposal.md) 的研究主张。代码职责和贡献入口见 [Project Overview](../project_overview.md)。受核对提交与来源映射集中在[主线核验记录](../maintenance/research-documentation-20261016.md)，不在正文维护版本流水。
 
 ## 当前研究阶段
 

@@ -4,7 +4,7 @@
 
 VLA-Pilot++ 研究如何在完成主要任务的同时，让机器人保留多种高质量行为，以适应额外且不断变化的用户偏好、环境约束、安全风险和协作要求。核心思想是将 **quality-diversity（QD）** 引入 evolutionary diffusion steering：从寻找单一高分动作，推进到系统性地产生、维护和利用多样化的可行解集。
 
-本文按作者在 Notion「论文撰写 → 文字大纲」中 Related Work 之前的论述组织。主体是研究目标与待验证的方法主张；末尾 Future Work 是在此基础上新增的研究建议。当前实现和实验证据见 [Research Progress](research_progress.md)，工程导览见 [Project Overview](../project_overview.md)。
+当前实现和实验证据见 [Research Progress](research_progress.md)，工程导览见 [Project Overview](../project_overview.md)。
 
 ## 研究动机：任务成功之外，为什么需要多样性
 
@@ -103,12 +103,6 @@ flowchart LR
 同时报告：任务成功率、约束违反率、偏好满足程度、具有质量门槛的行为覆盖、解集质量分布、执行后的行为差异、恢复成功率与重试成本，以及模型计算量、在线调用和墙钟时间。不同描述符的覆盖率不可直接比较；QD-score 需固定质量标度、分区和空区域处理。默认设置下计算量不同的结果，与等计算对照分开解释。
 
 主要风险包括代理 reward 与操作成功错位、候选投影忽略接触动力学、低质量行为占据档案、在线判断波动、描述符与真实行为脱节，以及小样本过度归因。每轮实验应聚焦一个可反驳假设，保留合法失败与完整尝试，使用独立评估检查改进。
-
-## 研究依据与范围
-
-主要来源为作者的 Notion [VLA-Pilot++ → 论文撰写 → 文字大纲](https://app.notion.com/p/34e803e44a5c8078b11ed9e7921d0b43)：从 story、七问表和题目，至 Abstract、Intro，止于 Related Work 之前。读取日期：2026-10-16（Asia/Shanghai）。原文的多目标动机、从 steering 到 exploration 的定位、质量与描述分离、三步搜索流程和贡献结构均予以保留。
-
-“潜在风险点与思考”中的六张图片尚未取得可读内容；不据此补写作者观点。原文的预期结果、优先权表述和未定义术语按待验证主张处理；具体映射与缺口见[来源与主线核验记录](../maintenance/research-documentation-20261016.md)。下面两条 RSI 路线是新增建议，不归为原文已经提出或项目已经实现的成果。
 
 ## Future Work：Diversity-driven Agentic Recursive Self-Improvement
 
