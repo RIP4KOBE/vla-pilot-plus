@@ -2,6 +2,12 @@
 
 Runtime identities and evidence are recorded separately for each evaluation. Current module paths are documented in [architecture](architecture.md); historical branch navigation is in the [branch index](../maintenance/branch-index.md).
 
+## Public models and PI05 integration
+
+The exact RDT, T5, SigLIP and PI05 asset identities have been matched to public revisions. DINO source can be reconstructed from a fixed public commit plus a comments/indentation-only patch. PaliGemma tokenizer access is gated. See [source evidence](model-assets.md) and the [machine-readable verification summary](validation/public-models-20261016.json). PI05 uses a separate standard LIBERO Object protocol with shared Codex control; its diagnostic attempts, runtime fixes and final acceptance are tracked in the [PI05 evaluation report](pi05-evaluation.md).
+
+On 2026-10-16, remote `main` was still at `6c1e6557c6d0f34f644e711ad4afbfd0df92c290`, while accepted local `main` was five commits ahead at `dc10a15f1ecea1f47a56658638c5a03b29f6aded`. Those unpublished commits included the clean-install documentation and results; this explains the stale Proposal/Progress pages. The accepted main was first published with an ordinary push. GitHub's README, installation guide, Proposal and Progress were then fetched and verified byte-for-byte against that main. This task's PI05 implementation was developed on `codex/public-models-pi05` and evaluated at `6d713b28908e58f460c1be18a4c0f51bc9fa270c`. Its [accepted result receipt](validation/pi05-libero-object-20261016.json) binds the runtime snapshot; the subsequent documentation and Git file-handling changes do not alter that runtime. The accepted implementation and documentation are published together through the ordinary main merge/push workflow.
+
 ## Clean-environment evaluation
 
 The collaborator installation and evaluation uses runtime commit `ef74b02be6e9430e861ae6d1980a4b2641e4c716`, transferred through Git into a fresh clone originally obtained from remote main at `6c1e6557c6d0f34f644e711ad4afbfd0df92c290`. It uses a new Python environment and explicit, hash-verified Robosuite compatibility patches. All three ten-task cohorts completed: VLS 1/10, EDS 3/10, EDS+QD 0/10, with 30/30 valid episodes. Installation attempts, coverage, task outcomes, hashes, and the delivery-source comparison are recorded in the [onboarding validation report](onboarding-validation.md) and [compact evidence](validation/onboarding-20261015.json). Final documentation and dependency-recipe comments do not change the 113 frozen runtime files or effective dependency requirements. Historical scores below remain separate measurements.
@@ -35,7 +41,7 @@ The collaborator installation and evaluation uses runtime commit `ef74b02be6e943
 
 历史 P2 同轮控制的 4/10 属于另一套 provider/reward/Stage 条件；标准 `libero_object` 的无引导 9/10、VLS 7/10不属于 ObjectSwap OOD，不能据数值直接排序当前方法。
 
-以下为维护者机器上的 ignored 证据，普通 clone 不自带。仓库根目录为 `/home/hynx/lizhuo/VLA-Pilot++`，证据根为其 `.worktrees/exp/steering-integration/`；维护者可按索引交付字节副本，目前没有配置公开归档或模型包：
+以下为维护者机器上的 ignored 证据，普通 clone 不自带。仓库根目录为 `/home/hynx/lizhuo/VLA-Pilot++`，证据根为其 `.worktrees/exp/steering-integration/`；维护者可按索引交付字节副本，完整运行归档目前未公开；模型的公开固定来源现已见[资产核验与下载](model-assets.md)：
 
 - [迁移 CPU](../../.worktrees/exp/steering-integration/checks/cpu-migration.log)：1118 passed、2 warnings、82.42s；[最初干净安装报告](../../.worktrees/exp/steering-integration/pending-integration/steering-clean-install-report.md)与[验收摘要](../../.worktrees/exp/steering-integration/pending-integration/clean-install-validation-summary.json)：1118 passed、1 warning、86.53s，绑定迁移提交。
 - [公共 runtime CPU／原环境](../../.worktrees/exp/steering-integration/checks/cpu-common-framework-002.log)与[同一独立安装环境](../../.worktrees/exp/steering-integration/checks/cpu-common-framework-clean.log)：分别1403 passed、124.18s与1403 passed、124.63s。

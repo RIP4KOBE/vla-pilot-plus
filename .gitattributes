@@ -1,0 +1,3 @@
+
+# Patch context and historical payload whitespace are protected by asset hashes.
+scripts/dependency_patches/dinov2-source.patch whitespace=-blank-at-eol

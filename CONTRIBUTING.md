@@ -28,7 +28,7 @@ git push -u origin codex/my-steering-change
 
 ## 配置冻结与对照
 
-科学设置放在[共享 ObjectSwap 协议](configs/evaluation/libero_object_swap.yaml)和[方法 profile](configs/steering)。机器路径、GPU/EGL与显存选择放在 ignored `configs/local.yaml`。凭据、权重和大视频不提交；必要科学 fixture、expected manifest与来源说明随代码审阅。
+科学设置放在[共享 ObjectSwap 协议](configs/evaluation/libero_object_swap.yaml)和[方法 profile](configs/steering)。机器路径、GPU/EGL与显存选择放在 ignored `.local/*.yaml` 或 `configs/local.yaml`。凭据、权重和大视频不提交；必要科学 fixture、expected manifest与来源说明随代码审阅。
 
 每次完整 cohort 使用新目录。启动前记录假设、源码/配置、任务与seed、资产、初始化和服务参数；运行期间保持源码、profile、提示词、依赖及资产不变。保留全部成功、失败、基础设施异常和原始捕获。中断/源码漂移不自动重试，不把多轮成功拼成一个分数。
 
@@ -56,4 +56,4 @@ env -u VLA_CODEX_ONLY CUDA_VISIBLE_DEVICES='' PYTHON_DOTENV_DISABLED=1 \
 
 资产验证比较固定内容和真实加载选择。保留正常HF snapshot链接；DINO bytecode兼容边界与clean分发策略见[安装说明](docs/steering/installation.md)。权重、源码和数据的获取方式与许可分别交接。
 
-原始日志/视频保存在外部归档，Git保存小型报告、manifest和必要fixture。本次全部逐任务结果与原始证据hash保存在[随Git摘要](docs/steering/validation/final-results.json)；完整归档与精确模型包只由维护者本地持有，尚无公开分发入口。交接时给出实际可访问的副本位置、字节hash和许可边界，分别登记runtime/auditor/release身份与真正的main merge commit。后续审计器只在独立报告中重新核验原始快照，原始receipt与运行成绩的源码归属保持不变。现有[MIT LICENSE](LICENSE)与各第三方许可分别适用。
+原始日志/视频保存在外部归档，Git保存小型报告、manifest和必要fixture。本次全部逐任务结果与原始证据hash保存在[随Git摘要](docs/steering/validation/final-results.json)；完整运行归档由维护者保存；精确模型、编码器与感知资产已有[公开下载与哈希核验入口](docs/steering/model-assets.md)。交接时给出实际可访问的副本位置、字节hash和许可边界，分别登记runtime/auditor/release身份与真正的main merge commit。后续审计器只在独立报告中重新核验原始快照，原始receipt与运行成绩的源码归属保持不变。现有[MIT LICENSE](LICENSE)与各第三方许可分别适用。
