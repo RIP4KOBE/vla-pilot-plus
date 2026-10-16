@@ -62,7 +62,8 @@ def audit(folder):
         expected_rows += [r for r in read(folder/'source/scripts/steering_model_assets_manifest.json')['files'] if r['root']=='torch_home']
         check('exact_asset_receipt',env['model_assets']['valid'] is True and env['model_assets']['files']==expected_rows)
         evaluation=folder/'output/evaluation'
-        streams={name:[json.loads(line) for line in (evaluation/(name+'.jsonl')).read_text().splitlines() if line.strip()]
+        streams={name:[json.loads(line) for line in ((evaluation/(name+'.jsonl')).read_text().splitlines()
+                     if (evaluation/(name+'.jsonl')).exists() else []) if line.strip()]
                  for name in ('episode_metadata','episode_compute','pi05_metrics','stage_events')}
         identity=lambda row:(row.get('episode_id'),row.get('task_id'),row.get('episode_seed'))
         identities=[(i,t,s) for i,(t,s) in enumerate(zip(manifest['tasks'],manifest['seeds']))]
@@ -86,6 +87,8 @@ def audit(folder):
             contract=audit_run(folder,task=task,model=manifest['model'],effort=manifest['reasoning_effort'])
             valid=video_ok and task_ok and contract['task_contract_valid']
             tasks.append(dict(task_id=task,seed=manifest['seeds'][index-1],valid=valid,
+                infrastructure_error=row_compute.get('outcome') not in (None,'completed'),
+                unfinished=not bool(row_compute),
                 success=video_ok and '_success' in videos[0].name,
                 videos=[str(v.relative_to(folder)) for v in videos],chunks=len(task_metrics),
                 contract_summary=contract['summary'],
@@ -98,6 +101,7 @@ def audit(folder):
     return dict(schema='pi05_vls_audit_v1',valid=bool(checks) and all(checks.values()),
                 benchmark='libero_object',checks=checks,errors=errors,tasks=tasks,
                 successes=sum(r['success'] for r in tasks),completed=sum(r['valid'] for r in tasks),
+                planned=len(manifest.get('tasks',[])) if 'manifest' in locals() else None,
                 limitations=['Runtime mechanism counters and checkpoint loading are attestations, not independent replay.',
                              'One episode per task is a smoke benchmark, not the upstream multi-trial score.'])
 

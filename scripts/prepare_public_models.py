@@ -77,6 +77,9 @@ def download(args):
     from huggingface_hub import snapshot_download
     for key in keys:
         entry=recipe['huggingface'][key]
+        for row in entry['files']:
+            target=root/key/row['path']
+            if target.exists():checked(target,row)
         print(f"{key}: {entry['repo']} @ {entry['revision']}",flush=True)
         snapshot_download(entry['repo'],revision=entry['revision'],local_dir=root/key,
                           allow_patterns=[r['path'] for r in entry['files']])
@@ -89,6 +92,8 @@ def download(args):
 def configure_pi05(args):
     from scripts.pi05_runtime import verify_assets
     from scripts.prepare_steering_assets import verify_libero, write_json
+    if args.gpu < 0 or args.egl_device_id < 0:
+        raise ValueError('GPU and EGL indices must be nonnegative')
     root=args.directory.expanduser().resolve();libero=(ROOT/'third_party/libero_pro').resolve()
     local=dict(gpu=args.gpu,egl_device_id=args.egl_device_id,allocator_limit_gib=96,
         pi05_checkpoint=str(root/'pi05_checkpoint'),pi05_tokenizer=str(root/'pi05_tokenizer'),

@@ -433,7 +433,9 @@ class PI05PolicySteer(PI05Policy):
             raise RuntimeError("Call post_init() first")
         
         device, dtype = sample.device, sample.dtype
-        actions = self._postprocessor(sample).to(device, dtype)
+        # Flow latents have max_action_dim=32; checkpoint action statistics and
+        # the environment describe only the seven real robot action dimensions.
+        actions = self._postprocessor(sample[..., :self._original_action_dim]).to(device, dtype)
         batch_size = sample.shape[0]
 
         action_transition = {"action": actions}

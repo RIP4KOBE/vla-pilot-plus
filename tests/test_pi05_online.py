@@ -67,6 +67,21 @@ def test_gradient_failure_is_not_unguided_fallback(policy_class):
         policy_class._compute_keypoint_gradient(obj,torch.ones(2,10,3),torch.zeros(1,3),broken)
 
 
+def test_padded_latents_are_unpadded_before_action_normalization(policy_class):
+    received=[]
+    def postprocess(x):
+        received.append(tuple(x.shape))
+        return x*torch.ones(7)+torch.zeros(7)
+    adapter=SimpleNamespace(delta_actions_to_ee_trajectory=lambda x:x[:,:3].cumsum(0))
+    obj=SimpleNamespace(_adapter=adapter,_postprocessor=postprocess,
+                        _original_action_dim=7,_action_chunk_horizon=10)
+    x=torch.ones(2,50,32,requires_grad=True)
+    result=policy_class._sample_to_trajectory_3d(obj,x)
+    result.sum().backward()
+    assert received==[(2,50,7)] and result.shape==(2,10,3)
+    assert x.grad[...,:3].abs().sum()>0 and x.grad[...,7:].abs().sum()==0
+
+
 def test_pi05_protocol_does_not_inherit_rdt_rng_or_swap(tmp_path):
     from scripts.pi05_runtime import load_config
     from scripts.steering_runtime import load_config as rdt_config
@@ -108,3 +123,13 @@ def test_dino_patch_does_not_change_python_ast():
     old=old.split('\nclass SwiGLUFFNFused')[0]
     new=new.split('\nclass SwiGLUFFNFused')[0]
     assert ast.dump(ast.parse(old))==ast.dump(ast.parse(new))
+
+
+def test_download_never_overwrites_existing_different_model(tmp_path,monkeypatch):
+    import scripts.prepare_public_models as assets
+    import huggingface_hub
+    p=tmp_path/'rdt_checkpoint/config.json';p.parent.mkdir();p.write_text('wrong')
+    monkeypatch.setattr(huggingface_hub,'snapshot_download',lambda *a,**k:pytest.fail('network must not run'))
+    with pytest.raises(ValueError,match='identity mismatch'):
+        assets.download(SimpleNamespace(model='rdt',directory=tmp_path))
+    assert p.read_text()=='wrong'

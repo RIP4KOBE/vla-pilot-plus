@@ -27,6 +27,7 @@ The PI05 adapter retains its existing gradient-reward normalization for Stage fe
 
 - The pinned upstream loader can catch loading errors and return a model anyway. The PI05 entrypoint now requires local verified assets, restores only safetensors-declared aliases tied to the same model Parameter, and fails on all missing or incompatible weights.
 - PI05 formerly passed float flow times to a resampler that interprets integer scheduler IDs. Resampling calls used integer step indices, so scheduled scoring could be skipped. PI05 now uses those actual Euler-step IDs. This changes the broken PI05 path; it does not change RDT's scheduler or shared FKD implementation.
+- FKD trajectory scoring now removes the policy's padded 32-dimensional latent tail before applying the seven-dimensional robot action normalizer. The first diagnostic exposed this previously masked mismatch; it is retained as an invalid engineering attempt.
 - Reward/gradient errors now fail visibly instead of silently substituting zero reward or unguided inference.
 - The local PaliGemma tokenizer is explicit. No hidden model or tokenizer download occurs during a cohort.
 - Per-chunk evidence records strict loading, model calls/batch rows, gradients, actual FKD scoring and final ordering. The audit reuses shared online-capture/reward/action checks and separately binds the PI05 protocol and assets.
